@@ -62,6 +62,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Framework\Model.cs" />
+    <Compile Include="Learning\MultinomialNaiveBayesClassifier.cs" />
     <Compile Include="Learning\PorterStemmer.cs" />
     <Compile Include="Learning\SparseVector.cs" />
     <Compile Include="Learning\Tokenizer.cs" />
