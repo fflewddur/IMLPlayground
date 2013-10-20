@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SVMPlayground.TF_IDF
+namespace IML_Playground.Learning
 {
     [Serializable]
     class SparseVector

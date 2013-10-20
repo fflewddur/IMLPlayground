@@ -50,6 +50,19 @@ namespace IML_Playground.Model
             private set { SetProperty<string>(ref _author, value); }
         }
 
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendLine(string.Format("Message ID: {0}", Id));
+            sb.AppendLine(string.Format("Original group: {0}", OriginalGroup));
+            sb.AppendLine(string.Format("Author: {0}", Author));
+            sb.AppendLine(string.Format("Subject: {0}", Subject));
+            sb.AppendLine(Body);
+
+            return sb.ToString();
+        }
+
         public static NewsItem CreateFromStream(Stream stream, string fullName)
         {
             NewsItem item = null;

@@ -1,4 +1,5 @@
-﻿using IML_Playground.Model;
+﻿using IML_Playground.Learning;
+using IML_Playground.Model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -18,9 +19,11 @@ namespace IML_Playground
             Stopwatch watch = new Stopwatch();
             watch.Start();
             NewsCollection train = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "20news-bydate-train.zip"));
+            Vocabulary vocab = train.BuildVocabulary();
             watch.Stop();
             TimeSpan ts = watch.Elapsed;
             Console.WriteLine("Elapsed time: {0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
+            Console.WriteLine("Memory usage: {0:.00} MB", GC.GetTotalMemory(true) / 1024.0 / 1024.0);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
         }

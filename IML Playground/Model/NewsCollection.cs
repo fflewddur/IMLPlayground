@@ -1,4 +1,5 @@
 ﻿using IML_Playground.Framework;
+using IML_Playground.Learning;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +13,31 @@ namespace IML_Playground.Model
 {
     class NewsCollection : Collection<NewsItem>
     {
+        public Vocabulary BuildVocabulary()
+        {
+            //Parallel.ForEach(this, item =>
+            //{
+            //    HashSet<string> tokens = Tokenizer.Tokenize(item.Body);
+            //    tokens.UnionWith(Tokenizer.Tokenize(item.Subject));
+            //});
+            HashSet<string> tokens = new HashSet<string>();
+            foreach (NewsItem item in this)
+            {
+                tokens.UnionWith(Tokenizer.Tokenize(item.Body));
+                tokens.UnionWith(Tokenizer.Tokenize(item.Subject));
+            }
+
+            foreach (string token in tokens)
+            {
+                Console.WriteLine("'{0}'", token);
+            }
+
+            Vocabulary vocab = new Vocabulary();
+            vocab.AddTokens(tokens);
+
+            return vocab;
+        }
+
         public static NewsCollection CreateFromZip(string path)
         {
             NewsCollection nc = new NewsCollection();

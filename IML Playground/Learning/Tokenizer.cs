@@ -6,20 +6,22 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace SVMPlayground.TF_IDF
+namespace IML_Playground.Learning
 {
     [Serializable]
     class Tokenizer
     {
-        private static Regex _regexWordBoundaries;
-        private static Regex _regexWhitespace;
-        private static Regex _regexAlphaNumeric;
-        private static Regex _regexNumericOnly;
-        private static HashSet<string> _stopWords;
+        private static readonly Regex _regexWordBoundaries;
+        private static readonly Regex _regexWhitespace;
+        private static readonly Regex _regexAlphaNumeric;
+        private static readonly Regex _regexNumericOnly;
+        private static readonly HashSet<string> _stopWords;
+        private static readonly char[] WordSeparators = { ' ', '\t', ',', '.', '!', '?', ';', ':', '"', '\'', '(', ')', '[', ']', '<', '>', '\r', '\n' };
 
         const int MAX_TOKEN_LENGTH = 128;
         const int MIN_TOKEN_LENGTH = 3;
         const string STOPWORDS_FILENAME = "stopwords.txt";
+
 
         static Tokenizer()
         {
@@ -36,34 +38,62 @@ namespace SVMPlayground.TF_IDF
                 _stopWords.Add(word);
         }
 
-        public static HashSet<string> Tokenize(string text)
+        public static IEnumerable<string> Tokenize(string text)
         {
             return Tokenize(text, MIN_TOKEN_LENGTH);
         }
 
-        // Break @text into tokens on word boundaries. Eliminate whitespace and only include words of length @minLength or greater.
-        public static HashSet<string> Tokenize(string text, int minLength)
+        /// <summary>
+        /// Break input into tokens on word boundaries. Eliminate whitespace and only include words of minLength or greater.
+        /// </summary>
+        /// <param name="text">The input text to tokenize.</param>
+        /// <param name="minLength">The minimum token length.</param>
+        /// <returns>An enumerable collection of string tokens.</returns>
+        public static IEnumerable<string> Tokenize(string text, int minLength)
         {
             HashSet<string> tokens = new HashSet<string>();
 
-            string[] tempTokens = _regexWordBoundaries.Split(text);
+            string[] tempTokens = text.Split(Tokenizer.WordSeparators, StringSplitOptions.RemoveEmptyEntries);
 
             foreach (string token in tempTokens)
             {
                 string t = token.ToLowerInvariant();
-                t = _regexWhitespace.Replace(t, @"");
 
-                if (t.Length >= minLength && t.Length <= MAX_TOKEN_LENGTH && 
-                    !_stopWords.Contains(t) &&
-                    _regexAlphaNumeric.IsMatch(t) &&
-                    !_regexNumericOnly.IsMatch(t))
+                if (t.Length >= minLength && t.Length <= MAX_TOKEN_LENGTH &&
+                    !_stopWords.Contains(t) && StringIsAlphaNumeric(t))
                 {
-                    //Console.WriteLine("Token: '{0}'", t);
+
                     tokens.Add(t);
                 }
             }
 
             return tokens;
+        }
+
+        /// <summary>
+        /// Returns true if a string contains at least one letter and no other characters except digits, '-', and '''.
+        /// </summary>
+        /// <param name="str">The string to check.</param>
+        /// <returns></returns>
+        private static bool StringIsAlphaNumeric(string str)
+        {
+            bool retval = true;
+            bool numericOnly = true;
+
+            foreach (char c in str)
+            {
+                if (Char.IsLetter(c))
+                {
+                    numericOnly = false;
+                }
+                else if (!Char.IsDigit(c) && !Char.IsPunctuation(c))
+                {
+                    retval = false;
+                    break;
+                }
+            }
+
+            return retval && !numericOnly;
         }
     }
 }

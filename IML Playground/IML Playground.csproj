@@ -72,6 +72,7 @@
     <Compile Include="Learning\PorterStemmer.cs" />
     <Compile Include="Learning\SparseVector.cs" />
     <Compile Include="Learning\Tokenizer.cs" />
+    <Compile Include="Learning\Vocabulary.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -115,9 +116,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <Resource Include="Datasets\stopwords.txt">
+    <None Include="Datasets\stopwords.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Resource>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
