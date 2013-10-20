@@ -15,10 +15,13 @@ namespace IML_Playground.Model
         private string _subject;
         private string _body;
         private string _author;
+        private Dictionary<string, int> _tokenCounts;
 
         public NewsItem()
         {
         }
+
+        #region Properties
 
         public int Id
         {
@@ -49,6 +52,19 @@ namespace IML_Playground.Model
             get { return _author; }
             private set { SetProperty<string>(ref _author, value); }
         }
+
+        public string AllText
+        {
+            get { return Subject + ' ' + Body; }
+        }
+
+        public Dictionary<string, int> TokenCounts
+        {
+            get { return _tokenCounts; }
+            set { SetProperty<Dictionary<string, int>>(ref _tokenCounts, value); }
+        }
+
+        #endregion
 
         public override string ToString()
         {
