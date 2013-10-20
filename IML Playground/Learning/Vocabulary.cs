@@ -35,6 +35,34 @@ namespace IML_Playground.Learning
 
         #region Public methods
 
+        /// <summary>
+        /// Get the number of documents a word appears in.
+        /// </summary>
+        /// <param name="wordId">The ID of the word to lookup.</param>
+        /// <returns>Number of documents wordId appears in.</returns>
+        public int GetDocFreq(int wordId)
+        {
+            int freq;
+            _documentFreqs.TryGetValue(wordId, out freq);
+            return freq;
+        }
+
+        public int GetWordId(string word)
+        {
+            int id;
+            if (!_wordsToIds.TryGetValue(word, out id))
+                id = -1;
+            return id;
+        }
+
+        public string GetWord(int id)
+        {
+            string word;
+            if (!_idsToWords.TryGetValue(id, out word))
+                word = "[NOT FOUND]";
+            return word;
+        }
+
         public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs)
         {
             foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)

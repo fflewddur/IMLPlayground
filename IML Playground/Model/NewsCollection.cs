@@ -15,6 +15,18 @@ namespace IML_Playground.Model
     class NewsCollection : Collection<NewsItem>
     {
         /// <summary>
+        /// Compute TF-IDF vectors for each item in the collection.
+        /// </summary>
+        /// <param name="vocab">Vocabulary to use.</param>
+        public void ComputeTFIDFVectors(Vocabulary vocab)
+        {
+            Parallel.ForEach(this, (item) =>
+            {
+                item.ComputeTFIDFVector(vocab, this.Count);
+            });
+        }
+
+        /// <summary>
         /// Create a Vocabulary object representing all of the tokens identified in this NewsCollection.
         /// </summary>
         /// <returns>A new Vocabulary object.</returns>

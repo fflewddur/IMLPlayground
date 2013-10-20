@@ -61,7 +61,7 @@ namespace IML_Playground.Learning
         private Dictionary<int, double> Data { get { return _data; } }
 
         // Use @vocab to print out the value associated with each key, but with the output of each key replaced by vocab[key]
-        public string ToPrettyString(Dictionary<int, string> vocab)
+        public string ToPrettyString(Vocabulary vocab)
         {
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat("Items: {0} Values: ", _data.Count);
@@ -69,7 +69,7 @@ namespace IML_Playground.Learning
             var sorted = (from entry in _data orderby entry.Value descending select entry);
             foreach (KeyValuePair<int, double> pair in sorted)
             {
-                sb.AppendFormat("{0} = {1}, ", vocab[pair.Key], pair.Value);
+                sb.AppendFormat("{0} = {1:0.00}, ", vocab.GetWord(pair.Key), pair.Value);
             }
 
             return sb.ToString();

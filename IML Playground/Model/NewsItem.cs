@@ -1,4 +1,5 @@
 ﻿using IML_Playground.Framework;
+using IML_Playground.Learning;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,7 @@ namespace IML_Playground.Model
         private string _body;
         private string _author;
         private Dictionary<string, int> _tokenCounts;
+        private SparseVector _features;
 
         public NewsItem()
         {
@@ -65,6 +67,25 @@ namespace IML_Playground.Model
         }
 
         #endregion
+
+        public void ComputeTFIDFVector(Vocabulary vocab, int nDocs)
+        {
+            SparseVector features = new SparseVector();
+
+            foreach (KeyValuePair<string, int> pair in TokenCounts)
+            {
+                int wordId = vocab.GetWordId(pair.Key);
+                if (wordId > 0) // Make sure this token was included in our vocabulary
+                {
+                    int df = vocab.GetDocFreq(wordId);
+                    double tf = Math.Log10(pair.Value + 1); // Normalized term frequency
+                    double idf = Math.Log10(nDocs / (df + 1)); // Normalized inverse document frequency
+                    features.Set(wordId, tf * idf);
+                }
+            }
+
+            _features = features;
+        }
 
         public override string ToString()
         {

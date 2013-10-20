@@ -20,6 +20,7 @@ namespace IML_Playground
             watch.Start();
             NewsCollection train = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "20news-bydate-train.zip"));
             Vocabulary vocab = train.BuildVocabulary();
+            train.ComputeTFIDFVectors(vocab);
             watch.Stop();
             TimeSpan ts = watch.Elapsed;
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);
