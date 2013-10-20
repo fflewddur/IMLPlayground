@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SVMPlayground.Framework
+namespace IML_Playground.Framework
 {
     // Abstract class to support models implementing INotifyPropertyChanged
     [Serializable]
