@@ -18,7 +18,8 @@ namespace IML_Playground.Model
         private string _body;
         private string _author;
         private Dictionary<string, int> _tokenCounts;
-        private SparseVector _features;
+        private SparseVector _featureWeights;
+        private SparseVector _featureCounts;
 
         public NewsItem()
         {
@@ -67,14 +68,26 @@ namespace IML_Playground.Model
             set { SetProperty<Dictionary<string, int>>(ref _tokenCounts, value); }
         }
 
-        public SparseVector Features
+        public SparseVector FeatureWeights
         {
-            get { return _features; }
-            private set { SetProperty<SparseVector>(ref _features, value); }
+            get { return _featureWeights; }
+            private set { SetProperty<SparseVector>(ref _featureWeights, value); }
+        }
+
+        public SparseVector FeatureCounts
+        {
+            get { return _featureCounts; }
+            private set { SetProperty<SparseVector>(ref _featureCounts, value); }
         }
 
         #endregion
 
+        /// <summary>
+        /// Given a vocabulary and corpus size, compute the TF-IDF value for each vocabulary member in this document.
+        /// The values are stored in this item's FeatureWeights property.
+        /// </summary>
+        /// <param name="vocab">The vocabulary to restrict ourselves to.</param>
+        /// <param name="nDocs">Corpus size</param>
         public void ComputeTFIDFVector(Vocabulary vocab, int nDocs)
         {
             SparseVector features = new SparseVector();
@@ -91,7 +104,26 @@ namespace IML_Playground.Model
                 }
             }
 
-            Features = features;
+            FeatureWeights = features;
+        }
+
+        /// <summary>
+        /// Given a vocabulary, compute the number of instances of each vocabulary member in this document.
+        /// The values are stored in this item's FeatureCounts property.
+        /// </summary>
+        /// <param name="vocab">The vocabulary to restrict ourselves to.</param>
+        public void ComputeCountVector(Vocabulary vocab)
+        {
+            SparseVector features = new SparseVector();
+
+            foreach (KeyValuePair<string, int> pair in TokenCounts)
+            {
+                int wordId = vocab.GetWordId(pair.Key);
+                if (wordId > 0) // Make sure this token was included in our vocabulary
+                    features.Set(wordId, pair.Value);
+            }
+
+            FeatureCounts = features;
         }
 
         public override string ToString()

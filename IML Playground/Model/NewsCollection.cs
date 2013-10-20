@@ -15,6 +15,14 @@ namespace IML_Playground.Model
     [Serializable]
     class NewsCollection : Collection<NewsItem>
     {
+        public void ComputeFeatureVectors(Vocabulary vocab)
+        {
+            Parallel.ForEach(this, (item) =>
+            {
+                item.ComputeCountVector(vocab);
+            });
+        }
+
         /// <summary>
         /// Compute TF-IDF vectors for each item in the collection.
         /// </summary>
