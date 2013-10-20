@@ -33,5 +33,18 @@ namespace IML_Playground.Learning
                 }
             }
         }
+
+        public int Count
+        {
+            get { return _wordsToIds.Count; }
+        }
+
+        public override string ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (KeyValuePair<string, int> pair in _wordsToIds)
+                sb.Append(string.Format("{0}:{1} ", pair.Key, pair.Value));
+            return sb.ToString();
+        }
     }
 }

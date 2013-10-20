@@ -22,6 +22,7 @@ namespace IML_Playground
             Vocabulary vocab = train.BuildVocabulary();
             watch.Stop();
             TimeSpan ts = watch.Elapsed;
+            Console.WriteLine("Vocabulary size: {0}", vocab.Count);
             Console.WriteLine("Elapsed time: {0:00}:{1:00}:{2:00}.{3:00}", ts.Hours, ts.Minutes, ts.Seconds, ts.Milliseconds);
             Console.WriteLine("Memory usage: {0:.00} MB", GC.GetTotalMemory(true) / 1024.0 / 1024.0);
             Console.WriteLine("Press any key to continue...");
