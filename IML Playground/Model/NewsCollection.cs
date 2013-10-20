@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Model
 {
+    [Serializable]
     class NewsCollection : Collection<NewsItem>
     {
         /// <summary>

@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Model
 {
+    [Serializable]
     class NewsItem : IML_Playground.Framework.Model
     {
         private int _id;
