@@ -20,41 +20,20 @@ namespace IML_Playground.Model
         /// <returns>A new Vocabulary object.</returns>
         public Vocabulary BuildVocabulary()
         {
-            //HashSet<string>[] tokenSets = new HashSet<string>[this.Count];
             ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
 
             // Tokenize and stem each document, returning a collection of tokens and corresponding counts.
             Parallel.ForEach(this, (item, state, index) =>
             {
-                PorterStemmer stemmer = new PorterStemmer();
-                //HashSet<string> tokens = (HashSet<string>)Tokenizer.TokenizeAndStem(item.Body, stemmer);
-                //tokens.UnionWith(Tokenizer.Tokenize(item.Subject));
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
                 Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(item.AllText, stemmer) as Dictionary<string, int>;
                 item.TokenCounts = tokens;
                 foreach (KeyValuePair<string, int> pair in tokens)
                 {
-                    tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1); // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
+                    // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
+                    tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1); 
                 }
-//                tokenSets[index] = tokens;
             });
-            //HashSet<string> tokens = new HashSet<string>();
-            //int index = 0;
-            //foreach (NewsItem item in this)
-            //{
-            //    HashSet<string> tokens = (HashSet<string>)Tokenizer.Tokenize(item.Body);
-            //    tokens.UnionWith(Tokenizer.Tokenize(item.Subject));
-            //    tokenSets[index] = tokens;
-            //    index++;
-            //}
-
-            //foreach (string token in tokens)
-            //{
-            //    Console.WriteLine("'{0}'", token);
-            //}
-
-            //HashSet<string> allTokens = new HashSet<string>();
-            //foreach (HashSet<string> tokens in tokenSets)
-            //    allTokens.UnionWith(tokens);
 
             Vocabulary vocab = new Vocabulary();
             vocab.AddTokens(tokenDocCounts);
