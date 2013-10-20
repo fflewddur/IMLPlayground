@@ -18,9 +18,21 @@ namespace IML_Playground
         {
             Stopwatch watch = new Stopwatch();
             watch.Start();
-            NewsCollection train = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "20news-bydate-train.zip"));
-            Vocabulary vocab = train.BuildVocabulary();
-            train.ComputeTFIDFVectors(vocab);
+
+            // Build our vocabulary
+            NewsCollection trainAll = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "20news-bydate-train.zip"));
+            Vocabulary vocab = trainAll.BuildVocabulary();
+            trainAll.ComputeTFIDFVectors(vocab);
+
+            // Build a training set
+            NewsCollection trainHockeyBaseball = trainAll.Subset("rec.sports.baseball", "rec.sports.hockey");
+
+            // Build a test set
+            NewsCollection testHockeyBaseball = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "20news-bydate-test.zip"),
+"rec.sports.baseball", "rec.sports.hockey");
+            testHockeyBaseball.TokenizeItems();
+            testHockeyBaseball.ComputeTFIDFVectors(vocab, trainAll.Count); // Use the full training set size for computing TF-IDF weights
+
             watch.Stop();
             TimeSpan ts = watch.Elapsed;
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);

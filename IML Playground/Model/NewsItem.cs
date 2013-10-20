@@ -66,6 +66,12 @@ namespace IML_Playground.Model
             set { SetProperty<Dictionary<string, int>>(ref _tokenCounts, value); }
         }
 
+        public SparseVector Features
+        {
+            get { return _features; }
+            private set { SetProperty<SparseVector>(ref _features, value); }
+        }
+
         #endregion
 
         public void ComputeTFIDFVector(Vocabulary vocab, int nDocs)
@@ -84,7 +90,7 @@ namespace IML_Playground.Model
                 }
             }
 
-            _features = features;
+            Features = features;
         }
 
         public override string ToString()

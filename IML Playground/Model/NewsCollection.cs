@@ -18,12 +18,18 @@ namespace IML_Playground.Model
         /// Compute TF-IDF vectors for each item in the collection.
         /// </summary>
         /// <param name="vocab">Vocabulary to use.</param>
-        public void ComputeTFIDFVectors(Vocabulary vocab)
+        /// <param name="nDocs">Number of documents to use in IDF computation.</param>
+        public void ComputeTFIDFVectors(Vocabulary vocab, int nDocs)
         {
             Parallel.ForEach(this, (item) =>
             {
-                item.ComputeTFIDFVector(vocab, this.Count);
+                item.ComputeTFIDFVector(vocab, nDocs);
             });
+        }
+
+        public void ComputeTFIDFVectors(Vocabulary vocab)
+        {
+            ComputeTFIDFVectors(vocab, this.Count);
         }
 
         /// <summary>
@@ -43,7 +49,7 @@ namespace IML_Playground.Model
                 foreach (KeyValuePair<string, int> pair in tokens)
                 {
                     // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
-                    tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1); 
+                    tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1);
                 }
             });
 
@@ -54,11 +60,25 @@ namespace IML_Playground.Model
         }
 
         /// <summary>
+        /// Tokenize each item in the collection.
+        /// </summary>
+        public void TokenizeItems()
+        {
+            Parallel.ForEach(this, (item) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer();
+                Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(item.AllText, stemmer) as Dictionary<string, int>;
+                item.TokenCounts = tokens;
+            });
+        }
+
+        /// <summary>
         /// Read in a .zip file of the 20 Newsgroups dataset.
         /// </summary>
         /// <param name="path">Path to ZIP archive.</param>
+        /// <param name="groups">List of newsgroups to include, or null to include all groups.</param>
         /// <returns>A NewsCollection representing the newsgroup messages in the ZIP archive.</returns>
-        public static NewsCollection CreateFromZip(string path)
+        public static NewsCollection CreateFromZip(string path, params string[] groups)
         {
             NewsCollection nc = new NewsCollection();
 
@@ -75,9 +95,47 @@ namespace IML_Playground.Model
                     // Don't bother with directory entries
                     if (entry.FullName != null && !entry.FullName.EndsWith("/"))
                     {
-                        NewsItem item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
+                        NewsItem item = null;
+                        if (groups.Length > 0)
+                        {
+                            foreach (string group in groups) // Did we ask to include this group?
+                            {
+                                if (entry.FullName.StartsWith(group))
+                                {
+                                    item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
+                                    break;
+                                }
+                            }
+                        }
+                        else
+                            item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
+
                         if (item != null)
                             nc.Add(item);
+                    }
+                }
+            }
+
+            return nc;
+        }
+
+        /// <summary>
+        /// Create a new NewsCollection, using this one as a starting point, that only includes specified groups.
+        /// </summary>
+        /// <param name="groups">The news groups to include in the new collection.</param>
+        /// <returns>A new NewsCollection.</returns>
+        public NewsCollection Subset(params string[] groups)
+        {
+            NewsCollection nc = new NewsCollection();
+
+            foreach (NewsItem item in this)
+            {
+                foreach (string group in groups)
+                {
+                    if (item.OriginalGroup.Equals(group))
+                    {
+                        nc.Add(item);
+                        break;
                     }
                 }
             }
