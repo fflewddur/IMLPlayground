@@ -12,6 +12,8 @@ namespace IML_Playground.Learning
         private Dictionary<string, int> _wordsToIds;
         private Dictionary<int, string> _idsToWords;
 
+        const int MIN_DF = 3; // Minimum document frequency; tokens below this threshold will not be added to our vocabulary.
+
         public Vocabulary()
         {
             _nextId = 1;
@@ -19,13 +21,16 @@ namespace IML_Playground.Learning
             _idsToWords = new Dictionary<int, string>();
         }
 
-        public void AddTokens(IEnumerable<string> tokens)
+        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs)
         {
-            foreach (string token in tokens)
+            foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)
             {
-                _wordsToIds[token] = _nextId;
-                _idsToWords[_nextId] = token;
-                _nextId++;
+                if (tokenDf.Value >= MIN_DF)
+                {
+                    _wordsToIds[tokenDf.Key] = _nextId;
+                    _idsToWords[_nextId] = tokenDf.Key;
+                    _nextId++;
+                }
             }
         }
     }
