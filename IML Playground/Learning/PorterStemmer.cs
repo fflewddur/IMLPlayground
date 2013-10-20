@@ -77,13 +77,8 @@ namespace IML_Playground.Learning
           * by calling one of the various stem(something) methods.
           */
 
-        public interface StemmerInterface
-        {
-            string stemTerm(string s);
-        }
-
-        [ClassInterface(ClassInterfaceType.None)] [Serializable]
-        public class PorterStemmer : StemmerInterface
+        [Serializable]
+        public class PorterStemmer : IStemmer
         {
             private char[] b;
             private int i,     /* offset into b */
