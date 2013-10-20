@@ -11,12 +11,8 @@ namespace IML_Playground.Learning
     [Serializable]
     class Tokenizer
     {
-        private static readonly Regex _regexWordBoundaries;
-        private static readonly Regex _regexWhitespace;
-        private static readonly Regex _regexAlphaNumeric;
-        private static readonly Regex _regexNumericOnly;
         private static readonly HashSet<string> _stopWords;
-        private static readonly char[] WordSeparators = { ' ', '\t', ',', '.', '!', '?', ';', ':', '"', '\'', '(', ')', '[', ']', '<', '>', '\r', '\n' };
+        private static readonly char[] WordSeparators = { ' ', '\t', '-', '_', '@', '/', '\\', '*', '&', '^', '%', '#', '+', '|', ',', '.', '!', '?', ';', ':', '"', '\'', '(', ')', '[', ']', '<', '>', '\r', '\n' };
 
         const int MAX_TOKEN_LENGTH = 128;
         const int MIN_TOKEN_LENGTH = 3;
@@ -25,11 +21,6 @@ namespace IML_Playground.Learning
 
         static Tokenizer()
         {
-            _regexWordBoundaries = new Regex(@"\b|_", RegexOptions.Compiled); // Match word bounary characters and underscores
-            _regexWhitespace = new Regex(@"[\s_]+", RegexOptions.Compiled); // Match whitespace and underscores
-            _regexAlphaNumeric = new Regex(@"^\w+$", RegexOptions.Compiled); // Match word characters
-            _regexNumericOnly = new Regex(@"^\d+$", RegexOptions.Compiled); // Match strings containing only numbers
-
             // Read in our stopwords file
             _stopWords = new HashSet<string>();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Datasets", STOPWORDS_FILENAME);
@@ -38,10 +29,16 @@ namespace IML_Playground.Learning
                 _stopWords.Add(word);
         }
 
-        public static IEnumerable<string> Tokenize(string text)
+        public static IEnumerable<KeyValuePair<string, int>> Tokenize(string text)
         {
-            return Tokenize(text, MIN_TOKEN_LENGTH);
+            return Tokenize(text, MIN_TOKEN_LENGTH, null);
         }
+
+        public static IEnumerable<KeyValuePair<string, int>> TokenizeAndStem(string text, IStemmer stemmer)
+        {
+            return Tokenize(text, MIN_TOKEN_LENGTH, stemmer);
+        }
+
 
         /// <summary>
         /// Break input into tokens on word boundaries. Eliminate whitespace and only include words of minLength or greater.
@@ -49,9 +46,10 @@ namespace IML_Playground.Learning
         /// <param name="text">The input text to tokenize.</param>
         /// <param name="minLength">The minimum token length.</param>
         /// <returns>An enumerable collection of string tokens.</returns>
-        public static IEnumerable<string> Tokenize(string text, int minLength)
+        public static IEnumerable<KeyValuePair<string, int>> Tokenize(string text, int minLength, IStemmer stemmer)
         {
-            HashSet<string> tokens = new HashSet<string>();
+            //HashSet<string> tokens = new HashSet<string>();
+            Dictionary<string, int> tokens = new Dictionary<string, int>();
 
             string[] tempTokens = text.Split(Tokenizer.WordSeparators, StringSplitOptions.RemoveEmptyEntries);
 
@@ -62,8 +60,14 @@ namespace IML_Playground.Learning
                 if (t.Length >= minLength && t.Length <= MAX_TOKEN_LENGTH &&
                     !_stopWords.Contains(t) && StringIsAlphaNumeric(t))
                 {
-
-                    tokens.Add(t);
+                    if (stemmer != null)
+                        t = stemmer.stemTerm(t);
+                    int count;
+                    if (tokens.TryGetValue(t, out count))
+                        tokens[t] = count + 1;
+                    else
+                        tokens[t] = 1;
+                    //tokens.Add(t);
                 }
             }
 
@@ -71,7 +75,7 @@ namespace IML_Playground.Learning
         }
 
         /// <summary>
-        /// Returns true if a string contains at least one letter and no other characters except digits, '-', and '''.
+        /// Returns true if a string contains at least one letter and no other characters except digits or punctuation.
         /// </summary>
         /// <param name="str">The string to check.</param>
         /// <returns></returns>
