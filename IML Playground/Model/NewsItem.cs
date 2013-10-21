@@ -20,6 +20,7 @@ namespace IML_Playground.Model
         private Dictionary<string, int> _tokenCounts;
         private SparseVector _featureWeights;
         private SparseVector _featureCounts;
+        private Label _label;
 
         public NewsItem()
         {
@@ -55,6 +56,12 @@ namespace IML_Playground.Model
         {
             get { return _author; }
             private set { SetProperty<string>(ref _author, value); }
+        }
+
+        public Label Label
+        {
+            get { return _label; }
+            set { SetProperty<Label>(ref _label, value); }
         }
 
         public string AllText

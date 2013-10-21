@@ -27,7 +27,7 @@ namespace IML_Playground.Learning
             Vocab = vocab;
             _perClassFeatureCounts = new List<Dictionary<int, int>>();
             _perClassFeaturePriors = new List<Dictionary<int, double>>();
-            foreach (Label c in Labels)
+            foreach (Label l in Labels)
             {
                 _perClassFeatureCounts.Add(new Dictionary<int, int>());
                 _perClassFeaturePriors.Add(new Dictionary<int, double>());

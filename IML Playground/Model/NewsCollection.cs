@@ -85,9 +85,9 @@ namespace IML_Playground.Model
         /// Read in a .zip file of the 20 Newsgroups dataset.
         /// </summary>
         /// <param name="path">Path to ZIP archive.</param>
-        /// <param name="groups">List of newsgroups to include, or null to include all groups.</param>
+        /// <param name="labels">List of newsgroups to include, or null to include all groups.</param>
         /// <returns>A NewsCollection representing the newsgroup messages in the ZIP archive.</returns>
-        public static NewsCollection CreateFromZip(string path, params Label[] groups)
+        public static NewsCollection CreateFromZip(string path, params Label[] labels)
         {
             NewsCollection nc = new NewsCollection();
 
@@ -105,13 +105,14 @@ namespace IML_Playground.Model
                     if (entry.FullName != null && !entry.FullName.EndsWith("/"))
                     {
                         NewsItem item = null;
-                        if (groups.Length > 0)
+                        if (labels.Length > 0)
                         {
-                            foreach (Label group in groups) // Did we ask to include this group?
+                            foreach (Label label in labels) // Did we ask to include this group?
                             {
-                                if (entry.FullName.StartsWith(group.SystemLabel))
+                                if (entry.FullName.StartsWith(label.SystemLabel))
                                 {
                                     item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
+                                    item.Label = label;
                                     break;
                                 }
                             }
@@ -131,18 +132,19 @@ namespace IML_Playground.Model
         /// <summary>
         /// Create a new NewsCollection, using this one as a starting point, that only includes specified groups.
         /// </summary>
-        /// <param name="groups">The news groups to include in the new collection.</param>
+        /// <param name="labels">The news groups to include in the new collection.</param>
         /// <returns>A new NewsCollection.</returns>
-        public NewsCollection Subset(params Label[] groups)
+        public NewsCollection Subset(params Label[] labels)
         {
             NewsCollection nc = new NewsCollection();
 
             foreach (NewsItem item in this)
             {
-                foreach (Label group in groups)
+                foreach (Label label in labels)
                 {
-                    if (item.OriginalGroup.Equals(group.SystemLabel))
+                    if (item.OriginalGroup.Equals(label.SystemLabel))
                     {
+                        item.Label = label;
                         nc.Add(item);
                         break;
                     }
