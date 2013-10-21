@@ -68,6 +68,7 @@
     </Compile>
     <Compile Include="Framework\CollectionModel.cs" />
     <Compile Include="Framework\Model.cs" />
+    <Compile Include="Learning\Label.cs" />
     <Compile Include="Learning\IStemmer.cs" />
     <Compile Include="Learning\MultinomialNaiveBayesClassifier.cs" />
     <Compile Include="Learning\PorterStemmer.cs" />

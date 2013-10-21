@@ -24,19 +24,22 @@ namespace IML_Playground
             NewsCollection trainAll = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "20news-bydate-train.zip"));
             Vocabulary vocab = trainAll.BuildVocabulary();
             trainAll.ComputeTFIDFVectors(vocab);
+            List<Label> labels = new List<Label>();
+            labels.Add(new Label("Baseball", "rec.sports.baseball"));
+            labels.Add(new Label("Hockey", "rec.sports.hockey"));
 
             watch.Stop();
             TimeSpan tsVocab = watch.Elapsed;
 
             // Build a training set
             watch.Restart();
-            
-            NewsCollection trainHockeyBaseball = trainAll.Subset("rec.sports.baseball", "rec.sports.hockey");
+
+            NewsCollection trainHockeyBaseball = trainAll.Subset(labels.ToArray());
             trainHockeyBaseball.ComputeFeatureVectors(vocab);
 
             // Build a test set
             NewsCollection testHockeyBaseball = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "20news-bydate-test.zip"),
-"rec.sports.baseball", "rec.sports.hockey");
+                labels.ToArray());
             testHockeyBaseball.TokenizeItems();
             testHockeyBaseball.ComputeTFIDFVectors(vocab, trainAll.Count); // Use the full training set size for computing TF-IDF weights (do we even need this?)
             testHockeyBaseball.ComputeFeatureVectors(vocab);
@@ -46,6 +49,7 @@ namespace IML_Playground
 
             // Build a classifier and train it
             watch.Restart();
+            MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
             watch.Stop();
             TimeSpan tsClassifier = watch.Elapsed;
 

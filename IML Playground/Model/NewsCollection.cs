@@ -87,7 +87,7 @@ namespace IML_Playground.Model
         /// <param name="path">Path to ZIP archive.</param>
         /// <param name="groups">List of newsgroups to include, or null to include all groups.</param>
         /// <returns>A NewsCollection representing the newsgroup messages in the ZIP archive.</returns>
-        public static NewsCollection CreateFromZip(string path, params string[] groups)
+        public static NewsCollection CreateFromZip(string path, params Label[] groups)
         {
             NewsCollection nc = new NewsCollection();
 
@@ -107,9 +107,9 @@ namespace IML_Playground.Model
                         NewsItem item = null;
                         if (groups.Length > 0)
                         {
-                            foreach (string group in groups) // Did we ask to include this group?
+                            foreach (Label group in groups) // Did we ask to include this group?
                             {
-                                if (entry.FullName.StartsWith(group))
+                                if (entry.FullName.StartsWith(group.SystemLabel))
                                 {
                                     item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
                                     break;
@@ -133,15 +133,15 @@ namespace IML_Playground.Model
         /// </summary>
         /// <param name="groups">The news groups to include in the new collection.</param>
         /// <returns>A new NewsCollection.</returns>
-        public NewsCollection Subset(params string[] groups)
+        public NewsCollection Subset(params Label[] groups)
         {
             NewsCollection nc = new NewsCollection();
 
             foreach (NewsItem item in this)
             {
-                foreach (string group in groups)
+                foreach (Label group in groups)
                 {
-                    if (item.OriginalGroup.Equals(group))
+                    if (item.OriginalGroup.Equals(group.SystemLabel))
                     {
                         nc.Add(item);
                         break;
