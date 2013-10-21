@@ -12,7 +12,7 @@ namespace IML_Playground.Learning
     class Tokenizer
     {
         private static readonly HashSet<string> _stopWords;
-        private static readonly char[] WordSeparators = { ' ', '\t', '-', '_', '@', '/', '\\', '*', '&', '^', '%', '#', '+', '|', ',', '.', '!', '?', ';', ':', '"', '\'', '(', ')', '[', ']', '<', '>', '\r', '\n' };
+        private static readonly char[] WordSeparators = { ' ', '\t', '-', '_', '@', '/', '\\', '*', '&', '^', '%', '#', '+', '|', ',', '.', '!', '?', ';', ':', '"', '\'', '(', ')', '[', ']', '<', '>', '{', '}', '\r', '\n' };
 
         const int MAX_TOKEN_LENGTH = 128;
         const int MIN_TOKEN_LENGTH = 3;
