@@ -109,10 +109,11 @@ namespace IML_Playground.Model
                         {
                             foreach (Label label in labels) // Did we ask to include this group?
                             {
-                                if (entry.FullName.StartsWith(label.SystemLabel))
+                                if (entry.FullName.StartsWith(label.SystemLabel, StringComparison.InvariantCultureIgnoreCase))
                                 {
                                     item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
-                                    item.Label = label;
+                                    if (item != null)
+                                        item.Label = label;
                                     break;
                                 }
                             }
@@ -142,7 +143,7 @@ namespace IML_Playground.Model
             {
                 foreach (Label label in labels)
                 {
-                    if (item.OriginalGroup.Equals(label.SystemLabel))
+                    if (item.OriginalGroup.Equals(label.SystemLabel, StringComparison.InvariantCultureIgnoreCase))
                     {
                         item.Label = label;
                         nc.Add(item);

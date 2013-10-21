@@ -25,8 +25,8 @@ namespace IML_Playground
             Vocabulary vocab = trainAll.BuildVocabulary();
             trainAll.ComputeTFIDFVectors(vocab);
             List<Label> labels = new List<Label>();
-            labels.Add(new Label("Baseball", "rec.sports.baseball"));
-            labels.Add(new Label("Hockey", "rec.sports.hockey"));
+            labels.Add(new Label("Baseball", "rec.sport.baseball"));
+            labels.Add(new Label("Hockey", "rec.sport.hockey"));
 
             watch.Stop();
             TimeSpan tsVocab = watch.Elapsed;
@@ -50,11 +50,64 @@ namespace IML_Playground
             // Build a classifier and train it
             watch.Restart();
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
+            foreach (NewsItem item in trainHockeyBaseball)
+            {
+                classifier.AddInstance(item.Label, item.FeatureCounts);
+            }
             watch.Stop();
             TimeSpan tsClassifier = watch.Elapsed;
 
+            // Test our classifier
+            int rightHockey = 0;
+            int rightBaseball = 0;
+            int wrongHockey = 0;
+            int wrongBaseball = 0;
+            int count = 0;
+            foreach (NewsItem item in testHockeyBaseball)
+            {
+                Label prediction = classifier.PredictInstance(item.FeatureCounts);
+                if (prediction != null)
+                {
+                    if (prediction == item.Label)
+                    {
+                        switch (prediction.UserLabel)
+                        {
+                            case "Hockey":
+                                rightHockey++;
+                                break;
+                            case "Baseball":
+                                rightBaseball++;
+                                break;
+                        }
+
+                    }
+                    else
+                    {
+                        switch (prediction.UserLabel)
+                        {
+                            case "Hockey":
+                                wrongHockey++;
+                                break;
+                            case "Baseball":
+                                wrongBaseball++;
+                                break;
+                        }
+                    }
+                    Console.WriteLine("Item {0} ({1}) predicated as {2}.", item.Id, item.Label.UserLabel, prediction.UserLabel);
+                }
+                else
+                {
+                    Console.WriteLine("No prediction.");
+                }
+                count++;
+                if (count >= 1)
+                    break;
+            }
+            Console.WriteLine("Right hockey: {0}\nRight baseball: {1}\nWrong hockey: {2}\nWrong baseball: {3}\nAccuracy: {4:0.000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
+
             // Print some diagnostics
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);
+            Console.WriteLine("Training set size: {0}", trainHockeyBaseball.Count);
             Console.WriteLine("Elapsed time to build vocab: {0:00}:{1:00}:{2:00}.{3:00}", tsVocab.Hours, tsVocab.Minutes, tsVocab.Seconds, tsVocab.Milliseconds);
             Console.WriteLine("Elapsed time to build data sets: {0:00}:{1:00}:{2:00}.{3:00}", tsDatasets.Hours, tsDatasets.Minutes, tsDatasets.Seconds, tsDatasets.Milliseconds);
             Console.WriteLine("Elapsed time to train classifier: {0:00}:{1:00}:{2:00}.{3:00}", tsClassifier.Hours, tsClassifier.Minutes, tsClassifier.Seconds, tsClassifier.Milliseconds);

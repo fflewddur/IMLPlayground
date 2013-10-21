@@ -17,22 +17,26 @@ namespace IML_Playground.Learning
         // Feature vectors for each training document, per class
         private List<Label> _labels;
         private Vocabulary _vocab;
-        private List<Dictionary<int, int>> _perClassFeatureCounts;
-        private List<Dictionary<int, double>> _perClassFeaturePriors;
+        private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
+        private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
         private Dictionary<Label, List<SparseVector>> _trainingSet;
+        
+
 
         public MultinomialNaiveBayesClassifier(List<Label> labels, Vocabulary vocab)
         {
             Labels = labels;
             Vocab = vocab;
-            _perClassFeatureCounts = new List<Dictionary<int, int>>();
-            _perClassFeaturePriors = new List<Dictionary<int, double>>();
+            _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
+            _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
+            _trainingSet = new Dictionary<Label, List<SparseVector>>();
             foreach (Label l in Labels)
             {
-                _perClassFeatureCounts.Add(new Dictionary<int, int>());
-                _perClassFeaturePriors.Add(new Dictionary<int, double>());
+                _perClassFeatureCounts[l] = new Dictionary<int, int>();
+                _perClassFeaturePriors[l] = new Dictionary<int, double>();
+                _trainingSet[l] = new List<SparseVector>();
             }
-            _trainingSet = new Dictionary<Label, List<SparseVector>>();
+
         }
 
         #region Properties
@@ -53,6 +57,102 @@ namespace IML_Playground.Learning
 
         public void AddInstance(Label classification, SparseVector features)
         {
+            // TODO: handle prior values here?
+            
+            // Update our feature counts
+            foreach (KeyValuePair<int, double> pair in features.Data)
+            {
+                int count;
+                _perClassFeatureCounts[classification].TryGetValue(pair.Key, out count);
+                count += (int)pair.Value;
+                _perClassFeatureCounts[classification][pair.Key] = count;
+            }
+
+            // Store this feature vector
+            _trainingSet[classification].Add(features);
+        }
+
+        public Label PredictInstance(SparseVector features)
+        {
+            Label label = null;
+            Dictionary<Label, double> pClass = new Dictionary<Label, double>();
+
+            // Compute Pr(c)
+            int trainingSetSize = 0;
+            foreach (Label l in Labels)
+            {
+                trainingSetSize += _trainingSet[l].Count;
+                pClass[l] = 0;
+            }
+            if (trainingSetSize > 0)
+            {
+                foreach (Label l in Labels)
+                {
+                    pClass[l] = _trainingSet[l].Count / (double)trainingSetSize;
+                }
+            }
+
+            Dictionary<Label, int> featuresPerClass = new Dictionary<Label, int>();
+            Dictionary<Label, Dictionary<int, double>> pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
+            foreach (Label l in Labels)
+            {
+                pWordGivenClass[l] = new Dictionary<int, double>();
+                int count = 0;
+                foreach (int value in _perClassFeatureCounts[l].Values)
+                {
+                    count += value;
+                }
+                // Add size of vocabulary to count
+                count += Vocab.Count;
+
+                foreach (KeyValuePair<int, int> pair in _perClassFeatureCounts[l])
+                {
+                    double prior;
+                    if (!_perClassFeaturePriors[l].TryGetValue(pair.Key, out prior))
+                        prior = 1;
+                    pWordGivenClass[l][pair.Key] = (prior + pair.Value) / (double)count;
+                }
+            }
+
+            Dictionary<Label, double> pDocGivenClass = new Dictionary<Label,double>();
+            foreach (Label l in Labels)
+            {
+                pDocGivenClass[l] = 1;
+                foreach (KeyValuePair<int, double> pair in features.Data)
+                {
+                    double pWord;
+                    if (pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
+                    {
+                        pWord = Math.Pow(pWord, pair.Value);
+                        pDocGivenClass[l] *= pWord;
+                    }
+                }
+            }
+
+            double pDoc = 0;
+            foreach (Label l in Labels)
+            {
+                pDoc += (pClass[l] * pDocGivenClass[l]);
+            }
+
+            Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
+            foreach (Label l in Labels)
+            {
+                pClassGivenDoc[l] = (pClass[l] * pDocGivenClass[l]) / pDoc;
+            }
+
+            double maxP = 0;
+            foreach (Label l in Labels)
+            {
+                Console.WriteLine("Label: {0} Probability: {1:0.000}", l.UserLabel, pClassGivenDoc[l]);
+                if (pClassGivenDoc[l] > maxP)
+                {
+                    maxP = pClassGivenDoc[l];
+                    label = l;
+                }
+            }
+
+            return label;
         }
     }
 }
