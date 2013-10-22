@@ -90,6 +90,7 @@ namespace IML_Playground.Learning
                 }
             }
 
+            // Compute Pr(w|c)
             Dictionary<Label, int> featuresPerClass = new Dictionary<Label, int>();
             Dictionary<Label, Dictionary<int, double>> pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
             foreach (Label l in Labels)
@@ -101,7 +102,7 @@ namespace IML_Playground.Learning
                     count += value;
                 }
                 // Add size of vocabulary to count
-                //count += Vocab.Count;
+                count += Vocab.Count;
 
                 foreach (KeyValuePair<int, int> pair in _perClassFeatureCounts[l])
                 {
@@ -112,6 +113,7 @@ namespace IML_Playground.Learning
                 }
             }
 
+            // Compute Pr(d|c)
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label,double>();
             foreach (Label l in Labels)
             {
@@ -127,18 +129,21 @@ namespace IML_Playground.Learning
                 }
             }
 
+            // Compute Pr(d)
             double pDoc = 0;
             foreach (Label l in Labels)
             {
                 pDoc += (pClass[l] * pDocGivenClass[l]);
             }
 
+            // Compute Pr(c|d)
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
                 pClassGivenDoc[l] = (pClass[l] * pDocGivenClass[l]) / pDoc;
             }
 
+            // Find the class with the highest probability for this document
             double maxP = 0;
             foreach (Label l in Labels)
             {
