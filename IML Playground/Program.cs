@@ -58,6 +58,7 @@ namespace IML_Playground
             TimeSpan tsClassifier = watch.Elapsed;
 
             // Test our classifier
+            watch.Restart();
             int rightHockey = 0;
             int rightBaseball = 0;
             int wrongHockey = 0;
@@ -104,6 +105,8 @@ namespace IML_Playground
                 //    break;
             }
             Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
+            watch.Stop();
+            TimeSpan tsTest = watch.Elapsed;
 
             // Print some diagnostics
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);
@@ -111,6 +114,7 @@ namespace IML_Playground
             Console.WriteLine("Elapsed time to build vocab: {0:00}:{1:00}:{2:00}.{3:00}", tsVocab.Hours, tsVocab.Minutes, tsVocab.Seconds, tsVocab.Milliseconds);
             Console.WriteLine("Elapsed time to build data sets: {0:00}:{1:00}:{2:00}.{3:00}", tsDatasets.Hours, tsDatasets.Minutes, tsDatasets.Seconds, tsDatasets.Milliseconds);
             Console.WriteLine("Elapsed time to train classifier: {0:00}:{1:00}:{2:00}.{3:00}", tsClassifier.Hours, tsClassifier.Minutes, tsClassifier.Seconds, tsClassifier.Milliseconds);
+            Console.WriteLine("Elapsed time to test classifier: {0:00}:{1:00}:{2:00}.{3:00}", tsTest.Hours, tsTest.Minutes, tsTest.Seconds, tsTest.Milliseconds);
             Console.WriteLine("Memory usage: {0:.00} MB", GC.GetTotalMemory(true) / 1024.0 / 1024.0);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
