@@ -134,7 +134,14 @@ namespace IML_Playground
             watch.Restart();
 
             NewsCollection trainAll = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "simple-train.zip"));
+            foreach (NewsItem item in trainAll)
+            {
+                Console.WriteLine("Item {0}: {1}", item.Id, item.AllText);
+            }
+            Console.WriteLine();
             Vocabulary vocab = trainAll.BuildVocabulary();
+            Console.WriteLine("Vocab: {0}\n", vocab);
+
             trainAll.ComputeTFIDFVectors(vocab);
             List<Label> labels = new List<Label>();
             labels.Add(new Label("Baseball", "rec.sport.baseball"));
@@ -163,8 +170,15 @@ namespace IML_Playground
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
             foreach (NewsItem item in trainHockeyBaseball)
             {
+                Console.Write("Adding instance of {0}: ", item.Label.UserLabel);
+                foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data)
+                {
+                    Console.Write("{0}={1:0.0} ", vocab.GetWord(pair.Key), pair.Value);
+                }
+                Console.WriteLine();
                 classifier.AddInstance(item.Label, item.FeatureCounts);
             }
+            Console.WriteLine();
             watch.Stop();
             TimeSpan tsClassifier = watch.Elapsed;
 
@@ -177,6 +191,13 @@ namespace IML_Playground
             int count = 0;
             foreach (NewsItem item in testHockeyBaseball)
             {
+                Console.Write("Predicting instance of {0}: ", item.Label.UserLabel);
+                foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data)
+                {
+                    Console.Write("{0}={1:0.0} ", vocab.GetWord(pair.Key), pair.Value);
+                }
+                Console.WriteLine();
+
                 Label prediction = classifier.PredictInstance(item.FeatureCounts);
                 if (prediction != null)
                 {
@@ -215,6 +236,7 @@ namespace IML_Playground
                 //if (count >= 2)
                 //    break;
             }
+            Console.WriteLine();
             Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
             watch.Stop();
             TimeSpan tsTest = watch.Elapsed;
