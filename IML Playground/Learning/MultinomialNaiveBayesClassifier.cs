@@ -90,7 +90,7 @@ namespace IML_Playground.Learning
                 }
             }
 
-            // Compute Pr(w|c)
+            // Compute Pr(w|c) [Pr(c|w)Pr(
             Dictionary<Label, int> featuresPerClass = new Dictionary<Label, int>();
             Dictionary<Label, Dictionary<int, double>> pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
             foreach (Label l in Labels)
@@ -113,7 +113,7 @@ namespace IML_Playground.Learning
                 }
             }
 
-            // Compute Pr(d|c)
+            // Compute Pr(d|c) [take the log of this and Pr(c), shown in EQ 9]
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label,double>();
             foreach (Label l in Labels)
             {
@@ -148,6 +148,7 @@ namespace IML_Playground.Learning
             foreach (Label l in Labels)
             {
                 Console.WriteLine("Label: {0} Probability: {1:0.00000}", l.UserLabel, pClassGivenDoc[l]);
+                // These are NaN because I'm dividing by 0 somewhere, let's fix that.
                 if (pClassGivenDoc[l] > maxP)
                 {
                     maxP = pClassGivenDoc[l];
