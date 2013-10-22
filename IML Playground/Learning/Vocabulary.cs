@@ -15,7 +15,9 @@ namespace IML_Playground.Learning
         private Dictionary<int, string> _idsToWords;
         private Dictionary<int, int> _documentFreqs; // number of documents each word appears in
 
-        const int MIN_DF = 3; // Minimum document frequency; tokens below this threshold will not be added to our vocabulary.
+        const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 5% of documents
+        const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
+//        const int MIN_DF = 100; // Minimum document frequency; tokens below this threshold will not be added to our vocabulary.
 
         public Vocabulary()
         {
@@ -64,11 +66,14 @@ namespace IML_Playground.Learning
             return word;
         }
 
-        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs)
+        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs)
         {
+            int min_df = (int)(MIN_DF_PERCENT * nDocs);
+            int max_df = (int)(MAX_DF_PERCENT * nDocs);
+
             foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)
             {
-                if (tokenDf.Value >= MIN_DF)
+                if (tokenDf.Value >= min_df && tokenDf.Value < max_df)
                 {
                     _wordsToIds[tokenDf.Key] = _nextId;
                     _idsToWords[_nextId] = tokenDf.Key;

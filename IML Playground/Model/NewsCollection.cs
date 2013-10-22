@@ -63,7 +63,7 @@ namespace IML_Playground.Model
             });
 
             Vocabulary vocab = new Vocabulary();
-            vocab.AddTokens(tokenDocCounts);
+            vocab.AddTokens(tokenDocCounts, this.Count);
 
             return vocab;
         }

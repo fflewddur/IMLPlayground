@@ -93,17 +93,17 @@ namespace IML_Playground
                                 break;
                         }
                     }
-                    Console.WriteLine("Item {0} ({1}) predicated as {2}.", item.Id, item.Label.UserLabel, prediction.UserLabel);
+                    Console.WriteLine("Item {0}:\nIs about {1}, predicated as {2}.\n", item.Id, item.Label.UserLabel, prediction.UserLabel);
                 }
                 else
                 {
                     Console.WriteLine("No prediction.");
                 }
                 count++;
-                if (count >= 1)
-                    break;
+                //if (count >= 2)
+                //    break;
             }
-            Console.WriteLine("Right hockey: {0}\nRight baseball: {1}\nWrong hockey: {2}\nWrong baseball: {3}\nAccuracy: {4:0.000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
+            Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
 
             // Print some diagnostics
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);

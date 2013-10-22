@@ -20,8 +20,6 @@ namespace IML_Playground.Learning
         private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
         private Dictionary<Label, List<SparseVector>> _trainingSet;
-        
-
 
         public MultinomialNaiveBayesClassifier(List<Label> labels, Vocabulary vocab)
         {
@@ -103,7 +101,7 @@ namespace IML_Playground.Learning
                     count += value;
                 }
                 // Add size of vocabulary to count
-                count += Vocab.Count;
+                //count += Vocab.Count;
 
                 foreach (KeyValuePair<int, int> pair in _perClassFeatureCounts[l])
                 {
@@ -144,7 +142,7 @@ namespace IML_Playground.Learning
             double maxP = 0;
             foreach (Label l in Labels)
             {
-                Console.WriteLine("Label: {0} Probability: {1:0.000}", l.UserLabel, pClassGivenDoc[l]);
+                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l.UserLabel, pClassGivenDoc[l]);
                 if (pClassGivenDoc[l] > maxP)
                 {
                     maxP = pClassGivenDoc[l];
