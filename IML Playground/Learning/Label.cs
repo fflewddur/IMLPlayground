@@ -55,5 +55,10 @@ namespace IML_Playground.Learning
         }
         
         #endregion
+
+        public override string ToString()
+        {
+            return UserLabel;
+        }
     }
 }
