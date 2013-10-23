@@ -16,8 +16,8 @@ namespace IML_Playground
 
         public static void Main()
         {
-            //Test20Newsgroups();
-            TestSimple();
+            Test20Newsgroups();
+            //TestSimple();
         }
 
         private static void Test20Newsgroups()

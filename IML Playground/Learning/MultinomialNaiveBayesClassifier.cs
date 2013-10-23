@@ -96,21 +96,32 @@ namespace IML_Playground.Learning
             foreach (Label l in Labels)
             {
                 pWordGivenClass[l] = new Dictionary<int, double>();
-                int count = 0;
+                int sumFeatures = 0;
                 foreach (int value in _perClassFeatureCounts[l].Values)
                 {
-                    count += value;
+                    sumFeatures += value;
                 }
-                // Add size of vocabulary to count
-                //count += Vocab.Count;
-                Console.WriteLine("Count of features in this class: {0}", count);
-                foreach (KeyValuePair<int, int> pair in _perClassFeatureCounts[l])
+
+                // Sum up the priors
+                double sumPriors = 0;
+                foreach (int id in Vocab.FeatureIds)
                 {
                     double prior;
-                    if (!_perClassFeaturePriors[l].TryGetValue(pair.Key, out prior))
+                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = 1;
-                    pWordGivenClass[l][pair.Key] = (prior + pair.Value) / (double)count;
-                    Console.WriteLine("Pr({0}|{1}) = {2:0.000}", Vocab.GetWord(pair.Key), l.UserLabel, pWordGivenClass[l][pair.Key]);
+                    sumPriors += prior;
+                }
+
+                //Console.WriteLine("Count of features in this class: {0}", sumFeatures);
+                foreach (int id in Vocab.FeatureIds)
+                {
+                    int countFeature;
+                    _perClassFeatureCounts[l].TryGetValue(id, out countFeature);
+                    double prior;
+                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
+                        prior = 1;
+                    pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures + sumPriors);
+                    //Console.WriteLine("Pr({0}|{1}) = {2:0.000}", Vocab.GetWord(id), l.UserLabel, pWordGivenClass[l][id]);
                 }
             }
 
@@ -119,15 +130,15 @@ namespace IML_Playground.Learning
             foreach (Label l in Labels)
             {
 
-                double prob = 1;
-                // FIXME: This needs to run over entire vocab
+                double prob = 0;
                 foreach (KeyValuePair<int, double> pair in features.Data)
                 {
                     double pWord;
                     if (pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
                     {
-                        pWord = Math.Pow(pWord, pair.Value);
-                        prob *= pWord;
+//                        pWord = Math.Pow(pWord, pair.Value);
+//                        prob *= pWord;
+                        prob += (pair.Value * Math.Log10(pWord));
                     }
                 }
                 pDocGivenClass[l] = prob;
@@ -144,14 +155,17 @@ namespace IML_Playground.Learning
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
-                pClassGivenDoc[l] = (pClass[l] * pDocGivenClass[l]) / pDoc;
+                //pClassGivenDoc[l] = (pClass[l] * pDocGivenClass[l]) / pDoc;
+                pClassGivenDoc[l] = Math.Log10(pClass[l]) + pDocGivenClass[l];
             }
 
             // Find the class with the highest probability for this document
-            double maxP = 0;
+            double maxP = double.MinValue;
             foreach (Label l in Labels)
             {
-                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l.UserLabel, pClassGivenDoc[l]);
+                if (double.IsNaN(pClassGivenDoc[l]))
+                    Console.Error.WriteLine("Error: Probability for class {0} is NaN.", l);
+                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
                 // These are NaN because I'm dividing by 0 somewhere, let's fix that.
                 if (pClassGivenDoc[l] > maxP)
                 {

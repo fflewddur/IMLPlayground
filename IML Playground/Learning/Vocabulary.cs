@@ -34,6 +34,11 @@ namespace IML_Playground.Learning
             get { return _wordsToIds.Count; }
         }
 
+        public int[] FeatureIds
+        {
+            get { return _wordsToIds.Values.ToArray(); }
+        }
+
         #endregion
 
         #region Public methods
