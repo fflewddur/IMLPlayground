@@ -102,14 +102,15 @@ namespace IML_Playground.Learning
                     count += value;
                 }
                 // Add size of vocabulary to count
-                count += Vocab.Count;
-
+                //count += Vocab.Count;
+                Console.WriteLine("Count of features in this class: {0}", count);
                 foreach (KeyValuePair<int, int> pair in _perClassFeatureCounts[l])
                 {
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(pair.Key, out prior))
                         prior = 1;
                     pWordGivenClass[l][pair.Key] = (prior + pair.Value) / (double)count;
+                    Console.WriteLine("Pr({0}|{1}) = {2:0.000}", Vocab.GetWord(pair.Key), l.UserLabel, pWordGivenClass[l][pair.Key]);
                 }
             }
 
@@ -117,16 +118,19 @@ namespace IML_Playground.Learning
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label,double>();
             foreach (Label l in Labels)
             {
-                pDocGivenClass[l] = 1;
+
+                double prob = 1;
+                // FIXME: This needs to run over entire vocab
                 foreach (KeyValuePair<int, double> pair in features.Data)
                 {
                     double pWord;
                     if (pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
                     {
                         pWord = Math.Pow(pWord, pair.Value);
-                        pDocGivenClass[l] *= pWord;
+                        prob *= pWord;
                     }
                 }
+                pDocGivenClass[l] = prob;
             }
 
             // Compute Pr(d)
