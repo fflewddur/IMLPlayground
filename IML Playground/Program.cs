@@ -56,11 +56,13 @@ namespace IML_Playground
             // Build a classifier and train it
             watch.Restart();
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
+            List<Instance> instances = new List<Instance>();
             foreach (NewsItem item in trainHockeyBaseball)
             {
                 Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
-                classifier.AddInstance(instance);
+                instances.Add(instance);
             }
+            classifier.AddInstances(instances);
             watch.Stop();
             TimeSpan tsClassifier = watch.Elapsed;
 
@@ -70,7 +72,6 @@ namespace IML_Playground
             int rightBaseball = 0;
             int wrongHockey = 0;
             int wrongBaseball = 0;
-            int count = 0;
             foreach (NewsItem item in testHockeyBaseball)
             {
                 Instance instance = new Instance { Features = item.FeatureCounts };
@@ -88,7 +89,6 @@ namespace IML_Playground
                                 rightBaseball++;
                                 break;
                         }
-
                     }
                     else
                     {
@@ -102,15 +102,12 @@ namespace IML_Playground
                                 break;
                         }
                     }
-                    Console.WriteLine("Item {0}:\nIs about {1}, predicated as {2}.\n", item.Id, item.Label.UserLabel, prediction.UserLabel);
+                    //Console.WriteLine("Item {0}:\nIs about {1}, predicated as {2}.\n", item.Id, item.Label.UserLabel, prediction.UserLabel);
                 }
                 else
                 {
                     Console.WriteLine("No prediction.");
                 }
-                count++;
-                //if (count >= 2)
-                //    break;
             }
             Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
             watch.Stop();

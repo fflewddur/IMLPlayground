@@ -21,6 +21,10 @@ namespace IML_Playground.Learning
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
         private Dictionary<Label, List<SparseVector>> _trainingSet;
 
+        // Store these for efficiency
+        private Dictionary<Label, double> _pClass;
+        private Dictionary<Label, Dictionary<int, double>> _pWordGivenClass;
+
         public MultinomialNaiveBayesClassifier(List<Label> labels, Vocabulary vocab)
         {
             Labels = labels;
@@ -35,6 +39,8 @@ namespace IML_Playground.Learning
                 _trainingSet[l] = new List<SparseVector>();
             }
 
+            _pClass = new Dictionary<Label, double>();
+            _pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
         }
 
         #region Properties
@@ -53,10 +59,8 @@ namespace IML_Playground.Learning
 
         #endregion
 
-        public void AddInstance(Instance instance)
+        private void AddInstanceWithoutPrUpdates(Instance instance)
         {
-            // TODO: handle prior values here?
-            
             // Update our feature counts
             foreach (KeyValuePair<int, double> pair in instance.Features.Data)
             {
@@ -70,32 +74,106 @@ namespace IML_Playground.Learning
             _trainingSet[instance.Label].Add(instance.Features);
         }
 
+        public void AddInstance(Instance instance)
+        {
+            AddInstanceWithoutPrUpdates(instance);
+
+            // Update our probabilities for classes and words
+            ComputePrC();
+            ComputePrWGivenC();
+        }
+
+        public void AddInstances(IEnumerable<Instance> instances)
+        {
+            foreach (Instance instance in instances)
+            {
+                AddInstanceWithoutPrUpdates(instance);
+            }
+
+            // Update our probabilities for classes and words
+            ComputePrC();
+            ComputePrWGivenC();
+        }
+
         public Label PredictInstance(Instance instance)
         {
             Label label = null;
-            Dictionary<Label, double> pClass = new Dictionary<Label, double>();
 
-            // Compute Pr(c)
+            // Compute Pr(d|c) [take the log of this and Pr(c), shown in EQ 9]
+            Dictionary<Label, double> pDocGivenClass = new Dictionary<Label,double>();
+            foreach (Label l in Labels)
+            {
+                double prob = 0;
+                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
+                {
+                    double pWord;
+                    if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
+                    {
+                        prob += (pair.Value * Math.Log10(pWord));
+                    }
+                }
+                pDocGivenClass[l] = prob;
+            }
+
+            // Compute Pr(d)
+            double pDoc = 0;
+            foreach (Label l in Labels)
+            {
+                pDoc += (_pClass[l] * pDocGivenClass[l]);
+            }
+
+            // Compute Pr(c|d)
+            Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
+            foreach (Label l in Labels)
+            {
+                //pClassGivenDoc[l] = (pClass[l] * pDocGivenClass[l]) / pDoc;
+                pClassGivenDoc[l] = Math.Log10(_pClass[l]) + pDocGivenClass[l];
+            }
+
+            // Find the class with the highest probability for this document
+            double maxP = double.MinValue;
+            foreach (Label l in Labels)
+            {
+                if (double.IsNaN(pClassGivenDoc[l]))
+                    Console.Error.WriteLine("Error: Probability for class {0} is NaN.", l);
+//                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
+                // These are NaN because I'm dividing by 0 somewhere, let's fix that.
+                if (pClassGivenDoc[l] > maxP)
+                {
+                    maxP = pClassGivenDoc[l];
+                    label = l;
+                }
+            }
+
+            return label;
+        }
+
+        private void ComputePrC()
+        {
+            _pClass.Clear();
             int trainingSetSize = 0;
+
             foreach (Label l in Labels)
             {
                 trainingSetSize += _trainingSet[l].Count;
-                pClass[l] = 0;
+                _pClass[l] = 0;
             }
             if (trainingSetSize > 0)
             {
                 foreach (Label l in Labels)
                 {
-                    pClass[l] = _trainingSet[l].Count / (double)trainingSetSize;
+                    _pClass[l] = _trainingSet[l].Count / (double)trainingSetSize;
                 }
             }
+        }
 
-            // Compute Pr(w|c) [Pr(c|w)Pr(
-            Dictionary<Label, int> featuresPerClass = new Dictionary<Label, int>();
-            Dictionary<Label, Dictionary<int, double>> pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
+        private void ComputePrWGivenC()
+        {
+            _pWordGivenClass.Clear();
+
             foreach (Label l in Labels)
             {
-                pWordGivenClass[l] = new Dictionary<int, double>();
+                _pWordGivenClass[l] = new Dictionary<int, double>();
                 int sumFeatures = 0;
                 foreach (int value in _perClassFeatureCounts[l].Values)
                 {
@@ -120,61 +198,10 @@ namespace IML_Playground.Learning
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = 1;
-                    pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures + sumPriors);
+                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures + sumPriors);
                     //Console.WriteLine("Pr({0}|{1}) = {2:0.000}", Vocab.GetWord(id), l.UserLabel, pWordGivenClass[l][id]);
                 }
             }
-
-            // Compute Pr(d|c) [take the log of this and Pr(c), shown in EQ 9]
-            Dictionary<Label, double> pDocGivenClass = new Dictionary<Label,double>();
-            foreach (Label l in Labels)
-            {
-
-                double prob = 0;
-                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-                {
-                    double pWord;
-                    if (pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
-                    {
-//                        pWord = Math.Pow(pWord, pair.Value);
-//                        prob *= pWord;
-                        prob += (pair.Value * Math.Log10(pWord));
-                    }
-                }
-                pDocGivenClass[l] = prob;
-            }
-
-            // Compute Pr(d)
-            double pDoc = 0;
-            foreach (Label l in Labels)
-            {
-                pDoc += (pClass[l] * pDocGivenClass[l]);
-            }
-
-            // Compute Pr(c|d)
-            Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
-            foreach (Label l in Labels)
-            {
-                //pClassGivenDoc[l] = (pClass[l] * pDocGivenClass[l]) / pDoc;
-                pClassGivenDoc[l] = Math.Log10(pClass[l]) + pDocGivenClass[l];
-            }
-
-            // Find the class with the highest probability for this document
-            double maxP = double.MinValue;
-            foreach (Label l in Labels)
-            {
-                if (double.IsNaN(pClassGivenDoc[l]))
-                    Console.Error.WriteLine("Error: Probability for class {0} is NaN.", l);
-                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
-                // These are NaN because I'm dividing by 0 somewhere, let's fix that.
-                if (pClassGivenDoc[l] > maxP)
-                {
-                    maxP = pClassGivenDoc[l];
-                    label = l;
-                }
-            }
-
-            return label;
         }
     }
 }
