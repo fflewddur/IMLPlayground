@@ -58,7 +58,8 @@ namespace IML_Playground
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
             foreach (NewsItem item in trainHockeyBaseball)
             {
-                classifier.AddInstance(item.Label, item.FeatureCounts);
+                Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
+                classifier.AddInstance(instance);
             }
             watch.Stop();
             TimeSpan tsClassifier = watch.Elapsed;
@@ -72,7 +73,8 @@ namespace IML_Playground
             int count = 0;
             foreach (NewsItem item in testHockeyBaseball)
             {
-                Label prediction = classifier.PredictInstance(item.FeatureCounts);
+                Instance instance = new Instance { Features = item.FeatureCounts };
+                Label prediction = classifier.PredictInstance(instance);
                 if (prediction != null)
                 {
                     if (prediction == item.Label)
@@ -170,13 +172,14 @@ namespace IML_Playground
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
             foreach (NewsItem item in trainHockeyBaseball)
             {
+                Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
                 Console.Write("Adding instance of {0}: ", item.Label.UserLabel);
                 foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data)
                 {
                     Console.Write("{0}={1:0.0} ", vocab.GetWord(pair.Key), pair.Value);
                 }
                 Console.WriteLine();
-                classifier.AddInstance(item.Label, item.FeatureCounts);
+                classifier.AddInstance(instance);
             }
             Console.WriteLine();
             watch.Stop();
@@ -198,7 +201,8 @@ namespace IML_Playground
                 }
                 Console.WriteLine();
 
-                Label prediction = classifier.PredictInstance(item.FeatureCounts);
+                Instance instance = new Instance { Features = item.FeatureCounts };
+                Label prediction = classifier.PredictInstance(instance);
                 if (prediction != null)
                 {
                     if (prediction == item.Label)
@@ -233,8 +237,6 @@ namespace IML_Playground
                     Console.WriteLine("No prediction.");
                 }
                 count++;
-                //if (count >= 2)
-                //    break;
             }
             Console.WriteLine();
             Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));

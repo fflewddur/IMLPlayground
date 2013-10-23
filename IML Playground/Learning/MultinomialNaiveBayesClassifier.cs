@@ -53,24 +53,24 @@ namespace IML_Playground.Learning
 
         #endregion
 
-        public void AddInstance(Label classification, SparseVector features)
+        public void AddInstance(Instance instance)
         {
             // TODO: handle prior values here?
             
             // Update our feature counts
-            foreach (KeyValuePair<int, double> pair in features.Data)
+            foreach (KeyValuePair<int, double> pair in instance.Features.Data)
             {
                 int count;
-                _perClassFeatureCounts[classification].TryGetValue(pair.Key, out count);
+                _perClassFeatureCounts[instance.Label].TryGetValue(pair.Key, out count);
                 count += (int)pair.Value;
-                _perClassFeatureCounts[classification][pair.Key] = count;
+                _perClassFeatureCounts[instance.Label][pair.Key] = count;
             }
 
             // Store this feature vector
-            _trainingSet[classification].Add(features);
+            _trainingSet[instance.Label].Add(instance.Features);
         }
 
-        public Label PredictInstance(SparseVector features)
+        public Label PredictInstance(Instance instance)
         {
             Label label = null;
             Dictionary<Label, double> pClass = new Dictionary<Label, double>();
@@ -131,7 +131,7 @@ namespace IML_Playground.Learning
             {
 
                 double prob = 0;
-                foreach (KeyValuePair<int, double> pair in features.Data)
+                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
                 {
                     double pWord;
                     if (pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
