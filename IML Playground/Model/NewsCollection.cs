@@ -12,6 +12,9 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Model
 {
+    // TODO Add method to save ARFF file of vocab and instances
+    // TODO Add method to randomly select N item from each class (for building smaller training sets)
+
     [Serializable]
     class NewsCollection : Collection<NewsItem>
     {
