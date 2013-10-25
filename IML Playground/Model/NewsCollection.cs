@@ -12,8 +12,6 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Model
 {
-    // TODO Add method to save ARFF file of vocab and instances
-
     [Serializable]
     class NewsCollection : Collection<NewsItem>
     {

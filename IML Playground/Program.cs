@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +18,7 @@ namespace IML_Playground
 
         public static void Main()
         {
-            Test20Newsgroups(10);
+            Test20Newsgroups(50);
             //TestSimple();
         }
 
@@ -116,6 +118,18 @@ namespace IML_Playground
             Console.WriteLine("Saving ARFF files...");
             trainHockeyBaseball.SaveArffFile("trainingSet.arff", vocab, labels.ToArray());
             testHockeyBaseball.SaveArffFile("testingSet.arff", vocab, labels.ToArray());
+
+            Console.WriteLine("Serializing data objects...");
+            IFormatter formatter = new BinaryFormatter();
+            using (FileStream s = File.Create("trainingSet.bin"))
+                formatter.Serialize(s, trainHockeyBaseball);
+            using (FileStream s = File.Create("testSet.bin"))
+                formatter.Serialize(s, testHockeyBaseball);
+            using (FileStream s = File.Create("vocabulary.bin"))
+                formatter.Serialize(s, vocab);
+            using (FileStream s = File.Create("labels.bin"))
+                formatter.Serialize(s, labels);
+            
 
             // Print some diagnostics
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);
