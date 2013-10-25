@@ -16,11 +16,11 @@ namespace IML_Playground
 
         public static void Main()
         {
-            Test20Newsgroups();
+            Test20Newsgroups(10);
             //TestSimple();
         }
 
-        private static void Test20Newsgroups()
+        private static void Test20Newsgroups(int trainingSize = Int32.MaxValue)
         {
             Stopwatch watch = new Stopwatch();
 
@@ -40,7 +40,7 @@ namespace IML_Playground
             // Build a training set
             watch.Restart();
 
-            NewsCollection trainHockeyBaseball = trainAll.Subset(labels.ToArray());
+            NewsCollection trainHockeyBaseball = trainAll.Subset(trainingSize, labels.ToArray());
             trainHockeyBaseball.ComputeFeatureVectors(vocab);
 
             // Build a test set

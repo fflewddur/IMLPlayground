@@ -136,26 +136,50 @@ namespace IML_Playground.Model
         /// <summary>
         /// Create a new NewsCollection, using this one as a starting point, that only includes specified groups.
         /// </summary>
+        /// <param name="size">The max size of each group.</param>
         /// <param name="labels">The news groups to include in the new collection.</param>
         /// <returns>A new NewsCollection.</returns>
-        public NewsCollection Subset(params Label[] labels)
+        public NewsCollection Subset(int size, params Label[] labels)
         {
             NewsCollection nc = new NewsCollection();
+            Random rand = new Random();
 
-            foreach (NewsItem item in this)
+            //foreach (NewsItem item in this)
+            foreach (Label label in labels)
             {
-                foreach (Label label in labels)
+                //foreach (Label label in labels)
+                NewsCollection thisLabel = new NewsCollection();
+
+                // Get all of the items with a matching label
+                foreach (NewsItem item in this)
                 {
                     if (item.OriginalGroup.Equals(label.SystemLabel, StringComparison.InvariantCultureIgnoreCase))
                     {
                         item.Label = label;
-                        nc.Add(item);
-                        break;
+                        thisLabel.Add(item);
+                        //nc.Add(item);
+                        //break;
                     }
                 }
+
+                // Randomly remove items until the list's length is less than 'size'
+                while (thisLabel.Count > size)
+                {
+                    thisLabel.RemoveAt(rand.Next(thisLabel.Count));
+                }
+
+                // Add the items (no more than 'size') to our collection
+                foreach (NewsItem item in thisLabel)
+                    nc.Add(item);
             }
 
             return nc;
+        }
+
+        // Call Subset, but don't restrict group size
+        public NewsCollection Subset(params Label[] labels)
+        {
+            return this.Subset(Int32.MaxValue, labels);
         }
     }
 }
