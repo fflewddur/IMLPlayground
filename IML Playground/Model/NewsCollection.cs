@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 namespace IML_Playground.Model
 {
     // TODO Add method to save ARFF file of vocab and instances
-    // TODO Add method to randomly select N item from each class (for building smaller training sets)
 
     [Serializable]
     class NewsCollection : Collection<NewsItem>
@@ -180,6 +179,50 @@ namespace IML_Playground.Model
         public NewsCollection Subset(params Label[] labels)
         {
             return this.Subset(Int32.MaxValue, labels);
+        }
+
+        /// <summary>
+        /// Save a weka-compatible ARFF file of this collection.
+        /// </summary>
+        /// <param name="filePath">The location of the output file.</param>
+        /// <param name="vocab">The Vocabulary of features.</param>
+        /// <param name="labels">The collection of potential output labels.</param>
+        public async void SaveArffFile(string filePath, Vocabulary vocab, params Label[] labels)
+        {
+            using (TextWriter writer = File.CreateText(filePath))
+            {
+                await writer.WriteLineAsync(string.Format("@RELATION {0}\n", "test")); // TODO compute the relation name form labels
+                
+                // Write out each feature and its type (for us, they're all numeric)
+                foreach (int id in vocab.FeatureIds)
+                {
+                    await writer.WriteLineAsync(string.Format("@ATTRIBUTE _{0} NUMERIC", vocab.GetWord(id)));
+                }
+
+                // Write out the list of possible output labels
+                string[] classAttributeParts = new string[labels.Length];
+                for (int i = 0; i < labels.Length; i++)
+                    classAttributeParts[i] = labels[i].SystemLabel;
+                string classAttribute = string.Format("{{{0}}}", string.Join(",", classAttributeParts));
+                await writer.WriteLineAsync(string.Format("@ATTRIBUTE class {0}\n", classAttribute));
+
+                // Write out sparse vectors for each item
+                await writer.WriteLineAsync("@DATA");
+                int classIndex = vocab.Count; // the class attribute is always the last attribute
+                foreach (NewsItem item in this)
+                {
+                    string[] itemFeatures = new string[item.FeatureCounts.Data.Count + 1]; // include room for class attribute
+                    int index = 0;
+                    foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data.OrderBy(pair => pair.Key))
+                    {
+                        itemFeatures[index] = string.Format("{0} {1}", pair.Key - 1, pair.Value); // Subtract 1 because ARFF features are 0-indexed, but our are 1-indexed
+                        index++;
+                    }
+                    itemFeatures[index] = string.Format("{0} \"{1}\"", classIndex, item.Label.SystemLabel);
+                    string featureString = string.Join(", ", itemFeatures);
+                    await writer.WriteLineAsync(string.Format("{{{0}}}", featureString));
+                }
+            }
         }
     }
 }

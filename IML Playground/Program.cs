@@ -113,6 +113,10 @@ namespace IML_Playground
             watch.Stop();
             TimeSpan tsTest = watch.Elapsed;
 
+            Console.WriteLine("Saving ARFF files...");
+            trainHockeyBaseball.SaveArffFile("trainingSet.arff", vocab, labels.ToArray());
+            testHockeyBaseball.SaveArffFile("testingSet.arff", vocab, labels.ToArray());
+
             // Print some diagnostics
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);
             Console.WriteLine("Training set size: {0}", trainHockeyBaseball.Count);
@@ -235,6 +239,10 @@ namespace IML_Playground
                 }
                 count++;
             }
+
+            Console.WriteLine("Saving ARFF file...");
+            trainHockeyBaseball.SaveArffFile("test.arff", vocab, labels.ToArray());
+
             Console.WriteLine();
             Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
             watch.Stop();
