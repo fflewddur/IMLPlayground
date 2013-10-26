@@ -18,8 +18,21 @@ namespace IML_Playground
 
         public static void Main()
         {
-            Test20Newsgroups(50);
+            //TestSerializedModel();
+            Test20Newsgroups();
             //TestSimple();
+        }
+
+        private static void TestSerializedModel()
+        {
+            IFormatter formatter = new BinaryFormatter();
+            MultinomialNaiveBayesClassifier classifier;
+            NewsCollection testSet;
+            using (FileStream s = File.OpenRead("model.bin"))
+                classifier = (MultinomialNaiveBayesClassifier)formatter.Deserialize(s);
+            using (FileStream s = File.OpenRead("testSet.bin"))
+                testSet = (NewsCollection)formatter.Deserialize(s);
+            
         }
 
         private static void Test20Newsgroups(int trainingSize = Int32.MaxValue)
@@ -70,48 +83,10 @@ namespace IML_Playground
 
             // Test our classifier
             watch.Restart();
-            int rightHockey = 0;
-            int rightBaseball = 0;
-            int wrongHockey = 0;
-            int wrongBaseball = 0;
-            foreach (NewsItem item in testHockeyBaseball)
-            {
-                Instance instance = new Instance { Features = item.FeatureCounts };
-                Label prediction = classifier.PredictInstance(instance);
-                if (prediction != null)
-                {
-                    if (prediction == item.Label)
-                    {
-                        switch (prediction.UserLabel)
-                        {
-                            case "Hockey":
-                                rightHockey++;
-                                break;
-                            case "Baseball":
-                                rightBaseball++;
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        switch (prediction.UserLabel)
-                        {
-                            case "Hockey":
-                                wrongHockey++;
-                                break;
-                            case "Baseball":
-                                wrongBaseball++;
-                                break;
-                        }
-                    }
-                    //Console.WriteLine("Item {0}:\nIs about {1}, predicated as {2}.\n", item.Id, item.Label.UserLabel, prediction.UserLabel);
-                }
-                else
-                {
-                    Console.WriteLine("No prediction.");
-                }
-            }
-            Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
+            Evaluator eval = new Evaluator { Classifier = classifier };
+            IEnumerable<Instance> testInstances = testHockeyBaseball.ToInstances();
+            eval.EvaluateOnTestSet(testInstances);
+
             watch.Stop();
             TimeSpan tsTest = watch.Elapsed;
 
@@ -129,6 +104,8 @@ namespace IML_Playground
                 formatter.Serialize(s, vocab);
             using (FileStream s = File.Create("labels.bin"))
                 formatter.Serialize(s, labels);
+            using (FileStream s = File.Create("model.bin"))
+                formatter.Serialize(s, classifier);
             
 
             // Print some diagnostics
@@ -202,63 +179,15 @@ namespace IML_Playground
 
             // Test our classifier
             watch.Restart();
-            int rightHockey = 0;
-            int rightBaseball = 0;
-            int wrongHockey = 0;
-            int wrongBaseball = 0;
-            int count = 0;
-            foreach (NewsItem item in testHockeyBaseball)
-            {
-                Console.Write("Predicting instance of {0}: ", item.Label.UserLabel);
-                foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data)
-                {
-                    Console.Write("{0}={1:0.0} ", vocab.GetWord(pair.Key), pair.Value);
-                }
-                Console.WriteLine();
-
-                Instance instance = new Instance { Features = item.FeatureCounts };
-                Label prediction = classifier.PredictInstance(instance);
-                if (prediction != null)
-                {
-                    if (prediction == item.Label)
-                    {
-                        switch (prediction.UserLabel)
-                        {
-                            case "Hockey":
-                                rightHockey++;
-                                break;
-                            case "Baseball":
-                                rightBaseball++;
-                                break;
-                        }
-
-                    }
-                    else
-                    {
-                        switch (prediction.UserLabel)
-                        {
-                            case "Hockey":
-                                wrongHockey++;
-                                break;
-                            case "Baseball":
-                                wrongBaseball++;
-                                break;
-                        }
-                    }
-                    Console.WriteLine("Item {0}:\nIs about {1}, predicated as {2}.\n", item.Id, item.Label.UserLabel, prediction.UserLabel);
-                }
-                else
-                {
-                    Console.WriteLine("No prediction.");
-                }
-                count++;
-            }
+            Evaluator eval = new Evaluator { Classifier = classifier };
+            IEnumerable<Instance> testInstances = testHockeyBaseball.ToInstances();
+            eval.EvaluateOnTestSet(testInstances);
 
             Console.WriteLine("Saving ARFF file...");
             trainHockeyBaseball.SaveArffFile("test.arff", vocab, labels.ToArray());
 
             Console.WriteLine();
-            Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
+            //Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
             watch.Stop();
             TimeSpan tsTest = watch.Elapsed;
 

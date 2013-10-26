@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Learning
 {
     [Serializable]
-    class MultinomialNaiveBayesClassifier : IML_Playground.Framework.Model
+    class MultinomialNaiveBayesClassifier : IML_Playground.Framework.Model, IClassifier
     {
         // Data we need:
         // Frequency count of each feature, per class

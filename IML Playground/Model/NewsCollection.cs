@@ -15,6 +15,23 @@ namespace IML_Playground.Model
     [Serializable]
     class NewsCollection : Collection<NewsItem>
     {
+        /// <summary>
+        /// Return an enumerable collection of Instances representing the items in this collection.
+        /// </summary>
+        /// <returns>Enumerable collection of Instances.</returns>
+        public IEnumerable<Instance> ToInstances()
+        {
+            List<Instance> instances = new List<Instance>();
+
+            foreach (NewsItem item in this)
+            {
+                Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
+                instances.Add(instance);
+            }
+
+            return instances;
+        }
+
         public void ComputeFeatureVectors(Vocabulary vocab)
         {
             Parallel.ForEach(this, (item) =>
