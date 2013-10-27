@@ -86,6 +86,7 @@ namespace IML_Playground
             Evaluator eval = new Evaluator { Classifier = classifier };
             IEnumerable<Instance> testInstances = testHockeyBaseball.ToInstances();
             eval.EvaluateOnTestSet(testInstances);
+            Console.WriteLine("Weighted F1: {0:0.000}", eval.WeightedF1);
 
             watch.Stop();
             TimeSpan tsTest = watch.Elapsed;

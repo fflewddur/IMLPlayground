@@ -7,16 +7,17 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Learning
 {
-    class Evaluator
+    class Evaluator : IML_Playground.Framework.Model
     {
         IClassifier _classifier;
         int[,] _confusionMatrix;
         Dictionary<Label, int> _labelIndices; // This lets us know where each label belongs in the confusion matrix
-        double _accuracy;
+        double _f1;
 
         public Evaluator()
         {
             _labelIndices = new Dictionary<Label, int>();
+            _f1 = -1;
         }
 
         public IClassifier Classifier
@@ -33,6 +34,12 @@ namespace IML_Playground.Learning
                     index++;
                 }
             }
+        }
+
+        public double WeightedF1
+        {
+            get { return _f1; }
+            private set { SetProperty<double>(ref _f1, value); }
         }
 
         public void EvaluateOnTestSet(IEnumerable<Instance> instances)
@@ -66,13 +73,16 @@ namespace IML_Playground.Learning
             UpdateF1Weighted();
         }
 
-        private double UpdateF1Weighted()
+        private void UpdateF1Weighted()
         {
+            Dictionary<Label, double> weightedF1Scores = new Dictionary<Label, double>();
+
             foreach (KeyValuePair<Label, int> pair in _labelIndices)
             {
                 int truePositives = 0;
                 int falsePositives = 0;
                 int falseNegatives = 0;
+                int trueNegatives = 0;
 
                 for (int i = 0; i < _labelIndices.Count; i++)
                 {
@@ -84,27 +94,38 @@ namespace IML_Playground.Learning
                             falsePositives += _confusionMatrix[i, j];
                         else if (pair.Value == j) // False negatives
                             falseNegatives += _confusionMatrix[i, j];
+                        else
+                            trueNegatives += _confusionMatrix[i, j];
                     }
                 }
 
                 double recall = truePositives / (double)(truePositives + falseNegatives);
                 double precision = truePositives / (double)(truePositives + falsePositives);
                 double f1 = (2.0 * precision * recall) / (precision + recall);
-                Console.WriteLine("Label: {0} Precision: {1:0.000} Recall: {2:0.000} F1: {3:0.000} TP: {4} FP: {5} FN: {6}", pair.Key.UserLabel, precision, recall, f1, truePositives, falsePositives, falseNegatives);
+                double f1Weight = (truePositives + falseNegatives) / (double)(truePositives + trueNegatives + falsePositives + falseNegatives);
+                weightedF1Scores[pair.Key] = f1 * f1Weight;
+                //Console.WriteLine("Label: {0} Precision: {1:0.000} Recall: {2:0.000} F1: {3:0.000} F1 Weight: {7:0.000} TP: {4} FP: {5} FN: {6}", pair.Key.UserLabel, precision, recall, f1, truePositives, falsePositives, falseNegatives, f1Weight);
             }
 
-            // HACK this assumes a 2-dimensional array
-            Console.WriteLine("Confusion matrix:");
-            for (int i = 0; i < _confusionMatrix.GetLength(0); i++)
+            // Compute the single weighted F1 score
+            double f1Weighted = 0;
+            foreach (double f1 in weightedF1Scores.Values)
             {
-                for (int j = 0; j < _confusionMatrix.GetLength(1); j++)
-                {
-                    Console.Write("{0}\t", _confusionMatrix[i, j]);
-                }
-                Console.WriteLine();
+                f1Weighted += f1;
             }
-            Console.WriteLine();
-            return 0;
+            WeightedF1 = f1Weighted;
+
+            // HACK this assumes a 2-dimensional array
+            //Console.WriteLine("Confusion matrix:");
+            //for (int i = 0; i < _confusionMatrix.GetLength(0); i++)
+            //{
+            //    for (int j = 0; j < _confusionMatrix.GetLength(1); j++)
+            //    {
+            //        Console.Write("{0}\t", _confusionMatrix[i, j]);
+            //    }
+            //    Console.WriteLine();
+            //}
+            //Console.WriteLine();
         }
     }
 }
