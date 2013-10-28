@@ -1,4 +1,4 @@
-﻿using IML_Playground.Framework;
+﻿using IML_Playground.ViewModel;
 using IML_Playground.Learning;
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Model
 {
     [Serializable]
-    class NewsItem : IML_Playground.Framework.Model
+    class NewsItem : IML_Playground.ViewModel.ViewModelBase
     {
         private int _id;
         private string _originalGroup;

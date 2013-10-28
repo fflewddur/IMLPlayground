@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Learning
 {
-    class Evaluator : IML_Playground.Framework.Model
+    class Evaluator : IML_Playground.ViewModel.ViewModelBase
     {
         IClassifier _classifier;
         int[,] _confusionMatrix;

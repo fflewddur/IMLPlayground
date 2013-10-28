@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Learning
 {
     [Serializable]
-    class Instance : IML_Playground.Framework.Model
+    class Instance : IML_Playground.ViewModel.ViewModelBase
     {
         private Label _label;
         private SparseVector _features;

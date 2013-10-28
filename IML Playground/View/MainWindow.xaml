@@ -1,0 +1,47 @@
+﻿<Window x:Class="IML_Playground.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Feature Viewer" Height="550" Width="725">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Feature lists -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+        </Grid>
+
+        <!-- Summary statistics -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Confusion matrix-->
+            <UniformGrid Grid.Column="0" Rows="4" Columns="3">
+                <Label />
+                <Label ContentStringFormat="Actual {0}" Name="ActualPositive" />
+                <Label Content="Actual negative" Name="ActualNegative" />
+                <Label Content="Predicted positive" Name="PredictedPositive" />
+                <Label Name="TruePositiveCount" />
+                <Label Name="FalsePositiveCount" />
+                <Label Content="Predicted negative" Name="PredictedNegative" />
+                <Label Name="FalseNegativeCount" />
+                <Label Name="TrueNegativeCount" />
+                <Label Content="Weighted F1 score" />
+                <Label Name="F1Weighted" />
+            </UniformGrid>
+
+            <!-- Update button -->
+            <Grid Grid.Column="1">
+                <Button>Update</Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</Window>

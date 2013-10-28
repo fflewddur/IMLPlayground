@@ -6,11 +6,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Framework
+namespace IML_Playground.ViewModel
 {
     // Abstract class to support models implementing INotifyPropertyChanged
     [Serializable]
-    abstract class Model : INotifyPropertyChanged
+    abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Learning
 {
     [Serializable]
-    class Label : IML_Playground.Framework.Model
+    class Label : IML_Playground.ViewModel.ViewModelBase
     {
         private string _userLabel;
         private string _systemLabel;
