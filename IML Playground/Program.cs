@@ -12,6 +12,12 @@ using System.Threading.Tasks;
 
 namespace IML_Playground
 {
+    // TODO Add interface for extracting per-class feature counts and weights from a classifier
+    // TODO Add interface for updating per-class feature weights in a classifier
+    // TODO Build UI to display feature counts for each class
+    // TODO UI should display classifier's F1 score
+    // TODO Allow user to update feature weights from UI
+
     class Program
     {
         public const string DataDir = "Datasets";
