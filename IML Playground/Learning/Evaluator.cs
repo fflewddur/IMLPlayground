@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Learning
 {
-    class Evaluator : IML_Playground.ViewModel.ViewModelBase
+    class Evaluator
     {
         IClassifier _classifier;
         int[,] _confusionMatrix;
@@ -36,10 +36,16 @@ namespace IML_Playground.Learning
             }
         }
 
+        public int[,] ConfusionMatrix
+        {
+            get { return _confusionMatrix; }
+            private set { _confusionMatrix = value; }
+        }
+
         public double WeightedF1
         {
             get { return _f1; }
-            private set { SetProperty<double>(ref _f1, value); }
+            private set { _f1 = value; }
         }
 
         public void EvaluateOnTestSet(IEnumerable<Instance> instances)
