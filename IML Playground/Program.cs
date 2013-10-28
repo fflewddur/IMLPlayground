@@ -9,6 +9,7 @@ using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace IML_Playground
 {
@@ -22,10 +23,15 @@ namespace IML_Playground
     {
         public const string DataDir = "Datasets";
 
+        [STAThread]
         public static void Main()
         {
+            Application app = new Application();
+            MainWindow window = new MainWindow();
+            window.Show();
+            app.Run(window);
             //TestSerializedModel();
-            Test20Newsgroups();
+            //Test20Newsgroups();
             //TestSimple();
         }
 

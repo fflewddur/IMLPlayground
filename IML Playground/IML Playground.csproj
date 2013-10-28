@@ -54,21 +54,13 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </ApplicationDefinition>
     <Compile Include="Learning\Evaluator.cs" />
     <Compile Include="Learning\IClassifier.cs" />
     <Compile Include="Utilities.cs" />
-    <Page Include="MainWindow.xaml">
+    <Page Include="UI\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="Framework\CollectionModel.cs" />
     <Compile Include="Framework\Model.cs" />
     <Compile Include="Learning\Instance.cs" />
@@ -79,7 +71,7 @@
     <Compile Include="Learning\SparseVector.cs" />
     <Compile Include="Learning\Tokenizer.cs" />
     <Compile Include="Learning\Vocabulary.cs" />
-    <Compile Include="MainWindow.xaml.cs">
+    <Compile Include="UI\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
