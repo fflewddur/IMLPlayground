@@ -99,6 +99,7 @@
     <Compile Include="Learning\Tokenizer.cs" />
     <Compile Include="Learning\Vocabulary.cs" />
     <Compile Include="ViewModel\ClassifierEvaluatorViewModel.cs" />
+    <Compile Include="ViewModel\ClassifierFeaturesViewModel.cs" />
     <Compile Include="View\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

@@ -26,8 +26,19 @@ namespace IML_Playground.ViewModel
             _evaluator = evaluator;
             _testSet = instances;
 
+            if (_evaluator.Classifier.Labels.Count >= 2)
+            {
+                PositiveLabel = _evaluator.Classifier.Labels[0].UserLabel;
+                NegativeLabel = _evaluator.Classifier.Labels[1].UserLabel;
+            }
+
+            ClassifierViewModel = new ClassifierFeaturesViewModel(_evaluator.Classifier);
+            
             Retrain = new RelayCommand(PerformRetrain);
+            PerformRetrain(); // Ensure our values are up-to-date
         }
+
+        public ClassifierFeaturesViewModel ClassifierViewModel { get; private set; }
 
         public string PositiveLabel
         {
@@ -78,6 +89,14 @@ namespace IML_Playground.ViewModel
             Console.WriteLine("PerformRetrain()");
             _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
             WeightedF1 = _evaluator.WeightedF1;
+            int[,] cm = _evaluator.ConfusionMatrix;
+            if (cm.GetLength(0) == 2 && cm.GetLength(1) == 2)
+            {
+                TruePositives = cm[0, 0];
+                FalsePositives = cm[0, 1];
+                FalseNegatives = cm[1, 0];
+                TrueNegatives = cm[1, 1];
+            }
         }
     }
 }

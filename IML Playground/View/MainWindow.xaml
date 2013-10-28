@@ -9,7 +9,7 @@
         </Grid.RowDefinitions>
 
         <!-- Feature lists -->
-        <Grid Grid.Row="0">
+        <Grid Grid.Row="0" DataContext="{Binding Path=ClassifierViewModel}">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -23,20 +23,33 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <!-- Confusion matrix-->
-            <UniformGrid Grid.Column="0" Rows="4" Columns="3">
-                <Label />
-                <Label ContentStringFormat="Actual {0}" Content="{Binding PositiveLabel}" />
-                <Label ContentStringFormat="Actual {0}" Content="{Binding NegativeLabel}" />
-                <Label Content="Predicted positive" Name="PredictedPositive" />
-                <Label Name="TruePositiveCount" />
-                <Label Name="FalsePositiveCount" />
-                <Label Content="Predicted negative" Name="PredictedNegative" />
-                <Label Name="FalseNegativeCount" />
-                <Label Name="TrueNegativeCount" />
-                <Label Content="Weighted F1 score" />
-                <Label Content="{Binding WeightedF1}"/>
-            </UniformGrid>
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Confusion matrix-->
+                <UniformGrid Grid.Row="0" Rows="3" Columns="3">
+                    <Label />
+                    <Label ContentStringFormat="Actual {0}" Content="{Binding PositiveLabel}" />
+                    <Label ContentStringFormat="Actual {0}" Content="{Binding NegativeLabel}" />
+                    <Label ContentStringFormat="Predicted {0}" Content="{Binding PositiveLabel}"/>
+                    <Label Content="{Binding TruePositives}" />
+                    <Label Content="{Binding FalsePositives}" />
+                    <Label ContentStringFormat="Predicted {0}" Content="{Binding NegativeLabel}" />
+                    <Label Content="{Binding FalseNegatives}" />
+                    <Label Content="{Binding TrueNegatives}" />
+                </UniformGrid>
+
+    <!-- F1 score -->
+                <Grid Grid.Row="1">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
+                        <Label Content="Weighted F1 score:" />
+                        <Label ContentStringFormat="{}{0:0.000}" Content="{Binding WeightedF1}"/>
+                    </StackPanel>
+                </Grid>
+            </Grid>
 
             <!-- Update button -->
             <Grid Grid.Column="1">

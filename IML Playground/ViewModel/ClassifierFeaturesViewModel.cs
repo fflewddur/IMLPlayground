@@ -1,0 +1,19 @@
+﻿using IML_Playground.Learning;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace IML_Playground.ViewModel
+{
+    class ClassifierFeaturesViewModel : ViewModelBase
+    {
+        IClassifier _classifier;
+
+        public ClassifierFeaturesViewModel(IClassifier classifier)
+        {
+            _classifier = classifier;
+        }
+    }
+}
