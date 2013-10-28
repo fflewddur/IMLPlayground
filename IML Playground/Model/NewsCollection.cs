@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Model
 {
     [Serializable]
-    class NewsCollection : Collection<NewsItem>
+    class NewsCollection : Collection<NewsItem>, IInstances
     {
         /// <summary>
         /// Return an enumerable collection of Instances representing the items in this collection.

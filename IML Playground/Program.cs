@@ -1,5 +1,6 @@
 ﻿using IML_Playground.Learning;
 using IML_Playground.Model;
+using IML_Playground.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -26,13 +27,48 @@ namespace IML_Playground
         [STAThread]
         public static void Main()
         {
-            Application app = new Application();
-            MainWindow window = new MainWindow();
-            window.Show();
-            app.Run(window);
+            TestFeatureUI();
             //TestSerializedModel();
             //Test20Newsgroups();
             //TestSimple();
+        }
+
+        private static void TestFeatureUI()
+        {
+            Console.WriteLine("Loading model...");
+            MultinomialNaiveBayesClassifier classifier = LoadSerializedModel("model-simple.bin") as MultinomialNaiveBayesClassifier;
+            Evaluator evaluator = new Evaluator() { Classifier = classifier };
+            Console.WriteLine("Loading test set...");
+            NewsCollection testSet = LoadSerializedInstances("testSet-simple.bin") as NewsCollection;
+
+            Console.WriteLine("Building UI...");
+            ClassifierEvaluatorViewModel vm = new ClassifierEvaluatorViewModel(evaluator, testSet);
+
+            Application app = new Application();
+            MainWindow window = new MainWindow();
+            window.DataContext = vm;
+            window.Show();
+            app.Run(window);
+        }
+
+        private static IClassifier LoadSerializedModel(string path)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            MultinomialNaiveBayesClassifier classifier;
+            using (FileStream s = File.OpenRead(path))
+                classifier = (MultinomialNaiveBayesClassifier)formatter.Deserialize(s);
+
+            return classifier;
+        }
+
+        private static IInstances LoadSerializedInstances(string path)
+        {
+            IFormatter formatter = new BinaryFormatter();
+            NewsCollection instances;
+            using (FileStream s = File.OpenRead(path))
+                instances = (NewsCollection)formatter.Deserialize(s);
+
+            return instances;
         }
 
         private static void TestSerializedModel()
@@ -203,6 +239,19 @@ namespace IML_Playground
             //Console.WriteLine("Hockey true-positives: {0}\nBaseball true-positives: {1}\nHockey false-positives: {2}\nBaseball false-positives: {3}\nAccuracy: {4:0.0000}", rightHockey, rightBaseball, wrongHockey, wrongBaseball, (rightHockey + rightBaseball) / (double)(rightHockey + rightBaseball + wrongHockey + wrongBaseball));
             watch.Stop();
             TimeSpan tsTest = watch.Elapsed;
+
+            Console.WriteLine("Serializing data objects...");
+            IFormatter formatter = new BinaryFormatter();
+            using (FileStream s = File.Create("trainingSet.bin"))
+                formatter.Serialize(s, trainHockeyBaseball);
+            using (FileStream s = File.Create("testSet.bin"))
+                formatter.Serialize(s, testHockeyBaseball);
+            using (FileStream s = File.Create("vocabulary.bin"))
+                formatter.Serialize(s, vocab);
+            using (FileStream s = File.Create("labels.bin"))
+                formatter.Serialize(s, labels);
+            using (FileStream s = File.Create("model.bin"))
+                formatter.Serialize(s, classifier);
 
             // Print some diagnostics
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);

@@ -26,8 +26,8 @@
             <!-- Confusion matrix-->
             <UniformGrid Grid.Column="0" Rows="4" Columns="3">
                 <Label />
-                <Label ContentStringFormat="Actual {0}" Name="ActualPositive" />
-                <Label Content="Actual negative" Name="ActualNegative" />
+                <Label ContentStringFormat="Actual {0}" Content="{Binding PositiveLabel}" />
+                <Label ContentStringFormat="Actual {0}" Content="{Binding NegativeLabel}" />
                 <Label Content="Predicted positive" Name="PredictedPositive" />
                 <Label Name="TruePositiveCount" />
                 <Label Name="FalsePositiveCount" />
@@ -35,12 +35,12 @@
                 <Label Name="FalseNegativeCount" />
                 <Label Name="TrueNegativeCount" />
                 <Label Content="Weighted F1 score" />
-                <Label Name="F1Weighted" />
+                <Label Content="{Binding WeightedF1}"/>
             </UniformGrid>
 
             <!-- Update button -->
             <Grid Grid.Column="1">
-                <Button>Update</Button>
+                <Button Command="{Binding Retrain}">Retrain</Button>
             </Grid>
         </Grid>
     </Grid>
