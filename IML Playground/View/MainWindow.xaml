@@ -10,11 +10,24 @@
 
         <!-- Feature lists -->
         <Grid Grid.Row="0" DataContext="{Binding Path=ClassifierViewModel}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
+
+            <!-- Positive class features -->
+            <Label Grid.Column="0" Grid.Row="0" Content="{Binding LabelPositive.UserLabel}" />
+            <DataGrid Grid.Column="0" Grid.Row="1" ItemsSource="{Binding FeaturesPositive}" />
+
+            <!-- Negative class features -->
+            <Label Grid.Column="1" Grid.Row="0" Content="{Binding LabelNegative.UserLabel}" />
+            <DataGrid Grid.Column="1" Grid.Row="1" ItemsSource="{Binding FeaturesNegative}" />
         </Grid>
+
 
         <!-- Summary statistics -->
         <Grid Grid.Row="1">
@@ -42,7 +55,7 @@
                     <Label Content="{Binding TrueNegatives}" />
                 </UniformGrid>
 
-    <!-- F1 score -->
+                <!-- F1 score -->
                 <Grid Grid.Row="1">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
                         <Label Content="Weighted F1 score:" />

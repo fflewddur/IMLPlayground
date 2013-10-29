@@ -19,6 +19,8 @@ namespace IML_Playground
     // TODO Build UI to display feature counts for each class
     // TODO UI should display classifier's F1 score
     // TODO Allow user to update feature weights from UI
+    // TODO Figure out how make getter properties readonly
+    // TODO Figure out if we can use IEnumerable in interfaces backed by HashSets or other specific collections
 
     class Program
     {
