@@ -43,7 +43,6 @@ namespace IML_Playground.ViewModel
             {
                 FeaturesNegative.Add(feature);
             }
-
         }
     }
 }

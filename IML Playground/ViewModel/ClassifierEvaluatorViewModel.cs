@@ -87,6 +87,20 @@ namespace IML_Playground.ViewModel
         private void PerformRetrain()
         {
             Console.WriteLine("PerformRetrain()");
+
+            // Update priors
+            foreach (Feature feature in ClassifierViewModel.FeaturesPositive)
+            {
+                int featureId = _evaluator.Classifier.Vocab.GetWordId(feature.Characters);
+                _evaluator.Classifier.UpdatePrior(_evaluator.Classifier.Labels[0], featureId, feature.Weight);
+            }
+            foreach (Feature feature in ClassifierViewModel.FeaturesNegative)
+            {
+                int featureId = _evaluator.Classifier.Vocab.GetWordId(feature.Characters);
+                _evaluator.Classifier.UpdatePrior(_evaluator.Classifier.Labels[1], featureId, feature.Weight);
+            }
+
+            // Evaluate new classifier
             _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
             WeightedF1 = _evaluator.WeightedF1;
             int[,] cm = _evaluator.ConfusionMatrix;
