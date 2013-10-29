@@ -99,7 +99,7 @@ namespace IML_Playground.Learning
             Label label = null;
             Prediction prediction = new Prediction();
 
-            // Compute Pr(d|c) [take the log of this and Pr(c), shown in EQ 9]
+            // Compute Pr(d|c)
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
@@ -109,25 +109,27 @@ namespace IML_Playground.Learning
                     double pWord;
                     if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
                     {
-                        prob += (pair.Value * Math.Log10(pWord));
+                        prob += (pair.Value * Math.Log(pWord));
                     }
                 }
                 pDocGivenClass[l] = prob;
             }
 
             // Compute Pr(d)
-            double pDoc = 0;
-            foreach (Label l in Labels)
-            {
-                pDoc += (_pClass[l] * pDocGivenClass[l]);
-            }
+            //double pDoc = 0;
+            //foreach (Label l in Labels)
+            //{
+            //    //pDoc += (_pClass[l] * pDocGivenClass[l]);
+            //    pDoc += (Math.Log(_pClass[l]) + pDocGivenClass[l]);
+            //}
+            //Console.WriteLine("pDoc: {0}", pDoc);
 
             // Compute Pr(c|d)
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
-                //pClassGivenDoc[l] = (pClass[l] * pDocGivenClass[l]) / pDoc;
-                pClassGivenDoc[l] = Math.Log10(_pClass[l]) + pDocGivenClass[l];
+                pClassGivenDoc[l] = Math.Log(_pClass[l]) + pDocGivenClass[l];
+                //pClassGivenDoc[l] = (Math.Log(_pClass[l]) + pDocGivenClass[l]) / pDoc;
             }
 
             // Find the class with the highest probability for this document
@@ -136,7 +138,7 @@ namespace IML_Playground.Learning
             {
                 if (double.IsNaN(pClassGivenDoc[l]))
                     Console.Error.WriteLine("Error: Probability for class {0} is NaN.", l);
-                //                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
+                //Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
                 // These are NaN because I'm dividing by 0 somewhere, let's fix that.
                 if (pClassGivenDoc[l] > maxP)
                 {
@@ -199,11 +201,6 @@ namespace IML_Playground.Learning
                 // Sum up the feature counts
                 _pWordGivenClass[l] = new Dictionary<int, double>();
                 int sumFeatures = _perClassFeatureCounts[l].Values.Sum();
-                //int sumFeatures = 0;
-                //foreach (int value in _perClassFeatureCounts[l].Values)
-                //{
-                //    sumFeatures += value;
-                //}
 
                 // Sum up the priors
                 double sumPriors = 0;
@@ -222,7 +219,7 @@ namespace IML_Playground.Learning
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
-                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures + sumPriors);
+                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)(sumFeatures + sumPriors));
                 }
             }
         }
