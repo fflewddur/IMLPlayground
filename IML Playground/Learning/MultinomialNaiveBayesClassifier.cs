@@ -155,6 +155,11 @@ namespace IML_Playground.Learning
             return label;
         }
 
+        public void UpdatePrior(Label label, int feature, double prior)
+        {
+            _perClassFeaturePriors[label][feature] = prior;
+        }
+
         private void ComputePrC()
         {
             _pClass.Clear();

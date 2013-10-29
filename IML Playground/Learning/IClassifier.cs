@@ -15,5 +15,6 @@ namespace IML_Playground.Learning
         void AddInstance(Instance instance);
         void AddInstances(IEnumerable<Instance> instances);
         Label PredictInstance(Instance instance);
+        void UpdatePrior(Label label, int feature, double prior);
     }
 }
