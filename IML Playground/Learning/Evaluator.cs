@@ -58,18 +58,18 @@ namespace IML_Playground.Learning
             int incorrect = 0;
             foreach (Instance instance in instances)
             {
-                Label prediction = Classifier.PredictInstance(instance);
-                if (prediction == instance.Label)
+                Prediction prediction = Classifier.PredictInstance(instance);
+                if (prediction.Label == instance.Label)
                 {
                     // Correct prediction.
-                    int index = _labelIndices[prediction];
+                    int index = _labelIndices[prediction.Label];
                     _confusionMatrix[index, index]++;
                     correct++;
                 }
                 else
                 {
                     // Incorrect prediction. Increment [column(actual class), row(predicted class)]
-                    int indexPredicted = _labelIndices[prediction];
+                    int indexPredicted = _labelIndices[prediction.Label];
                     int indexActual = _labelIndices[instance.Label];
                     _confusionMatrix[indexPredicted, indexActual]++;
                     incorrect++;

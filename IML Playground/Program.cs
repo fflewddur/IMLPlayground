@@ -29,19 +29,20 @@ namespace IML_Playground
         [STAThread]
         public static void Main()
         {
-            TestFeatureUI();
+            TestFeatureUISimple();
+            //TestFeatureUI20Newsgroups();
             //TestSerializedModel();
             //Test20Newsgroups();
             //TestSimple();
         }
 
-        private static void TestFeatureUI()
+        private static void TestFeatureUI(IClassifier classifier, IInstances testSet)
         {
-            Console.WriteLine("Loading model...");
-            MultinomialNaiveBayesClassifier classifier = LoadSerializedModel("model-simple.bin") as MultinomialNaiveBayesClassifier;
+            //Console.WriteLine("Loading model...");
+            //MultinomialNaiveBayesClassifier classifier = LoadSerializedModel("model-simple.bin") as MultinomialNaiveBayesClassifier;
             Evaluator evaluator = new Evaluator() { Classifier = classifier };
-            Console.WriteLine("Loading test set...");
-            NewsCollection testSet = LoadSerializedInstances("testSet-simple.bin") as NewsCollection;
+            //Console.WriteLine("Loading test set...");
+            //NewsCollection testSet = LoadSerializedInstances("testSet-simple.bin") as NewsCollection;
 
             Console.WriteLine("Building UI...");
             ClassifierEvaluatorViewModel vm = new ClassifierEvaluatorViewModel(evaluator, testSet);
@@ -51,6 +52,20 @@ namespace IML_Playground
             window.DataContext = vm;
             window.Show();
             app.Run(window);
+        }
+
+        private static void TestFeatureUISimple()
+        {
+            IClassifier classifier = TrainModel("simple-train.zip");
+            IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "simple-test.zip");
+            TestFeatureUI(classifier, testSet);
+        }
+
+        private static void TestFeatureUI20Newsgroups()
+        {
+            IClassifier classifier = TrainModel("20news-bydate-train.zip");
+            IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "20news-bydate-test.zip");
+            TestFeatureUI(classifier, testSet);
         }
 
         private static IClassifier LoadSerializedModel(string path)
@@ -63,6 +78,50 @@ namespace IML_Playground
             return classifier;
         }
 
+        private static IClassifier TrainModel(string filename)
+        {
+            NewsCollection trainAll = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, filename));
+            //foreach (NewsItem item in trainAll)
+            //{
+            //    Console.WriteLine("Item {0}: {1}", item.Id, item.AllText);
+            //}
+            Console.WriteLine();
+            Vocabulary vocab = trainAll.BuildVocabulary();
+            //Console.WriteLine("Vocab: {0}\n", vocab);
+
+            trainAll.ComputeTFIDFVectors(vocab);
+            List<Label> labels = new List<Label>();
+            labels.Add(new Label("Baseball", "rec.sport.baseball"));
+            labels.Add(new Label("Hockey", "rec.sport.hockey"));
+
+            NewsCollection trainHockeyBaseball = trainAll.Subset(labels.ToArray());
+            trainHockeyBaseball.ComputeFeatureVectors(vocab);
+
+            MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
+            foreach (NewsItem item in trainHockeyBaseball)
+            {
+                Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
+                //Console.Write("Adding instance of {0}: ", item.Label.UserLabel);
+                //foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data)
+                //{
+                //    Console.Write("{0}={1:0.0} ", vocab.GetWord(pair.Key), pair.Value);
+                //}
+                //Console.WriteLine();
+                classifier.AddInstance(instance);
+            }
+
+            return classifier;
+        }
+
+        private static IInstances LoadTestSet(IEnumerable<Label> labels, Vocabulary vocab, string filename)
+        {
+            NewsCollection set = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, filename), labels.ToArray());
+            set.TokenizeItems();
+            set.ComputeFeatureVectors(vocab);
+
+            return set;
+        }
+
         private static IInstances LoadSerializedInstances(string path)
         {
             IFormatter formatter = new BinaryFormatter();
@@ -71,18 +130,6 @@ namespace IML_Playground
                 instances = (NewsCollection)formatter.Deserialize(s);
 
             return instances;
-        }
-
-        private static void TestSerializedModel()
-        {
-            IFormatter formatter = new BinaryFormatter();
-            MultinomialNaiveBayesClassifier classifier;
-            NewsCollection testSet;
-            using (FileStream s = File.OpenRead("model.bin"))
-                classifier = (MultinomialNaiveBayesClassifier)formatter.Deserialize(s);
-            using (FileStream s = File.OpenRead("testSet.bin"))
-                testSet = (NewsCollection)formatter.Deserialize(s);
-            
         }
 
         private static void Test20Newsgroups(int trainingSize = Int32.MaxValue)

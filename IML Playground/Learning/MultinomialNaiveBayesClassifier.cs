@@ -82,11 +82,7 @@ namespace IML_Playground.Learning
         public void AddInstance(Instance instance)
         {
             AddInstanceWithoutPrUpdates(instance);
-
-            // Update our probabilities for classes and words
-            ComputePrC();
-            ComputePrWGivenC();
-            UpdateFeaturesPerClass();
+            Retrain();
         }
 
         public void AddInstances(IEnumerable<Instance> instances)
@@ -95,16 +91,13 @@ namespace IML_Playground.Learning
             {
                 AddInstanceWithoutPrUpdates(instance);
             }
-
-            // Update our probabilities for classes and words
-            ComputePrC();
-            ComputePrWGivenC();
-            UpdateFeaturesPerClass();
+            Retrain();
         }
 
-        public Label PredictInstance(Instance instance)
+        public Prediction PredictInstance(Instance instance)
         {
             Label label = null;
+            Prediction prediction = new Prediction();
 
             // Compute Pr(d|c) [take the log of this and Pr(c), shown in EQ 9]
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
@@ -152,7 +145,8 @@ namespace IML_Playground.Learning
                 }
             }
 
-            return label;
+            prediction.Label = label;
+            return prediction;
         }
 
         public void UpdatePrior(Label label, int feature, double prior)
@@ -160,6 +154,19 @@ namespace IML_Playground.Learning
             _perClassFeaturePriors[label][feature] = prior;
         }
 
+        /// <summary>
+        /// Update our probabilities for classes and words, incorporating any user-provided feature priors.
+        /// </summary>
+        public void Retrain()
+        {
+            ComputePrC();
+            ComputePrWGivenC();
+            UpdateFeaturesPerClass();
+        }
+
+        /// <summary>
+        /// Compute the probability of each class.
+        /// </summary>
         private void ComputePrC()
         {
             _pClass.Clear();
@@ -179,18 +186,24 @@ namespace IML_Playground.Learning
             }
         }
 
+        /// <summary>
+        /// Compute the probability of each feature occuring in each class.
+        /// Incorporate user-provided feature priors.
+        /// </summary>
         private void ComputePrWGivenC()
         {
             _pWordGivenClass.Clear();
 
             foreach (Label l in Labels)
             {
+                // Sum up the feature counts
                 _pWordGivenClass[l] = new Dictionary<int, double>();
-                int sumFeatures = 0;
-                foreach (int value in _perClassFeatureCounts[l].Values)
-                {
-                    sumFeatures += value;
-                }
+                int sumFeatures = _perClassFeatureCounts[l].Values.Sum();
+                //int sumFeatures = 0;
+                //foreach (int value in _perClassFeatureCounts[l].Values)
+                //{
+                //    sumFeatures += value;
+                //}
 
                 // Sum up the priors
                 double sumPriors = 0;
@@ -198,11 +211,10 @@ namespace IML_Playground.Learning
                 {
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
-                        prior = _defaultPrior;
+                        prior = _defaultPrior; // Use a default value if the user didn't provide one.
                     sumPriors += prior;
                 }
 
-                //Console.WriteLine("Count of features in this class: {0}", sumFeatures);
                 foreach (int id in Vocab.FeatureIds)
                 {
                     int countFeature;
@@ -211,7 +223,6 @@ namespace IML_Playground.Learning
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
                     _pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures + sumPriors);
-                    //Console.WriteLine("Pr({0}|{1}) = {2:0.000}", Vocab.GetWord(id), l.UserLabel, pWordGivenClass[l][id]);
                 }
             }
         }
