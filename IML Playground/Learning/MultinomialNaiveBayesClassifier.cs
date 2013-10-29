@@ -9,17 +9,14 @@ namespace IML_Playground.Learning
     [Serializable]
     class MultinomialNaiveBayesClassifier : IML_Playground.ViewModel.ViewModelBase, IClassifier
     {
-        // Data we need:
-        // Frequency count of each feature, per class
-        // Number of classes
-        // Vocabulary size
-        // Prior (weight) for each feature, per class
-        // Feature vectors for each training document, per class
+        private const double _defaultPrior = 1.0;
+
         private List<Label> _labels;
         private Vocabulary _vocab;
         private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
         private Dictionary<Label, List<SparseVector>> _trainingSet;
+        private Dictionary<Label, HashSet<Feature>> _featuresPerClass; // This gives us a single property to expose with all of the feature data for each class
 
         // Store these for efficiency
         private Dictionary<Label, double> _pClass;
@@ -31,12 +28,14 @@ namespace IML_Playground.Learning
             Vocab = vocab;
             _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
+            _featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
             _trainingSet = new Dictionary<Label, List<SparseVector>>();
             foreach (Label l in Labels)
             {
                 _perClassFeatureCounts[l] = new Dictionary<int, int>();
                 _perClassFeaturePriors[l] = new Dictionary<int, double>();
                 _trainingSet[l] = new List<SparseVector>();
+                _featuresPerClass[l] = new HashSet<Feature>();
             }
 
             _pClass = new Dictionary<Label, double>();
@@ -55,6 +54,12 @@ namespace IML_Playground.Learning
         {
             get { return _vocab; }
             private set { SetProperty<Vocabulary>(ref _vocab, value); }
+        }
+
+        public Dictionary<Label, HashSet<Feature>> FeaturesPerClass
+        {
+            get { return _featuresPerClass; }
+            private set { SetProperty<Dictionary<Label, HashSet<Feature>>>(ref _featuresPerClass, value); }
         }
 
         #endregion
@@ -81,6 +86,7 @@ namespace IML_Playground.Learning
             // Update our probabilities for classes and words
             ComputePrC();
             ComputePrWGivenC();
+            UpdateFeaturesPerClass();
         }
 
         public void AddInstances(IEnumerable<Instance> instances)
@@ -93,6 +99,7 @@ namespace IML_Playground.Learning
             // Update our probabilities for classes and words
             ComputePrC();
             ComputePrWGivenC();
+            UpdateFeaturesPerClass();
         }
 
         public Label PredictInstance(Instance instance)
@@ -100,7 +107,7 @@ namespace IML_Playground.Learning
             Label label = null;
 
             // Compute Pr(d|c) [take the log of this and Pr(c), shown in EQ 9]
-            Dictionary<Label, double> pDocGivenClass = new Dictionary<Label,double>();
+            Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
                 double prob = 0;
@@ -136,7 +143,7 @@ namespace IML_Playground.Learning
             {
                 if (double.IsNaN(pClassGivenDoc[l]))
                     Console.Error.WriteLine("Error: Probability for class {0} is NaN.", l);
-//                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
+                //                Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
                 // These are NaN because I'm dividing by 0 somewhere, let's fix that.
                 if (pClassGivenDoc[l] > maxP)
                 {
@@ -186,7 +193,7 @@ namespace IML_Playground.Learning
                 {
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
-                        prior = 1;
+                        prior = _defaultPrior;
                     sumPriors += prior;
                 }
 
@@ -197,9 +204,35 @@ namespace IML_Playground.Learning
                     _perClassFeatureCounts[l].TryGetValue(id, out countFeature);
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
-                        prior = 1;
+                        prior = _defaultPrior;
                     _pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures + sumPriors);
                     //Console.WriteLine("Pr({0}|{1}) = {2:0.000}", Vocab.GetWord(id), l.UserLabel, pWordGivenClass[l][id]);
+                }
+            }
+        }
+
+        private void UpdateFeaturesPerClass()
+        {
+            _featuresPerClass.Clear();
+
+            foreach (Label label in Labels)
+            {
+                _featuresPerClass[label] = new HashSet<Feature>();
+            }
+
+            foreach (int featureId in Vocab.FeatureIds)
+            {
+
+                foreach (Label label in Labels)
+                {
+                    string characters = _vocab.GetWord(featureId);
+                    int count;
+                    _perClassFeatureCounts[label].TryGetValue(featureId, out count);
+                    double weight;
+                    if (!_perClassFeaturePriors[label].TryGetValue(featureId, out weight))
+                        weight = _defaultPrior;
+                    
+                    _featuresPerClass[label].Add(new Feature { Characters = characters, Count = count, Weight = weight });
                 }
             }
         }
