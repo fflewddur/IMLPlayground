@@ -17,7 +17,6 @@ namespace IML_Playground.Learning
 
         const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 5% of documents
         const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
-//        const int MIN_DF = 100; // Minimum document frequency; tokens below this threshold will not be added to our vocabulary.
 
         public Vocabulary()
         {
@@ -78,7 +77,7 @@ namespace IML_Playground.Learning
 
             foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)
             {
-                if (tokenDf.Value >= min_df && tokenDf.Value < max_df)
+                if (tokenDf.Value >= min_df && tokenDf.Value <= max_df)
                 {
                     _wordsToIds[tokenDf.Key] = _nextId;
                     _idsToWords[_nextId] = tokenDf.Key;

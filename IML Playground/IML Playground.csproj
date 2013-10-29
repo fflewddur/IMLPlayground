@@ -82,9 +82,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Learning\Evaluator.cs" />
+    <Compile Include="Learning\Evidence.cs" />
     <Compile Include="Learning\Feature.cs" />
     <Compile Include="Learning\IClassifier.cs" />
     <Compile Include="Learning\IInstances.cs" />
+    <Compile Include="Learning\Prediction.cs" />
     <Compile Include="Utilities.cs" />
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
