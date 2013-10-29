@@ -20,17 +20,17 @@
             </Grid.ColumnDefinitions>
 
             <!-- Positive class features -->
-            <Label Grid.Column="0" Grid.Row="0" Content="{Binding LabelPositive.UserLabel}" />
+            <Label Grid.Column="0" Grid.Row="0" Content="{Binding LabelPositive.UserLabel}" FontWeight="Bold" HorizontalContentAlignment="Center" />
             <DataGrid Grid.Column="0" Grid.Row="1" ItemsSource="{Binding FeaturesPositive}" />
 
             <!-- Negative class features -->
-            <Label Grid.Column="1" Grid.Row="0" Content="{Binding LabelNegative.UserLabel}" />
+            <Label Grid.Column="1" Grid.Row="0" Content="{Binding LabelNegative.UserLabel}" FontWeight="Bold" HorizontalContentAlignment="Center" />
             <DataGrid Grid.Column="1" Grid.Row="1" ItemsSource="{Binding FeaturesNegative}" />
         </Grid>
 
 
         <!-- Summary statistics -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="0 10 0 0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="*" />
@@ -58,8 +58,8 @@
                 <!-- F1 score -->
                 <Grid Grid.Row="1">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" >
-                        <Label Content="Weighted F1 score:" />
-                        <Label ContentStringFormat="{}{0:0.000}" Content="{Binding WeightedF1}"/>
+                        <Label Content="Weighted F1 score:" FontWeight="Bold" />
+                        <Label ContentStringFormat="{}{0:0.000}" Content="{Binding WeightedF1}" FontWeight="Bold" />
                     </StackPanel>
                 </Grid>
             </Grid>
