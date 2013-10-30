@@ -54,6 +54,11 @@ namespace IML_Playground.Learning
             return freq;
         }
 
+        /// <summary>
+        /// Return the unique ID associated with a given word.
+        /// </summary>
+        /// <param name="word">The word whose ID we want.</param>
+        /// <returns>The ID of the provided word, or -1 if the ID is invalid.</returns>
         public int GetWordId(string word)
         {
             int id;
@@ -62,6 +67,11 @@ namespace IML_Playground.Learning
             return id;
         }
 
+        /// <summary>
+        /// Return the word associated with a given unique ID.
+        /// </summary>
+        /// <param name="id">The ID whose word we want.</param>
+        /// <returns>The word associated with the provided ID, or "[NOT FOUND]" if the ID is invalid.</returns>
         public string GetWord(int id)
         {
             string word;
@@ -70,6 +80,11 @@ namespace IML_Playground.Learning
             return word;
         }
 
+        /// <summary>
+        /// Add a collection of tokens and their corresponding frequency counts to our vocabulary.
+        /// </summary>
+        /// <param name="tokenDocFreqs"></param>
+        /// <param name="nDocs"></param>
         public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs)
         {
             int min_df = (int)(MIN_DF_PERCENT * nDocs);
