@@ -15,8 +15,8 @@ namespace IML_Playground.Learning
         private Dictionary<int, string> _idsToWords;
         private Dictionary<int, int> _documentFreqs; // number of documents each word appears in
 
-        const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 5% of documents
-        const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
+        public const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 5% of documents
+        public const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
 
         public Vocabulary()
         {
@@ -85,7 +85,7 @@ namespace IML_Playground.Learning
         /// </summary>
         /// <param name="tokenDocFreqs"></param>
         /// <param name="nDocs"></param>
-        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs)
+        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs, double min_df_percent = MIN_DF_PERCENT, double max_df_percent = MAX_DF_PERCENT)
         {
             int min_df = (int)(MIN_DF_PERCENT * nDocs);
             int max_df = (int)(MAX_DF_PERCENT * nDocs);
@@ -100,6 +100,26 @@ namespace IML_Playground.Learning
                     _nextId++;
                 }
             }
+        }
+
+        /// <summary>
+        /// Return the subset of the vocabulary that exists in a set of Instances.
+        /// </summary>
+        /// <param name="instances">The collection of Instances to restrict our vocabulary to.</param>
+        /// <returns>A Vocabulary covering the provided Instances.</returns>
+        public Vocabulary SubsetInInstances(IInstances instances)
+        {
+            Vocabulary vocab = new Vocabulary();
+            // FIXME I don't work at all
+            foreach (Instance instance in instances.ToInstances())
+            {
+                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
+                {
+
+                }
+            }
+
+            return vocab;
         }
 
         public override string ToString()
