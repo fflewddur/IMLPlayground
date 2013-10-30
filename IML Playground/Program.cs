@@ -16,11 +16,9 @@ namespace IML_Playground
 {
     // TODO Add interface for extracting per-class feature counts and weights from a classifier
     // TODO Add interface for updating per-class feature weights in a classifier
-    // TODO Build UI to display feature counts for each class
-    // TODO UI should display classifier's F1 score
-    // TODO Allow user to update feature weights from UI
     // TODO Figure out how make getter properties readonly
     // TODO Figure out if we can use IEnumerable in interfaces backed by HashSets or other specific collections
+    // TODO Filter vocabulary to remove words not found in training set
 
     class Program
     {
@@ -30,7 +28,8 @@ namespace IML_Playground
         public static void Main()
         {
             //TestFeatureUISimple();
-            TestFeatureUI20Newsgroups();
+            //TestFeatureUI20Newsgroups();
+            TestFeatureUI20Newsgroups(10);
             //TestSerializedModel();
             //Test20Newsgroups();
             //TestSimple();
@@ -61,9 +60,9 @@ namespace IML_Playground
             TestFeatureUI(classifier, testSet);
         }
 
-        private static void TestFeatureUI20Newsgroups()
+        private static void TestFeatureUI20Newsgroups(int trainingSetSize = Int32.MaxValue)
         {
-            IClassifier classifier = TrainModel("20news-bydate-train.zip");
+            IClassifier classifier = TrainModel("20news-bydate-train.zip", trainingSetSize);
             IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "20news-bydate-test.zip");
             TestFeatureUI(classifier, testSet);
         }
@@ -78,7 +77,7 @@ namespace IML_Playground
             return classifier;
         }
 
-        private static IClassifier TrainModel(string filename)
+        private static IClassifier TrainModel(string filename, int trainingSetSize = Int32.MaxValue)
         {
             NewsCollection trainAll = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, filename));
             //foreach (NewsItem item in trainAll)
@@ -94,7 +93,7 @@ namespace IML_Playground
             labels.Add(new Label("Baseball", "rec.sport.baseball"));
             labels.Add(new Label("Hockey", "rec.sport.hockey"));
 
-            NewsCollection trainHockeyBaseball = trainAll.Subset(labels.ToArray());
+            NewsCollection trainHockeyBaseball = trainAll.Subset(trainingSetSize, labels.ToArray());
             trainHockeyBaseball.ComputeFeatureVectors(vocab);
 
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
