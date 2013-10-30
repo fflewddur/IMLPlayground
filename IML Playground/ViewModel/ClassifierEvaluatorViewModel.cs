@@ -100,6 +100,9 @@ namespace IML_Playground.ViewModel
                 _evaluator.Classifier.UpdatePrior(_evaluator.Classifier.Labels[1], featureId, feature.Weight);
             }
 
+            // Retrain our model
+            _evaluator.Classifier.Retrain();
+
             // Evaluate new classifier
             _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
             WeightedF1 = _evaluator.WeightedF1;
