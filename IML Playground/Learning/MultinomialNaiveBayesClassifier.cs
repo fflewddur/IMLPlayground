@@ -253,7 +253,7 @@ namespace IML_Playground.Learning
                     if (!_perClassFeaturePriors[label].TryGetValue(featureId, out weight))
                         weight = _defaultPrior;
                     
-                    _featuresPerClass[label].Add(new Feature { Characters = characters, Count = count, Weight = weight });
+                    _featuresPerClass[label].Add(new Feature { Characters = characters, CountTraining = count, Weight = weight });
                 }
             }
         }

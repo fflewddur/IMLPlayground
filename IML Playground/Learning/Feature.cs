@@ -11,7 +11,8 @@ namespace IML_Playground.Learning
     class Feature
     {
         private string _characters;
-        private int _count;
+        private int _countTraining;
+        private int _countTesting;
         private double _weight;
 
         public string Characters
@@ -20,10 +21,16 @@ namespace IML_Playground.Learning
             set { _characters = value; }
         }
 
-        public int Count
+        public int CountTraining
         {
-            get { return _count; }
-            set { _count = value; }
+            get { return _countTraining; }
+            set { _countTraining = value; }
+        }
+
+        public int CountTesting
+        {
+            get { return _countTesting; }
+            set { _countTesting = value; }
         }
 
         public double Weight
