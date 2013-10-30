@@ -58,7 +58,7 @@ namespace IML_Playground.Learning
 
         private Dictionary<int, double>.KeyCollection Keys { get { return _data.Keys; } }
         private Dictionary<int, double>.ValueCollection Values { get { return _data.Values; } }
-        public Dictionary<int, double> Data { get { return _data; } }
+        public IReadOnlyDictionary<int, double> Data { get { return _data; } }
 
         // Use @vocab to print out the value associated with each key, but with the output of each key replaced by vocab[key]
         public string ToPrettyString(Vocabulary vocab)
