@@ -132,8 +132,9 @@ namespace IML_Playground.Learning
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
-                pClassGivenDoc[l] = _pClass[l] * Math.Pow(Math.E, pDocGivenClass[l]) / pDoc;
-                //pClassGivenDoc[l] = (Math.Log(_pClass[l]) + pDocGivenClass[l]) / pDoc; // for log likelihood
+                //pClassGivenDoc[l] = _pClass[l] * Math.Pow(Math.E, pDocGivenClass[l]) / pDoc; // no log likelihood, with normalization
+                //pClassGivenDoc[l] = (Math.Log(_pClass[l]) + pDocGivenClass[l]) / pDoc; // for log likelihood, with normalization
+                pClassGivenDoc[l] = Math.Log(_pClass[l]) + pDocGivenClass[l]; // For log likelihood, no normalization
             }
 
             // Find the class with the highest probability for this document
@@ -227,7 +228,7 @@ namespace IML_Playground.Learning
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
-                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)(sumFeatures + sumPriors));
+                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)(sumFeatures)); // Removed + sumPriors
                 }
             }
         }
