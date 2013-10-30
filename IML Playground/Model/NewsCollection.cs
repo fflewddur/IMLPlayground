@@ -15,9 +15,40 @@ namespace IML_Playground.Model
     [Serializable]
     class NewsCollection : Collection<NewsItem>, IInstances
     {
+        IEnumerable<Instance> _instances;
+
+        public NewsCollection()
+        {
+            _instances = null;
+        }
+        
         public new int Count
         {
             get { return base.Count; }
+        }
+
+        protected override void ClearItems()
+        {
+            base.ClearItems();
+            _instances = null;
+        }
+
+        protected override void InsertItem(int index, NewsItem item)
+        {
+            base.InsertItem(index, item);
+            _instances = null;
+        }
+
+        protected override void RemoveItem(int index)
+        {
+            base.RemoveItem(index);
+            _instances = null;
+        }
+
+        protected override void SetItem(int index, NewsItem item)
+        {
+            base.SetItem(index, item);
+            _instances = null;
         }
 
         /// <summary>
@@ -26,15 +57,20 @@ namespace IML_Playground.Model
         /// <returns>Enumerable collection of Instances.</returns>
         public IEnumerable<Instance> ToInstances()
         {
-            List<Instance> instances = new List<Instance>();
-
-            foreach (NewsItem item in this)
+            if (_instances == null)
             {
-                Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
-                instances.Add(instance);
+                List<Instance> instances = new List<Instance>();
+
+                foreach (NewsItem item in this)
+                {
+                    Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
+                    instances.Add(instance);
+                }
+
+                _instances = instances;
             }
 
-            return instances;
+            return _instances;
         }
 
         public void ComputeFeatureVectors(Vocabulary vocab)
