@@ -143,7 +143,6 @@ namespace IML_Playground.Learning
             {
                 if (double.IsNaN(pClassGivenDoc[l]))
                 {
-                    Console.Error.WriteLine("Error: Probability for class {0} is NaN.", l);
                     throw new System.ArithmeticException(string.Format("Probability for class {0} is NaN.", l));
                 }
                 //Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);

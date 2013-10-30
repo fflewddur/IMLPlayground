@@ -15,6 +15,11 @@ namespace IML_Playground.Model
     [Serializable]
     class NewsCollection : Collection<NewsItem>, IInstances
     {
+        public new int Count
+        {
+            get { return base.Count; }
+        }
+
         /// <summary>
         /// Return an enumerable collection of Instances representing the items in this collection.
         /// </summary>
@@ -62,7 +67,7 @@ namespace IML_Playground.Model
         /// Create a Vocabulary object representing all of the tokens identified in this NewsCollection.
         /// </summary>
         /// <returns>A new Vocabulary object.</returns>
-        public Vocabulary BuildVocabulary()
+        public Vocabulary BuildVocabulary(double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT)
         {
             ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
 
@@ -80,7 +85,7 @@ namespace IML_Playground.Model
             });
 
             Vocabulary vocab = new Vocabulary();
-            vocab.AddTokens(tokenDocCounts, this.Count);
+            vocab.AddTokens(tokenDocCounts, this.Count, min_df_percent, max_df_percent);
 
             return vocab;
         }

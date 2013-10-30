@@ -8,6 +8,8 @@ namespace IML_Playground.Learning
 {
     interface IInstances
     {
+        int Count { get; }
+
         IEnumerable<Instance> ToInstances();
     }
 }

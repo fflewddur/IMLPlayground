@@ -30,7 +30,7 @@ namespace IML_Playground
         {
             //TestFeatureUISimple();
             //TestFeatureUI20Newsgroups();
-            TestFeatureUI20Newsgroups(10);
+            TestFeatureUI20Newsgroups(10, .10, .90);
             //TestSerializedModel();
             //Test20Newsgroups();
             //TestSimple();
@@ -61,9 +61,10 @@ namespace IML_Playground
             TestFeatureUI(classifier, testSet);
         }
 
-        private static void TestFeatureUI20Newsgroups(int trainingSetSize = Int32.MaxValue)
+        private static void TestFeatureUI20Newsgroups(int trainingSetSize = Int32.MaxValue, 
+            double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT)
         {
-            IClassifier classifier = TrainModel("20news-bydate-train.zip", trainingSetSize);
+            IClassifier classifier = TrainModel("20news-bydate-train.zip", trainingSetSize, min_df_percent, max_df_percent);
             IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "20news-bydate-test.zip");
             TestFeatureUI(classifier, testSet);
         }
@@ -78,7 +79,8 @@ namespace IML_Playground
             return classifier;
         }
 
-        private static IClassifier TrainModel(string filename, int trainingSetSize = Int32.MaxValue)
+        private static IClassifier TrainModel(string filename, int trainingSetSize = Int32.MaxValue,
+            double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT)
         {
             NewsCollection trainAll = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, filename));
             //foreach (NewsItem item in trainAll)
@@ -86,7 +88,7 @@ namespace IML_Playground
             //    Console.WriteLine("Item {0}: {1}", item.Id, item.AllText);
             //}
             Console.WriteLine();
-            Vocabulary vocab = trainAll.BuildVocabulary();
+            Vocabulary vocab = trainAll.BuildVocabulary(min_df_percent, max_df_percent);
             //Console.WriteLine("Vocab: {0}\n", vocab);
 
             trainAll.ComputeTFIDFVectors(vocab);
@@ -204,7 +206,7 @@ namespace IML_Playground
                 formatter.Serialize(s, labels);
             using (FileStream s = File.Create("model.bin"))
                 formatter.Serialize(s, classifier);
-            
+
 
             // Print some diagnostics
             Console.WriteLine("Vocabulary size: {0}", vocab.Count);
@@ -307,8 +309,8 @@ namespace IML_Playground
             Console.WriteLine("Training set size: {0}", trainHockeyBaseball.Count);
             Console.WriteLine("Elapsed time to build vocab: {0:00}:{1:00}:{2:00}.{3:00}", tsVocab.Hours, tsVocab.Minutes, tsVocab.Seconds, tsVocab.Milliseconds);
             Console.WriteLine("Elapsed time to build data sets: {0:00}:{1:00}:{2:00}.{3:00}", tsDatasets.Hours, tsDatasets.Minutes, tsDatasets.Seconds, tsDatasets.Milliseconds);
-//            Console.WriteLine("Elapsed time to train classifier: {0:00}:{1:00}:{2:00}.{3:00}", tsClassifier.Hours, tsClassifier.Minutes, tsClassifier.Seconds, tsClassifier.Milliseconds);
-//            Console.WriteLine("Elapsed time to test classifier: {0:00}:{1:00}:{2:00}.{3:00}", tsTest.Hours, tsTest.Minutes, tsTest.Seconds, tsTest.Milliseconds);
+            //            Console.WriteLine("Elapsed time to train classifier: {0:00}:{1:00}:{2:00}.{3:00}", tsClassifier.Hours, tsClassifier.Minutes, tsClassifier.Seconds, tsClassifier.Milliseconds);
+            //            Console.WriteLine("Elapsed time to test classifier: {0:00}:{1:00}:{2:00}.{3:00}", tsTest.Hours, tsTest.Minutes, tsTest.Seconds, tsTest.Milliseconds);
             Console.WriteLine("Memory usage: {0:.00} MB", GC.GetTotalMemory(true) / 1024.0 / 1024.0);
             Console.WriteLine("Press any key to continue...");
             Console.ReadKey();
