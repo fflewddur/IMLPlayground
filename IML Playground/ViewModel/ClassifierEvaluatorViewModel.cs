@@ -13,8 +13,8 @@ namespace IML_Playground.ViewModel
     {
         private Evaluator _evaluator;
         private IInstances _testSet;
-        private string _positiveLabel;
-        private string _negativeLabel;
+        private Label _positiveLabel;
+        private Label _negativeLabel;
         private int _truePositives;
         private int _trueNegatives;
         private int _falsePositives;
@@ -28,12 +28,13 @@ namespace IML_Playground.ViewModel
 
             if (_evaluator.Classifier.Labels.Count >= 2)
             {
-                PositiveLabel = _evaluator.Classifier.Labels[0].UserLabel;
-                NegativeLabel = _evaluator.Classifier.Labels[1].UserLabel;
+                PositiveLabel = _evaluator.Classifier.Labels[0];
+                NegativeLabel = _evaluator.Classifier.Labels[1];
             }
 
             ClassifierViewModel = new ClassifierFeaturesViewModel(_evaluator.Classifier);
-            
+            AddTestSetFeatureCounts();
+
             Retrain = new RelayCommand(PerformRetrain);
             PerformRetrain(); // Ensure our values are up-to-date
         }
@@ -42,16 +43,16 @@ namespace IML_Playground.ViewModel
 
         public ClassifierFeaturesViewModel ClassifierViewModel { get; private set; }
 
-        public string PositiveLabel
+        public Label PositiveLabel
         {
             get { return _positiveLabel; }
-            private set { SetProperty<string>(ref _positiveLabel, value); }
+            private set { SetProperty<Label>(ref _positiveLabel, value); }
         }
 
-        public string NegativeLabel
+        public Label NegativeLabel
         {
             get { return _negativeLabel; }
-            private set { SetProperty<string>(ref _negativeLabel, value); }
+            private set { SetProperty<Label>(ref _negativeLabel, value); }
         }
 
         public int TruePositives
@@ -87,6 +88,37 @@ namespace IML_Playground.ViewModel
         public ICommand Retrain { get; private set; }
 
         #endregion
+
+        private void AddTestSetFeatureCounts()
+        {
+            foreach (Feature feature in ClassifierViewModel.FeaturesPositive)
+            {
+                foreach (Instance instance in _testSet.ToInstances())
+                {
+                    if (instance.Label == PositiveLabel)
+                    {
+                        int featureId = _evaluator.Classifier.Vocab.GetWordId(feature.Characters);
+                        double count;
+                        instance.Features.TryGet(featureId, out count);
+                        feature.CountTesting += (int)count;
+                    }
+                }
+            }
+            foreach (Feature feature in ClassifierViewModel.FeaturesNegative)
+            {
+                foreach (Instance instance in _testSet.ToInstances())
+                {
+                    if (instance.Label == NegativeLabel)
+                    {
+                        int featureId = _evaluator.Classifier.Vocab.GetWordId(feature.Characters);
+                        double count;
+                        instance.Features.TryGet(featureId, out count);
+                        feature.CountTesting += (int)count;
+                    }
+                }
+            }
+
+        }
 
         private void PerformRetrain()
         {

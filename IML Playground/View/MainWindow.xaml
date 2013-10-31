@@ -20,11 +20,11 @@
             </Grid.ColumnDefinitions>
 
             <!-- Positive class features -->
-            <Label Grid.Column="0" Grid.Row="0" Content="{Binding LabelPositive.UserLabel}" FontWeight="Bold" HorizontalContentAlignment="Center" />
+            <Label Grid.Column="0" Grid.Row="0" Content="{Binding LabelPositive}" FontWeight="Bold" HorizontalContentAlignment="Center" />
             <DataGrid Grid.Column="0" Grid.Row="1" ItemsSource="{Binding FeaturesPositive}" />
 
             <!-- Negative class features -->
-            <Label Grid.Column="1" Grid.Row="0" Content="{Binding LabelNegative.UserLabel}" FontWeight="Bold" HorizontalContentAlignment="Center" />
+            <Label Grid.Column="1" Grid.Row="0" Content="{Binding LabelNegative}" FontWeight="Bold" HorizontalContentAlignment="Center" />
             <DataGrid Grid.Column="1" Grid.Row="1" ItemsSource="{Binding FeaturesNegative}" />
         </Grid>
 
