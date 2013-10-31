@@ -15,7 +15,7 @@ namespace IML_Playground.Learning
         private Vocabulary _vocab;
         private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
-        private Dictionary<Label, List<SparseVector>> _trainingSet;
+        private Dictionary<Label, HashSet<Instance>> _trainingSet;
         private Dictionary<Label, HashSet<Feature>> _featuresPerClass; // This gives us a single property to expose with all of the feature data for each class
 
         // Store these for efficiency
@@ -29,12 +29,12 @@ namespace IML_Playground.Learning
             _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
             _featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
-            _trainingSet = new Dictionary<Label, List<SparseVector>>();
+            _trainingSet = new Dictionary<Label, HashSet<Instance>>();
             foreach (Label l in Labels)
             {
                 _perClassFeatureCounts[l] = new Dictionary<int, int>();
                 _perClassFeaturePriors[l] = new Dictionary<int, double>();
-                _trainingSet[l] = new List<SparseVector>();
+                _trainingSet[l] = new HashSet<Instance>();
                 _featuresPerClass[l] = new HashSet<Feature>();
             }
 
@@ -76,7 +76,7 @@ namespace IML_Playground.Learning
             }
 
             // Store this feature vector
-            _trainingSet[instance.Label].Add(instance.Features);
+            _trainingSet[instance.Label].Add(instance);
         }
 
         public void AddInstance(Instance instance)

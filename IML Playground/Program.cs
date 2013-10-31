@@ -28,9 +28,9 @@ namespace IML_Playground
         [STAThread]
         public static void Main()
         {
-            //TestFeatureUISimple();
+            TestFeatureUISimple();
             //TestFeatureUI20Newsgroups();
-            TestFeatureUI20Newsgroups(10, .10, .90);
+            //TestFeatureUI20Newsgroups(10, .10, .90);
             //TestSerializedModel();
             //Test20Newsgroups();
             //TestSimple();

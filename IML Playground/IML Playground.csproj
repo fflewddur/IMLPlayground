@@ -65,6 +65,7 @@
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="System.Windows.Controls.Ribbon" />
     <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>packages\MvvmLightLibs.4.2.30.0\lib\net45\System.Windows.Interactivity.dll</HintPath>
     </Reference>
@@ -88,6 +89,10 @@
     <Compile Include="Learning\IInstances.cs" />
     <Compile Include="Learning\Prediction.cs" />
     <Compile Include="Utilities.cs" />
+    <Page Include="View\Resources.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -172,6 +177,18 @@
     <None Include="Datasets\stopwords.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\refresh_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Open_6529.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Save_6530.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\ExportReportData_10565.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

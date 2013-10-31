@@ -36,6 +36,10 @@ namespace IML_Playground.ViewModel
             AddTestSetFeatureCounts();
 
             Retrain = new RelayCommand(PerformRetrain);
+            SaveModel = new RelayCommand(PerformSaveModel);
+            LoadModel = new RelayCommand(PerformLoadModel);
+            ExportModelAsArff = new RelayCommand(PerformExportModelAsArff);
+
             PerformRetrain(); // Ensure our values are up-to-date
         }
 
@@ -86,6 +90,9 @@ namespace IML_Playground.ViewModel
         }
 
         public ICommand Retrain { get; private set; }
+        public ICommand SaveModel { get; private set; }
+        public ICommand LoadModel { get; private set; }
+        public ICommand ExportModelAsArff { get; private set; }
 
         #endregion
 
@@ -149,6 +156,27 @@ namespace IML_Playground.ViewModel
                 FalsePositives = cm[0, 1];
                 FalseNegatives = cm[1, 0];
                 TrueNegatives = cm[1, 1];
+            }
+        }
+
+        private void PerformSaveModel()
+        { }
+
+        private void PerformLoadModel()
+        { }
+
+        private void PerformExportModelAsArff()
+        {
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.DefaultExt = ".arff";
+            dialog.Filter = "ARFF files|.arff";
+
+            Nullable<bool> result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = dialog.FileName;
+                Console.WriteLine("Export ARFF file to {0}.", filename);
             }
         }
     }
