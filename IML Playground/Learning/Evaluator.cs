@@ -20,6 +20,8 @@ namespace IML_Playground.Learning
             _f1 = -1;
         }
 
+        #region Properties
+
         public IClassifier Classifier
         {
             get { return _classifier; }
@@ -47,6 +49,8 @@ namespace IML_Playground.Learning
             get { return _f1; }
             private set { _f1 = value; }
         }
+
+        #endregion
 
         public void EvaluateOnTestSet(IEnumerable<Instance> instances)
         {

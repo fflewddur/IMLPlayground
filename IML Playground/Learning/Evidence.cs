@@ -19,6 +19,8 @@ namespace IML_Playground.Learning
             Vocab = vocab;
         }
 
+        #region Override methods
+
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -31,5 +33,7 @@ namespace IML_Playground.Learning
 
             return sb.ToString();
         }
+
+        #endregion
     }
 }

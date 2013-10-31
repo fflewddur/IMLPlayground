@@ -24,10 +24,14 @@ namespace IML_Playground.ViewModel
             UpdateFeatures(_classifier);
         }
 
+        #region Properties
+
         public Label LabelPositive { get; private set; }
         public Label LabelNegative { get; private set; }
         public ObservableCollection<Feature> FeaturesPositive { get; private set; }
         public ObservableCollection<Feature> FeaturesNegative { get; private set; }
+
+        #endregion
 
         private void UpdateFeatures(IClassifier classifier)
         {

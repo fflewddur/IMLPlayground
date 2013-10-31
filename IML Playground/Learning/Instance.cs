@@ -12,6 +12,8 @@ namespace IML_Playground.Learning
         private Label _label;
         private SparseVector _features;
 
+        #region Properties
+
         public Label Label
         {
             get { return _label; }
@@ -23,5 +25,7 @@ namespace IML_Playground.Learning
             get { return _features; }
             set { SetProperty<SparseVector>(ref _features, value); }
         }
+
+        #endregion
     }
 }

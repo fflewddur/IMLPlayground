@@ -8,13 +8,17 @@ namespace IML_Playground.Learning
 {
     class Prediction
     {
-        public Label Label;
-        public Dictionary<Label, Evidence> EvidencePerClass;
-
         public Prediction()
         {
             EvidencePerClass = new Dictionary<Label, Evidence>();
         }
+
+        #region Properties
+
+        public Label Label;
+        public Dictionary<Label, Evidence> EvidencePerClass;
+
+        #endregion
 
         public override string ToString()
         {

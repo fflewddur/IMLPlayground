@@ -21,11 +21,17 @@ namespace IML_Playground.Model
         {
             _instances = null;
         }
-        
+
+        #region Properties
+
         public new int Count
         {
             get { return base.Count; }
         }
+
+        #endregion
+
+        #region Override methods
 
         protected override void ClearItems()
         {
@@ -50,6 +56,8 @@ namespace IML_Playground.Model
             base.SetItem(index, item);
             _instances = null;
         }
+
+        #endregion
 
         /// <summary>
         /// Return an enumerable collection of Instances representing the items in this collection.

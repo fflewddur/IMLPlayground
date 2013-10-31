@@ -40,6 +40,8 @@ namespace IML_Playground.Learning
         
         #endregion
 
+        #region Override methods
+
         public override string ToString()
         {
             return UserLabel;
@@ -65,5 +67,7 @@ namespace IML_Playground.Learning
             hash = hash * 31 + UserLabel.GetHashCode();
             return hash;
         }
+
+        #endregion
     }
 }

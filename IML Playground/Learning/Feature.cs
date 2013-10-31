@@ -15,6 +15,8 @@ namespace IML_Playground.Learning
         private int _countTesting;
         private double _weight;
 
+        #region Properties
+
         public string Characters
         {
             get { return _characters; }
@@ -38,5 +40,7 @@ namespace IML_Playground.Learning
             get { return _weight; }
             set { _weight = value; }
         }
+
+        #endregion
     }
 }

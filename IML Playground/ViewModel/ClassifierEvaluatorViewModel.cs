@@ -38,6 +38,8 @@ namespace IML_Playground.ViewModel
             PerformRetrain(); // Ensure our values are up-to-date
         }
 
+        #region Properties
+
         public ClassifierFeaturesViewModel ClassifierViewModel { get; private set; }
 
         public string PositiveLabel
@@ -83,6 +85,8 @@ namespace IML_Playground.ViewModel
         }
 
         public ICommand Retrain { get; private set; }
+
+        #endregion
 
         private void PerformRetrain()
         {
