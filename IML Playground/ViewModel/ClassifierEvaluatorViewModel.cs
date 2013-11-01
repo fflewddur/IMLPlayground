@@ -36,9 +36,11 @@ namespace IML_Playground.ViewModel
             AddTestSetFeatureCounts();
 
             Retrain = new RelayCommand(PerformRetrain);
-            SaveModel = new RelayCommand(PerformSaveModel);
-            LoadModel = new RelayCommand(PerformLoadModel);
+            Resample = new RelayCommand(PerformResample, () => false);
+            SaveModel = new RelayCommand(PerformSaveModel, () => (false));
+            LoadModel = new RelayCommand(PerformLoadModel, () => (false));
             ExportModelAsArff = new RelayCommand(PerformExportModelAsArff);
+            ExportTestSetAsArff = new RelayCommand(PerformExportTestSetAsArff);
 
             PerformRetrain(); // Ensure our values are up-to-date
         }
@@ -90,9 +92,11 @@ namespace IML_Playground.ViewModel
         }
 
         public ICommand Retrain { get; private set; }
+        public ICommand Resample { get; private set; }
         public ICommand SaveModel { get; private set; }
         public ICommand LoadModel { get; private set; }
         public ICommand ExportModelAsArff { get; private set; }
+        public ICommand ExportTestSetAsArff { get; private set; }
 
         #endregion
 
@@ -165,8 +169,9 @@ namespace IML_Playground.ViewModel
         private void PerformLoadModel()
         { }
 
-        private void PerformExportModelAsArff()
+        private async void PerformExportModelAsArff()
         {
+            // Display the Save File Dialog
             Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
             dialog.DefaultExt = ".arff";
             dialog.Filter = "ARFF files|.arff";
@@ -177,7 +182,30 @@ namespace IML_Playground.ViewModel
             {
                 string filename = dialog.FileName;
                 Console.WriteLine("Export ARFF file to {0}.", filename);
+                await _evaluator.Classifier.SaveArffFile(filename); // Save the ARFF file
             }
+        }
+
+        private async void PerformExportTestSetAsArff()
+        {
+            // Display the Save File Dialog
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.DefaultExt = ".arff";
+            dialog.Filter = "ARFF files|.arff";
+
+            Nullable<bool> result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = dialog.FileName;
+                Console.WriteLine("Export ARFF file to {0}.", filename);
+                await _testSet.SaveArffFile(filename, _evaluator.Classifier.Vocab, _evaluator.Classifier.Labels.ToArray()); // Save the ARFF file
+            }
+        }
+
+        private void PerformResample()
+        {
+
         }
     }
 }

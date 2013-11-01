@@ -19,9 +19,9 @@ namespace IML_Playground
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : RibbonWindow
+    public partial class FeatureViewer : RibbonWindow
     {
-        public MainWindow()
+        public FeatureViewer()
         {
             InitializeComponent();
         }
