@@ -33,6 +33,11 @@ namespace IML_Playground.ViewModel
 
         #endregion
 
+        public void UpdateFeatures()
+        {
+            UpdateFeatures(_classifier);
+        }
+
         private void UpdateFeatures(IClassifier classifier)
         {
             FeaturesPositive.Clear();

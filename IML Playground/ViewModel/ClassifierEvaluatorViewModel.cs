@@ -13,6 +13,7 @@ namespace IML_Playground.ViewModel
     {
         private Evaluator _evaluator;
         private IInstances _testSet;
+        private IInstances _fullTrainSet;
         private Label _positiveLabel;
         private Label _negativeLabel;
         private int _truePositives;
@@ -21,10 +22,11 @@ namespace IML_Playground.ViewModel
         private int _falseNegatives;
         private double _weightedF1;
 
-        public ClassifierEvaluatorViewModel(Evaluator evaluator, IInstances instances)
+        public ClassifierEvaluatorViewModel(Evaluator evaluator, IInstances testSet, IInstances fullTrainSet)
         {
             _evaluator = evaluator;
-            _testSet = instances;
+            _testSet = testSet;
+            _fullTrainSet = fullTrainSet;
 
             if (_evaluator.Classifier.Labels.Count >= 2)
             {
@@ -36,7 +38,7 @@ namespace IML_Playground.ViewModel
             AddTestSetFeatureCounts();
 
             Retrain = new RelayCommand(PerformRetrain);
-            Resample = new RelayCommand(PerformResample, () => false);
+            Resample = new RelayCommand(PerformResample);
             SaveModel = new RelayCommand(PerformSaveModel, () => (false));
             LoadModel = new RelayCommand(PerformLoadModel, () => (false));
             ExportModelAsArff = new RelayCommand(PerformExportModelAsArff);
@@ -148,7 +150,7 @@ namespace IML_Playground.ViewModel
             }
 
             // Retrain our model
-            _evaluator.Classifier.Retrain();
+            _evaluator.Classifier.Train();
 
             // Evaluate new classifier
             _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
@@ -205,7 +207,15 @@ namespace IML_Playground.ViewModel
 
         private void PerformResample()
         {
+            IEnumerable<Instance> instances = _fullTrainSet.Subset(10, _evaluator.Classifier.Labels.ToArray()); // TODO make the size user-editable
+            _evaluator.Classifier.ClearInstances(); // Remove the existing training set
+            _evaluator.Classifier.AddInstances(instances); // Add the new training set
 
+            PerformRetrain(); // Evaluate the new model
+
+            // Update our classifier viewmodel
+            ClassifierViewModel.UpdateFeatures();
+            AddTestSetFeatureCounts();
         }
     }
 }

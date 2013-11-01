@@ -31,16 +31,10 @@ namespace IML_Playground.Learning
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
             _featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
             _trainingSet = new Dictionary<Label, HashSet<Instance>>();
-            foreach (Label l in Labels)
-            {
-                _perClassFeatureCounts[l] = new Dictionary<int, int>();
-                _perClassFeaturePriors[l] = new Dictionary<int, double>();
-                _trainingSet[l] = new HashSet<Instance>();
-                _featuresPerClass[l] = new HashSet<Feature>();
-            }
-
             _pClass = new Dictionary<Label, double>();
             _pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
+
+            InitTrainingData();
         }
 
         #region Properties
@@ -65,21 +59,49 @@ namespace IML_Playground.Learning
 
         #endregion
 
+        /// <summary>
+        /// Remove all training information.
+        /// </summary>
+        public void ClearInstances()
+        {
+            _perClassFeatureCounts.Clear();
+            _perClassFeaturePriors.Clear();
+            _featuresPerClass.Clear();
+            _pClass.Clear();
+            _trainingSet.Clear();
+            _pWordGivenClass.Clear();
+
+            InitTrainingData();
+        }
+
+        /// <summary>
+        /// Add a single instance to the classifier's training set. Retrain the classifier after the instance has been added.
+        /// </summary>
+        /// <param name="instance">The instance to add.</param>
         public void AddInstance(Instance instance)
         {
             AddInstanceWithoutPrUpdates(instance);
-            Retrain();
+            Train();
         }
 
+        /// <summary>
+        /// Add a collection of instances to the classifier's training set. Retrain the classifier after each instance has been added.
+        /// </summary>
+        /// <param name="instances">The collection of instances to add.</param>
         public void AddInstances(IEnumerable<Instance> instances)
         {
             foreach (Instance instance in instances)
             {
                 AddInstanceWithoutPrUpdates(instance);
             }
-            Retrain();
+            Train();
         }
 
+        /// <summary>
+        /// Run the classifier on a single instance.
+        /// </summary>
+        /// <param name="instance">The instance whose label we want to predict.</param>
+        /// <returns>A prediction for this instance.</returns>
         public Prediction PredictInstance(Instance instance)
         {
             Label label = null;
@@ -145,6 +167,12 @@ namespace IML_Playground.Learning
             return prediction;
         }
 
+        /// <summary>
+        /// Update the prior weight for a given feature, with respect to a given class.
+        /// </summary>
+        /// <param name="label">The class which this prior value applies to.</param>
+        /// <param name="feature">The feature which this prior value applies to.</param>
+        /// <param name="prior">The new prior value for this feature/class tuple.</param>
         public void UpdatePrior(Label label, int feature, double prior)
         {
             _perClassFeaturePriors[label][feature] = prior;
@@ -221,11 +249,25 @@ namespace IML_Playground.Learning
         /// <summary>
         /// Update our probabilities for classes and words, incorporating any user-provided feature priors.
         /// </summary>
-        public void Retrain()
+        public void Train()
         {
             ComputePrC();
             ComputePrWGivenC();
             UpdateFeaturesPerClass();
+        }
+
+        /// <summary>
+        /// Initialize training data structures using our collection of potential output labels.
+        /// </summary>
+        private void InitTrainingData()
+        {
+            foreach (Label l in Labels)
+            {
+                _perClassFeatureCounts[l] = new Dictionary<int, int>();
+                _perClassFeaturePriors[l] = new Dictionary<int, double>();
+                _trainingSet[l] = new HashSet<Instance>();
+                _featuresPerClass[l] = new HashSet<Feature>();
+            }
         }
 
         /// <summary>

@@ -16,7 +16,8 @@ namespace IML_Playground.Learning
         void AddInstances(IEnumerable<Instance> instances);
         Prediction PredictInstance(Instance instance);
         void UpdatePrior(Label label, int feature, double prior);
-        void Retrain();
+        void Train(); // Train the classifier on all added training instances
+        void ClearInstances(); // Remove all existing training instances
 
         Task<bool> SaveArffFile(string filePath);
     }

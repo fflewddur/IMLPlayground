@@ -81,12 +81,18 @@ namespace IML_Playground.Model
             return _instances;
         }
 
+        /// <summary>
+        /// Compute the feature vectors for each item.
+        /// </summary>
+        /// <param name="vocab">The feature vocabulary to use.</param>
         public void ComputeFeatureVectors(Vocabulary vocab)
         {
             Parallel.ForEach(this, (item) =>
             {
                 item.ComputeCountVector(vocab);
             });
+
+            _instances = null; // This operation invalidates our existing instance collection.
         }
 
         /// <summary>
@@ -202,15 +208,13 @@ namespace IML_Playground.Model
         /// <param name="size">The max size of each group.</param>
         /// <param name="labels">The news groups to include in the new collection.</param>
         /// <returns>A new NewsCollection.</returns>
-        public NewsCollection Subset(int size, params Label[] labels)
+        public NewsCollection ItemsSubset(int size, params Label[] labels)
         {
             NewsCollection nc = new NewsCollection();
             Random rand = new Random();
 
-            //foreach (NewsItem item in this)
             foreach (Label label in labels)
             {
-                //foreach (Label label in labels)
                 NewsCollection thisLabel = new NewsCollection();
 
                 // Get all of the items with a matching label
@@ -220,8 +224,6 @@ namespace IML_Playground.Model
                     {
                         item.Label = label;
                         thisLabel.Add(item);
-                        //nc.Add(item);
-                        //break;
                     }
                 }
 
@@ -240,9 +242,9 @@ namespace IML_Playground.Model
         }
 
         // Call Subset, but don't restrict group size
-        public NewsCollection Subset(params Label[] labels)
+        public NewsCollection ItemsSubset(params Label[] labels)
         {
-            return this.Subset(Int32.MaxValue, labels);
+            return this.ItemsSubset(Int32.MaxValue, labels);
         }
 
         /// <summary>
@@ -253,44 +255,45 @@ namespace IML_Playground.Model
         /// <param name="labels">The collection of potential output labels.</param>
         public async Task<bool> SaveArffFile(string filePath, Vocabulary vocab, params Label[] labels)
         {
-            await MultinomialNaiveBayesClassifier.SaveArffFile(ToInstances(), vocab, labels, filePath);
-            return true;
-            /*
-            using (TextWriter writer = File.CreateText(filePath))
+            return await MultinomialNaiveBayesClassifier.SaveArffFile(ToInstances(), vocab, labels, filePath);
+        }
+
+        /// <summary>
+        /// Return a collection of instances from this collection, with a limited number of items in each class.
+        /// </summary>
+        /// <param name="size">The max number of items to include from each class.</param>
+        /// <param name="labels">List of classes.</param>
+        /// <returns></returns>
+        public IEnumerable<Instance> Subset(int size, params Label[] labels)
+        {
+            Random rand = new Random();
+            List<Instance> subset = new List<Instance>();
+
+            foreach (Label label in labels)
             {
-                await writer.WriteLineAsync(string.Format("@RELATION {0}\n", "test")); // TODO compute the relation name form labels
-                
-                // Write out each feature and its type (for us, they're all numeric)
-                foreach (int id in vocab.FeatureIds)
-                {
-                    await writer.WriteLineAsync(string.Format("@ATTRIBUTE _{0} NUMERIC", vocab.GetWord(id)));
-                }
+                List<Instance> thisLabel = new List<Instance>();
 
-                // Write out the list of possible output labels
-                string[] classAttributeParts = new string[labels.Length];
-                for (int i = 0; i < labels.Length; i++)
-                    classAttributeParts[i] = labels[i].SystemLabel;
-                string classAttribute = string.Format("{{{0}}}", string.Join(",", classAttributeParts));
-                await writer.WriteLineAsync(string.Format("@ATTRIBUTE class {0}\n", classAttribute));
-
-                // Write out sparse vectors for each item
-                await writer.WriteLineAsync("@DATA");
-                int classIndex = vocab.Count; // the class attribute is always the last attribute
-                foreach (NewsItem item in this)
+                // Get all of the items with a matching label
+                foreach (Instance instance in this.ToInstances())
                 {
-                    string[] itemFeatures = new string[item.FeatureCounts.Data.Count + 1]; // include room for class attribute
-                    int index = 0;
-                    foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data.OrderBy(pair => pair.Key))
+                    if (instance.Label.Equals(label))
                     {
-                        itemFeatures[index] = string.Format("{0} {1}", pair.Key - 1, pair.Value); // Subtract 1 because ARFF features are 0-indexed, but our are 1-indexed
-                        index++;
+                        thisLabel.Add(instance);
                     }
-                    itemFeatures[index] = string.Format("{0} \"{1}\"", classIndex, item.Label.SystemLabel);
-                    string featureString = string.Join(", ", itemFeatures);
-                    await writer.WriteLineAsync(string.Format("{{{0}}}", featureString));
                 }
+
+                // Randomly remove items until the list's length is less than 'size'
+                while (thisLabel.Count > size)
+                {
+                    thisLabel.RemoveAt(rand.Next(thisLabel.Count));
+                }
+
+                // Add the items (no more than 'size') to our collection
+                foreach (Instance instance in thisLabel)
+                    subset.Add(instance);
             }
-             */
+
+            return subset;
         }
     }
 }
