@@ -29,6 +29,7 @@
                 <RibbonGroup Header="Training">
                     <RibbonButton Label="Retrain" SmallImageSource="Art/refresh_16xLG.png" Command="{Binding Retrain}" />
                     <RibbonButton Label="Resample" SmallImageSource="Art/Files_7954.png" Command="{Binding Resample}" />
+                    <RibbonTextBox Label="Sample size" />
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>
