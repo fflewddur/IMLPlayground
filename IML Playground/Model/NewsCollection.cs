@@ -251,8 +251,11 @@ namespace IML_Playground.Model
         /// <param name="filePath">The location of the output file.</param>
         /// <param name="vocab">The Vocabulary of features.</param>
         /// <param name="labels">The collection of potential output labels.</param>
-        public async void SaveArffFile(string filePath, Vocabulary vocab, params Label[] labels)
+        public async Task<bool> SaveArffFile(string filePath, Vocabulary vocab, params Label[] labels)
         {
+            await MultinomialNaiveBayesClassifier.SaveArffFile(ToInstances(), vocab, labels, filePath);
+            return true;
+            /*
             using (TextWriter writer = File.CreateText(filePath))
             {
                 await writer.WriteLineAsync(string.Format("@RELATION {0}\n", "test")); // TODO compute the relation name form labels
@@ -287,6 +290,7 @@ namespace IML_Playground.Model
                     await writer.WriteLineAsync(string.Format("{{{0}}}", featureString));
                 }
             }
+             */
         }
     }
 }

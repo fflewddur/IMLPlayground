@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -63,21 +64,6 @@ namespace IML_Playground.Learning
         }
 
         #endregion
-
-        private void AddInstanceWithoutPrUpdates(Instance instance)
-        {
-            // Update our feature counts
-            foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-            {
-                int count;
-                _perClassFeatureCounts[instance.Label].TryGetValue(pair.Key, out count);
-                count += (int)pair.Value;
-                _perClassFeatureCounts[instance.Label][pair.Key] = count;
-            }
-
-            // Store this feature vector
-            _trainingSet[instance.Label].Add(instance);
-        }
 
         public void AddInstance(Instance instance)
         {
@@ -164,6 +150,74 @@ namespace IML_Playground.Learning
             _perClassFeaturePriors[label][feature] = prior;
         }
 
+        public async Task<bool> SaveArffFile(string filePath)
+        {
+            bool retval = true;
+
+            // Merge our training set into a single collection of instances
+            HashSet<Instance> instances = new HashSet<Instance>();
+            foreach (Label label in Labels)
+            {
+                foreach (Instance instance in _trainingSet[label])
+                {
+                    instances.Add(instance);
+                }
+            }
+
+            try
+            {
+                await MultinomialNaiveBayesClassifier.SaveArffFile(instances, Vocab, Labels.ToArray(), filePath);
+            }
+            catch (IOException e)
+            {
+                Console.Error.WriteLine("Error saving ARFF file: {0}.", e.Message);
+                retval = false;
+            }
+
+            return retval;
+        }
+
+        public static async Task<bool> SaveArffFile(IEnumerable<Instance> instances, Vocabulary vocab, Label[] labels, string filePath)
+        {
+            using (TextWriter writer = File.CreateText(filePath))
+            {
+                string relation = string.Join("_", labels.Select(l => l.UserLabel));
+                await writer.WriteLineAsync(string.Format("@RELATION {0}\n", relation));
+
+                // Write out each feature and its type (for us, they're all numeric)
+                foreach (int id in vocab.FeatureIds)
+                {
+                    await writer.WriteLineAsync(string.Format("@ATTRIBUTE _{0} NUMERIC", vocab.GetWord(id)));
+                }
+
+                // Write out the list of possible output labels
+                string[] classAttributeParts = new string[labels.Length];
+                for (int i = 0; i < labels.Length; i++)
+                    classAttributeParts[i] = labels[i].SystemLabel;
+                string classAttribute = string.Format("{{{0}}}", string.Join(",", classAttributeParts));
+                await writer.WriteLineAsync(string.Format("@ATTRIBUTE class {0}\n", classAttribute));
+
+                // Write out sparse vectors for each item
+                await writer.WriteLineAsync("@DATA");
+                int classIndex = vocab.Count; // the class attribute is always the last attribute
+                foreach (Instance instance in instances)
+                {
+                    string[] itemFeatures = new string[instance.Features.Data.Count + 1]; // include room for class attribute
+                    int index = 0;
+                    foreach (KeyValuePair<int, double> pair in instance.Features.Data.OrderBy(pair => pair.Key))
+                    {
+                        itemFeatures[index] = string.Format("{0} {1}", pair.Key - 1, pair.Value); // Subtract 1 because ARFF features are 0-indexed, but our are 1-indexed
+                        index++;
+                    }
+                    itemFeatures[index] = string.Format("{0} \"{1}\"", classIndex, instance.Label.SystemLabel);
+                    string featureString = string.Join(", ", itemFeatures);
+                    await writer.WriteLineAsync(string.Format("{{{0}}}", featureString));
+                }
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Update our probabilities for classes and words, incorporating any user-provided feature priors.
         /// </summary>
@@ -172,6 +226,25 @@ namespace IML_Playground.Learning
             ComputePrC();
             ComputePrWGivenC();
             UpdateFeaturesPerClass();
+        }
+
+        /// <summary>
+        /// Add an instance to our training set, but don't compute probability updates.
+        /// </summary>
+        /// <param name="instance">The instance to add.</param>
+        private void AddInstanceWithoutPrUpdates(Instance instance)
+        {
+            // Update our feature counts
+            foreach (KeyValuePair<int, double> pair in instance.Features.Data)
+            {
+                int count;
+                _perClassFeatureCounts[instance.Label].TryGetValue(pair.Key, out count);
+                count += (int)pair.Value;
+                _perClassFeatureCounts[instance.Label][pair.Key] = count;
+            }
+
+            // Store this feature vector
+            _trainingSet[instance.Label].Add(instance);
         }
 
         /// <summary>
@@ -232,6 +305,9 @@ namespace IML_Playground.Learning
             }
         }
 
+        /// <summary>
+        /// Create collections of Features for each Label, using our current training set as the source data.
+        /// </summary>
         private void UpdateFeaturesPerClass()
         {
             _featuresPerClass.Clear();
@@ -252,7 +328,7 @@ namespace IML_Playground.Learning
                     double weight;
                     if (!_perClassFeaturePriors[label].TryGetValue(featureId, out weight))
                         weight = _defaultPrior;
-                    
+
                     _featuresPerClass[label].Add(new Feature { Characters = characters, CountTraining = count, Weight = weight });
                 }
             }

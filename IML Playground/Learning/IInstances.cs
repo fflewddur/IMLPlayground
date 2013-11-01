@@ -11,5 +11,6 @@ namespace IML_Playground.Learning
         int Count { get; }
 
         IEnumerable<Instance> ToInstances();
+        Task<bool> SaveArffFile(string filePath, Vocabulary vocab, params Label[] labels);
     }
 }

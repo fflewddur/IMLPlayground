@@ -17,5 +17,7 @@ namespace IML_Playground.Learning
         Prediction PredictInstance(Instance instance);
         void UpdatePrior(Label label, int feature, double prior);
         void Retrain();
+
+        Task<bool> SaveArffFile(string filePath);
     }
 }

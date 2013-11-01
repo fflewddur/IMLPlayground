@@ -93,7 +93,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\MainWindow.xaml">
+    <Page Include="View\FeatureViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -108,8 +108,8 @@
     <Compile Include="Learning\Vocabulary.cs" />
     <Compile Include="ViewModel\ClassifierEvaluatorViewModel.cs" />
     <Compile Include="ViewModel\ClassifierFeaturesViewModel.cs" />
-    <Compile Include="View\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
+    <Compile Include="View\FeatureViewer.xaml.cs">
+      <DependentUpon>FeatureViewer.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
@@ -189,6 +189,10 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="View\Art\ExportReportData_10565.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Files_7954.png" />
+    <Resource Include="View\Art\FileUpload_6026.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
