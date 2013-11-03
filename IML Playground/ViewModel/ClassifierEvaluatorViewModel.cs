@@ -21,12 +21,14 @@ namespace IML_Playground.ViewModel
         private int _falsePositives;
         private int _falseNegatives;
         private double _weightedF1;
+        private int _resampleSize;
 
         public ClassifierEvaluatorViewModel(Evaluator evaluator, IInstances testSet, IInstances fullTrainSet)
         {
             _evaluator = evaluator;
             _testSet = testSet;
             _fullTrainSet = fullTrainSet;
+            _resampleSize = 10; // default value
 
             if (_evaluator.Classifier.Labels.Count >= 2)
             {
@@ -91,6 +93,12 @@ namespace IML_Playground.ViewModel
         {
             get { return _weightedF1; }
             private set { SetProperty<double>(ref _weightedF1, value); }
+        }
+
+        public int ResampleSize
+        {
+            get { return _resampleSize; }
+            set { SetProperty<int>(ref _resampleSize, value); }
         }
 
         public ICommand Retrain { get; private set; }
@@ -207,7 +215,7 @@ namespace IML_Playground.ViewModel
 
         private void PerformResample()
         {
-            IEnumerable<Instance> instances = _fullTrainSet.Subset(10, _evaluator.Classifier.Labels.ToArray()); // TODO make the size user-editable
+            IEnumerable<Instance> instances = _fullTrainSet.Subset(_resampleSize, _evaluator.Classifier.Labels.ToArray()); // TODO make the size user-editable
             _evaluator.Classifier.ClearInstances(); // Remove the existing training set
             _evaluator.Classifier.AddInstances(instances); // Add the new training set
 
