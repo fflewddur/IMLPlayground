@@ -214,7 +214,7 @@ namespace IML_Playground.ViewModel
 
         private void PerformResample()
         {
-            IEnumerable<Instance> instances = _fullTrainSet.Subset(_resampleSize, _evaluator.Classifier.Labels.ToArray()); // TODO make the size user-editable
+            IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, _evaluator.Classifier.Labels.ToArray()); // TODO make the size user-editable
             _evaluator.Classifier.ClearInstances(); // Remove the existing training set
             _evaluator.Classifier.AddInstances(instances); // Add the new training set
 
