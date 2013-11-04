@@ -2,7 +2,10 @@
 using IML_Playground.Learning;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
@@ -40,8 +43,8 @@ namespace IML_Playground.ViewModel
 
             Retrain = new RelayCommand(PerformRetrain);
             Resample = new RelayCommand(PerformResample);
-            SaveModel = new RelayCommand(PerformSaveModel, () => (false));
-            LoadModel = new RelayCommand(PerformLoadModel, () => (false));
+            SaveModel = new RelayCommand(PerformSaveModel, () => false);
+            LoadModel = new RelayCommand(PerformLoadModel, () => false);
             ExportModelAsArff = new RelayCommand(PerformExportModelAsArff);
             ExportTestSetAsArff = new RelayCommand(PerformExportTestSetAsArff);
 
@@ -172,8 +175,23 @@ namespace IML_Playground.ViewModel
             }
         }
 
-        private void PerformSaveModel()
-        { }
+        private async void PerformSaveModel()
+        {
+            // Display the Save File Dialog
+            Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.Filter = "MODEL files (*.model|.model";
+            dialog.FileName = "model";
+            dialog.Title = "Save model as";
+
+            Nullable<bool> result = dialog.ShowDialog();
+
+            if (result == true)
+            {
+                string filename = dialog.FileName;
+                Console.WriteLine("Save model to {0}.", filename);
+                await SerializeAsync(filename);
+            }
+        }
 
         private void PerformLoadModel()
         { }
@@ -182,8 +200,9 @@ namespace IML_Playground.ViewModel
         {
             // Display the Save File Dialog
             Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.DefaultExt = ".arff";
-            dialog.Filter = "ARFF files|.arff";
+            dialog.Filter = "ARFF files (*.arff)|.arff";
+            dialog.FileName = "model";
+            dialog.Title = "Export model as";
 
             Nullable<bool> result = dialog.ShowDialog();
 
@@ -199,8 +218,9 @@ namespace IML_Playground.ViewModel
         {
             // Display the Save File Dialog
             Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.DefaultExt = ".arff";
-            dialog.Filter = "ARFF files|.arff";
+            dialog.Filter = "ARFF files (*.arff)|.arff";
+            dialog.FileName = "testSet";
+            dialog.Title = "Export test set as";
 
             Nullable<bool> result = dialog.ShowDialog();
 
@@ -223,6 +243,16 @@ namespace IML_Playground.ViewModel
             // Update our classifier viewmodel
             ClassifierViewModel.UpdateFeatures();
             AddTestSetFeatureCounts();
+        }
+
+        private Task SerializeAsync(string filename)
+        {
+            return Task.Run(() =>
+            {
+                IFormatter formatter = new BinaryFormatter();
+                using (FileStream s = File.Create(filename))
+                    formatter.Serialize(s, this);
+            });
         }
     }
 }

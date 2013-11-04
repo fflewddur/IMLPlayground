@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace IML_Playground.Learning
 {
+    [Serializable]
     class Evaluator
     {
         IClassifier _classifier;
