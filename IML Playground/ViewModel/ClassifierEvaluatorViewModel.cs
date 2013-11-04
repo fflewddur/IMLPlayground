@@ -28,7 +28,6 @@ namespace IML_Playground.ViewModel
             _evaluator = evaluator;
             _testSet = testSet;
             _fullTrainSet = fullTrainSet;
-            _resampleSize = 10; // default value
 
             if (_evaluator.Classifier.Labels.Count >= 2)
             {

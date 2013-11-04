@@ -37,7 +37,7 @@ namespace IML_Playground
             //TestSimple();
         }
 
-        private static void TestFeatureUI(IClassifier classifier, IInstances testSet, IInstances fullTrainSet)
+        private static void TestFeatureUI(IClassifier classifier, IInstances testSet, IInstances fullTrainSet, int trainingSetSize = Int32.MaxValue)
         {
             //Console.WriteLine("Loading model...");
             //MultinomialNaiveBayesClassifier classifier = LoadSerializedModel("model-simple.bin") as MultinomialNaiveBayesClassifier;
@@ -47,6 +47,7 @@ namespace IML_Playground
 
             Console.WriteLine("Building UI...");
             ClassifierEvaluatorViewModel vm = new ClassifierEvaluatorViewModel(evaluator, testSet, fullTrainSet);
+            vm.ResampleSize = trainingSetSize;
 
             Application app = new Application();
             FeatureViewer window = new FeatureViewer();
@@ -69,7 +70,7 @@ namespace IML_Playground
             IInstances fullTrainSet;
             IClassifier classifier = TrainModel("20news-bydate-train.zip", out fullTrainSet, trainingSetSize, min_df_percent, max_df_percent);
             IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "20news-bydate-test.zip");
-            TestFeatureUI(classifier, testSet, fullTrainSet);
+            TestFeatureUI(classifier, testSet, fullTrainSet, trainingSetSize);
         }
 
         private static IClassifier LoadSerializedModel(string path)
