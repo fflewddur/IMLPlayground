@@ -16,7 +16,8 @@ namespace IML_Playground.ViewModel
     {
         private Evaluator _evaluator;
         private IInstances _testSet;
-        private IInstances _fullTrainSet;
+        private IInstances _fullTrainSet; // The complete training set (allows us to resample smaller training sets at will).
+        private ClassifierFeaturesViewModel _classifierViewModel;
         private Label _positiveLabel;
         private Label _negativeLabel;
         private int _truePositives;
@@ -25,13 +26,31 @@ namespace IML_Playground.ViewModel
         private int _falseNegatives;
         private double _weightedF1;
         private int _resampleSize;
+        private SerializableModel _serializableModel; // Used to serialize our classifier, test set, and complete training set.
 
         public ClassifierEvaluatorViewModel(Evaluator evaluator, IInstances testSet, IInstances fullTrainSet)
         {
             _evaluator = evaluator;
             _testSet = testSet;
             _fullTrainSet = fullTrainSet;
+            
+            _serializableModel = new SerializableModel();
+            _serializableModel.Classifier = _evaluator.Classifier;
+            _serializableModel.FullTrainingSet = _fullTrainSet;
+            _serializableModel.TestSet = _testSet;
 
+            Retrain = new RelayCommand(PerformRetrain);
+            Resample = new RelayCommand(PerformResample);
+            SaveModel = new RelayCommand(PerformSaveModel);
+            LoadModel = new RelayCommand(PerformLoadModel);
+            ExportModelAsArff = new RelayCommand(PerformExportModelAsArff);
+            ExportTestSetAsArff = new RelayCommand(PerformExportTestSetAsArff);
+
+            Initialize();
+        }
+
+        private void Initialize()
+        {
             if (_evaluator.Classifier.Labels.Count >= 2)
             {
                 PositiveLabel = _evaluator.Classifier.Labels[0];
@@ -41,19 +60,16 @@ namespace IML_Playground.ViewModel
             ClassifierViewModel = new ClassifierFeaturesViewModel(_evaluator.Classifier);
             AddTestSetFeatureCounts();
 
-            Retrain = new RelayCommand(PerformRetrain);
-            Resample = new RelayCommand(PerformResample);
-            SaveModel = new RelayCommand(PerformSaveModel, () => false);
-            LoadModel = new RelayCommand(PerformLoadModel, () => false);
-            ExportModelAsArff = new RelayCommand(PerformExportModelAsArff);
-            ExportTestSetAsArff = new RelayCommand(PerformExportTestSetAsArff);
-
             PerformRetrain(); // Ensure our values are up-to-date
         }
 
         #region Properties
 
-        public ClassifierFeaturesViewModel ClassifierViewModel { get; private set; }
+        public ClassifierFeaturesViewModel ClassifierViewModel
+        { 
+            get { return _classifierViewModel; }
+            private set { SetProperty<ClassifierFeaturesViewModel>(ref _classifierViewModel, value); }
+        }
 
         public Label PositiveLabel
         {
@@ -179,7 +195,8 @@ namespace IML_Playground.ViewModel
         {
             // Display the Save File Dialog
             Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.Filter = "MODEL files (*.model|.model";
+            dialog.DefaultExt = ".model";
+            dialog.Filter = "MODEL files (.model)|*.model";
             dialog.FileName = "model";
             dialog.Title = "Save model as";
 
@@ -189,18 +206,32 @@ namespace IML_Playground.ViewModel
             {
                 string filename = dialog.FileName;
                 Console.WriteLine("Save model to {0}.", filename);
-                await SerializeAsync(filename);
+                await SerializeModelAsync(filename);
             }
         }
 
-        private void PerformLoadModel()
-        { }
+        private async void PerformLoadModel()
+        {
+            Microsoft.Win32.OpenFileDialog dialog = new Microsoft.Win32.OpenFileDialog();
+            dialog.DefaultExt = ".model";
+            dialog.Filter = "MODEL files (.model)|*.model";
+            dialog.Title = "Load model";
+
+            Nullable<bool> result = dialog.ShowDialog();
+            if (result == true)
+            {
+                string filename = dialog.FileName;
+                Console.WriteLine("Load model {0}.", filename);
+                await DeserializeModelAsync(filename);
+            }
+        }
 
         private async void PerformExportModelAsArff()
         {
             // Display the Save File Dialog
             Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.Filter = "ARFF files (*.arff)|.arff";
+            dialog.DefaultExt = ".arff";
+            dialog.Filter = "ARFF files (.arff)|*.arff";
             dialog.FileName = "model";
             dialog.Title = "Export model as";
 
@@ -218,7 +249,8 @@ namespace IML_Playground.ViewModel
         {
             // Display the Save File Dialog
             Microsoft.Win32.SaveFileDialog dialog = new Microsoft.Win32.SaveFileDialog();
-            dialog.Filter = "ARFF files (*.arff)|.arff";
+            dialog.DefaultExt = ".arff";
+            dialog.Filter = "ARFF files (.arff)|*.arff";
             dialog.FileName = "testSet";
             dialog.Title = "Export test set as";
 
@@ -245,13 +277,30 @@ namespace IML_Playground.ViewModel
             AddTestSetFeatureCounts();
         }
 
-        private Task SerializeAsync(string filename)
+        public Task SerializeModelAsync(string filename)
         {
             return Task.Run(() =>
             {
                 IFormatter formatter = new BinaryFormatter();
                 using (FileStream s = File.Create(filename))
-                    formatter.Serialize(s, this);
+                    formatter.Serialize(s, _serializableModel);
+            });
+        }
+
+        public Task DeserializeModelAsync(string filename)
+        {
+            return Task.Run(() =>
+            {
+                IFormatter formatter = new BinaryFormatter();
+                using (FileStream s = File.OpenRead(filename))
+                {
+                    _serializableModel = (SerializableModel)formatter.Deserialize(s);
+                    _evaluator.Classifier = _serializableModel.Classifier;
+                    _fullTrainSet = _serializableModel.FullTrainingSet;
+                    _testSet = _serializableModel.TestSet;
+
+                    Initialize();
+                }
             });
         }
     }

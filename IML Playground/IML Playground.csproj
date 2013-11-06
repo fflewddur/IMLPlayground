@@ -88,6 +88,7 @@
     <Compile Include="Learning\IClassifier.cs" />
     <Compile Include="Learning\IInstances.cs" />
     <Compile Include="Learning\Prediction.cs" />
+    <Compile Include="Learning\SerializableModel.cs" />
     <Compile Include="Utilities.cs" />
     <Page Include="View\Resources.xaml">
       <SubType>Designer</SubType>
