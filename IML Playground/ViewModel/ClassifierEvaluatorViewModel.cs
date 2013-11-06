@@ -297,7 +297,7 @@ namespace IML_Playground.ViewModel
             StatusMessage = "";
         }
 
-        public Task SerializeModelAsync(string filename)
+        private Task SerializeModelAsync(string filename)
         {
             return Task.Run(() =>
             {
@@ -307,7 +307,7 @@ namespace IML_Playground.ViewModel
             });
         }
 
-        public Task DeserializeModelAsync(string filename)
+        private Task DeserializeModelAsync(string filename)
         {
             return Task.Run(() =>
             {
