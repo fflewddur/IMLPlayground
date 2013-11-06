@@ -105,8 +105,8 @@ namespace IML_Playground.Model
                 if (wordId > 0) // Make sure this token was included in our vocabulary
                 {
                     int df = vocab.GetDocFreq(wordId);
-                    double tf = Math.Log10(pair.Value + 1); // Normalized term frequency
-                    double idf = Math.Log10(nDocs / (df + 1)); // Normalized inverse document frequency
+                    double tf = Math.Log(pair.Value + 1); // Normalized term frequency
+                    double idf = Math.Log(nDocs / (df + 1)); // Normalized inverse document frequency
                     features.Set(wordId, tf * idf);
                 }
             }
