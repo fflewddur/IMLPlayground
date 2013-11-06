@@ -10,6 +10,7 @@
             <RowDefinition Height="auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="auto" />
+            <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
         <!-- Ribbon -->
@@ -88,5 +89,21 @@
                 </Grid>
             </Grid>
         </Grid>
+        
+        <!-- Status bar -->
+        <StatusBar Grid.Row="3">
+            <Label Content="{Binding StatusMessage}" />
+            <ProgressBar IsIndeterminate="True" Width="100" Height="10">
+                <ProgressBar.Style>
+                    <Style>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding StatusMessage}" Value="">
+                                <Setter Property="ProgressBar.Visibility" Value="Collapsed" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ProgressBar.Style>
+            </ProgressBar>
+        </StatusBar>
     </Grid>
 </RibbonWindow>

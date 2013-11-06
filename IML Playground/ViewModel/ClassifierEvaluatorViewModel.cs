@@ -26,6 +26,7 @@ namespace IML_Playground.ViewModel
         private int _falseNegatives;
         private double _weightedF1;
         private int _resampleSize;
+        private string _statusMessage;
         private SerializableModel _serializableModel; // Used to serialize our classifier, test set, and complete training set.
 
         public ClassifierEvaluatorViewModel(Evaluator evaluator, IInstances testSet, IInstances fullTrainSet)
@@ -119,6 +120,12 @@ namespace IML_Playground.ViewModel
             set { SetProperty<int>(ref _resampleSize, value); }
         }
 
+        public string StatusMessage
+        {
+            get { return _statusMessage; }
+            private set { SetProperty<string>(ref _statusMessage, value); }
+        }
+
         public ICommand Retrain { get; private set; }
         public ICommand Resample { get; private set; }
         public ICommand SaveModel { get; private set; }
@@ -130,6 +137,8 @@ namespace IML_Playground.ViewModel
 
         private void AddTestSetFeatureCounts()
         {
+            StatusMessage = "Updating feature counts...";
+
             foreach (Feature feature in ClassifierViewModel.FeaturesPositive)
             {
                 foreach (Instance instance in _testSet.ToInstances())
@@ -157,11 +166,12 @@ namespace IML_Playground.ViewModel
                 }
             }
 
+            StatusMessage = "";
         }
 
         private void PerformRetrain()
         {
-            Console.WriteLine("PerformRetrain()");
+            StatusMessage = "Retraining...";
 
             // Update priors
             foreach (Feature feature in ClassifierViewModel.FeaturesPositive)
@@ -189,6 +199,8 @@ namespace IML_Playground.ViewModel
                 FalseNegatives = cm[1, 0];
                 TrueNegatives = cm[1, 1];
             }
+
+            StatusMessage = "";
         }
 
         private async void PerformSaveModel()
@@ -205,8 +217,9 @@ namespace IML_Playground.ViewModel
             if (result == true)
             {
                 string filename = dialog.FileName;
-                Console.WriteLine("Save model to {0}.", filename);
+                StatusMessage = "Saving model...";
                 await SerializeModelAsync(filename);
+                StatusMessage = "";
             }
         }
 
@@ -221,8 +234,9 @@ namespace IML_Playground.ViewModel
             if (result == true)
             {
                 string filename = dialog.FileName;
-                Console.WriteLine("Load model {0}.", filename);
+                StatusMessage = "Loading model...";
                 await DeserializeModelAsync(filename);
+                StatusMessage = "";
             }
         }
 
@@ -240,8 +254,9 @@ namespace IML_Playground.ViewModel
             if (result == true)
             {
                 string filename = dialog.FileName;
-                Console.WriteLine("Export ARFF file to {0}.", filename);
+                StatusMessage = "Exporting model...";
                 await _evaluator.Classifier.SaveArffFile(filename); // Save the ARFF file
+                StatusMessage = "";
             }
         }
 
@@ -259,13 +274,16 @@ namespace IML_Playground.ViewModel
             if (result == true)
             {
                 string filename = dialog.FileName;
-                Console.WriteLine("Export ARFF file to {0}.", filename);
+                StatusMessage = "Exporting test set...";
                 await _testSet.SaveArffFile(filename, _evaluator.Classifier.Vocab, _evaluator.Classifier.Labels.ToArray()); // Save the ARFF file
+                StatusMessage = "";
             }
         }
 
         private void PerformResample()
         {
+            StatusMessage = "Resampling...";
+            
             IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, _evaluator.Classifier.Labels.ToArray()); // TODO make the size user-editable
             _evaluator.Classifier.ClearInstances(); // Remove the existing training set
             _evaluator.Classifier.AddInstances(instances); // Add the new training set
@@ -275,6 +293,8 @@ namespace IML_Playground.ViewModel
             // Update our classifier viewmodel
             ClassifierViewModel.UpdateFeatures();
             AddTestSetFeatureCounts();
+
+            StatusMessage = "";
         }
 
         public Task SerializeModelAsync(string filename)

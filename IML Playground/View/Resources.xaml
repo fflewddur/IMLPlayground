@@ -1,7 +1,3 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Image x:Key="open" Source="Art/Open_6296_32.bmp"/>
-    <Image x:Key="save" Source="Art/Save_6530_32.bmp" />
-    <Image x:Key="export" Source="Art/ExportReportData_10565_32.bmp" />
-    <Image x:Key="retrain" />
 </ResourceDictionary>
