@@ -102,10 +102,6 @@ namespace IML_Playground
             // Restrict ourselves to the labels we're interested in
             NewsCollection trainHockeyBaseball = trainAll.ItemsSubset(labels.ToArray());
 
-            // Compute feature vectors
-            trainHockeyBaseball.ComputeTFIDFVectors(vocab);
-            trainHockeyBaseball.ComputeFeatureVectors(vocab);
-
             // Assign the correct label to each item
             foreach (NewsItem item in trainHockeyBaseball)
             {
@@ -116,8 +112,13 @@ namespace IML_Playground
                 }
             }
 
+            // Compute feature vectors
+            trainHockeyBaseball.ComputeTFIDFVectors(vocab);
+            trainHockeyBaseball.ComputeFeatureVectors(vocab);
+
             // Restrict our training set to a given size
             NewsCollection trainHockeyBaseballSmall = trainAll.ItemsSubset(trainingSetSize, labels.ToArray());
+            vocab.RestrictToInstances(trainHockeyBaseballSmall);
 
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
             foreach (NewsItem item in trainHockeyBaseballSmall)

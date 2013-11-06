@@ -25,6 +25,7 @@ namespace IML_Playground.ViewModel
         private int _falsePositives;
         private int _falseNegatives;
         private double _weightedF1;
+        private int _vocabSize;
         private int _resampleSize;
         private string _statusMessage;
         private SerializableModel _serializableModel; // Used to serialize our classifier, test set, and complete training set.
@@ -58,6 +59,7 @@ namespace IML_Playground.ViewModel
                 NegativeLabel = _evaluator.Classifier.Labels[1];
             }
 
+            VocabSize = _evaluator.Classifier.Vocab.Count;
             ClassifierViewModel = new ClassifierFeaturesViewModel(_evaluator.Classifier);
             AddTestSetFeatureCounts();
 
@@ -112,6 +114,12 @@ namespace IML_Playground.ViewModel
         {
             get { return _weightedF1; }
             private set { SetProperty<double>(ref _weightedF1, value); }
+        }
+
+        public int VocabSize
+        {
+            get { return _vocabSize; }
+            private set { SetProperty<int>(ref _vocabSize, value); }
         }
 
         public int ResampleSize
