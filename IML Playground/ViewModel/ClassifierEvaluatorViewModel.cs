@@ -34,7 +34,7 @@ namespace IML_Playground.ViewModel
             _evaluator = evaluator;
             _testSet = testSet;
             _fullTrainSet = fullTrainSet;
-            
+
             _serializableModel = new SerializableModel();
             _serializableModel.Classifier = _evaluator.Classifier;
             _serializableModel.FullTrainingSet = _fullTrainSet;
@@ -67,7 +67,7 @@ namespace IML_Playground.ViewModel
         #region Properties
 
         public ClassifierFeaturesViewModel ClassifierViewModel
-        { 
+        {
             get { return _classifierViewModel; }
             private set { SetProperty<ClassifierFeaturesViewModel>(ref _classifierViewModel, value); }
         }
@@ -280,20 +280,20 @@ namespace IML_Playground.ViewModel
             }
         }
 
-        private void PerformResample()
+        private async void PerformResample()
         {
             StatusMessage = "Resampling...";
-            
-            IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, _evaluator.Classifier.Labels.ToArray()); // TODO make the size user-editable
-            _evaluator.Classifier.ClearInstances(); // Remove the existing training set
-            _evaluator.Classifier.AddInstances(instances); // Add the new training set
+            await Task.Run(() =>
+            {
+                IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, _evaluator.Classifier.Labels.ToArray());
+                _evaluator.Classifier.ClearInstances(); // Remove the existing training set
+                _evaluator.Classifier.AddInstances(instances); // Add the new training set
 
-            PerformRetrain(); // Evaluate the new model
-
+                PerformRetrain(); // Evaluate the new model
+            });
             // Update our classifier viewmodel
             ClassifierViewModel.UpdateFeatures();
             AddTestSetFeatureCounts();
-
             StatusMessage = "";
         }
 
