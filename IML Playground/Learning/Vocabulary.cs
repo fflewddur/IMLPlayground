@@ -103,23 +103,40 @@ namespace IML_Playground.Learning
         }
 
         /// <summary>
-        /// Return the subset of the vocabulary that exists in a set of Instances.
+        /// Remove vocabulary elements that do not exist in a given set of Instances.
         /// </summary>
         /// <param name="instances">The collection of Instances to restrict our vocabulary to.</param>
-        /// <returns>A Vocabulary covering the provided Instances.</returns>
-        public Vocabulary SubsetInInstances(IInstances instances)
+        public void RestrictToInstances(IInstances instances)
         {
-            Vocabulary vocab = new Vocabulary();
-            // FIXME I don't work at all
+            HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
+            HashSet<int> notInInstances = new HashSet<int>(); // Track the feature IDs to remove
+
+            // Build a set of features in instances
             foreach (Instance instance in instances.ToInstances())
             {
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data)
                 {
-
+                    inInstances.Add(pair.Key);
                 }
             }
 
-            return vocab;
+            // Build a set of features to remove
+            foreach (int id in _idsToWords.Keys)
+            {
+                if (!inInstances.Contains(id))
+                    notInInstances.Add(id);
+            }
+
+            // Remove features
+            foreach (int id in notInInstances)
+            {
+                string word = _idsToWords[id];
+                _wordsToIds.Remove(word);
+                _idsToWords.Remove(id);
+                _documentFreqs.Remove(id);
+            }
+
+            return;
         }
 
         public override string ToString()
