@@ -114,6 +114,57 @@ namespace IML_Playground.Model
         }
 
         /// <summary>
+        /// Compute TF-IDF vectors for each specified class.
+        /// </summary>
+        /// <param name="vocab"></param>
+        /// <param name="labels"></param>
+        public void ComputeClassTFIDFVectors(Vocabulary vocab, IEnumerable<Label> labels)
+        {
+            Dictionary<Label, Dictionary<int, Tuple<double, int>>> perClassTFIDFWeightsAndCounts = new Dictionary<Label, Dictionary<int, Tuple<double, int>>>(); // sums and counts
+            Dictionary<Label, Dictionary<int, double>> perClassTFIDFWeights = new Dictionary<Label, Dictionary<int, double>>(); // averages
+            
+            foreach (Label label in labels)
+            {
+                perClassTFIDFWeightsAndCounts[label] = new Dictionary<int, Tuple<double, int>>();
+                perClassTFIDFWeights[label] = new Dictionary<int, double>();
+                
+                foreach (NewsItem item in this)
+                {
+                    if (item.Label.Equals(label))
+                    {
+                        foreach (KeyValuePair<int, double> pair in item.FeatureWeights.Data)
+                        {
+                            Tuple<double, int> value;
+                            perClassTFIDFWeightsAndCounts[label].TryGetValue(pair.Key, out value);
+                            double tfidfWeight = 0;
+                            int nWeights = 0;
+                            if (value != null)
+                            {
+                                tfidfWeight = value.Item1;
+                                nWeights = value.Item2;
+                            }
+                            tfidfWeight += pair.Value;
+                            nWeights += 1;
+                            perClassTFIDFWeightsAndCounts[label][pair.Key] = new Tuple<double, int>(tfidfWeight, nWeights);
+                        }
+                    }
+                }
+                
+                foreach (KeyValuePair<int, Tuple<double, int>> pair in perClassTFIDFWeightsAndCounts[label])
+                {
+                    perClassTFIDFWeights[label][pair.Key] = pair.Value.Item1 / pair.Value.Item2; // Average TF-IDF weights
+                }
+
+                Console.WriteLine("Top 10 features for {0}:", label);
+                
+                foreach (KeyValuePair<int, double> pair in perClassTFIDFWeights[label].OrderByDescending(key => key.Value).Take(10))
+                {
+                    Console.WriteLine("\t{0}: {1:0.000}", vocab.GetWord(pair.Key), pair.Value);
+                }
+            }
+        }
+
+        /// <summary>
         /// Create a Vocabulary object representing all of the tokens identified in this NewsCollection.
         /// </summary>
         /// <returns>A new Vocabulary object.</returns>
