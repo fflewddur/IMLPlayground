@@ -18,9 +18,9 @@ namespace IML_Playground
     // TODO Add interface for updating per-class feature weights in a classifier
     // TODO Figure out how make getter properties readonly
     // TODO Figure out if we can use IEnumerable in interfaces backed by HashSets or other specific collections
-    // TODO Filter vocabulary to remove words not found in training set
-    // TODO Compute TF-IDF on entire *class*, not individual items (identifies high IG features per class)
     // TODO Implement RelayCommand ourselves to remove MvvmLight dependency
+    // TODO Add method to restrict vocabulary to a collection of words
+    // TODO Add method to set per-class priors for vocabulary
 
     class Program
     {
