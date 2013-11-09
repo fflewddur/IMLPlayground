@@ -113,6 +113,86 @@ namespace IML_Playground.Model
             ComputeTFIDFVectors(vocab, this.Count);
         }
 
+        public void ComputeClassFeatureValues(Vocabulary vocab, IEnumerable<Label> labels)
+        {
+            Dictionary<Label, Dictionary<int, int>> perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
+            Dictionary<int, int> featureCounts = new Dictionary<int, int>();
+            Dictionary<Label, Dictionary<int, double>> perClassFeatureRatios = new Dictionary<Label, Dictionary<int, double>>();
+            Dictionary<Label, Dictionary<int, double>> perClassFeatureValues = new Dictionary<Label, Dictionary<int, double>>();
+
+            // Compute the sum of occurences for each feature in each set of labeled items
+            foreach (Label label in labels)
+            {
+                perClassFeatureCounts[label] = new Dictionary<int, int>();
+
+                foreach (NewsItem item in this)
+                {
+                    if (item.Label.Equals(label))
+                    {
+                        foreach (KeyValuePair<int, double> pair in item.FeatureCounts.Data)
+                        {
+                            int count;
+                            perClassFeatureCounts[label].TryGetValue(pair.Key, out count);
+                            perClassFeatureCounts[label][pair.Key] = (int)(count + pair.Value);
+                        }
+                    }
+                }
+            }
+
+            // Compute the ratio of occurences for each feature in each class, versus the other classes
+            foreach (Label label in labels)
+            {
+                perClassFeatureRatios[label] = new Dictionary<int, double>();
+
+                foreach (KeyValuePair<int, int> pair in perClassFeatureCounts[label])
+                {
+                    double numerator = pair.Value + 1; // add 1 to avoid 0 values
+                    double denominator = labels.Count() - 1; // add 1 per other class to avoid 0 in the denominator
+
+                    foreach (Label otherLabel in labels)
+                    {
+                        if (!otherLabel.Equals(label))
+                        {
+                            int count;
+                            perClassFeatureCounts[otherLabel].TryGetValue(pair.Key, out count);
+                            denominator += count;
+                        }
+                    }
+
+                    perClassFeatureRatios[label][pair.Key] = numerator / denominator;
+                }
+            }
+
+            // Compute the sum of occurences for each feature in the complete set of items
+            foreach (Label label in labels)
+            {
+                foreach (KeyValuePair<int, int> pair in perClassFeatureCounts[label])
+                {
+                    int count;
+                    featureCounts.TryGetValue(pair.Key, out count);
+                    featureCounts[pair.Key] = count + pair.Value;
+                }
+            }
+
+            // Compute feature values
+            foreach (Label label in labels)
+            {
+                perClassFeatureValues[label] = new Dictionary<int,double>();
+
+                foreach (KeyValuePair<int, double> pair in perClassFeatureRatios[label])
+                {
+                    perClassFeatureValues[label][pair.Key] = Math.Log(pair.Value * featureCounts[pair.Key]); // take the log to keep out values reasonably sized
+                }
+
+                Console.WriteLine("Top 10 features for {0}:", label);
+
+                foreach (KeyValuePair<int, double> pair in perClassFeatureValues[label].OrderByDescending(key => key.Value).Take(10))
+                {
+                    Console.WriteLine("\t{0}: {1:0.000}", vocab.GetWord(pair.Key), pair.Value);
+                }
+            }
+        }
+
         /// <summary>
         /// Compute TF-IDF vectors for each specified class.
         /// </summary>

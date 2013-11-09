@@ -116,6 +116,7 @@ namespace IML_Playground
             trainHockeyBaseball.ComputeTFIDFVectors(vocab);
             trainHockeyBaseball.ComputeFeatureVectors(vocab);
             trainHockeyBaseball.ComputeClassTFIDFVectors(vocab, labels);
+            trainHockeyBaseball.ComputeClassFeatureValues(vocab, labels);
 
             // Restrict our training set to a given size
             NewsCollection trainHockeyBaseballSmall = trainAll.ItemsSubset(trainingSetSize, labels.ToArray());
