@@ -128,15 +128,30 @@ namespace IML_Playground.Learning
             }
 
             // Remove features
-            foreach (int id in notInInstances)
-            {
-                string word = _idsToWords[id];
-                _wordsToIds.Remove(word);
-                _idsToWords.Remove(id);
-                _documentFreqs.Remove(id);
-            }
+            RemoveElements(notInInstances);
 
             return;
+        }
+
+        /// <summary>
+        /// Remove vocabulary elements that don't exist in a given collection of IDs.
+        /// </summary>
+        /// <param name="ids">The collection of IDs to restrict our vocabulary to.</param>
+        public void RestrictToSubset(IEnumerable<int> ids)
+        {
+            HashSet<int> toRemove = new HashSet<int>();
+
+            // Build a set of features to remove
+            foreach (int id in _idsToWords.Keys)
+            {
+                if (!ids.Contains(id))
+                {
+                    toRemove.Add(id);
+                }
+            }
+
+            // Remove features
+            RemoveElements(toRemove);
         }
 
         public override string ToString()
@@ -148,5 +163,29 @@ namespace IML_Playground.Learning
         }
 
         #endregion
+
+        /// <summary>
+        /// Remove a specific element from this vocabulary.
+        /// </summary>
+        /// <param name="id">The ID of the element to remove.</param>
+        private void RemoveElement(int id)
+        {
+            string word = _idsToWords[id];
+            _wordsToIds.Remove(word);
+            _idsToWords.Remove(id);
+            _documentFreqs.Remove(id);
+        }
+
+        /// <summary>
+        /// Remove a collection of elements from this vocabulary.
+        /// </summary>
+        /// <param name="ids">The collection of element IDs to remove.</param>
+        private void RemoveElements(IEnumerable<int> ids)
+        {
+            foreach (int id in ids)
+            {
+                RemoveElement(id);
+            }
+        }
     }
 }
