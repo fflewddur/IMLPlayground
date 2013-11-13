@@ -51,10 +51,10 @@ namespace IML_Playground.Learning
             private set { SetProperty<Vocabulary>(ref _vocab, value); }
         }
 
-        public Dictionary<Label, HashSet<Feature>> FeaturesPerClass
+        public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
         {
             get { return _featuresPerClass; }
-            private set { SetProperty<Dictionary<Label, HashSet<Feature>>>(ref _featuresPerClass, value); }
+            //private set { SetProperty<Dictionary<Label, HashSet<Feature>>>(ref _featuresPerClass, value); }
         }
 
         #endregion

@@ -10,7 +10,7 @@ namespace IML_Playground.Learning
     {
         List<Label> Labels { get; }
         Vocabulary Vocab { get; }
-        Dictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
+        IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
 
         void AddInstance(Instance instance);
         void AddInstances(IEnumerable<Instance> instances);
