@@ -19,8 +19,8 @@ namespace IML_Playground
     // TODO Figure out how make getter properties readonly
     // TODO Figure out if we can use IEnumerable in interfaces backed by HashSets or other specific collections
     // TODO Implement RelayCommand ourselves to remove MvvmLight dependency
-    // TODO Add method to restrict vocabulary to a collection of words
     // TODO Add method to set per-class priors for vocabulary
+    // TODO Support adding/removing items from a vocabulary after the classifier has already been built
 
     class Program
     {
@@ -31,7 +31,7 @@ namespace IML_Playground
         {
             //TestFeatureUISimple();
             //TestFeatureUI20Newsgroups();
-            TestFeatureUI20Newsgroups(10, .10, .90);
+            TestFeatureUI20Newsgroups(10, .10, .90, 20);
             //TestSerializedModel();
             //Test20Newsgroups();
             //TestSimple();
@@ -65,10 +65,11 @@ namespace IML_Playground
         }
 
         private static void TestFeatureUI20Newsgroups(int trainingSetSize = Int32.MaxValue,
-            double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT)
+            double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT,
+            int vocabSize = Int32.MaxValue)
         {
             IInstances fullTrainSet;
-            IClassifier classifier = TrainModel("20news-bydate-train.zip", out fullTrainSet, trainingSetSize, min_df_percent, max_df_percent);
+            IClassifier classifier = TrainModel("20news-bydate-train.zip", out fullTrainSet, trainingSetSize, min_df_percent, max_df_percent, vocabSize);
             IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "20news-bydate-test.zip");
             TestFeatureUI(classifier, testSet, fullTrainSet, trainingSetSize);
         }
@@ -84,7 +85,8 @@ namespace IML_Playground
         }
 
         private static IClassifier TrainModel(string filename, out IInstances fullTrainSet, int trainingSetSize = Int32.MaxValue,
-            double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT)
+            double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT,
+            int vocabSize = Int32.MaxValue)
         {
             NewsCollection trainAll = NewsCollection.CreateFromZip(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, filename));
             //foreach (NewsItem item in trainAll)
@@ -116,12 +118,12 @@ namespace IML_Playground
             trainHockeyBaseball.ComputeTFIDFVectors(vocab);
             trainHockeyBaseball.ComputeFeatureVectors(vocab);
             trainHockeyBaseball.ComputeClassTFIDFVectors(vocab, labels);
-            IEnumerable<int> highIGFeatures = trainHockeyBaseball.GetHighIGFeatures(vocab, labels, 10);
-            vocab.RestrictToSubset(highIGFeatures);
 
             // Restrict our training set to a given size
             NewsCollection trainHockeyBaseballSmall = trainAll.ItemsSubset(trainingSetSize, labels.ToArray());
-            vocab.RestrictToInstances(trainHockeyBaseballSmall);
+            IEnumerable<int> highIGFeatures = trainHockeyBaseballSmall.GetHighIGFeatures(vocab, labels, vocabSize);
+            vocab.RestrictToSubset(highIGFeatures);
+            //vocab.RestrictToInstances(trainHockeyBaseballSmall);
 
             MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
             foreach (NewsItem item in trainHockeyBaseballSmall)
