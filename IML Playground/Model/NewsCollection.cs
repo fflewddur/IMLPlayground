@@ -113,6 +113,13 @@ namespace IML_Playground.Model
             ComputeTFIDFVectors(vocab, this.Count);
         }
 
+        /// <summary>
+        /// Return the features with the highest information gain.
+        /// </summary>
+        /// <param name="vocab">The Vocabulary of potential features.</param>
+        /// <param name="labels">The class labels to compare.</param>
+        /// <param name="nFeatures">The maximum number of features to return, per class.</param>
+        /// <returns>A collection of the highest information gain features.</returns>
         public IEnumerable<int> GetHighIGFeatures(Vocabulary vocab, IEnumerable<Label> labels, int nFeatures)
         {
             Dictionary<Label, Dictionary<int, int>> perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
