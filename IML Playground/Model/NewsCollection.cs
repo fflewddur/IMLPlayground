@@ -113,12 +113,13 @@ namespace IML_Playground.Model
             ComputeTFIDFVectors(vocab, this.Count);
         }
 
-        public void ComputeClassFeatureValues(Vocabulary vocab, IEnumerable<Label> labels)
+        public IEnumerable<int> GetHighIGFeatures(Vocabulary vocab, IEnumerable<Label> labels, int nFeatures)
         {
             Dictionary<Label, Dictionary<int, int>> perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
             Dictionary<int, int> featureCounts = new Dictionary<int, int>();
             Dictionary<Label, Dictionary<int, double>> perClassFeatureRatios = new Dictionary<Label, Dictionary<int, double>>();
             Dictionary<Label, Dictionary<int, double>> perClassFeatureValues = new Dictionary<Label, Dictionary<int, double>>();
+            HashSet<int> highIGFeatures = new HashSet<int>();
 
             // Compute the sum of occurences for each feature in each set of labeled items
             foreach (Label label in labels)
@@ -186,11 +187,14 @@ namespace IML_Playground.Model
 
                 Console.WriteLine("Top 10 features for {0}:", label);
 
-                foreach (KeyValuePair<int, double> pair in perClassFeatureValues[label].OrderByDescending(key => key.Value).Take(10))
+                foreach (KeyValuePair<int, double> pair in perClassFeatureValues[label].OrderByDescending(key => key.Value).Take(nFeatures))
                 {
                     Console.WriteLine("\t{0}: {1:0.000}", vocab.GetWord(pair.Key), pair.Value);
+                    highIGFeatures.Add(pair.Key);
                 }
             }
+
+            return highIGFeatures;
         }
 
         /// <summary>
