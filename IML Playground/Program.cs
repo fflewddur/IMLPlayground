@@ -37,7 +37,7 @@ namespace IML_Playground
             //TestSimple();
         }
 
-        private static void TestFeatureUI(IClassifier classifier, IInstances testSet, IInstances fullTrainSet, int trainingSetSize = Int32.MaxValue)
+        private static void TestFeatureUI(IClassifier classifier, IInstances testSet, Vocabulary fullVocab, IInstances fullTrainSet, int trainingSetSize = Int32.MaxValue)
         {
             //Console.WriteLine("Loading model...");
             //MultinomialNaiveBayesClassifier classifier = LoadSerializedModel("model-simple.bin") as MultinomialNaiveBayesClassifier;
@@ -46,7 +46,7 @@ namespace IML_Playground
             //NewsCollection testSet = LoadSerializedInstances("testSet-simple.bin") as NewsCollection;
 
             Console.WriteLine("Building UI...");
-            ClassifierEvaluatorViewModel vm = new ClassifierEvaluatorViewModel(evaluator, testSet, fullTrainSet);
+            ClassifierEvaluatorViewModel vm = new ClassifierEvaluatorViewModel(evaluator, fullVocab, testSet, fullTrainSet);
             vm.ResampleSize = trainingSetSize;
 
             Application app = new Application();
@@ -59,9 +59,10 @@ namespace IML_Playground
         private static void TestFeatureUISimple()
         {
             IInstances fullTrainSet;
-            IClassifier classifier = TrainModel("simple-train.zip", out fullTrainSet);
+            Vocabulary fullVocab;
+            IClassifier classifier = TrainModel("simple-train.zip", out fullTrainSet, out fullVocab);
             IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "simple-test.zip");
-            TestFeatureUI(classifier, testSet, fullTrainSet);
+            TestFeatureUI(classifier, testSet, fullVocab, fullTrainSet);
         }
 
         private static void TestFeatureUI20Newsgroups(int trainingSetSize = Int32.MaxValue,
@@ -69,9 +70,10 @@ namespace IML_Playground
             int vocabSize = Int32.MaxValue)
         {
             IInstances fullTrainSet;
-            IClassifier classifier = TrainModel("20news-bydate-train.zip", out fullTrainSet, trainingSetSize, min_df_percent, max_df_percent, vocabSize);
+            Vocabulary fullVocab;
+            IClassifier classifier = TrainModel("20news-bydate-train.zip", out fullTrainSet, out fullVocab, trainingSetSize, min_df_percent, max_df_percent, vocabSize);
             IInstances testSet = LoadTestSet(classifier.Labels, classifier.Vocab, "20news-bydate-test.zip");
-            TestFeatureUI(classifier, testSet, fullTrainSet, trainingSetSize);
+            TestFeatureUI(classifier, testSet, fullVocab, fullTrainSet, trainingSetSize);
         }
 
         private static IClassifier LoadSerializedModel(string path)
@@ -84,7 +86,7 @@ namespace IML_Playground
             return classifier;
         }
 
-        private static IClassifier TrainModel(string filename, out IInstances fullTrainSet, int trainingSetSize = Int32.MaxValue,
+        private static IClassifier TrainModel(string filename, out IInstances fullTrainSet, out Vocabulary fullVocab, int trainingSetSize = Int32.MaxValue,
             double min_df_percent = Vocabulary.MIN_DF_PERCENT, double max_df_percent = Vocabulary.MAX_DF_PERCENT,
             int vocabSize = Int32.MaxValue)
         {
@@ -94,7 +96,7 @@ namespace IML_Playground
             //    Console.WriteLine("Item {0}: {1}", item.Id, item.AllText);
             //}
             Console.WriteLine();
-            Vocabulary vocab = trainAll.BuildVocabulary(min_df_percent, max_df_percent);
+            fullVocab = trainAll.BuildVocabulary(min_df_percent, max_df_percent);
             //Console.WriteLine("Vocab: {0}\n", vocab);
 
             List<Label> labels = new List<Label>();
@@ -115,17 +117,17 @@ namespace IML_Playground
             }
 
             // Compute feature vectors
-            trainHockeyBaseball.ComputeTFIDFVectors(vocab);
-            trainHockeyBaseball.ComputeFeatureVectors(vocab);
-            trainHockeyBaseball.ComputeClassTFIDFVectors(vocab, labels);
+            trainHockeyBaseball.ComputeTFIDFVectors(fullVocab);
+            trainHockeyBaseball.ComputeFeatureVectors(fullVocab);
+            trainHockeyBaseball.ComputeClassTFIDFVectors(fullVocab, labels);
 
             // Restrict our training set to a given size
             NewsCollection trainHockeyBaseballSmall = trainAll.ItemsSubset(trainingSetSize, labels.ToArray());
-            IEnumerable<int> highIGFeatures = trainHockeyBaseballSmall.GetHighIGFeatures(vocab, labels, vocabSize);
-            vocab.RestrictToSubset(highIGFeatures);
+            IEnumerable<int> highIGFeatures = trainHockeyBaseballSmall.GetHighIGFeatures(fullVocab, labels, vocabSize);
+            fullVocab.RestrictToSubset(highIGFeatures);
             //vocab.RestrictToInstances(trainHockeyBaseballSmall);
 
-            MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, vocab);
+            MultinomialNaiveBayesClassifier classifier = new MultinomialNaiveBayesClassifier(labels, fullVocab);
             foreach (NewsItem item in trainHockeyBaseballSmall)
             {
                 Instance instance = new Instance { Label = item.Label, Features = item.FeatureCounts };
