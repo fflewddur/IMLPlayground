@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IML_Playground.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Learning
 {
     [Serializable]
-    class MultinomialNaiveBayesFeedbackClassifier : IML_Playground.ViewModel.ViewModelBase, IClassifier
+    class MultinomialNaiveBayesFeedbackClassifier : ViewModelBase, IClassifier
     {
         private const double _defaultPrior = 1.0;
 

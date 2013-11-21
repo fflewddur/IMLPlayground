@@ -10,7 +10,7 @@ namespace IML_Playground.ViewModel
 {
     // Abstract class to support models implementing INotifyPropertyChanged
     [Serializable]
-    abstract class ViewModelBase : INotifyPropertyChanged
+    public abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

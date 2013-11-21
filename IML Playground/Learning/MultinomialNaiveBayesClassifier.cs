@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IML_Playground.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Learning
 {
     [Serializable]
-    class MultinomialNaiveBayesClassifier : IML_Playground.ViewModel.ViewModelBase, IClassifier
+    class MultinomialNaiveBayesClassifier : ViewModelBase, IClassifier
     {
         private const double _defaultPrior = 1.0;
 
@@ -326,24 +327,23 @@ namespace IML_Playground.Learning
                 int sumFeatures = _perClassFeatureCounts[l].Values.Sum();
 
                 // Sum up the priors
-                //double sumPriors = 0;
-                //foreach (int id in Vocab.FeatureIds)
-                //{
-                //    double prior;
-                //    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
-                //        prior = _defaultPrior; // Use a default value if the user didn't provide one.
-                //    sumPriors += prior;
-                //}
+                double sumPriors = 0;
+                foreach (int id in Vocab.FeatureIds)
+                {
+                    double prior;
+                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
+                        prior = _defaultPrior; // Use a default value if the user didn't provide one.
+                    sumPriors += prior;
+                }
 
                 foreach (int id in Vocab.FeatureIds)
                 {
                     int countFeature;
                     _perClassFeatureCounts[l].TryGetValue(id, out countFeature);
-//                    double prior;
-//                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
-//                        prior = _defaultPrior;
-//                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)(sumFeatures)); // Removed + sumPriors // OLD VERSION
-                    _pWordGivenClass[l][id] = (1 + countFeature) / (double)sumFeatures;
+                    double prior;
+                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
+                        prior = _defaultPrior;
+                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)(sumFeatures + sumPriors));
                 }
             }
         }
