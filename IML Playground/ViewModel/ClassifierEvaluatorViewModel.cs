@@ -17,6 +17,7 @@ namespace IML_Playground.ViewModel
         private Evaluator _evaluator;
         private Vocabulary _fullVocab; // The complete vocabulary (allows us to build vocabulary subsets at will).
         private IInstances _testSet;
+        private IInstances _trainSet;
         private IInstances _fullTrainSet; // The complete training set (allows us to resample smaller training sets at will).
         private ClassifierFeaturesViewModel _classifierViewModel;
         private Label _positiveLabel;
@@ -31,9 +32,10 @@ namespace IML_Playground.ViewModel
         private string _statusMessage;
         private SerializableModel _serializableModel; // Used to serialize our classifier, test set, and complete training set.
 
-        public ClassifierEvaluatorViewModel(Evaluator evaluator, Vocabulary fullVocab, IInstances testSet, IInstances fullTrainSet)
+        public ClassifierEvaluatorViewModel(Evaluator evaluator, Vocabulary fullVocab, IInstances trainSet, IInstances testSet, IInstances fullTrainSet)
         {
             _evaluator = evaluator;
+            _trainSet = trainSet;
             _testSet = testSet;
             _fullVocab = fullVocab;
             _fullTrainSet = fullTrainSet;
@@ -45,6 +47,7 @@ namespace IML_Playground.ViewModel
 
             Retrain = new RelayCommand(PerformRetrain);
             Resample = new RelayCommand(PerformResample);
+            ResizeVocab = new RelayCommand(PerformResizeVocab);
             SaveModel = new RelayCommand(PerformSaveModel);
             LoadModel = new RelayCommand(PerformLoadModel);
             ExportModelAsArff = new RelayCommand(PerformExportModelAsArff);
@@ -138,6 +141,7 @@ namespace IML_Playground.ViewModel
 
         public ICommand Retrain { get; private set; }
         public ICommand Resample { get; private set; }
+        public ICommand ResizeVocab { get; private set; }
         public ICommand SaveModel { get; private set; }
         public ICommand LoadModel { get; private set; }
         public ICommand ExportModelAsArff { get; private set; }
@@ -294,44 +298,56 @@ namespace IML_Playground.ViewModel
         {
             StatusMessage = "Resampling...";
             await Task.Run(() =>
-            {
-                IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, _evaluator.Classifier.Labels.ToArray());
-                _evaluator.Classifier.ClearInstances(); // Remove the existing training set
-                _evaluator.Classifier.AddInstances(instances); // Add the new training set
+                {
+                    IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, _evaluator.Classifier.Labels.ToArray());
+                    _evaluator.Classifier.ClearInstances(); // Remove the existing training set
+                    _evaluator.Classifier.AddInstances(instances); // Add the new training set
 
-                PerformRetrain(); // Evaluate the new model
-            });
+                    PerformRetrain(); // Evaluate the new model
+                });
             // Update our classifier viewmodel
             ClassifierViewModel.UpdateFeatures();
             AddTestSetFeatureCounts();
             StatusMessage = "";
         }
 
+        private async void PerformResizeVocab()
+        {
+            StatusMessage = "Resizing vocabulary...";
+            await Task.Run(() =>
+                {
+                    //_evaluator.Classifier.get
+                    //.ComputeFeatureVectors(_fullVocab);
+                    //_fullVocab.GetSubset()
+                });
+            StatusMessage = "";
+        }
+
         private Task SerializeModelAsync(string filename)
         {
             return Task.Run(() =>
-            {
-                IFormatter formatter = new BinaryFormatter();
-                using (FileStream s = File.Create(filename))
-                    formatter.Serialize(s, _serializableModel);
-            });
+                {
+                    IFormatter formatter = new BinaryFormatter();
+                    using (FileStream s = File.Create(filename))
+                        formatter.Serialize(s, _serializableModel);
+                });
         }
 
         private Task DeserializeModelAsync(string filename)
         {
             return Task.Run(() =>
-            {
-                IFormatter formatter = new BinaryFormatter();
-                using (FileStream s = File.OpenRead(filename))
                 {
-                    _serializableModel = (SerializableModel)formatter.Deserialize(s);
-                    _evaluator.Classifier = _serializableModel.Classifier;
-                    _fullTrainSet = _serializableModel.FullTrainingSet;
-                    _testSet = _serializableModel.TestSet;
+                    IFormatter formatter = new BinaryFormatter();
+                    using (FileStream s = File.OpenRead(filename))
+                    {
+                        _serializableModel = (SerializableModel)formatter.Deserialize(s);
+                        _evaluator.Classifier = _serializableModel.Classifier;
+                        _fullTrainSet = _serializableModel.FullTrainingSet;
+                        _testSet = _serializableModel.TestSet;
 
-                    Initialize();
-                }
-            });
+                        Initialize();
+                    }
+                });
         }
     }
 }
