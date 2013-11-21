@@ -85,14 +85,14 @@ namespace IML_Playground.Learning
         /// </summary>
         /// <param name="tokenDocFreqs"></param>
         /// <param name="nDocs"></param>
-        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs, double min_df_percent = MIN_DF_PERCENT, double max_df_percent = MAX_DF_PERCENT)
+        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs = -1, double min_df_percent = MIN_DF_PERCENT, double max_df_percent = MAX_DF_PERCENT)
         {
-            int min_df = (int)(MIN_DF_PERCENT * nDocs);
-            int max_df = (int)(MAX_DF_PERCENT * nDocs);
+            int min_df = (int)(min_df_percent * nDocs);
+            int max_df = (int)(max_df_percent * nDocs);
 
             foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)
             {
-                if (tokenDf.Value >= min_df && tokenDf.Value <= max_df)
+                if (nDocs > 0 && tokenDf.Value >= min_df && tokenDf.Value <= max_df)
                 {
                     _wordsToIds[tokenDf.Key] = _nextId;
                     _idsToWords[_nextId] = tokenDf.Key;
@@ -131,6 +131,26 @@ namespace IML_Playground.Learning
             RemoveElements(notInInstances);
 
             return;
+        }
+
+        /// <summary>
+        /// Build a new Vocabulary that is restricted to the given collection of IDs.
+        /// </summary>
+        /// <param name="ids">The collection of IDs to restrict the new vocabulary to.</param>
+        /// <returns>The new vocabulary object.</returns>
+        public Vocabulary GetSubset(IEnumerable<int> ids)
+        {
+            Vocabulary v = new Vocabulary();
+            Dictionary<string, int> tokens = new Dictionary<string,int>();
+
+            foreach (int id in ids)
+            {
+                tokens.Add(_idsToWords[id],  _documentFreqs[_nextId]);
+            }
+
+            v.AddTokens(tokens);
+
+            return v;
         }
 
         /// <summary>
