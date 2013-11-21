@@ -31,7 +31,7 @@ namespace IML_Playground
         {
             //TestFeatureUISimple();
             //TestFeatureUI20Newsgroups();
-            TestFeatureUI20Newsgroups(10, .10, .90, 5);
+            TestFeatureUI20Newsgroups(100, .10, .90, 50);
             //TestSerializedModel();
             //Test20Newsgroups();
             //TestSimple();

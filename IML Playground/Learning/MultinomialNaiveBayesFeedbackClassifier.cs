@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace IML_Playground.Learning
 {
     [Serializable]
-    class MultinomialNaiveBayesClassifier : IML_Playground.ViewModel.ViewModelBase, IClassifier
+    class MultinomialNaiveBayesFeedbackClassifier : IML_Playground.ViewModel.ViewModelBase, IClassifier
     {
         private const double _defaultPrior = 1.0;
 
@@ -23,7 +23,7 @@ namespace IML_Playground.Learning
         private Dictionary<Label, double> _pClass;
         private Dictionary<Label, Dictionary<int, double>> _pWordGivenClass;
 
-        public MultinomialNaiveBayesClassifier(List<Label> labels, Vocabulary vocab)
+        public MultinomialNaiveBayesFeedbackClassifier(List<Label> labels, Vocabulary vocab)
         {
             Labels = labels;
             Vocab = vocab;
