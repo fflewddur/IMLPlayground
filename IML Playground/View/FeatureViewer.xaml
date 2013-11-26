@@ -28,8 +28,12 @@
                     <RibbonButton Label="Export test set" SmallImageSource="Art/FileUpload_6026.png" Command="{Binding ExportTestSetAsArff}" />
                 </RibbonGroup>
                 <RibbonGroup Header="Training">
+                    
                     <RibbonButton Label="Retrain" SmallImageSource="Art/refresh_16xLG.png" Command="{Binding Retrain}" />
                     <RibbonButton Label="Resample" SmallImageSource="Art/Files_7954.png" Command="{Binding Resample}" />
+                    <RibbonComboBox Label="Classifier" IsEditable="False">
+                        <RibbonGallery />
+                    </RibbonComboBox>
                     <RibbonTextBox Label="Sample size (per class)" Text="{Binding ResampleSize, UpdateSourceTrigger=PropertyChanged}" />
                     <RibbonTextBox Label="Vocabulary size (per class)" Text="{Binding VocabularySize, UpdateSourceTrigger=PropertyChanged}" />
                 </RibbonGroup>

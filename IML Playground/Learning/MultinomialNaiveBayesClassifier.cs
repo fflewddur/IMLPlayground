@@ -26,6 +26,7 @@ namespace IML_Playground.Learning
 
         public MultinomialNaiveBayesClassifier(List<Label> labels, Vocabulary vocab)
         {
+            Name = "MNB";
             Labels = labels;
             Vocab = vocab;
             _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
@@ -39,6 +40,8 @@ namespace IML_Playground.Learning
         }
 
         #region Properties
+
+        public string Name { get; private set; }
 
         public List<Label> Labels
         {

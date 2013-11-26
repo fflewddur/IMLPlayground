@@ -8,6 +8,7 @@ namespace IML_Playground.Learning
 {
     interface IClassifier
     {
+        string Name { get; }
         List<Label> Labels { get; }
         Vocabulary Vocab { get; }
         IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
