@@ -14,6 +14,7 @@ namespace IML_Playground.ViewModel
 {
     class ClassifierEvaluatorViewModel : ViewModelBase
     {
+        private List<IClassifier> _classifiers;
         private Evaluator _evaluator;
         private Vocabulary _fullVocab; // The complete vocabulary (allows us to build vocabulary subsets at will).
         private IInstances _testSet;
@@ -32,9 +33,10 @@ namespace IML_Playground.ViewModel
         private string _statusMessage;
         private SerializableModel _serializableModel; // Used to serialize our classifier, test set, and complete training set.
 
-        public ClassifierEvaluatorViewModel(Evaluator evaluator, Vocabulary fullVocab, IInstances trainSet, IInstances testSet, IInstances fullTrainSet)
+        public ClassifierEvaluatorViewModel(List<IClassifier> classifiers, Vocabulary fullVocab, IInstances trainSet, IInstances testSet, IInstances fullTrainSet)
         {
-            _evaluator = evaluator;
+            _classifiers = classifiers;
+            //_evaluator = evaluator;
             _trainSet = trainSet;
             _testSet = testSet;
             _fullVocab = fullVocab;

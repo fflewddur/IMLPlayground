@@ -52,13 +52,17 @@ namespace IML_Playground.Learning
         public Vocabulary Vocab
         {
             get { return _vocab; }
-            private set { SetProperty<Vocabulary>(ref _vocab, value); }
+            set {
+                if (SetProperty<Vocabulary>(ref _vocab, value))
+                {
+                    ClearInstances(); // If the vocabulary changes, our current instances are invalidated.
+                }
+            }
         }
 
         public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
         {
             get { return _featuresPerClass; }
-            //private set { SetProperty<Dictionary<Label, HashSet<Feature>>>(ref _featuresPerClass, value); }
         }
 
         #endregion
