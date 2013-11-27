@@ -102,6 +102,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -109,6 +110,10 @@
                     </Grid.ColumnDefinitions>
                     <Label Content="Vocabulary size:" Grid.Row="0" Grid.Column="0" />
                     <Label Content="{Binding Path=VocabSize}" Grid.Row="0" Grid.Column="1" />
+                    <Label Content="Full vocabulary size:" Grid.Row="1" Grid.Column="0" />
+                    <Label Content="{Binding Path=FullVocabSize}" Grid.Row="1" Grid.Column="1" />
+                    <Label Content="Full training set size:" Grid.Row="2" Grid.Column="0" />
+                    <Label Content="{Binding Path=FullTrainSize}" Grid.Row="2" Grid.Column="1" />
                 </Grid>
             </Grid>
         </Grid>

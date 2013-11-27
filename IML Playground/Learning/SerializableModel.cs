@@ -15,7 +15,7 @@ namespace IML_Playground.Learning
     [Serializable]
     class SerializableModel
     {
-        public IClassifier Classifier;
+        public List<IClassifier> Classifiers;
         public IInstances FullTrainingSet;
         public IInstances TestSet;
     }
