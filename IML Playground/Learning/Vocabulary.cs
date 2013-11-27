@@ -15,7 +15,7 @@ namespace IML_Playground.Learning
         private Dictionary<int, string> _idsToWords;
         private Dictionary<int, int> _documentFreqs; // number of documents each word appears in
 
-        public const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 5% of documents
+        public const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 1% of documents
         public const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
 
         public Vocabulary()

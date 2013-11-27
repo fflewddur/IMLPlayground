@@ -14,7 +14,9 @@ namespace IML_Playground.ViewModel
 {
     class ClassifierEvaluatorViewModel : ViewModelBase
     {
-        private List<IClassifier> _classifiers;
+        private IEnumerable<IClassifier> _classifiers;
+        private IClassifier _currentClassifier;
+        private IEnumerable<Label> _labels;
         private Evaluator _evaluator;
         private Vocabulary _fullVocab; // The complete vocabulary (allows us to build vocabulary subsets at will).
         private IInstances _testSet;
@@ -33,10 +35,12 @@ namespace IML_Playground.ViewModel
         private string _statusMessage;
         private SerializableModel _serializableModel; // Used to serialize our classifier, test set, and complete training set.
 
-        public ClassifierEvaluatorViewModel(List<IClassifier> classifiers, Vocabulary fullVocab, IInstances trainSet, IInstances testSet, IInstances fullTrainSet)
+        public ClassifierEvaluatorViewModel(List<IClassifier> classifiers, IEnumerable<Label> labels, Vocabulary fullVocab, IInstances trainSet, IInstances testSet, IInstances fullTrainSet)
         {
             _classifiers = classifiers;
-            //_evaluator = evaluator;
+            _labels = labels;
+            CurrentClassifier = AvailableClassifiers.First(); // Take the first available classifier
+            _evaluator = new Evaluator() { Classifier = CurrentClassifier };
             _trainSet = trainSet;
             _testSet = testSet;
             _fullVocab = fullVocab;
@@ -60,10 +64,10 @@ namespace IML_Playground.ViewModel
 
         private void Initialize()
         {
-            if (_evaluator.Classifier.Labels.Count >= 2)
+            if (_evaluator.Classifier.Labels.Count() >= 2)
             {
-                PositiveLabel = _evaluator.Classifier.Labels[0];
-                NegativeLabel = _evaluator.Classifier.Labels[1];
+                PositiveLabel = _evaluator.Classifier.PositiveLabel;
+                NegativeLabel = _evaluator.Classifier.NegativeLabel;
             }
 
             VocabSize = _evaluator.Classifier.Vocab.Count;
@@ -141,6 +145,18 @@ namespace IML_Playground.ViewModel
             private set { SetProperty<string>(ref _statusMessage, value); }
         }
 
+        public IEnumerable<IClassifier> AvailableClassifiers
+        {
+            get { return _classifiers; }
+            private set { SetProperty<IEnumerable<IClassifier>>(ref _classifiers, value); }
+        }
+
+        public IClassifier CurrentClassifier
+        {
+            get { return _currentClassifier; }
+            set { SetProperty<IClassifier>(ref _currentClassifier, value); }
+        }
+
         public ICommand Retrain { get; private set; }
         public ICommand Resample { get; private set; }
         public ICommand ResizeVocab { get; private set; }
@@ -193,28 +209,29 @@ namespace IML_Playground.ViewModel
             foreach (Feature feature in ClassifierViewModel.FeaturesPositive)
             {
                 int featureId = _evaluator.Classifier.Vocab.GetWordId(feature.Characters);
-                _evaluator.Classifier.UpdatePrior(_evaluator.Classifier.Labels[0], featureId, feature.Weight);
+                _evaluator.Classifier.UpdatePrior(_evaluator.Classifier.PositiveLabel, featureId, feature.Weight);
             }
             foreach (Feature feature in ClassifierViewModel.FeaturesNegative)
             {
                 int featureId = _evaluator.Classifier.Vocab.GetWordId(feature.Characters);
-                _evaluator.Classifier.UpdatePrior(_evaluator.Classifier.Labels[1], featureId, feature.Weight);
+                _evaluator.Classifier.UpdatePrior(_evaluator.Classifier.NegativeLabel, featureId, feature.Weight);
             }
 
             // Retrain our model
             _evaluator.Classifier.Train();
 
             // Evaluate new classifier
-            _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
-            WeightedF1 = _evaluator.WeightedF1;
-            int[,] cm = _evaluator.ConfusionMatrix;
-            if (cm.GetLength(0) == 2 && cm.GetLength(1) == 2)
-            {
-                TruePositives = cm[0, 0];
-                FalsePositives = cm[0, 1];
-                FalseNegatives = cm[1, 0];
-                TrueNegatives = cm[1, 1];
-            }
+            // FIXME
+            //_evaluator.EvaluateOnTestSet(_testSet.ToInstances());
+            //WeightedF1 = _evaluator.WeightedF1;
+            //int[,] cm = _evaluator.ConfusionMatrix;
+            //if (cm.GetLength(0) == 2 && cm.GetLength(1) == 2)
+            //{
+            //    TruePositives = cm[0, 0];
+            //    FalsePositives = cm[0, 1];
+            //    FalseNegatives = cm[1, 0];
+            //    TrueNegatives = cm[1, 1];
+            //}
 
             StatusMessage = "";
         }

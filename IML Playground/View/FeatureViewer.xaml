@@ -31,9 +31,12 @@
                     
                     <RibbonButton Label="Retrain" SmallImageSource="Art/refresh_16xLG.png" Command="{Binding Retrain}" />
                     <RibbonButton Label="Resample" SmallImageSource="Art/Files_7954.png" Command="{Binding Resample}" />
-                    <RibbonComboBox Label="Classifier" IsEditable="False">
-                        <RibbonGallery />
-                    </RibbonComboBox>
+                    <ComboBox ItemsSource="{Binding AvailableClassifiers}" SelectedItem="{Binding CurrentClassifier}" DisplayMemberPath="Name" />
+                    <!--<RibbonComboBox Label="Classifier" IsEditable="False">
+                        <RibbonGallery MaxColumnCount="1" SelectedItem="{Binding CurrentClassifier}">
+                            <RibbonGalleryCategory ItemsSource="{Binding AvailableClassifiers}" DisplayMemberPath="Name" />
+                        </RibbonGallery>
+                    </RibbonComboBox>-->
                     <RibbonTextBox Label="Sample size (per class)" Text="{Binding ResampleSize, UpdateSourceTrigger=PropertyChanged}" />
                     <RibbonTextBox Label="Vocabulary size (per class)" Text="{Binding VocabularySize, UpdateSourceTrigger=PropertyChanged}" />
                 </RibbonGroup>

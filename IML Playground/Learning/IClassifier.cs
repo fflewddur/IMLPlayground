@@ -9,9 +9,11 @@ namespace IML_Playground.Learning
     interface IClassifier
     {
         string Name { get; }
-        List<Label> Labels { get; }
+        IEnumerable<Label> Labels { get; }
         Vocabulary Vocab { get; }
         IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
+        Label PositiveLabel { get; }
+        Label NegativeLabel { get; }
 
         void AddInstance(Instance instance);
         void AddInstances(IEnumerable<Instance> instances);

@@ -13,7 +13,7 @@ namespace IML_Playground.Learning
     {
         private const double _defaultPrior = 1.0;
 
-        private List<Label> _labels;
+        private IEnumerable<Label> _labels;
         private Vocabulary _vocab;
         private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
@@ -24,17 +24,18 @@ namespace IML_Playground.Learning
         private Dictionary<Label, double> _pClass;
         private Dictionary<Label, Dictionary<int, double>> _pWordGivenClass;
 
-        public MultinomialNaiveBayesClassifier(List<Label> labels, Vocabulary vocab)
+        public MultinomialNaiveBayesClassifier(IEnumerable<Label> labels, Vocabulary vocab)
         {
-            Name = "MNB";
-            Labels = labels;
-            Vocab = vocab;
             _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
             _featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
             _trainingSet = new Dictionary<Label, HashSet<Instance>>();
             _pClass = new Dictionary<Label, double>();
             _pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
+
+            Name = "MNB";
+            Labels = labels;
+            Vocab = vocab;
 
             InitTrainingData();
         }
@@ -43,16 +44,17 @@ namespace IML_Playground.Learning
 
         public string Name { get; private set; }
 
-        public List<Label> Labels
+        public IEnumerable<Label> Labels
         {
             get { return _labels; }
-            private set { SetProperty<List<Label>>(ref _labels, value); }
+            private set { SetProperty<IEnumerable<Label>>(ref _labels, value); }
         }
 
         public Vocabulary Vocab
         {
             get { return _vocab; }
-            set {
+            set
+            {
                 if (SetProperty<Vocabulary>(ref _vocab, value))
                 {
                     ClearInstances(); // If the vocabulary changes, our current instances are invalidated.
@@ -63,6 +65,16 @@ namespace IML_Playground.Learning
         public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
         {
             get { return _featuresPerClass; }
+        }
+
+        public Label PositiveLabel
+        {
+            get { return _labels.ToList()[0]; }
+        }
+
+        public Label NegativeLabel
+        {
+            get { return _labels.ToList()[1]; }
         }
 
         #endregion

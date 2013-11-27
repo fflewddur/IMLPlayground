@@ -18,8 +18,8 @@ namespace IML_Playground.ViewModel
 
             FeaturesPositive = new ObservableCollection<Feature>();
             FeaturesNegative = new ObservableCollection<Feature>();
-            LabelPositive = _classifier.Labels[0];
-            LabelNegative = _classifier.Labels[1];
+            LabelPositive = _classifier.Labels.ToList()[0];
+            LabelNegative = _classifier.Labels.ToList()[1];
 
             UpdateFeatures(_classifier);
         }
@@ -43,12 +43,12 @@ namespace IML_Playground.ViewModel
             FeaturesPositive.Clear();
             FeaturesNegative.Clear();
 
-            foreach (Feature feature in classifier.FeaturesPerClass[classifier.Labels[0]])
+            foreach (Feature feature in classifier.FeaturesPerClass[classifier.PositiveLabel])
             {
                 FeaturesPositive.Add(feature);
             }
 
-            foreach (Feature feature in classifier.FeaturesPerClass[classifier.Labels[1]])
+            foreach (Feature feature in classifier.FeaturesPerClass[classifier.NegativeLabel])
             {
                 FeaturesNegative.Add(feature);
             }
