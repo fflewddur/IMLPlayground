@@ -40,6 +40,7 @@ namespace IML_Playground.ViewModel
             _classifiers = classifiers;
             _labels = labels;
             CurrentClassifier = AvailableClassifiers.First(); // Take the first available classifier
+            CurrentClassifier.AddInstances(trainSet.ToInstances());
             _evaluator = new Evaluator() { Classifier = CurrentClassifier };
             _trainSet = trainSet;
             _testSet = testSet;
@@ -221,17 +222,16 @@ namespace IML_Playground.ViewModel
             _evaluator.Classifier.Train();
 
             // Evaluate new classifier
-            // FIXME
-            //_evaluator.EvaluateOnTestSet(_testSet.ToInstances());
-            //WeightedF1 = _evaluator.WeightedF1;
-            //int[,] cm = _evaluator.ConfusionMatrix;
-            //if (cm.GetLength(0) == 2 && cm.GetLength(1) == 2)
-            //{
-            //    TruePositives = cm[0, 0];
-            //    FalsePositives = cm[0, 1];
-            //    FalseNegatives = cm[1, 0];
-            //    TrueNegatives = cm[1, 1];
-            //}
+            _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
+            WeightedF1 = _evaluator.WeightedF1;
+            int[,] cm = _evaluator.ConfusionMatrix;
+            if (cm.GetLength(0) == 2 && cm.GetLength(1) == 2)
+            {
+                TruePositives = cm[0, 0];
+                FalsePositives = cm[0, 1];
+                FalseNegatives = cm[1, 0];
+                TrueNegatives = cm[1, 1];
+            }
 
             StatusMessage = "";
         }
