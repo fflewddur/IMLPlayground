@@ -145,7 +145,7 @@ namespace IML_Playground.Learning
 
             foreach (int id in ids)
             {
-                tokens.Add(_idsToWords[id],  _documentFreqs[_nextId]);
+                tokens.Add(_idsToWords[id],  _documentFreqs[id]);
             }
 
             v.AddTokens(tokens);
