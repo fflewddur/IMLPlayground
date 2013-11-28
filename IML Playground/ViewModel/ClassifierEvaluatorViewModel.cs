@@ -331,6 +331,14 @@ namespace IML_Playground.ViewModel
             }
         }
 
+        private void UpdateVocab()
+        {
+            IEnumerable<int> highIGFeatures = _trainSet.GetHighIGFeatures(_fullVocab, _labels, VocabSize);
+            Vocabulary newVocab = _fullVocab.GetSubset(highIGFeatures);
+            newVocab.RestrictToInstances(_trainSet);
+            CurrentClassifier.Vocab = newVocab;
+        }
+
         private void UpdateFeatureVectors()
         {
             // FIXME
@@ -346,10 +354,12 @@ namespace IML_Playground.ViewModel
             StatusMessage = "Resampling...";
             await Task.Run(() =>
                 {
-                    IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, CurrentClassifier.Labels.ToArray());
+                    _trainSet = _fullTrainSet.ItemsSubset(ResampleSize, CurrentClassifier.Labels.ToArray());
+                    //IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, CurrentClassifier.Labels.ToArray()); // FIXME This needs to be stored in _trainSet
+                    UpdateVocab(); // New training set means our vocab needs to be updated too.
                     UpdateFeatureVectors();
                     CurrentClassifier.ClearInstances(); // Remove the existing training set
-                    CurrentClassifier.AddInstances(instances); // Add the new training set
+                    CurrentClassifier.AddInstances(_trainSet.ToInstances()); // Add the new training set
 
                     PerformRetrain(); // Evaluate the new model
                 });
@@ -364,10 +374,7 @@ namespace IML_Playground.ViewModel
             StatusMessage = "Resizing vocabulary...";
             await Task.Run(() =>
                 {
-                    IEnumerable<int> highIGFeatures = _trainSet.GetHighIGFeatures(_fullVocab, _labels, VocabSize);
-                    Vocabulary newVocab = _fullVocab.GetSubset(highIGFeatures);
-                    newVocab.RestrictToInstances(_trainSet);
-                    CurrentClassifier.Vocab = newVocab;
+                    UpdateVocab();
                     // TODO After updating the classifier's vocab, it needs to be retrained
                 });
             // Update our classifier viewmodel

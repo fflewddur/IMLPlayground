@@ -114,7 +114,7 @@ namespace IML_Playground
             labels = localLabels;
 
             // Restrict ourselves to the labels we're interested in
-            NewsCollection trainHockeyBaseball = trainAll.ItemsSubset(labels.ToArray());
+            NewsCollection trainHockeyBaseball = (NewsCollection)trainAll.ItemsSubset(labels.ToArray());
 
             // Assign the correct label to each item
             foreach (NewsItem item in trainHockeyBaseball)
@@ -195,7 +195,7 @@ namespace IML_Playground
             // Build a training set
             watch.Restart();
 
-            NewsCollection trainHockeyBaseball = trainAll.ItemsSubset(trainingSize, labels.ToArray());
+            NewsCollection trainHockeyBaseball = (NewsCollection)trainAll.ItemsSubset(trainingSize, labels.ToArray());
             trainHockeyBaseball.ComputeFeatureVectors(vocab);
 
             // Build a test set
@@ -288,7 +288,7 @@ namespace IML_Playground
             // Build a training set
             watch.Restart();
 
-            NewsCollection trainHockeyBaseball = trainAll.ItemsSubset(labels.ToArray());
+            NewsCollection trainHockeyBaseball = (NewsCollection)trainAll.ItemsSubset(labels.ToArray());
             trainHockeyBaseball.ComputeFeatureVectors(vocab);
 
             // Build a test set

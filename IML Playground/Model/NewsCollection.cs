@@ -350,7 +350,7 @@ namespace IML_Playground.Model
         /// <param name="size">The max size of each group.</param>
         /// <param name="labels">The news groups to include in the new collection.</param>
         /// <returns>A new NewsCollection.</returns>
-        public NewsCollection ItemsSubset(int size, params Label[] labels)
+        public IInstances ItemsSubset(int size, params Label[] labels)
         {
             NewsCollection nc = new NewsCollection();
             Random rand = new Random();
@@ -384,7 +384,7 @@ namespace IML_Playground.Model
         }
 
         // Call Subset, but don't restrict group size
-        public NewsCollection ItemsSubset(params Label[] labels)
+        public IInstances ItemsSubset(params Label[] labels)
         {
             return this.ItemsSubset(Int32.MaxValue, labels);
         }
