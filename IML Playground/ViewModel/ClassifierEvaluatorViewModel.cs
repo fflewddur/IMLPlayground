@@ -333,6 +333,8 @@ namespace IML_Playground.ViewModel
 
         private void UpdateFeatureVectors()
         {
+            // FIXME
+
             //vocab.RestrictToInstances(trainHockeyBaseballSmall);
             //trainHockeyBaseball.ComputeFeatureVectors(fullVocab);
             //IEnumerable<int> highIGFeatures = trainHockeyBaseballSmall.GetHighIGFeatures(fullVocab, labels, vocabSize);
@@ -362,11 +364,15 @@ namespace IML_Playground.ViewModel
             StatusMessage = "Resizing vocabulary...";
             await Task.Run(() =>
                 {
-                    // FIXME
-                    //_evaluator.Classifier.get
-                    //.ComputeFeatureVectors(_fullVocab);
-                    //_fullVocab.GetSubset()
+                    IEnumerable<int> highIGFeatures = _trainSet.GetHighIGFeatures(_fullVocab, _labels, VocabSize);
+                    Vocabulary newVocab = _fullVocab.GetSubset(highIGFeatures);
+                    newVocab.RestrictToInstances(_trainSet);
+                    CurrentClassifier.Vocab = newVocab;
+                    // TODO After updating the classifier's vocab, it needs to be retrained
                 });
+            // Update our classifier viewmodel
+            ClassifierViewModel.UpdateFeatures();
+            AddTestSetFeatureCounts();
             StatusMessage = "";
         }
 

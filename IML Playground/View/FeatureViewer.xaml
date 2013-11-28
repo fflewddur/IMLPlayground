@@ -1,7 +1,7 @@
 ﻿<RibbonWindow x:Class="IML_Playground.FeatureViewer"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Feature Viewer" Height="550" Width="725">
+        Title="Feature Viewer" Height="550" Width="850">
     <RibbonWindow.Resources>
         <ResourceDictionary Source="Resources.xaml" />
     </RibbonWindow.Resources>
@@ -31,6 +31,7 @@
                     
                     <RibbonButton Label="Retrain" SmallImageSource="Art/refresh_16xLG.png" Command="{Binding Retrain}" />
                     <RibbonButton Label="Resample" SmallImageSource="Art/Files_7954.png" Command="{Binding Resample}" />
+                    <RibbonButton Label="Resize vocab" Command="{Binding ResizeVocab}" />
                     <ComboBox ItemsSource="{Binding AvailableClassifiers}" SelectedItem="{Binding CurrentClassifier}" DisplayMemberPath="Name" />
                     <!--<RibbonComboBox Label="Classifier" IsEditable="False">
                         <RibbonGallery MaxColumnCount="1" SelectedItem="{Binding CurrentClassifier}">
@@ -38,7 +39,7 @@
                         </RibbonGallery>
                     </RibbonComboBox>-->
                     <RibbonTextBox Label="Sample size (per class)" Text="{Binding ResampleSize, UpdateSourceTrigger=PropertyChanged}" />
-                    <RibbonTextBox Label="Vocabulary size (per class)" Text="{Binding VocabularySize, UpdateSourceTrigger=PropertyChanged}" />
+                    <RibbonTextBox Label="Vocabulary size (per class)" Text="{Binding VocabSize, UpdateSourceTrigger=PropertyChanged}" />
                 </RibbonGroup>
             </RibbonTab>
         </Ribbon>

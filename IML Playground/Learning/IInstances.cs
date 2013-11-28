@@ -12,6 +12,7 @@ namespace IML_Playground.Learning
 
         IEnumerable<Instance> ToInstances();
         IEnumerable<Instance> Subset(int size, params Label[] labels);
+        IEnumerable<int> GetHighIGFeatures(Vocabulary vocab, IEnumerable<Label> labels, int nFeatures);
         Task<bool> SaveArffFile(string filePath, Vocabulary vocab, params Label[] labels);
     }
 }

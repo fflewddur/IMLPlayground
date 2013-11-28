@@ -10,7 +10,7 @@ namespace IML_Playground.Learning
     {
         string Name { get; }
         IEnumerable<Label> Labels { get; }
-        Vocabulary Vocab { get; }
+        Vocabulary Vocab { get; set; }
         IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
         Label PositiveLabel { get; }
         Label NegativeLabel { get; }
