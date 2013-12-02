@@ -192,11 +192,11 @@ namespace IML_Playground.Model
                     perClassFeatureValues[label][pair.Key] = Math.Log(pair.Value * featureCounts[pair.Key]); // take the log to keep out values reasonably sized
                 }
 
-                Console.WriteLine("Top 10 features for {0}:", label);
+                //Console.WriteLine("Top 10 features for {0}:", label);
 
                 foreach (KeyValuePair<int, double> pair in perClassFeatureValues[label].OrderByDescending(key => key.Value).Take(nFeatures))
                 {
-                    Console.WriteLine("\t{0}: {1:0.000}", vocab.GetWord(pair.Key), pair.Value);
+                    //Console.WriteLine("\t{0}: {1:0.000}", vocab.GetWord(pair.Key), pair.Value);
                     highIGFeatures.Add(pair.Key);
                 }
             }

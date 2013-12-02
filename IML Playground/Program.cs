@@ -105,7 +105,7 @@ namespace IML_Playground
             //    Console.WriteLine("Item {0}: {1}", item.Id, item.AllText);
             //}
             //Console.WriteLine();
-            fullVocab = trainAll.BuildVocabulary(0, 1.0);
+            //fullVocab = trainAll.BuildVocabulary(0, 1.0);
             //Console.WriteLine("Vocab: {0}\n", vocab);
 
             List<Label> localLabels = new List<Label>();
@@ -115,6 +115,7 @@ namespace IML_Playground
 
             // Restrict ourselves to the labels we're interested in
             NewsCollection trainHockeyBaseball = (NewsCollection)trainAll.ItemsSubset(labels.ToArray());
+            fullVocab = trainHockeyBaseball.BuildVocabulary(0, 1.0);
 
             // Assign the correct label to each item
             foreach (NewsItem item in trainHockeyBaseball)

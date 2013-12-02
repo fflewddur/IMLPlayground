@@ -92,7 +92,7 @@ namespace IML_Playground.Learning
 
             foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)
             {
-                if (nDocs > 0 && tokenDf.Value >= min_df && tokenDf.Value <= max_df)
+                if (nDocs < 0 || (tokenDf.Value >= min_df && tokenDf.Value <= max_df))
                 {
                     _wordsToIds[tokenDf.Key] = _nextId;
                     _idsToWords[_nextId] = tokenDf.Key;
@@ -133,12 +133,28 @@ namespace IML_Playground.Learning
             return;
         }
 
+        public Vocabulary GetSubset(IInstances instances)
+        {
+            HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
+
+            // Build a set of features in instances
+            foreach (Instance instance in instances.ToInstances())
+            {
+                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
+                {
+                    inInstances.Add(pair.Key);
+                }
+            }
+
+            return GetSubset(inInstances, instances.Count);
+        }
+
         /// <summary>
         /// Build a new Vocabulary that is restricted to the given collection of IDs.
         /// </summary>
         /// <param name="ids">The collection of IDs to restrict the new vocabulary to.</param>
         /// <returns>The new vocabulary object.</returns>
-        public Vocabulary GetSubset(IEnumerable<int> ids)
+        public Vocabulary GetSubset(IEnumerable<int> ids, int nDocs)
         {
             Vocabulary v = new Vocabulary();
             Dictionary<string, int> tokens = new Dictionary<string,int>();
@@ -148,7 +164,7 @@ namespace IML_Playground.Learning
                 tokens.Add(_idsToWords[id],  _documentFreqs[id]);
             }
 
-            v.AddTokens(tokens);
+            v.AddTokens(tokens, nDocs, 0, 1.0);
 
             return v;
         }
