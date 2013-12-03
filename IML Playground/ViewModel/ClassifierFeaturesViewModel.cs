@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace IML_Playground.ViewModel
 {
@@ -35,11 +36,22 @@ namespace IML_Playground.ViewModel
 
         public void UpdateFeatures()
         {
-            UpdateFeatures(_classifier);
+            if (Application.Current != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    UpdateFeatures(_classifier);
+                });
+            }
+            else
+            {
+                UpdateFeatures(_classifier);
+            }
         }
 
         private void UpdateFeatures(IClassifier classifier)
         {
+
             FeaturesPositive.Clear();
             FeaturesNegative.Clear();
 
@@ -52,6 +64,7 @@ namespace IML_Playground.ViewModel
             {
                 FeaturesNegative.Add(feature);
             }
+
         }
     }
 }

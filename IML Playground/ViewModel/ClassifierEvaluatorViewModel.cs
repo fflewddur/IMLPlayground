@@ -2,6 +2,7 @@
 using IML_Playground.Learning;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -76,7 +77,6 @@ namespace IML_Playground.ViewModel
             CurrentClassifier.ClearInstances(); // Ensure the classifier has no training data
             CurrentClassifier.AddInstances(_trainSet.ToInstances()); // Add our current training set
             UpdateVocab();
-            UpdateFeatureVectors();
             VocabSize = CurrentClassifier.Vocab.Count;
             ClassifierViewModel = new ClassifierFeaturesViewModel(CurrentClassifier);
             AddTestSetFeatureCounts();
@@ -138,6 +138,11 @@ namespace IML_Playground.ViewModel
         {
             get { return _vocabSize; }
             private set { SetProperty<int>(ref _vocabSize, value); }
+        }
+
+        public int ActualVocabSize
+        {
+            get { return _currentClassifier.Vocab.Count; }
         }
 
         public int FullVocabSize
@@ -234,12 +239,16 @@ namespace IML_Playground.ViewModel
             foreach (Feature feature in ClassifierViewModel.FeaturesPositive)
             {
                 int featureId = CurrentClassifier.Vocab.GetWordId(feature.Characters);
+                Debug.Assert(featureId != -1, string.Format("featureId should never be -1: {0}", feature.Characters));
                 CurrentClassifier.UpdatePrior(CurrentClassifier.PositiveLabel, featureId, feature.Weight);
+                Console.WriteLine("P: {0} = {1}", feature.Characters, feature.Weight);
             }
             foreach (Feature feature in ClassifierViewModel.FeaturesNegative)
             {
                 int featureId = CurrentClassifier.Vocab.GetWordId(feature.Characters);
+                Debug.Assert(featureId != -1, string.Format("featureId should never be -1: {0}", feature.Characters));
                 CurrentClassifier.UpdatePrior(CurrentClassifier.NegativeLabel, featureId, feature.Weight);
+                Console.WriteLine("N: {0} = {1}", feature.Characters, feature.Weight);
             }
 
             // Retrain our model
@@ -248,6 +257,7 @@ namespace IML_Playground.ViewModel
             // Evaluate new classifier
             _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
             WeightedF1 = _evaluator.WeightedF1;
+            Console.WriteLine("Weighted F1: {0}", WeightedF1);
             int[,] cm = _evaluator.ConfusionMatrix;
             if (cm.GetLength(0) == 2 && cm.GetLength(1) == 2)
             {
@@ -312,7 +322,7 @@ namespace IML_Playground.ViewModel
             {
                 string filename = dialog.FileName;
                 StatusMessage = "Exporting model...";
-                await _evaluator.Classifier.SaveArffFile(filename); // Save the ARFF file
+                await CurrentClassifier.SaveArffFile(filename); // Save the ARFF file
                 StatusMessage = "";
             }
         }
@@ -348,20 +358,11 @@ namespace IML_Playground.ViewModel
             //Vocabulary newVocab = _fullVocab.GetSubset(highIGFeatures);
             //newVocab.RestrictToInstances(_trainSet);
             CurrentClassifier.Vocab = newVocab;
+            OnPropertyChanged("ActualVocabSize");
             CurrentClassifier.AddInstances(_trainSet.ToInstances());
-        }
-
-        private void UpdateFeatureVectors()
-        {
-            //Console.WriteLine("UpdateFeatureVectors()");
-            // FIXME
-            //_trainSet.ComputeFeatureVectors(CurrentClassifier.Vocab);
-            //_testSet.ComputeFeatureVectors(CurrentClassifier.Vocab);
-
-            //vocab.RestrictToInstances(trainHockeyBaseballSmall);
-            //trainHockeyBaseball.ComputeFeatureVectors(fullVocab);
-            //IEnumerable<int> highIGFeatures = trainHockeyBaseballSmall.GetHighIGFeatures(fullVocab, labels, vocabSize);
-            //fullVocab.RestrictToSubset(highIGFeatures);
+            if (ClassifierViewModel != null)
+                        ClassifierViewModel.UpdateFeatures();
+            
         }
 
         private async void PerformResample()
@@ -371,14 +372,10 @@ namespace IML_Playground.ViewModel
             await Task.Run(() =>
                 {
                     _trainSet = _fullTrainSet.ItemsSubset(ResampleSize, CurrentClassifier.Labels.ToArray());
-                    //IEnumerable<Instance> instances = _fullTrainSet.Subset(ResampleSize, CurrentClassifier.Labels.ToArray()); // FIXME This needs to be stored in _trainSet
                     UpdateVocab(); // New training set means our vocab needs to be updated too.
-                    //UpdateFeatureVectors();
-                    //CurrentClassifier.ClearInstances(); // Remove the existing training set
-                    //CurrentClassifier.AddInstances(_trainSet.ToInstances()); // Add the new training set
-
                     PerformRetrain(); // Evaluate the new model
                 });
+
             // Update our classifier viewmodel
             ClassifierViewModel.UpdateFeatures();
             AddTestSetFeatureCounts();
@@ -395,7 +392,7 @@ namespace IML_Playground.ViewModel
                     PerformRetrain();
                 });
             // Update our classifier viewmodel
-            ClassifierViewModel.UpdateFeatures();
+            ClassifierViewModel.UpdateFeatures();            
             AddTestSetFeatureCounts();
             StatusMessage = "";
         }
