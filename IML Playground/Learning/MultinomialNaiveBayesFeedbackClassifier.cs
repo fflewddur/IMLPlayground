@@ -359,11 +359,11 @@ namespace IML_Playground.Learning
                 {
                     int countFeature;
                     _perClassFeatureCounts[l].TryGetValue(id, out countFeature);
-//                    double prior;
-//                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
-//                        prior = _defaultPrior;
-//                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)(sumFeatures)); // Removed + sumPriors // OLD VERSION
-                    _pWordGivenClass[l][id] = (1 + countFeature) / (double)sumFeatures;
+                    double prior;
+                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
+                        prior = _defaultPrior;
+                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures); // Removed + sumPriors // OLD VERSION
+                    //_pWordGivenClass[l][id] = (1 + countFeature) / (double)sumFeatures;
                 }
             }
         }
