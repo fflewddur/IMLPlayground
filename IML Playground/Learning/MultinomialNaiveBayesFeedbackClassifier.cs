@@ -174,7 +174,6 @@ namespace IML_Playground.Learning
                     throw new System.ArithmeticException(string.Format("Probability for class {0} is NaN.", l));
                 }
                 //Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
-                // These are NaN because I'm dividing by 0 somewhere, let's fix that.
                 if (pClassGivenDoc[l] > maxP)
                 {
                     maxP = pClassGivenDoc[l];
@@ -388,11 +387,13 @@ namespace IML_Playground.Learning
                     string characters = _vocab.GetWord(featureId);
                     int count;
                     _perClassFeatureCounts[label].TryGetValue(featureId, out count);
-                    double weight;
-                    if (!_perClassFeaturePriors[label].TryGetValue(featureId, out weight))
-                        weight = _defaultPrior;
+                    double userWeight;
+                    if (!_perClassFeaturePriors[label].TryGetValue(featureId, out userWeight))
+                        userWeight = _defaultPrior;
+                    double systemWeight;
+                    _pWordGivenClass[label].TryGetValue(featureId, out systemWeight);
 
-                    _featuresPerClass[label].Add(new Feature { Characters = characters, CountTraining = count, Weight = weight });
+                    _featuresPerClass[label].Add(new Feature { Characters = characters, CountTraining = count, SystemWeight = systemWeight, UserWeight = userWeight });
                 }
             }
         }

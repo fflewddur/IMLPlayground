@@ -13,7 +13,8 @@ namespace IML_Playground.Learning
         private string _characters;
         private int _countTraining;
         private int _countTesting;
-        private double _weight;
+        private double _systemWeight;
+        private double _userWeight;
 
         #region Properties
 
@@ -35,10 +36,16 @@ namespace IML_Playground.Learning
             set { _countTesting = value; }
         }
 
-        public double Weight
+        public double SystemWeight
         {
-            get { return _weight; }
-            set { _weight = value; }
+            get { return _systemWeight; }
+            set { _systemWeight = value; }
+        }
+
+        public double UserWeight
+        {
+            get { return _userWeight; }
+            set { _userWeight = value; }
         }
 
         #endregion

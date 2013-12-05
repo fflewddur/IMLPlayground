@@ -240,15 +240,15 @@ namespace IML_Playground.ViewModel
             {
                 int featureId = CurrentClassifier.Vocab.GetWordId(feature.Characters);
                 Debug.Assert(featureId != -1, string.Format("featureId should never be -1: {0}", feature.Characters));
-                CurrentClassifier.UpdatePrior(CurrentClassifier.PositiveLabel, featureId, feature.Weight);
-                Console.WriteLine("P: {0} = {1}", feature.Characters, feature.Weight);
+                CurrentClassifier.UpdatePrior(CurrentClassifier.PositiveLabel, featureId, feature.UserWeight);
+                Console.WriteLine("P: {0} = {1}", feature.Characters, feature.UserWeight);
             }
             foreach (Feature feature in ClassifierViewModel.FeaturesNegative)
             {
                 int featureId = CurrentClassifier.Vocab.GetWordId(feature.Characters);
                 Debug.Assert(featureId != -1, string.Format("featureId should never be -1: {0}", feature.Characters));
-                CurrentClassifier.UpdatePrior(CurrentClassifier.NegativeLabel, featureId, feature.Weight);
-                Console.WriteLine("N: {0} = {1}", feature.Characters, feature.Weight);
+                CurrentClassifier.UpdatePrior(CurrentClassifier.NegativeLabel, featureId, feature.UserWeight);
+                Console.WriteLine("N: {0} = {1}", feature.Characters, feature.UserWeight);
             }
 
             // Retrain our model

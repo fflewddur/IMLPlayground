@@ -64,7 +64,7 @@ namespace IML_Playground.Learning
             foreach (Instance instance in instances)
             {
                 Prediction prediction = Classifier.PredictInstance(instance);
-                //Console.WriteLine(prediction);
+                Console.WriteLine(prediction);
                 if (prediction.Label == instance.Label)
                 {
                     // Correct prediction.

@@ -24,6 +24,7 @@ namespace IML_Playground.Learning
         {
             StringBuilder sb = new StringBuilder();
 
+            sb.AppendFormat("Predicted label is {0}\n", Label);
             foreach (KeyValuePair<Label, Evidence> pair in EvidencePerClass)
             {
                 sb.AppendFormat("{0}: {1}\n", pair.Key.UserLabel, pair.Value);
