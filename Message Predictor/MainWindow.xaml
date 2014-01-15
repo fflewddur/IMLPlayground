@@ -1,0 +1,84 @@
+﻿<RibbonWindow x:Class="Message_Predictor.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="800" Width="1200">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Ribbon -->
+        <Ribbon Name="Ribbon" Title="Ribbon" RenderOptions.BitmapScalingMode="HighQuality">
+            <Ribbon.ApplicationMenu>
+                <!-- Hide the Application Menu -->
+                <RibbonApplicationMenu Visibility="Collapsed">
+                </RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+            <Ribbon.QuickAccessToolBar>
+                <RibbonQuickAccessToolBar>
+                    <RibbonButton QuickAccessToolBarId="undo" Label="Undo" SmallImageSource="View/Art/Arrow_UndoRevertRestore_16xLG.png" KeyTip="Z" />
+                    <RibbonButton QuickAccessToolBarId="redo" Label="Redo" SmallImageSource="View/Art/Arrow_RedoRetry_16xLG.png" KeyTip="Y" />
+                </RibbonQuickAccessToolBar>
+            </Ribbon.QuickAccessToolBar>
+            <RibbonTab Header="Home" KeyTip="H">
+                <RibbonGroup Header="Predictions">
+                    <RibbonButton Label="Update predictions" LargeImageSource="View/Art/refresh_16xLG.png" KeyTip="U"/>
+                    <RibbonToggleButton Label="Automatically update predictions" SmallImageSource="View/Art/lightningBolt_16xLG.png" IsChecked="True"/>
+                    <RibbonToggleButton Label="Only show recent changes" SmallImageSource="View/Art/FindResults1_6264.png" KeyTip="R"/>
+                </RibbonGroup>
+                <RibbonGroup Header="File">
+                    <RibbonSplitButton Label="File to...">
+                        
+                    </RibbonSplitButton>
+                </RibbonGroup>
+                <RibbonGroup Header="Search">
+                    <RibbonTextBox Label="Find" SmallImageSource="View/Art/Find_5650.png" KeyTip="F"/>
+                </RibbonGroup>
+            </RibbonTab>
+        </Ribbon>
+        
+        <!-- Main window -->
+        <Grid Grid.Row="1">
+            <!-- Two-column split -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="7*" />
+                </Grid.ColumnDefinitions>
+                
+                <!-- Left column -->
+                <Grid Grid.Column="0">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Folders -->
+                    <Label Grid.Row="0">Folders</Label>
+                    
+                    <!-- Prediction overview -->
+                    <Label Grid.Row="1">Predictions</Label>
+                    
+                    <!-- Word overview -->
+                    <Label Grid.Row="2">Words</Label>
+                </Grid>
+                
+                <!-- Right column -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="2*" />
+                        <RowDefinition Height="1*" />
+                    </Grid.RowDefinitions>
+                    
+                    <!-- Messages -->
+                    <Label Grid.Row="0">Messages</Label>
+                    
+                    <!-- Important words -->
+                    <Label Grid.Row="1">Important words</Label>
+                </Grid>
+            </Grid>
+        </Grid>
+    </Grid>
+</RibbonWindow>
