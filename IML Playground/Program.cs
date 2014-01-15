@@ -1,6 +1,6 @@
-﻿using IML_Playground.Learning;
-using IML_Playground.Model;
+﻿using IML_Playground.Model;
 using IML_Playground.ViewModel;
+using LibIML;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;

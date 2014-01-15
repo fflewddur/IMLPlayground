@@ -1,14 +1,13 @@
-﻿using IML_Playground.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class Feature
+    public class Feature
     {
         private string _characters;
         private int _countTraining;

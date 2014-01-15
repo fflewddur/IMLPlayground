@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>IML_Playground</RootNamespace>
     <AssemblyName>IML Playground</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
@@ -28,6 +28,7 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -103,14 +104,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Learning\Evaluator.cs" />
-    <Compile Include="Learning\Evidence.cs" />
-    <Compile Include="Learning\Feature.cs" />
-    <Compile Include="Learning\IClassifier.cs" />
-    <Compile Include="Learning\IInstances.cs" />
-    <Compile Include="Learning\MultinomialNaiveBayesFeedbackClassifier.cs" />
-    <Compile Include="Learning\Prediction.cs" />
-    <Compile Include="Learning\SerializableModel.cs" />
     <Compile Include="Utilities.cs" />
     <Page Include="View\Resources.xaml">
       <SubType>Designer</SubType>
@@ -121,14 +114,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
-    <Compile Include="Learning\Instance.cs" />
-    <Compile Include="Learning\Label.cs" />
-    <Compile Include="Learning\IStemmer.cs" />
-    <Compile Include="Learning\MultinomialNaiveBayesClassifier.cs" />
-    <Compile Include="Learning\PorterStemmer.cs" />
-    <Compile Include="Learning\SparseVector.cs" />
-    <Compile Include="Learning\Tokenizer.cs" />
-    <Compile Include="Learning\Vocabulary.cs" />
     <Compile Include="ViewModel\ClassifierEvaluatorViewModel.cs" />
     <Compile Include="ViewModel\ClassifierFeaturesViewModel.cs" />
     <Compile Include="View\FeatureViewer.xaml.cs">
@@ -216,6 +201,12 @@
   <ItemGroup>
     <Resource Include="View\Art\Files_7954.png" />
     <Resource Include="View\Art\FileUpload_6026.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LibIML\LibIML.csproj">
+      <Project>{522d4c09-efb2-4f81-8a55-268cb4850b0b}</Project>
+      <Name>LibIML</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

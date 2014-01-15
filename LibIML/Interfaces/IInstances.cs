@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
-    interface IInstances
+    public interface IInstances
     {
         int Count { get; }
 

@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class SparseVector
+    public class SparseVector
     {
         private Dictionary<int, double> _data;
 

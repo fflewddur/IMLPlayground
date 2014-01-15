@@ -1,5 +1,5 @@
 ﻿using IML_Playground.ViewModel;
-using IML_Playground.Learning;
+using LibIML;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;

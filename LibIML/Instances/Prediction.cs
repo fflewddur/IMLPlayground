@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
-    class Prediction
+    public class Prediction
     {
         public Prediction()
         {

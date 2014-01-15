@@ -7,16 +7,18 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     /// <summary>
     /// Save all of the important data for our model in a single file.
     /// </summary>
     [Serializable]
-    class SerializableModel
+    public class SerializableModel
     {
+        #pragma warning disable 0649 // Disable warnings that these are never used/assigned to.
         public List<IClassifier> Classifiers;
         public IInstances FullTrainingSet;
         public IInstances TestSet;
+        #pragma warning restore 0649
     }
 }

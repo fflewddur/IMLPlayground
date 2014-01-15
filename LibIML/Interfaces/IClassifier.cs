@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
-    interface IClassifier
+    public interface IClassifier
     {
         string Name { get; }
         IEnumerable<Label> Labels { get; }

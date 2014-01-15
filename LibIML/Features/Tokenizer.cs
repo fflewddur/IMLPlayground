@@ -6,10 +6,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class Tokenizer
+    public class Tokenizer
     {
         private static readonly HashSet<string> _stopWords;
         private static readonly char[] WordSeparators = { ' ', '\t', '-', '_', '@', '/', '\\', '*', '&', '^', '%', '#', '+', '|', ',', '.', '!', '?', ';', ':', '"', '\'', '(', ')', '[', ']', '<', '>', '{', '}', '\r', '\n' };

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class Vocabulary
+    public class Vocabulary
     {
         private int _nextId;
         private Dictionary<string, int> _wordsToIds;

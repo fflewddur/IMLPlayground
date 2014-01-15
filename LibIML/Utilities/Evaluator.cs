@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class Evaluator
+    public class Evaluator
     {
         IClassifier _classifier;
         int[,] _confusionMatrix;

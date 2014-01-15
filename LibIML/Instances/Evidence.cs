@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
-    class Evidence
+    public class Evidence
     {
         public Dictionary<int, double> Weights;
         public double Confidence;

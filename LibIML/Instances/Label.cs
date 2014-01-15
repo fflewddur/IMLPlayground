@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class Label : IML_Playground.ViewModel.ViewModelBase, IEquatable<Label>
+    public class Label : ViewModelBase, IEquatable<Label>
     {
         private string _userLabel;
         private string _systemLabel;

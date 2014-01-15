@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
-    interface IStemmer
+    public interface IStemmer
     {
         string stemTerm(string s);
     }

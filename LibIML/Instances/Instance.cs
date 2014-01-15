@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class Instance : IML_Playground.ViewModel.ViewModelBase
+    public class Instance : ViewModelBase
     {
         private Label _label;
         private SparseVector _features;

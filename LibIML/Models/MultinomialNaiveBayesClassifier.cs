@@ -1,15 +1,14 @@
-﻿using IML_Playground.ViewModel;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IML_Playground.Learning
+namespace LibIML
 {
     [Serializable]
-    class MultinomialNaiveBayesClassifier : ViewModelBase, IClassifier
+    public class MultinomialNaiveBayesClassifier : ViewModelBase, IClassifier
     {
         private const double _defaultPrior = 1.0;
 
