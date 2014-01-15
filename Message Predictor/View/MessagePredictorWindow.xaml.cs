@@ -20,9 +20,9 @@ namespace Message_Predictor
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : RibbonWindow
+    public partial class MessagePredictorWindow : RibbonWindow
     {
-        public MainWindow()
+        public MessagePredictorWindow()
         {
             InitializeComponent();
 
