@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{35E7E253-BECF-4096-9E10-7B3D8EAABF42}</ProjectGuid>
+    <ProjectGuid>{DDE9E736-AA7A-48AC-99C6-1847EA376F09}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MessagePredictor</RootNamespace>
-    <AssemblyName>MessagePredictor</AssemblyName>
+    <RootNamespace>Message_Predictor_2</RootNamespace>
+    <AssemblyName>Message Predictor 2</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,8 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>
-    </StartupObject>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="GalaSoft.MvvmLight.Extras.WPF45">
@@ -67,16 +66,32 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="App.xaml">
-      <SubType>Designer</SubType>
+    <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="ViewModel\Base\ViewModelBase.cs" />
+    <Compile Include="View\MessagePredictorWindow.xaml.cs">
+      <DependentUpon>MessagePredictorWindow.xaml</DependentUpon>
+    </Compile>
+    <Page Include="View\MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
     </Compile>
+    <Compile Include="View\MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="View\MessagePredictorWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -94,8 +109,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="App.config">
-      <SubType>Designer</SubType>
+    <None Include="Datasets\20news-bydate-train.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -105,7 +120,39 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="View\" />
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Datasets\stopwords.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Arrow_RedoRetry_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Arrow_UndoRevertRestore_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Find_5650.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\FindResults1_6264.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\lightningBolt_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Redo_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\refresh_16xLG.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="View\Art\Undo_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Model\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibIML\LibIML.csproj">
@@ -114,7 +161,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="properties.xml">
+    <None Include="Properties.xml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

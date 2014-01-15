@@ -1,36 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Linq;
 
 namespace MessagePredictor
 {
-    class Program
+    /// <summary>
+    /// Interaction logic for App.xaml
+    /// </summary>
+    public partial class App : Application
     {
-        
-        [STAThread]
-        public static void Main(string[] args)
+        protected override void OnStartup(StartupEventArgs e)
         {
-            Console.WriteLine("hello");
-            LoadProperties();
-            //Application app = new Application();
-            App app = new App();
-            app.Run();
-            //MessagePredictorWindow window = new MessagePredictorWindow();
-            //window.DataContext = vm;
-            //window.Show();
-            //window.Activate();
-            //app.Run(window);
+            base.OnStartup(e);
+
+            LoadPropertiesFile();
         }
-        
+
         /// <summary>
         /// Load an XML file containing various runtime properties.
         /// </summary>
-        public static void LoadProperties()
+        private void LoadPropertiesFile()
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "properties.xml");
             try
@@ -60,7 +55,7 @@ namespace MessagePredictor
                             }
                         }
                     }
-                    
+
                 }
             }
             catch (FileNotFoundException e)
