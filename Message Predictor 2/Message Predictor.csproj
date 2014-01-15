@@ -7,8 +7,8 @@
     <ProjectGuid>{DDE9E736-AA7A-48AC-99C6-1847EA376F09}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Message_Predictor_2</RootNamespace>
-    <AssemblyName>Message Predictor 2</AssemblyName>
+    <RootNamespace>MessagePredictor</RootNamespace>
+    <AssemblyName>Message Predictor</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -74,16 +74,8 @@
     <Compile Include="View\MessagePredictorWindow.xaml.cs">
       <DependentUpon>MessagePredictorWindow.xaml</DependentUpon>
     </Compile>
-    <Page Include="View\MainWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="View\MainWindow.xaml.cs">
-      <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="View\MessagePredictorWindow.xaml">
