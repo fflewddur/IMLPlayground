@@ -10,10 +10,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Feature Viewer", "Feature V
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibIML", "..\LibIML\LibIML.csproj", "{522D4C09-EFB2-4F81-8A55-268CB4850B0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message Predictor", "..\Message Predictor 2\Message Predictor.csproj", "{DDE9E736-AA7A-48AC-99C6-1847EA376F09}"
-	ProjectSection(ProjectDependencies) = postProject
-		{522D4C09-EFB2-4F81-8A55-268CB4850B0B} = {522D4C09-EFB2-4F81-8A55-268CB4850B0B}
-	EndProjectSection
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Message Predictor", "..\Message Predictor\Message Predictor.csproj", "{DDE9E736-AA7A-48AC-99C6-1847EA376F09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
