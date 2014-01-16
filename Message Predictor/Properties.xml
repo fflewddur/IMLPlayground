@@ -3,7 +3,7 @@
 <MessagePredictorProperties>
   <Condition>Treatment</Condition>
   <TimeLimit minutes="10" seconds="0" />
-  <DataSet>
+  <DataSet file="20news-bydate-train.zip">
     <Topic1 trainSize="5" testSize="750" vocabSize="5" systemLabel="rec.sport.hockey" userLabel="Hockey" />
     <Topic2 trainSize="5" testSize="750" vocabSize="5" systemLabel="rec.sport.baseball" userLabel="Baseball" />
   </DataSet>

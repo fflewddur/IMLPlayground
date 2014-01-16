@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibIML;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
@@ -15,10 +16,29 @@ namespace MessagePredictor
     /// </summary>
     public partial class App : Application
     {
+        public const string DataDir = "Datasets";
+        
         public enum Condition
         {
             Control,
             Treatment
+        }
+        public enum PropertyKey
+        {
+            Unknown,
+            Condition,
+            TimeLimit,
+            DatasetFile,
+            Topic1TrainSize,
+            Topic1TestSize,
+            Topic1VocabSize,
+            Topic1SystemLabel,
+            Topic1UserLabel,
+            Topic2TrainSize,
+            Topic2TestSize,
+            Topic2VocabSize,
+            Topic2SystemLabel,
+            Topic2UserLabel
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -26,6 +46,12 @@ namespace MessagePredictor
             base.OnStartup(e);
 
             LoadPropertiesFile();
+            //LoadDataset();
+
+            MessagePredictorViewModel vm = new MessagePredictorViewModel();
+            var window = new MessagePredictorWindow();
+            window.DataContext = vm;
+            window.Show();
         }
 
         /// <summary>
@@ -39,7 +65,7 @@ namespace MessagePredictor
             if (conditionString.Equals("treatment", StringComparison.InvariantCultureIgnoreCase))
                 condition = Condition.Treatment;
 
-            this.Properties["condition"] = condition;
+            this.Properties[PropertyKey.Condition] = condition;
         }
 
         /// <summary>
@@ -55,15 +81,15 @@ namespace MessagePredictor
             if (element.Attribute("seconds") != null)
                 seconds = Int32.Parse(element.Attribute("seconds").Value.ToString());
 
-            this.Properties["timelimit"] = (minutes * 60) + seconds;
+            this.Properties[PropertyKey.TimeLimit] = (minutes * 60) + seconds;
         }
 
         /// <summary>
         /// Figure out which train and test data to load.
         /// </summary>
         /// <param name="element">The XML element containing information about the desired dataset.</param>
-        /// <param name="propertyPrefix"></param>
-        private void LoadTopicProperty(XElement element, string propertyPrefix)
+        /// <param name="topic">The topic number (e.g., 1 or 2)</param>
+        private void LoadTopicProperty(XElement element, int topic)
         {
             int trainSize = 0;
             int testSize = 0;
@@ -81,11 +107,34 @@ namespace MessagePredictor
             if (element.Attribute("userLabel") != null)
                 userLabel = element.Attribute("userLabel").Value.ToString();
 
-            this.Properties[propertyPrefix + "TrainSize"] = trainSize;
-            this.Properties[propertyPrefix + "TestSize"] = testSize;
-            this.Properties[propertyPrefix + "VocabSize"] = vocabSize;
-            this.Properties[propertyPrefix + "SystemLabel"] = systemLabel;
-            this.Properties[propertyPrefix + "UserLabel"] = userLabel;
+            PropertyKey keyTrainSize = PropertyKey.Unknown;
+            PropertyKey keyTestSize = PropertyKey.Unknown;
+            PropertyKey keyVocabSize = PropertyKey.Unknown;
+            PropertyKey keySystemLabel = PropertyKey.Unknown;
+            PropertyKey keyUserLabel = PropertyKey.Unknown;
+            switch (topic)
+            {
+                case 1:
+                    keyTrainSize = PropertyKey.Topic1TrainSize;
+                    keyTestSize = PropertyKey.Topic1TestSize;
+                    keyVocabSize = PropertyKey.Topic1VocabSize;
+                    keySystemLabel = PropertyKey.Topic1SystemLabel;
+                    keyUserLabel = PropertyKey.Topic1UserLabel;
+                    break;
+                case 2:
+                    keyTrainSize = PropertyKey.Topic2TrainSize;
+                    keyTestSize = PropertyKey.Topic2TestSize;
+                    keyVocabSize = PropertyKey.Topic2VocabSize;
+                    keySystemLabel = PropertyKey.Topic2SystemLabel;
+                    keyUserLabel = PropertyKey.Topic2UserLabel;
+                    break;
+            }
+            
+            this.Properties[keyTrainSize] = trainSize;
+            this.Properties[keyTestSize] = testSize;
+            this.Properties[keyVocabSize] = vocabSize;
+            this.Properties[keySystemLabel] = systemLabel;
+            this.Properties[keyUserLabel] = userLabel;
         }
 
         /// <summary>
@@ -109,15 +158,18 @@ namespace MessagePredictor
                     }
                     else if (element.Name == "DataSet")
                     {
+                        if (element.Attribute("file") != null)
+                            this.Properties[PropertyKey.DatasetFile] = element.Attribute("file").Value.ToString();
+
                         foreach (XElement childElement in element.Elements())
                         {
                             if (childElement.Name == "Topic1")
                             {
-                                LoadTopicProperty(childElement, "Topic1");
+                                LoadTopicProperty(childElement, 1);
                             }
                             else if (childElement.Name == "Topic2")
                             {
-                                LoadTopicProperty(childElement, "Topic2");
+                                LoadTopicProperty(childElement, 1);
                             }
                         }
                     }
