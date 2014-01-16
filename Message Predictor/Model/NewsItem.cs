@@ -65,7 +65,7 @@ namespace MessagePredictor
 
         public string AllText
         {
-            get { return Subject + ' ' + Body; }
+            get { return Subject + "\n" + Body; }
         }
 
         #endregion

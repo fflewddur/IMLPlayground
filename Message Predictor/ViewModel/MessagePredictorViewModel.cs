@@ -10,20 +10,50 @@ namespace MessagePredictor
 {
     class MessagePredictorViewModel: ViewModelBase
     {
+        NewsCollection _unlabeled;
+        NewsCollection _labeled;
+        NewsCollection _currentFolder;
+        NewsItem _currentMessage;
+
         public MessagePredictorViewModel()
         {
-
+            _unlabeled = LoadDataset();
+            
+            // Start with our current folder pointing at the collection of unlabeled items.
+            CurrentFolder = _unlabeled;
         }
 
-        private void LoadDataset()
+        #region Properties
+
+        public NewsCollection CurrentFolder
         {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.DataDir, App.Current.Properties["datasetfile"].ToString());
+            get { return _currentFolder; }
+            private set { SetProperty<NewsCollection>(ref _currentFolder, value); }
+        }
+
+        public NewsItem CurrentMessage
+        {
+            get { return _currentMessage; }
+            set { SetProperty<NewsItem>(ref _currentMessage, value); }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Load the dataset specified in our configuration properties.
+        /// </summary>
+        /// <returns>A NewsCollection representing the requested dataset.</returns>
+        private NewsCollection LoadDataset()
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.DataDir, App.Current.Properties[App.PropertyKey.DatasetFile].ToString());
 
             List<Label> labels = new List<Label>();
-            labels.Add(new Label(App.Current.Properties["Topic1UserLabel"].ToString(), App.Current.Properties["Topic1SystemLabel"].ToString()));
-            labels.Add(new Label(App.Current.Properties["Topic1UserLabe2"].ToString(), App.Current.Properties["Topic1SystemLabe2"].ToString()));
+            labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic1UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic1SystemLabel].ToString()));
+            labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic2UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic2SystemLabel].ToString()));
 
-            NewsCollection test = NewsCollection.CreateFromZip(path, labels);
+            NewsCollection dataset = NewsCollection.CreateFromZip(path, labels);
+
+            return dataset;
         }
     }
 }

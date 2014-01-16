@@ -23,6 +23,8 @@ namespace MessagePredictor
             Control,
             Treatment
         }
+
+        // Use these to access Application.Properties items.
         public enum PropertyKey
         {
             Unknown,
@@ -41,12 +43,13 @@ namespace MessagePredictor
             Topic2UserLabel
         }
 
+        // Called on Application startup. Handle any command line arguments, load our configuration properties, 
+        // and then build the ViewModel and View.
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
             LoadPropertiesFile();
-            //LoadDataset();
 
             MessagePredictorViewModel vm = new MessagePredictorViewModel();
             var window = new MessagePredictorWindow();
@@ -62,7 +65,7 @@ namespace MessagePredictor
         {
             string conditionString = element.Value.ToString();
             Condition condition = Condition.Control;
-            if (conditionString.Equals("treatment", StringComparison.InvariantCultureIgnoreCase))
+            if (conditionString.Equals("treatment"))
                 condition = Condition.Treatment;
 
             this.Properties[PropertyKey.Condition] = condition;
@@ -128,6 +131,9 @@ namespace MessagePredictor
                     keySystemLabel = PropertyKey.Topic2SystemLabel;
                     keyUserLabel = PropertyKey.Topic2UserLabel;
                     break;
+                default:
+                    Console.Error.WriteLine("Unknown topic: {0}", topic);
+                    break;
             }
             
             this.Properties[keyTrainSize] = trainSize;
@@ -169,7 +175,7 @@ namespace MessagePredictor
                             }
                             else if (childElement.Name == "Topic2")
                             {
-                                LoadTopicProperty(childElement, 1);
+                                LoadTopicProperty(childElement, 2);
                             }
                         }
                     }
