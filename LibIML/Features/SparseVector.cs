@@ -24,7 +24,7 @@ namespace LibIML
 
         #region Properties
 
-        private Dictionary<int, double>.KeyCollection Keys { get { return _data.Keys; } }
+        //private Dictionary<int, double>.KeyCollection Keys { get { return _data.Keys; } }
         private Dictionary<int, double>.ValueCollection Values { get { return _data.Values; } }
         public IReadOnlyDictionary<int, double> Data { get { return _data; } }
 
