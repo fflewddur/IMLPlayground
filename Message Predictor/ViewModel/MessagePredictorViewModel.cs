@@ -15,6 +15,7 @@ namespace MessagePredictor
         NewsCollection _currentFolder;
         NewsItem _currentMessage;
         List<Label> _labels;
+        Vocabulary _vocab;
 
         public MessagePredictorViewModel()
         {
@@ -31,7 +32,7 @@ namespace MessagePredictor
             List<NewsItem> forVocab = new List<NewsItem>();
             forVocab.AddRange(topic1.ToList());
             forVocab.AddRange(topic2.ToList());
-            Vocabulary vocab = Vocabulary.CreateVocabulary(forVocab);
+            _vocab = Vocabulary.CreateVocabulary(forVocab);
 
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
