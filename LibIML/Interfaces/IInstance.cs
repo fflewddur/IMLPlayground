@@ -10,7 +10,9 @@ namespace LibIML
     {
         string AllText { get; }
         Dictionary<string, int> TokenCounts { get; set; }
-        
+        Label Label { get; set; }
+        SparseVector Features { get; }
+
         void ComputeFeatureVector(Vocabulary vocab);
     }
 }

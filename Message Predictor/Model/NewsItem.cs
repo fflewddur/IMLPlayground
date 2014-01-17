@@ -16,7 +16,7 @@ namespace MessagePredictor
         private string _body;
         private string _author;
         private Dictionary<string, int> _tokenCounts;
-        private SparseVector _featureWeights;
+        //private SparseVector _featureWeights;
         private SparseVector _featureCounts;
         private Label _label;
 
@@ -73,14 +73,14 @@ namespace MessagePredictor
             get { return _tokenCounts; }
             set { SetProperty<Dictionary<string, int>>(ref _tokenCounts, value); }
         }
+        
+        //public SparseVector FeatureWeights
+        //{
+        //    get { return _featureWeights; }
+        //    private set { SetProperty<SparseVector>(ref _featureWeights, value); }
+        //}
 
-        public SparseVector FeatureWeights
-        {
-            get { return _featureWeights; }
-            private set { SetProperty<SparseVector>(ref _featureWeights, value); }
-        }
-
-        public SparseVector FeatureCounts
+        public SparseVector Features
         {
             get { return _featureCounts; }
             private set { SetProperty<SparseVector>(ref _featureCounts, value); }
@@ -104,7 +104,7 @@ namespace MessagePredictor
                     features.Set(wordId, pair.Value);
             }
 
-            FeatureCounts = features;
+            Features = features;
         }
 
         #region Static methods
