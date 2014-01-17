@@ -79,6 +79,9 @@
     <Compile Include="View\FolderList.xaml.cs">
       <DependentUpon>FolderList.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\ImportantWordsContainer.xaml.cs">
+      <DependentUpon>ImportantWordsContainer.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\MessageList.xaml.cs">
       <DependentUpon>MessageList.xaml</DependentUpon>
     </Compile>
@@ -92,6 +95,10 @@
     <Compile Include="View\MessageView.xaml.cs">
       <DependentUpon>MessageView.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\ImportantWordsContainer.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\Styles.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

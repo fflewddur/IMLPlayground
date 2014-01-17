@@ -85,6 +85,7 @@
                     
                     <!-- Important words -->
                     <Label Grid.Row="2" Style="{StaticResource headerStyle1}">Important words</Label>
+                    <local:ImportantWordsContainer Grid.Row="3" Style="{StaticResource contentStyle}"/>
                 </Grid>
             </Grid>
         </Grid>
