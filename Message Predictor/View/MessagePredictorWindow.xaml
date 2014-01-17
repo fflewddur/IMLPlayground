@@ -40,7 +40,7 @@
         </Ribbon>
         
         <!-- Main window -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Margin="10, 10, 0, 10">
             <!-- Two-column split -->
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -53,17 +53,21 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     
                     <!-- Folders -->
-                    <Label Grid.Row="0">Folders</Label>
+                    <Label Grid.Row="0" Style="{StaticResource headerStyle1}">Folders</Label>
+                    <local:FolderList Grid.Row="1" Style="{StaticResource contentStyle}"/>
                     
                     <!-- Prediction overview -->
-                    <Label Grid.Row="1">Predictions</Label>
+                    <Label Grid.Row="2" Style="{StaticResource headerStyle1}">Predictions</Label>
                     
                     <!-- Word overview -->
-                    <Label Grid.Row="2">Words</Label>
+                    <Label Grid.Row="4" Style="{StaticResource headerStyle1}">Words</Label>
                 </Grid>
                 
                 <!-- Right column -->
@@ -76,11 +80,11 @@
                     </Grid.RowDefinitions>
                     
                     <!-- Messages -->
-                    <Label Grid.Row="0">Messages</Label>
-                    <local:MessageList Grid.Row="1"/>
+                    <Label Grid.Row="0" Style="{StaticResource headerStyle1}">Messages</Label>
+                    <local:MessageList Grid.Row="1" Style="{StaticResource contentStyle}"/>
                     
                     <!-- Important words -->
-                    <Label Grid.Row="2">Important words</Label>
+                    <Label Grid.Row="2" Style="{StaticResource headerStyle1}">Important words</Label>
                 </Grid>
             </Grid>
         </Grid>
