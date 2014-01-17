@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="MessagePredictor.ImportantWordsOverview"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MessagePredictor" 
+             mc:Ignorable="d" 
+             d:DesignHeight="250" d:DesignWidth="600">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        
+        <!-- Topic labels-->
+        <Label Grid.Row="0" Grid.Column="0" Content="{Binding Topic1UserLabel}" />
+        <Label Grid.Row="1" Grid.Column="0" Content="{Binding Topic2UserLabel}" />
+        
+        <!-- List of words -->
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Topic1VocabList}" />
+        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Topic2VocabList}" />
+        
+        <!-- Add word buttons -->
+        <Button Grid.Row="0" Grid.Column="2" Content="{Binding Topic1UserLabel}" ContentStringFormat="Add a word about {0}" />
+        <Button Grid.Row="1" Grid.Column="2" Content="{Binding Topic2UserLabel}" ContentStringFormat="Add a word about {0}" />
+    </Grid>
+</UserControl>
