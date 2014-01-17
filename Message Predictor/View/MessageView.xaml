@@ -8,7 +8,7 @@
     <Grid>
         <TabControl>
             <TabItem Header="Message">
-                <TextBox Text="{Binding CurrentMessage.AllText, Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Auto"></TextBox>
+                <TextBox Text="{Binding CurrentMessage.AllText, Mode=OneWay}" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"></TextBox>
             </TabItem>
             <TabItem Header="Explanation"></TabItem>
         </TabControl>
