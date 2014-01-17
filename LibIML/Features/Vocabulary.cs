@@ -227,40 +227,73 @@ namespace LibIML
             }
         }
 
-        private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize)
+        #endregion
+
+        #region Information Gain code
+
+        private Dictionary<Label, double> ComputePrC(IEnumerable<IInstance> instances, IEnumerable<Label> labels)
         {
+            Dictionary<Label, double> PrC = new Dictionary<Label, double>();
             Dictionary<Label, int> labelCounts = new Dictionary<Label, int>(); // The number of instances in each class
-            Dictionary<int, int> featureCounts = new Dictionary<int, int>(); // The number of documents containing each feature
-            Dictionary<int, int> featureAbsences = new Dictionary<int,int>(); // The number of documents *not* containing each feature
-            Dictionary<Label, Dictionary<int, int>> featureCountsPerClass = new Dictionary<Label, Dictionary<int, int>>();
-            Dictionary<Label, Dictionary<int, int>> featureAbsencesPerClass = new Dictionary<Label, Dictionary<int, int>>();
-            Dictionary<Label, double> PrC = new Dictionary<Label, double>(); // Probability of each class
-            Dictionary<int, double> PrT = new Dictionary<int, double>(); // Probability of each feature
-            Dictionary<Label, Dictionary<int, double>> PrCGivenT = new Dictionary<Label, Dictionary<int, double>>();
-            Dictionary<Label, Dictionary<int, double>> PrCGivenNotT = new Dictionary<Label, Dictionary<int, double>>();
-            Dictionary<int, double> IG = new Dictionary<int, double>();
 
             foreach (Label label in labels)
             {
                 labelCounts[label] = 0;
-                featureCountsPerClass[label] = new Dictionary<int, int>();
-                featureAbsencesPerClass[label] = new Dictionary<int, int>();
-                PrC[label] = 0;
-                PrCGivenT[label] = new Dictionary<int, double>();
-                PrCGivenNotT[label] = new Dictionary<int, double>();
             }
 
-            // Initialize our summations
-            foreach (int featureId in _idsToWords.Keys)
-            {
-                featureCounts[featureId] = 0;
-                featureAbsences[featureId] = 0;
-            }
-
-            // Count the number of instances in each class
             foreach (IInstance instance in instances)
             {
                 labelCounts[instance.Label]++;
+            }
+
+            foreach (Label label in labels)
+            {
+                PrC[label] = (double)labelCounts[label] / (double)labelCounts.Count;
+            }
+
+            return PrC;
+        }
+
+        private Dictionary<int, double> ComputePrT(IEnumerable<IInstance> instances, IEnumerable<Label> labels)
+        {
+            Dictionary<int, double> PrT = new Dictionary<int, double>();
+            Dictionary<int, int> featureCounts = new Dictionary<int, int>(); // The number of documents containing each feature
+
+            foreach (int featureId in _idsToWords.Keys)
+            {
+                featureCounts[featureId] = 0;
+            }
+
+            foreach (IInstance instance in instances)
+            {
+                foreach (int featureId in instance.Features.Data.Keys)
+                {
+                    featureCounts[featureId]++; // Increment the number of document's we've seen this feature in
+                }
+            }
+
+            foreach (int featureId in _idsToWords.Keys)
+            {
+                PrT[featureId] = (double)featureCounts[featureId] / (double)featureCounts.Count;
+            }
+
+            return PrT;
+        }
+
+        private Dictionary<Label, Dictionary<int, double>> ComputePrCGivenT(IEnumerable<IInstance> instances, IEnumerable<Label> labels)
+        {
+            Dictionary<Label, Dictionary<int, double>> PrCGivenT = new Dictionary<Label, Dictionary<int, double>>();
+            Dictionary<int, int> featureCounts = new Dictionary<int, int>();
+            Dictionary<Label, Dictionary<int, int>> featureCountsPerClass = new Dictionary<Label, Dictionary<int, int>>();
+
+            foreach (Label label in labels)
+            {
+                featureCountsPerClass[label] = new Dictionary<int, int>();
+                PrCGivenT[label] = new Dictionary<int, double>();
+            }
+
+            foreach (IInstance instance in instances)
+            {
                 foreach (int featureId in instance.Features.Data.Keys)
                 {
                     int count;
@@ -268,11 +301,35 @@ namespace LibIML
                     featureCountsPerClass[instance.Label][featureId] = count + 1; // Increment this feature's count for this class
                     featureCounts.TryGetValue(featureId, out count);
                     featureCounts[featureId] = count + 1; // Increment the number of document's we've seen this feature in
-                    
+
                 }
             }
 
-            // Count the number of documents *not* containing each feature, per class
+            foreach (Label label in labels)
+            {
+                foreach (int featureId in _idsToWords.Keys)
+                {
+                    int count;
+                    featureCountsPerClass[label].TryGetValue(featureId, out count);
+                    PrCGivenT[label][featureId] = (double)(count + 1) / (double)(featureCounts[featureId] + labels.Count()); // Add a smoothing term
+                }
+            }
+
+            return PrCGivenT;
+        }
+
+        private Dictionary<Label, Dictionary<int, double>> ComputePrCGivenNotT(IEnumerable<IInstance> instances, IEnumerable<Label> labels)
+        {
+            Dictionary<Label, Dictionary<int, double>> PrCGivenNotT = new Dictionary<Label, Dictionary<int, double>>();
+            Dictionary<Label, Dictionary<int, int>> featureAbsencesPerClass = new Dictionary<Label, Dictionary<int, int>>();
+            Dictionary<int, int> featureAbsences = new Dictionary<int, int>(); // The number of documents *not* containing each feature
+
+            foreach (Label label in labels)
+            {
+                featureAbsencesPerClass[label] = new Dictionary<int, int>();
+                PrCGivenNotT[label] = new Dictionary<int, double>();
+            }
+
             foreach (int featureId in _idsToWords.Keys)
             {
                 foreach (IInstance instance in instances)
@@ -288,32 +345,34 @@ namespace LibIML
                 }
             }
 
-            // Set PrC values
             foreach (Label label in labels)
             {
-                PrC[label] = (double)labelCounts[label] / (double)labelCounts.Count;
-            }
-
-            // Set PrT values
-            foreach (int featureId in featureCounts.Keys)
-            {
-                PrT[featureId] = (double)featureCounts[featureId] / (double)featureCounts.Count;
-            }
-
-            // Set PrC|t and PrC|!t values
-            foreach (Label label in labels)
-            {
-                foreach (int featureId in featureCounts.Keys)
+                foreach (int featureId in _idsToWords.Keys)
                 {
                     int count;
-                    featureCountsPerClass[label].TryGetValue(featureId, out count);
-                    PrCGivenT[label][featureId] = (double)(count + 1) / (double)(featureCounts[featureId] + labels.Count()); // Add a smoothing term
                     featureAbsencesPerClass[label].TryGetValue(featureId, out count);
                     PrCGivenNotT[label][featureId] = (double)(count + 1) / (double)(featureAbsences[featureId] + labels.Count()); // Add a smoothing term
                 }
             }
 
-            // Computer information gain for each feature
+            return PrCGivenNotT;
+        }
+
+        private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize)
+        {
+            Dictionary<Label, double> PrC; // Probability of each class
+            Dictionary<int, double> PrT; // Probability of each feature
+            Dictionary<Label, Dictionary<int, double>> PrCGivenT;
+            Dictionary<Label, Dictionary<int, double>> PrCGivenNotT;
+            Dictionary<int, double> IG = new Dictionary<int, double>();                
+
+            // Compute class and feature probabilities
+            PrC = ComputePrC(instances, labels);
+            PrT = ComputePrT(instances, labels);
+            PrCGivenT = ComputePrCGivenT(instances, labels);
+            PrCGivenNotT = ComputePrCGivenNotT(instances, labels);
+
+            // Compute information gain for each feature
             foreach (int featureId in _idsToWords.Keys)
             {
                 double PrCSum = 0;
@@ -327,6 +386,8 @@ namespace LibIML
                 }
                 IG[featureId] = (-1.0 * PrCSum) + (PrT[featureId] * PrTSum) + ((1.0 - PrT[featureId]) * PrNotTSum);
             }
+
+            // Find the features with the highest information gain
             List<KeyValuePair<int, double>> HighIG = IG.OrderBy(entry => entry.Value).Take(vocabSize).ToList();
 
             // Reduce our vocabulary to this subset
