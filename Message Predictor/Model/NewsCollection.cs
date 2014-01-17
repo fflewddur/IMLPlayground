@@ -12,6 +12,16 @@ namespace MessagePredictor
 {
     class NewsCollection : Collection<NewsItem>
     {
+        public NewsCollection(string title) : base()
+        {
+            Title = title;
+        }
+
+        #region Properties
+
+        public string Title { get; set; }
+
+        #endregion
 
         /// <summary>
         /// Read in a .zip file of the 20 Newsgroups dataset.
@@ -21,7 +31,7 @@ namespace MessagePredictor
         /// <returns>A NewsCollection representing the newsgroup messages in the ZIP archive.</returns>
         public static NewsCollection CreateFromZip(string path, IEnumerable<Label> labels = null)
         {
-            NewsCollection nc = new NewsCollection();
+            NewsCollection nc = new NewsCollection(@"Unknown");
 
             if (!File.Exists(path))
             {
