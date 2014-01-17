@@ -44,7 +44,11 @@ namespace MessagePredictor
         public NewsCollection CurrentFolder
         {
             get { return _currentFolder; }
-            set { SetProperty<NewsCollection>(ref _currentFolder, value); }
+            set 
+            {
+                if (SetProperty<NewsCollection>(ref _currentFolder, value))
+                    CurrentMessage = CurrentFolder[0]; // Go to the first message in this folder
+            }
         }
 
         public NewsItem CurrentMessage
