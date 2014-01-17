@@ -32,7 +32,7 @@ namespace MessagePredictor
             List<NewsItem> forVocab = new List<NewsItem>();
             forVocab.AddRange(topic1.ToList());
             forVocab.AddRange(topic2.ToList());
-            _vocab = Vocabulary.CreateVocabulary(forVocab, (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize]);
+            _vocab = Vocabulary.CreateVocabulary(forVocab, _labels, (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize]);
 
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;

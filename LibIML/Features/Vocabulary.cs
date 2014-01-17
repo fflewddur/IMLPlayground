@@ -227,9 +227,115 @@ namespace LibIML
             }
         }
 
-        private void RestrictToHighIG(IEnumerable<IInstance> instances, int vocabSize)
+        private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize)
         {
+            Dictionary<Label, int> labelCounts = new Dictionary<Label, int>(); // The number of instances in each class
+            Dictionary<int, int> featureCounts = new Dictionary<int, int>(); // The number of documents containing each feature
+            Dictionary<int, int> featureAbsences = new Dictionary<int,int>(); // The number of documents *not* containing each feature
+            Dictionary<Label, Dictionary<int, int>> featureCountsPerClass = new Dictionary<Label, Dictionary<int, int>>();
+            Dictionary<Label, Dictionary<int, int>> featureAbsencesPerClass = new Dictionary<Label, Dictionary<int, int>>();
+            Dictionary<Label, double> PrC = new Dictionary<Label, double>(); // Probability of each class
+            Dictionary<int, double> PrT = new Dictionary<int, double>(); // Probability of each feature
+            Dictionary<Label, Dictionary<int, double>> PrCGivenT = new Dictionary<Label, Dictionary<int, double>>();
+            Dictionary<Label, Dictionary<int, double>> PrCGivenNotT = new Dictionary<Label, Dictionary<int, double>>();
+            Dictionary<int, double> IG = new Dictionary<int, double>();
 
+            foreach (Label label in labels)
+            {
+                labelCounts[label] = 0;
+                featureCountsPerClass[label] = new Dictionary<int, int>();
+                featureAbsencesPerClass[label] = new Dictionary<int, int>();
+                PrC[label] = 0;
+                PrCGivenT[label] = new Dictionary<int, double>();
+                PrCGivenNotT[label] = new Dictionary<int, double>();
+            }
+
+            // Initialize our summations
+            foreach (int featureId in _idsToWords.Keys)
+            {
+                featureCounts[featureId] = 0;
+                featureAbsences[featureId] = 0;
+            }
+
+            // Count the number of instances in each class
+            foreach (IInstance instance in instances)
+            {
+                labelCounts[instance.Label]++;
+                foreach (int featureId in instance.Features.Data.Keys)
+                {
+                    int count;
+                    featureCountsPerClass[instance.Label].TryGetValue(featureId, out count);
+                    featureCountsPerClass[instance.Label][featureId] = count + 1; // Increment this feature's count for this class
+                    featureCounts.TryGetValue(featureId, out count);
+                    featureCounts[featureId] = count + 1; // Increment the number of document's we've seen this feature in
+                    
+                }
+            }
+
+            // Count the number of documents *not* containing each feature, per class
+            foreach (int featureId in _idsToWords.Keys)
+            {
+                foreach (IInstance instance in instances)
+                {
+                    if (!instance.Features.Contains(featureId))
+                    {
+                        int count;
+                        featureAbsencesPerClass[instance.Label].TryGetValue(featureId, out count);
+                        featureAbsencesPerClass[instance.Label][featureId] = count + 1;
+                        featureAbsences.TryGetValue(featureId, out count);
+                        featureAbsences[featureId] = count + 1;
+                    }
+                }
+            }
+
+            // Set PrC values
+            foreach (Label label in labels)
+            {
+                PrC[label] = (double)labelCounts[label] / (double)labelCounts.Count;
+            }
+
+            // Set PrT values
+            foreach (int featureId in featureCounts.Keys)
+            {
+                PrT[featureId] = (double)featureCounts[featureId] / (double)featureCounts.Count;
+            }
+
+            // Set PrC|t and PrC|!t values
+            foreach (Label label in labels)
+            {
+                foreach (int featureId in featureCounts.Keys)
+                {
+                    int count;
+                    featureCountsPerClass[label].TryGetValue(featureId, out count);
+                    PrCGivenT[label][featureId] = (double)(count + 1) / (double)(featureCounts[featureId] + labels.Count()); // Add a smoothing term
+                    featureAbsencesPerClass[label].TryGetValue(featureId, out count);
+                    PrCGivenNotT[label][featureId] = (double)(count + 1) / (double)(featureAbsences[featureId] + labels.Count()); // Add a smoothing term
+                }
+            }
+
+            // Computer information gain for each feature
+            foreach (int featureId in _idsToWords.Keys)
+            {
+                double PrCSum = 0;
+                double PrTSum = 0;
+                double PrNotTSum = 0;
+                foreach (Label label in labels)
+                {
+                    PrCSum += PrC[label] * Math.Log(PrC[label]);
+                    PrTSum += PrCGivenT[label][featureId] * Math.Log(PrCGivenT[label][featureId]);
+                    PrNotTSum += PrCGivenNotT[label][featureId] * Math.Log(PrCGivenNotT[label][featureId]);
+                }
+                IG[featureId] = (-1.0 * PrCSum) + (PrT[featureId] * PrTSum) + ((1.0 - PrT[featureId]) * PrNotTSum);
+            }
+            List<KeyValuePair<int, double>> HighIG = IG.OrderBy(entry => entry.Value).Take(vocabSize).ToList();
+
+            // Reduce our vocabulary to this subset
+            List<int> featureIdsToRemove = _idsToWords.Keys.ToList();
+            foreach (KeyValuePair<int, double> pair in HighIG)
+            {
+                featureIdsToRemove.Remove(pair.Key);
+            }
+            this.RemoveElements(featureIdsToRemove);
         }
 
         #endregion
@@ -241,7 +347,7 @@ namespace LibIML
         /// </summary>
         /// <param name="instances">A collection of items to use as the basis for this vocabulary.</param>
         /// <returns>A new Vocabulary object.</returns>
-        public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances, int desiredVocabSize)
+        public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int desiredVocabSize)
         {
             ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
 
@@ -268,7 +374,7 @@ namespace LibIML
                 });
 
             // Restrict our vocabulary to terms with high information gain
-            vocab.RestrictToHighIG(instances, desiredVocabSize);
+            vocab.RestrictToHighIG(instances, labels, desiredVocabSize);
 
             return vocab;
         }
