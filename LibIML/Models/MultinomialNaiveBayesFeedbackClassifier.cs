@@ -16,7 +16,7 @@ namespace LibIML
         private Vocabulary _vocab;
         private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
-        private Dictionary<Label, HashSet<Instance>> _trainingSet;
+        private Dictionary<Label, HashSet<IInstance>> _trainingSet;
         private Dictionary<Label, HashSet<Feature>> _featuresPerClass; // This gives us a single property to expose with all of the feature data for each class
 
         // Store these for efficiency
@@ -28,7 +28,7 @@ namespace LibIML
             _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
             _featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
-            _trainingSet = new Dictionary<Label, HashSet<Instance>>();
+            _trainingSet = new Dictionary<Label, HashSet<IInstance>>();
             _pClass = new Dictionary<Label, double>();
             _pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
 
@@ -97,7 +97,7 @@ namespace LibIML
         /// Add a single instance to the classifier's training set. Retrain the classifier after the instance has been added.
         /// </summary>
         /// <param name="instance">The instance to add.</param>
-        public void AddInstance(Instance instance)
+        public void AddInstance(IInstance instance)
         {
             AddInstanceWithoutPrUpdates(instance);
             Train();
@@ -107,9 +107,9 @@ namespace LibIML
         /// Add a collection of instances to the classifier's training set. Retrain the classifier after each instance has been added.
         /// </summary>
         /// <param name="instances">The collection of instances to add.</param>
-        public void AddInstances(IEnumerable<Instance> instances)
+        public void AddInstances(IEnumerable<IInstance> instances)
         {
-            foreach (Instance instance in instances)
+            foreach (IInstance instance in instances)
             {
                 AddInstanceWithoutPrUpdates(instance);
             }
@@ -121,7 +121,7 @@ namespace LibIML
         /// </summary>
         /// <param name="instance">The instance whose label we want to predict.</param>
         /// <returns>A prediction for this instance.</returns>
-        public Prediction PredictInstance(Instance instance)
+        public Prediction PredictInstance(IInstance instance)
         {
             Label label = null;
             Prediction prediction = new Prediction();
@@ -201,10 +201,10 @@ namespace LibIML
             bool retval = true;
 
             // Merge our training set into a single collection of instances
-            HashSet<Instance> instances = new HashSet<Instance>();
+            HashSet<IInstance> instances = new HashSet<IInstance>();
             foreach (Label label in Labels)
             {
-                foreach (Instance instance in _trainingSet[label])
+                foreach (IInstance instance in _trainingSet[label])
                 {
                     instances.Add(instance);
                 }
@@ -223,7 +223,7 @@ namespace LibIML
             return retval;
         }
 
-        public static async Task<bool> SaveArffFile(IEnumerable<Instance> instances, Vocabulary vocab, Label[] labels, string filePath)
+        public static async Task<bool> SaveArffFile(IEnumerable<IInstance> instances, Vocabulary vocab, Label[] labels, string filePath)
         {
             using (TextWriter writer = File.CreateText(filePath))
             {
@@ -246,7 +246,7 @@ namespace LibIML
                 // Write out sparse vectors for each item
                 await writer.WriteLineAsync("@DATA");
                 int classIndex = vocab.Count; // the class attribute is always the last attribute
-                foreach (Instance instance in instances)
+                foreach (IInstance instance in instances)
                 {
                     string[] itemFeatures = new string[instance.Features.Data.Count + 1]; // include room for class attribute
                     int index = 0;
@@ -283,7 +283,7 @@ namespace LibIML
             {
                 _perClassFeatureCounts[l] = new Dictionary<int, int>();
                 _perClassFeaturePriors[l] = new Dictionary<int, double>();
-                _trainingSet[l] = new HashSet<Instance>();
+                _trainingSet[l] = new HashSet<IInstance>();
                 _featuresPerClass[l] = new HashSet<Feature>();
             }
         }
@@ -292,7 +292,7 @@ namespace LibIML
         /// Add an instance to our training set, but don't compute probability updates.
         /// </summary>
         /// <param name="instance">The instance to add.</param>
-        private void AddInstanceWithoutPrUpdates(Instance instance)
+        private void AddInstanceWithoutPrUpdates(IInstance instance)
         {
             // Update our feature counts
             foreach (KeyValuePair<int, double> pair in instance.Features.Data)

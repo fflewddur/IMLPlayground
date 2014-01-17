@@ -15,9 +15,9 @@ namespace LibIML
         Label PositiveLabel { get; }
         Label NegativeLabel { get; }
 
-        void AddInstance(Instance instance);
-        void AddInstances(IEnumerable<Instance> instances);
-        Prediction PredictInstance(Instance instance);
+        void AddInstance(IInstance instance);
+        void AddInstances(IEnumerable<IInstance> instances);
+        Prediction PredictInstance(IInstance instance);
         void UpdatePrior(Label label, int feature, double prior);
         void Train(); // Train the classifier on all added training instances
         void ClearInstances(); // Remove all existing training instances

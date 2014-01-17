@@ -20,9 +20,9 @@ namespace IML_Playground.ViewModel
         private IEnumerable<Label> _labels;
         private Evaluator _evaluator;
         private Vocabulary _fullVocab; // The complete vocabulary (allows us to build vocabulary subsets at will).
-        private IInstances _testSet;
-        private IInstances _trainSet;
-        private IInstances _fullTrainSet; // The complete training set (allows us to resample smaller training sets at will).
+        private IEnumerable<IInstance> _testSet;
+        private IEnumerable<IInstance> _trainSet;
+        private IEnumerable<IInstance> _fullTrainSet; // The complete training set (allows us to resample smaller training sets at will).
         private ClassifierFeaturesViewModel _classifierViewModel;
         private Label _positiveLabel;
         private Label _negativeLabel;
@@ -36,7 +36,8 @@ namespace IML_Playground.ViewModel
         private string _statusMessage;
         private SerializableModel _serializableModel; // Used to serialize our classifier, test set, and complete training set.
 
-        public ClassifierEvaluatorViewModel(List<IClassifier> classifiers, IEnumerable<Label> labels, Vocabulary fullVocab, IInstances trainSet, IInstances testSet, IInstances fullTrainSet)
+        public ClassifierEvaluatorViewModel(List<IClassifier> classifiers, IEnumerable<Label> labels, Vocabulary fullVocab,
+            IEnumerable<IInstance> trainSet, IEnumerable<IInstance> testSet, IEnumerable<IInstance> fullTrainSet)
         {
             _classifiers = classifiers;
             _labels = labels;
@@ -75,7 +76,7 @@ namespace IML_Playground.ViewModel
             }
 
             CurrentClassifier.ClearInstances(); // Ensure the classifier has no training data
-            CurrentClassifier.AddInstances(_trainSet.ToInstances()); // Add our current training set
+            CurrentClassifier.AddInstances(_trainSet); // Add our current training set
             UpdateVocab();
             VocabSize = CurrentClassifier.Vocab.Count;
             ClassifierViewModel = new ClassifierFeaturesViewModel(CurrentClassifier);
@@ -202,7 +203,7 @@ namespace IML_Playground.ViewModel
 
             foreach (Feature feature in ClassifierViewModel.FeaturesPositive)
             {
-                foreach (Instance instance in _testSet.ToInstances())
+                foreach (IInstance instance in _testSet)
                 {
                     if (instance.Label == PositiveLabel)
                     {
@@ -215,7 +216,7 @@ namespace IML_Playground.ViewModel
             }
             foreach (Feature feature in ClassifierViewModel.FeaturesNegative)
             {
-                foreach (Instance instance in _testSet.ToInstances())
+                foreach (IInstance instance in _testSet)
                 {
                     if (instance.Label == NegativeLabel)
                     {
@@ -255,7 +256,7 @@ namespace IML_Playground.ViewModel
             CurrentClassifier.Train();
 
             // Evaluate new classifier
-            _evaluator.EvaluateOnTestSet(_testSet.ToInstances());
+            _evaluator.EvaluateOnTestSet(_testSet);
             WeightedF1 = _evaluator.WeightedF1;
             Console.WriteLine("Weighted F1: {0}", WeightedF1);
             int[,] cm = _evaluator.ConfusionMatrix;

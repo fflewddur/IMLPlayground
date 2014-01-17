@@ -107,13 +107,13 @@ namespace LibIML
         /// Remove vocabulary elements that do not exist in a given set of Instances.
         /// </summary>
         /// <param name="instances">The collection of Instances to restrict our vocabulary to.</param>
-        public void RestrictToInstances(IInstances instances)
+        public void RestrictToInstances(IEnumerable<IInstance> instances)
         {
             HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
             HashSet<int> notInInstances = new HashSet<int>(); // Track the feature IDs to remove
 
             // Build a set of features in instances
-            foreach (Instance instance in instances.ToInstances())
+            foreach (IInstance instance in instances)
             {
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data)
                 {
@@ -134,12 +134,12 @@ namespace LibIML
             return;
         }
 
-        public Vocabulary GetSubset(IInstances instances)
+        public Vocabulary GetSubset(IEnumerable<IInstance> instances)
         {
             HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
 
             // Build a set of features in instances
-            foreach (Instance instance in instances.ToInstances())
+            foreach (IInstance instance in instances)
             {
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data)
                 {
@@ -147,7 +147,7 @@ namespace LibIML
                 }
             }
 
-            return GetSubset(inInstances, instances.Count);
+            return GetSubset(inInstances, instances.Count());
         }
 
         /// <summary>

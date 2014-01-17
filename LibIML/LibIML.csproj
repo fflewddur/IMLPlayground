@@ -46,7 +46,6 @@
     <Compile Include="Features\Feature.cs" />
     <Compile Include="Instances\Instance.cs" />
     <Compile Include="Interfaces\IClassifier.cs" />
-    <Compile Include="Interfaces\IInstances.cs" />
     <Compile Include="Interfaces\IStemmer.cs" />
     <Compile Include="Instances\Label.cs" />
     <Compile Include="Models\MultinomialNaiveBayesClassifier.cs" />

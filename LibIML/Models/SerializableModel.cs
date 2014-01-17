@@ -17,8 +17,8 @@ namespace LibIML
     {
         #pragma warning disable 0649 // Disable warnings that these are never used/assigned to.
         public List<IClassifier> Classifiers;
-        public IInstances FullTrainingSet;
-        public IInstances TestSet;
+        public IEnumerable<IInstance> FullTrainingSet;
+        public IEnumerable<IInstance> TestSet;
         #pragma warning restore 0649
     }
 }

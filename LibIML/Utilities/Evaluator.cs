@@ -53,7 +53,7 @@ namespace LibIML
 
         #endregion
 
-        public void EvaluateOnTestSet(IEnumerable<Instance> instances)
+        public void EvaluateOnTestSet(IEnumerable<IInstance> instances)
         {
             Debug.Assert(Classifier != null);
 
@@ -61,7 +61,7 @@ namespace LibIML
 
             int correct = 0;
             int incorrect = 0;
-            foreach (Instance instance in instances)
+            foreach (IInstance instance in instances)
             {
                 Prediction prediction = Classifier.PredictInstance(instance);
                 Console.WriteLine(prediction);
