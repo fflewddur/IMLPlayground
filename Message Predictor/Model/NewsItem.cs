@@ -89,6 +89,27 @@ namespace MessagePredictor
         #endregion
 
         /// <summary>
+        /// Given a vocabulary, compute the number of instances of each vocabulary member in this document.
+        /// The values are stored in this item's FeatureCounts property.
+        /// </summary>
+        /// <param name="vocab">The vocabulary to restrict ourselves to.</param>
+        public void ComputeFeatureVector(Vocabulary vocab)
+        {
+            SparseVector features = new SparseVector();
+
+            foreach (KeyValuePair<string, int> pair in TokenCounts)
+            {
+                int wordId = vocab.GetWordId(pair.Key);
+                if (wordId > 0) // Make sure this token was included in our vocabulary
+                    features.Set(wordId, pair.Value);
+            }
+
+            FeatureCounts = features;
+        }
+
+        #region Static methods
+
+        /// <summary>
         /// Create a new NewsItem from an IO Stream.
         /// </summary>
         /// <param name="stream">The IO Stream to read from.</param>
@@ -151,5 +172,7 @@ namespace MessagePredictor
             else
                 return false;
         }
+
+        #endregion
     }
 }
