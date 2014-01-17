@@ -27,6 +27,12 @@ namespace MessagePredictor
             folders.Add(topic1);
             folders.Add(topic2);
 
+            // Build a vocab from our training set
+            List<NewsItem> forVocab = new List<NewsItem>();
+            forVocab.AddRange(topic1.ToList());
+            forVocab.AddRange(topic2.ToList());
+            Vocabulary vocab = Vocabulary.CreateVocabulary(forVocab);
+
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
             CurrentFolder = Folders[0];

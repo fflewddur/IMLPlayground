@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -85,7 +86,7 @@ namespace LibIML
         /// </summary>
         /// <param name="tokenDocFreqs"></param>
         /// <param name="nDocs"></param>
-        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs = -1, double min_df_percent = MIN_DF_PERCENT, double max_df_percent = MAX_DF_PERCENT)
+        public void AddTokens(IEnumerable<KeyValuePair<string, int>> tokenDocFreqs, int nDocs = -1, double min_df_percent = 0, double max_df_percent = 1.0)
         {
             int min_df = (int)(min_df_percent * nDocs);
             int max_df = (int)(max_df_percent * nDocs);
@@ -200,6 +201,8 @@ namespace LibIML
 
         #endregion
 
+        #region Private methods
+
         /// <summary>
         /// Remove a specific element from this vocabulary.
         /// </summary>
@@ -223,5 +226,39 @@ namespace LibIML
                 RemoveElement(id);
             }
         }
+        
+        #endregion
+
+        #region Static methods
+
+        /// <summary>
+        /// Create a new Vocabulary from a collection of instances.
+        /// </summary>
+        /// <param name="instances">A collection of items to use as the basis for this vocabulary.</param>
+        /// <returns>A new Vocabulary object.</returns>
+        public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances)
+        {
+            ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
+
+            // Tokenize and stem each document, returning a collection of tokens and corresponding counts.
+            Parallel.ForEach(instances, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                foreach (KeyValuePair<string, int> pair in tokens)
+                {
+                    // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
+                    tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1);
+                }
+            });
+
+            Vocabulary vocab = new Vocabulary();
+            vocab.AddTokens(tokenDocCounts, instances.Count());
+
+            return vocab;
+        }
+
+        #endregion
     }
 }
