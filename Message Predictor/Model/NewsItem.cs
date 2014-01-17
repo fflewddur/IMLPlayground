@@ -15,9 +15,9 @@ namespace MessagePredictor
         private string _subject;
         private string _body;
         private string _author;
-        private Dictionary<string, int> _tokenCounts;
-        private SparseVector _featureWeights;
-        private SparseVector _featureCounts;
+        //private Dictionary<string, int> _tokenCounts;
+        //private SparseVector _featureWeights;
+        //private SparseVector _featureCounts;
         private Label _label;
 
         public NewsItem() : base()
@@ -65,7 +65,7 @@ namespace MessagePredictor
 
         public string AllText
         {
-            get { return Subject + "\n" + Body; }
+            get { return Id + "\n" + Subject + "\n" + "From: " + Author + "\n\n" + Body; }
         }
 
         #endregion
