@@ -64,6 +64,44 @@ namespace MessagePredictor
             set { SetProperty<NewsItem>(ref _currentMessage, value); }
         }
 
+        public string Topic1UserLabel
+        {
+            get 
+            {
+                if (_labels != null && _labels.Count > 0)
+                    return _labels[0].UserLabel;
+                else
+                    return "[None]";
+            }
+        }
+
+        public string Topic2UserLabel
+        {
+            get
+            {
+                if (_labels != null && _labels.Count > 1)
+                    return _labels[1].UserLabel;
+                else
+                    return "[None]";
+            }
+        }
+
+        public string Topic1VocabList
+        {
+            get
+            {
+                return _vocab.ToString();
+            }
+        }
+
+        public string Topic2VocabList
+        {
+            get
+            {
+                return _vocab.ToString();
+            }
+        }
+
         #endregion
 
         /// <summary>
