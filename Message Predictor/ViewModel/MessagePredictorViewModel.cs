@@ -11,28 +11,54 @@ namespace MessagePredictor
 {
     class MessagePredictorViewModel: ViewModelBase
     {
-        List<NewsCollection> _folders;
+        List<NewsCollection> _folders; // Collection of all our folders
+        NewsCollection _unknownFolder;
+        NewsCollection _topic1Folder;
+        NewsCollection _topic2Folder;
         NewsCollection _currentFolder;
         NewsItem _currentMessage;
         List<Label> _labels;
         Vocabulary _vocab;
+        MultinomialNaiveBayesFeedbackClassifier _classifier;
 
         public MessagePredictorViewModel()
         {
             List<NewsCollection> folders = new List<NewsCollection>();
-            NewsCollection unknown = LoadDataset();
-            NewsCollection topic1 = BuildTopicTrainingSet(unknown, _labels[0], (int)App.Current.Properties[App.PropertyKey.Topic1TrainSize]);
-            NewsCollection topic2 = BuildTopicTrainingSet(unknown, _labels[1], (int)App.Current.Properties[App.PropertyKey.Topic2TrainSize]);
+            _unknownFolder = LoadDataset();
+            _topic1Folder = BuildTopicTrainingSet(_unknownFolder, _labels[0], (int)App.Current.Properties[App.PropertyKey.Topic1TrainSize]);
+            _topic2Folder = BuildTopicTrainingSet(_unknownFolder, _labels[1], (int)App.Current.Properties[App.PropertyKey.Topic2TrainSize]);
 
-            folders.Add(unknown);
-            folders.Add(topic1);
-            folders.Add(topic2);
+            folders.Add(_unknownFolder);
+            folders.Add(_topic1Folder);
+            folders.Add(_topic2Folder);
 
             // Build a vocab from our training set
             List<NewsItem> forVocab = new List<NewsItem>();
-            forVocab.AddRange(topic1.ToList());
-            forVocab.AddRange(topic2.ToList());
+            forVocab.AddRange(_topic1Folder.ToList());
+            forVocab.AddRange(_topic2Folder.ToList());
             _vocab = Vocabulary.CreateVocabulary(forVocab, _labels, (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize]);
+
+            // Build a classifier
+            _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
+            _classifier.AddInstances(forVocab);
+
+            // Evaluate the classifier
+            int pRight = 0;
+            foreach (IInstance instance in _topic1Folder)
+            {
+                Prediction pred = _classifier.PredictInstance(instance);
+                if (pred.Label == instance.Label)
+                    pRight++;
+            }
+            _topic1Folder.CorrectPredictions = pRight;
+            pRight = 0;
+            foreach (IInstance instance in _topic2Folder)
+            {
+                Prediction pred = _classifier.PredictInstance(instance);
+                if (pred.Label == instance.Label)
+                    pRight++;
+            }
+            _topic2Folder.CorrectPredictions = pRight;
 
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
