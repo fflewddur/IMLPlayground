@@ -10,8 +10,11 @@ using System.Threading.Tasks;
 
 namespace MessagePredictor
 {
-    class NewsCollection : Collection<NewsItem>
+    class NewsCollection : ViewModelCollectionBase<NewsItem>
     {
+        string _title;
+        int _correctPredictions;
+
         public NewsCollection(string title) : base()
         {
             Title = title;
@@ -19,8 +22,17 @@ namespace MessagePredictor
 
         #region Properties
 
-        public string Title { get; set; }
-        public int CorrectPredictions { get; set; }
+        public string Title
+        {
+            get { return _title; }
+            set { SetProperty<string>(ref _title, value); }
+        }
+
+        public int CorrectPredictions
+        {
+            get { return _correctPredictions; }
+            set { SetProperty<int>(ref _correctPredictions, value); }
+        }
 
         #endregion
 
