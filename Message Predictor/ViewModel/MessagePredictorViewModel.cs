@@ -38,17 +38,34 @@ namespace MessagePredictor
             forVocab.AddRange(_topic2Folder.ToList());
             _vocab = Vocabulary.CreateVocabulary(forVocab, _labels, (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize]);
 
+            // Update our test set in light of our new vocabulary
+            Parallel.ForEach(_unknownFolder, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(_vocab);
+            });
+
             // Build a classifier
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
             _classifier.AddInstances(forVocab);
 
             // Evaluate the classifier
             int pRight = 0;
+            Topic1Predictions = 0;
+            Topic2Predictions = 0;
+            RecentlyChangedPredictions = 0;
             foreach (IInstance instance in _topic1Folder)
             {
                 Prediction pred = _classifier.PredictInstance(instance);
                 if (pred.Label == instance.Label)
+                {
+                    Topic1Predictions++;
                     pRight++;
+                }
+                else
+                    Topic2Predictions++;
             }
             _topic1Folder.CorrectPredictions = pRight;
             pRight = 0;
@@ -56,10 +73,22 @@ namespace MessagePredictor
             {
                 Prediction pred = _classifier.PredictInstance(instance);
                 if (pred.Label == instance.Label)
+                {
+                    Topic2Predictions++;
                     pRight++;
+                }
+                else
+                    Topic1Predictions++;
             }
             _topic2Folder.CorrectPredictions = pRight;
-
+            foreach (IInstance instance in _unknownFolder)
+            {
+                Prediction pred = _classifier.PredictInstance(instance);
+                if (pred.Label == _labels[0])
+                    Topic1Predictions++;
+                else
+                    Topic2Predictions++;
+            }
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
             CurrentFolder = Folders[0];
@@ -127,6 +156,10 @@ namespace MessagePredictor
                 return _vocab.ToString();
             }
         }
+
+        public int Topic1Predictions { get; set; }
+        public int Topic2Predictions { get; set; }
+        public int RecentlyChangedPredictions { get; set; }
 
         #endregion
 
