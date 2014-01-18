@@ -20,6 +20,7 @@ namespace MessagePredictor
         #region Properties
 
         public string Title { get; set; }
+        public int CorrectPredictions { get; set; }
 
         #endregion
 
