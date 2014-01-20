@@ -24,14 +24,12 @@
             </Ribbon.QuickAccessToolBar>
             <RibbonTab Header="Home" KeyTip="H">
                 <RibbonGroup Header="Predictions">
-                    <RibbonButton Label="Update predictions" LargeImageSource="Art/refresh_16xLG.png" KeyTip="U"/>
+                    <RibbonButton Label="Update predictions" LargeImageSource="Art/refresh_16xLG.png" KeyTip="U" Command="{Binding UpdatePredictions}"/>
                     <RibbonToggleButton Label="Automatically update predictions" SmallImageSource="Art/lightningBolt_16xLG.png" IsChecked="True"/>
                     <RibbonToggleButton Label="Only show recent changes" SmallImageSource="Art/FindResults1_6264.png" KeyTip="R"/>
                 </RibbonGroup>
                 <RibbonGroup Header="File">
-                    <RibbonSplitButton Label="File to...">
-                        
-                    </RibbonSplitButton>
+                    <RibbonMenuButton Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png" ItemsSource="{Binding Folders}" DisplayMemberPath="Title" />
                 </RibbonGroup>
                 <RibbonGroup Header="Search">
                     <RibbonTextBox Label="Find" SmallImageSource="Art/Find_5650.png" KeyTip="F"/>

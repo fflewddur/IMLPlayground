@@ -195,7 +195,10 @@
   <ItemGroup>
     <Resource Include="View\Art\Undo_16x.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="View\Art\Folder_6222.png" />
+    <Resource Include="View\Art\folder_Closed_32xLG.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LibIML\LibIML.csproj">
       <Project>{522d4c09-efb2-4f81-8a55-268cb4850b0b}</Project>

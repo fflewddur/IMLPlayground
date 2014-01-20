@@ -1,4 +1,5 @@
-﻿using LibIML;
+﻿using GalaSoft.MvvmLight.Command;
+using LibIML;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MessagePredictor
 {
@@ -118,6 +120,8 @@ namespace MessagePredictor
             CurrentFolder = Folders[0];
             CurrentMessage = CurrentFolder[0];
 
+            UpdatePredictions = new RelayCommand(PerformUpdatePredictions);
+
             Console.WriteLine("MessagePredictorViewModel() end");
         }
 
@@ -186,6 +190,17 @@ namespace MessagePredictor
         public int Topic1Predictions { get; set; }
         public int Topic2Predictions { get; set; }
         public int RecentlyChangedPredictions { get; set; }
+
+        #endregion
+
+        #region Commands
+        
+        public ICommand UpdatePredictions { get; private set; }
+
+        private void PerformUpdatePredictions()
+        {
+            Console.WriteLine("Update predictions");
+        }
 
         #endregion
 
