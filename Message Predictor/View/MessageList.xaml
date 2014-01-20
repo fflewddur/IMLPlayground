@@ -13,7 +13,8 @@
         </Grid.ColumnDefinitions>
         
         <!-- Summary list -->
-        <DataGrid Grid.Column="0" ItemsSource="{Binding CurrentFolder}" AutoGenerateColumns="False" SelectedItem="{Binding CurrentMessage}">
+        <DataGrid Grid.Column="0" ItemsSource="{Binding CurrentFolder}" AutoGenerateColumns="False" SelectedItem="{Binding CurrentMessage}" 
+                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" />
                 <DataGridTextColumn Header="Predicted topic" />
