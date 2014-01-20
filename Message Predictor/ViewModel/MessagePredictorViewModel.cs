@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -23,22 +24,36 @@ namespace MessagePredictor
 
         public MessagePredictorViewModel()
         {
+            Console.Write("MessagePredictorViewModel() start");
+            Stopwatch timer = new Stopwatch();
+
+            timer.Start();
             List<NewsCollection> folders = new List<NewsCollection>();
             _unknownFolder = LoadDataset();
+            timer.Stop();
+            Console.WriteLine("Time to load data set: {0}", timer.Elapsed);
+            
+            timer.Restart();
             _topic1Folder = BuildTopicTrainingSet(_unknownFolder, _labels[0], (int)App.Current.Properties[App.PropertyKey.Topic1TrainSize]);
             _topic2Folder = BuildTopicTrainingSet(_unknownFolder, _labels[1], (int)App.Current.Properties[App.PropertyKey.Topic2TrainSize]);
+            timer.Stop();
+            Console.WriteLine("Time to build topic training sets: {0}", timer.Elapsed);
 
             folders.Add(_unknownFolder);
             folders.Add(_topic1Folder);
             folders.Add(_topic2Folder);
 
             // Build a vocab from our training set
+            timer.Restart();
             List<NewsItem> forVocab = new List<NewsItem>();
             forVocab.AddRange(_topic1Folder.ToList());
             forVocab.AddRange(_topic2Folder.ToList());
             _vocab = Vocabulary.CreateVocabulary(forVocab, _labels, (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize]);
+            timer.Stop();
+            Console.WriteLine("Time to build vocab: {0}", timer.Elapsed);
 
             // Update our test set in light of our new vocabulary
+            timer.Restart();
             Parallel.ForEach(_unknownFolder, (instance, state, index) =>
             {
                 PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
@@ -46,12 +61,18 @@ namespace MessagePredictor
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(_vocab);
             });
+            timer.Stop();
+            Console.WriteLine("Time to update data for new vocab: {0}", timer.Elapsed);
 
             // Build a classifier
+            timer.Restart();
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
             _classifier.AddInstances(forVocab);
+            timer.Stop();
+            Console.WriteLine("Time to build classifier: {0}", timer.Elapsed);
 
             // Evaluate the classifier
+            timer.Restart();
             int pRight = 0;
             Topic1Predictions = 0;
             Topic2Predictions = 0;
@@ -89,10 +110,15 @@ namespace MessagePredictor
                 else
                     Topic2Predictions++;
             }
+            timer.Stop();
+            Console.WriteLine("Time to evaluate classifier: {0}", timer.Elapsed);
+
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
             CurrentFolder = Folders[0];
             CurrentMessage = CurrentFolder[0];
+
+            Console.WriteLine("MessagePredictorViewModel() end");
         }
 
         #region Properties
