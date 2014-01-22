@@ -121,6 +121,7 @@ namespace MessagePredictor
             CurrentMessage = CurrentFolder[0];
 
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions);
+            FileTo = new RelayCommand(PerformFileTo);
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
@@ -190,16 +191,25 @@ namespace MessagePredictor
         public int Topic1Predictions { get; set; }
         public int Topic2Predictions { get; set; }
         public int RecentlyChangedPredictions { get; set; }
+        public NewsCollection FileToSelectedItem { get; set; }
 
         #endregion
 
         #region Commands
         
         public ICommand UpdatePredictions { get; private set; }
+        public ICommand FileTo { get; private set; }
 
         private void PerformUpdatePredictions()
         {
             Console.WriteLine("Update predictions");
+        }
+
+        private void PerformFileTo()
+        {
+            Console.WriteLine("File to: " + FileToSelectedItem.Title);
+
+            FileToSelectedItem = null;
         }
 
         #endregion

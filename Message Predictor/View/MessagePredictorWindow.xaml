@@ -29,7 +29,18 @@
                     <RibbonToggleButton Label="Only show recent changes" SmallImageSource="Art/FindResults1_6264.png" KeyTip="R"/>
                 </RibbonGroup>
                 <RibbonGroup Header="File">
-                    <RibbonMenuButton Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png" ItemsSource="{Binding Folders}" DisplayMemberPath="Title" />
+                    <RibbonMenuButton Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png">
+                        <RibbonGallery ItemsSource="{Binding Folders}" Command="{Binding FileTo}" SelectedItem="{Binding FileToSelectedItem, Mode=TwoWay}">
+                            <!--<RibbonGalleryCategory ItemsSource="{Binding Folders}" MaxColumnCount="1" DisplayMemberPath="Title" />-->
+                        </RibbonGallery>
+                    </RibbonMenuButton>
+                    <!--
+                    <RibbonComboBox Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png">
+                        <RibbonGallery Command="{Binding FileTo}" SelectedItem="{Binding FileToSelectedItem, Mode=TwoWay}">
+                            <RibbonGalleryCategory ItemsSource="{Binding Folders}" MaxColumnCount="1" DisplayMemberPath="Title" />
+                        </RibbonGallery>
+                    </RibbonComboBox>
+                    -->
                 </RibbonGroup>
                 <RibbonGroup Header="Search">
                     <RibbonTextBox Label="Find" SmallImageSource="Art/Find_5650.png" KeyTip="F"/>
