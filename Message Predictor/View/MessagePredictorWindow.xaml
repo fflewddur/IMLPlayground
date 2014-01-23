@@ -1,4 +1,4 @@
-﻿<RibbonWindow x:Class="MessagePredictor.MessagePredictorWindow"
+﻿<Window x:Class="MessagePredictor.MessagePredictorWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:MessagePredictor"
@@ -9,10 +9,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         
+        <local:CommandBar Grid.Row="0" />
+        
         <!-- Ribbon -->
-        <Ribbon Name="Ribbon" Title="Ribbon" RenderOptions.BitmapScalingMode="HighQuality">
+        <!--<Ribbon Name="Ribbon" Title="Ribbon" RenderOptions.BitmapScalingMode="HighQuality">
             <Ribbon.ApplicationMenu>
-                <!-- Hide the Application Menu -->
+                --><!-- Hide the Application Menu --><!--
                 <RibbonApplicationMenu Visibility="Collapsed">
                 </RibbonApplicationMenu>
             </Ribbon.ApplicationMenu>
@@ -29,24 +31,39 @@
                     <RibbonToggleButton Label="Only show recent changes" SmallImageSource="Art/FindResults1_6264.png" KeyTip="R"/>
                 </RibbonGroup>
                 <RibbonGroup Header="File">
+                    <RibbonTwoLineText Text="Move to folder..." />
+                    <RibbonControlGroup>
+                        <RibbonButton Label="{Binding Folders[0].Title}" />
+                        <RibbonButton Label="{Binding Folders[1].Title}" />
+                        <RibbonButton Label="{Binding Folders[2].Title}" />
+                    </RibbonControlGroup>
+                    <RibbonSplitButton Label="Label">
+                        <RibbonGallery>
+                            <RibbonGalleryCategory>
+                                <RibbonGalleryItem Content="Unknown" />
+                                <RibbonGalleryItem Content="Hockey" />
+                                <RibbonGalleryItem Content="Baseball" />
+                            </RibbonGalleryCategory>
+                        </RibbonGallery>
+                    </RibbonSplitButton>
                     <RibbonMenuButton Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png">
                         <RibbonGallery ItemsSource="{Binding Folders}" Command="{Binding FileTo}" SelectedItem="{Binding FileToSelectedItem, Mode=TwoWay}">
-                            <!--<RibbonGalleryCategory ItemsSource="{Binding Folders}" MaxColumnCount="1" DisplayMemberPath="Title" />-->
+                            --><!--<RibbonGalleryCategory ItemsSource="{Binding Folders}" MaxColumnCount="1" DisplayMemberPath="Title" />--><!--
                         </RibbonGallery>
                     </RibbonMenuButton>
-                    <!--
+                    --><!--
                     <RibbonComboBox Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png">
                         <RibbonGallery Command="{Binding FileTo}" SelectedItem="{Binding FileToSelectedItem, Mode=TwoWay}">
                             <RibbonGalleryCategory ItemsSource="{Binding Folders}" MaxColumnCount="1" DisplayMemberPath="Title" />
                         </RibbonGallery>
                     </RibbonComboBox>
-                    -->
+                    --><!--
                 </RibbonGroup>
                 <RibbonGroup Header="Search">
                     <RibbonTextBox Label="Find" SmallImageSource="Art/Find_5650.png" KeyTip="F"/>
                 </RibbonGroup>
             </RibbonTab>
-        </Ribbon>
+        </Ribbon>-->
         
         <!-- Main window -->
         <Grid Grid.Row="1" Margin="10, 10, 0, 10">
@@ -100,4 +117,4 @@
             </Grid>
         </Grid>
     </Grid>
-</RibbonWindow>
+</Window>

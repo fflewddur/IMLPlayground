@@ -1,0 +1,39 @@
+﻿<UserControl x:Class="MessagePredictor.CommandBar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:ToggleSwitch="clr-namespace:ToggleSwitch;assembly=ToggleSwitch"
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+             mc:Ignorable="d" 
+             d:DesignHeight="70" d:DesignWidth="1100">
+    <Grid>
+        <StackPanel Orientation="Horizontal" Margin="10" HorizontalAlignment="Left">
+            <Button Padding="10 5" Margin="0 0 50 0" Command="{Binding UpdatePredictions}">
+                <TextBlock TextAlignment="Center">Update<LineBreak/>predictions</TextBlock>
+            </Button>
+            <Label VerticalContentAlignment="Center">
+                <TextBlock TextAlignment="Right">Update predictions<LineBreak />automatically</TextBlock>
+            </Label>
+            <ToggleSwitch:HorizontalToggleSwitch Margin="5 0 50 0" IsChecked="{Binding AutoUpdatePredictions}">
+
+            </ToggleSwitch:HorizontalToggleSwitch>
+            <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center">
+                <xctk:DropDownButton.DropDownContent>
+                    <StackPanel Orientation="Vertical">
+                        <Button Padding="10 5" Content="{Binding Folders[0].Title}" Command="{Binding FileToUnknown}"/>
+                        <Button Padding="10 5" Content="{Binding Folders[1].Title}" Command="{Binding FileToTopic1}"/>
+                        <Button Padding="10 5" Content="{Binding Folders[2].Title}" Command="{Binding FileToTopic2}"/>
+                    </StackPanel>
+                </xctk:DropDownButton.DropDownContent>
+                <TextBlock TextAlignment="Center">Move message<LineBreak />to folder..."</TextBlock>
+            </xctk:DropDownButton>
+            <Label Margin="50 0 5 0" VerticalContentAlignment="Center">
+                <TextBlock TextAlignment="Right">Only show<LineBreak />recent changes</TextBlock>
+            </Label>
+            <ToggleSwitch:HorizontalToggleSwitch IsChecked="{Binding OnlyShowRecentChanges}" />
+            <Label Margin="50 0 5 0" VerticalContentAlignment="Center">Find</Label>
+            <TextBox MaxLines="1" MinWidth="150" Height="25" SpellCheck.IsEnabled="True" VerticalContentAlignment="Center"></TextBox>
+        </StackPanel>
+    </Grid>
+</UserControl>

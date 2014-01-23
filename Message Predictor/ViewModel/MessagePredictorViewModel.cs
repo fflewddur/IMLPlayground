@@ -23,6 +23,8 @@ namespace MessagePredictor
         List<Label> _labels;
         Vocabulary _vocab;
         MultinomialNaiveBayesFeedbackClassifier _classifier;
+        bool _autoUpdatePredictions;
+        bool _onlyShowRecentChanges;
 
         public MessagePredictorViewModel()
         {
@@ -121,7 +123,9 @@ namespace MessagePredictor
             CurrentMessage = CurrentFolder[0];
 
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions);
-            FileTo = new RelayCommand(PerformFileTo);
+            FileToUnknown = new RelayCommand(PerformFileToUnknown);
+            FileToTopic1 = new RelayCommand(PerformFileToTopic1);
+            FileToTopic2 = new RelayCommand(PerformFileToTopic2);
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
@@ -188,28 +192,52 @@ namespace MessagePredictor
             }
         }
 
+        public bool AutoUpdatePredictions
+        {
+            get { return _autoUpdatePredictions; }
+            set { SetProperty<bool>(ref _autoUpdatePredictions, value); }
+        }
+
+        public bool OnlyShowRecentChanges
+        {
+            get { return _onlyShowRecentChanges; }
+            set { SetProperty<bool>(ref _onlyShowRecentChanges, value); }
+        }
+
         public int Topic1Predictions { get; set; }
         public int Topic2Predictions { get; set; }
         public int RecentlyChangedPredictions { get; set; }
-        public NewsCollection FileToSelectedItem { get; set; }
 
         #endregion
 
         #region Commands
         
         public ICommand UpdatePredictions { get; private set; }
-        public ICommand FileTo { get; private set; }
+        public ICommand FileToUnknown { get; private set; }
+        public ICommand FileToTopic1 { get; private set; }
+        public ICommand FileToTopic2 { get; private set; }
 
         private void PerformUpdatePredictions()
         {
             Console.WriteLine("Update predictions");
         }
 
-        private void PerformFileTo()
+        private void PerformFileToUnknown()
         {
-            Console.WriteLine("File to: " + FileToSelectedItem.Title);
+            NewsItem item = CurrentMessage;
+            MoveMessageToFolder(item, _unknownFolder);
+        }
 
-            FileToSelectedItem = null;
+        private void PerformFileToTopic1()
+        {
+            NewsItem item = CurrentMessage;
+            MoveMessageToFolder(item, _topic1Folder);
+        }
+
+        private void PerformFileToTopic2()
+        {
+            NewsItem item = CurrentMessage;
+            MoveMessageToFolder(item, _topic2Folder);
         }
 
         #endregion
