@@ -214,6 +214,38 @@ namespace MessagePredictor
 
         #endregion
 
+        public void MoveMessageToFolder(NewsItem item, NewsCollection collection)
+        {
+            NewsCollection container = GetFolderContainingMessage(item);
+            if (container != null)
+            {
+                if (!container.Remove(item))
+                {
+                    Console.Error.WriteLine("Error removing item {0} from container {0}", item, container);
+                }
+                else
+                {
+                    collection.Add(item);
+                }
+            }
+        }
+
+        private NewsCollection GetFolderContainingMessage(NewsItem item)
+        {
+            NewsCollection container = null;
+
+            foreach (NewsCollection collection in Folders)
+            {
+                if (collection.Contains(item))
+                {
+                    container = collection;
+                    break;
+                }
+            }
+
+            return container;
+        }
+
         /// <summary>
         /// Load the dataset specified in our configuration properties.
         /// </summary>
