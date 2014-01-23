@@ -12,7 +12,7 @@ using System.Windows.Input;
 
 namespace MessagePredictor
 {
-    class MessagePredictorViewModel: ViewModelBase
+    class MessagePredictorViewModel : ViewModelBase
     {
         List<NewsCollection> _folders; // Collection of all our folders
         NewsCollection _unknownFolder;
@@ -25,10 +25,13 @@ namespace MessagePredictor
         MultinomialNaiveBayesFeedbackClassifier _classifier;
         bool _autoUpdatePredictions;
         bool _onlyShowRecentChanges;
+        int _topic1Predictions;
+        int _topic2Predictions;
+        int _recentlyChangedPredictions;
 
         public MessagePredictorViewModel()
         {
-            Console.Write("MessagePredictorViewModel() start");
+            Console.WriteLine("MessagePredictorViewModel() start");
             Stopwatch timer = new Stopwatch();
 
             timer.Start();
@@ -36,7 +39,7 @@ namespace MessagePredictor
             _unknownFolder = LoadDataset();
             timer.Stop();
             Console.WriteLine("Time to load data set: {0}", timer.Elapsed);
-            
+
             timer.Restart();
             _topic1Folder = BuildTopicTrainingSet(_unknownFolder, _labels[0], (int)App.Current.Properties[App.PropertyKey.Topic1TrainSize]);
             _topic2Folder = BuildTopicTrainingSet(_unknownFolder, _labels[1], (int)App.Current.Properties[App.PropertyKey.Topic2TrainSize]);
@@ -117,15 +120,16 @@ namespace MessagePredictor
             timer.Stop();
             Console.WriteLine("Time to evaluate classifier: {0}", timer.Elapsed);
 
+            UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
+            FileToUnknown = new RelayCommand(PerformFileToUnknown, CanPerformFileToUnknown);
+            FileToTopic1 = new RelayCommand(PerformFileToTopic1, CanPerformFileToTopic1);
+            FileToTopic2 = new RelayCommand(PerformFileToTopic2, CanPerformFileToTopic2);
+
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
             CurrentFolder = Folders[0];
             CurrentMessage = CurrentFolder[0];
-
-            UpdatePredictions = new RelayCommand(PerformUpdatePredictions);
-            FileToUnknown = new RelayCommand(PerformFileToUnknown);
-            FileToTopic1 = new RelayCommand(PerformFileToTopic1);
-            FileToTopic2 = new RelayCommand(PerformFileToTopic2);
+            AutoUpdatePredictions = true;
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
@@ -141,10 +145,15 @@ namespace MessagePredictor
         public NewsCollection CurrentFolder
         {
             get { return _currentFolder; }
-            set 
+            set
             {
                 if (SetProperty<NewsCollection>(ref _currentFolder, value))
+                { 
                     CurrentMessage = CurrentFolder[0]; // Go to the first message in this folder
+                    FileToUnknown.RaiseCanExecuteChanged();
+                    FileToTopic1.RaiseCanExecuteChanged();
+                    FileToTopic2.RaiseCanExecuteChanged();
+                }
             }
         }
 
@@ -156,7 +165,7 @@ namespace MessagePredictor
 
         public string Topic1UserLabel
         {
-            get 
+            get
             {
                 if (_labels != null && _labels.Count > 0)
                     return _labels[0].UserLabel;
@@ -178,24 +187,21 @@ namespace MessagePredictor
 
         public string Topic1VocabList
         {
-            get
-            {
-                return _vocab.ToString();
-            }
+            get { return _vocab.ToString(); }
         }
 
         public string Topic2VocabList
         {
-            get
-            {
-                return _vocab.ToString();
-            }
+            get { return _vocab.ToString(); }
         }
 
         public bool AutoUpdatePredictions
         {
             get { return _autoUpdatePredictions; }
-            set { SetProperty<bool>(ref _autoUpdatePredictions, value); }
+            set {
+                if (SetProperty<bool>(ref _autoUpdatePredictions, value))
+                    UpdatePredictions.RaiseCanExecuteChanged();
+            }
         }
 
         public bool OnlyShowRecentChanges
@@ -204,22 +210,58 @@ namespace MessagePredictor
             set { SetProperty<bool>(ref _onlyShowRecentChanges, value); }
         }
 
-        public int Topic1Predictions { get; set; }
-        public int Topic2Predictions { get; set; }
-        public int RecentlyChangedPredictions { get; set; }
+        public int Topic1Predictions
+        {
+            get { return _topic1Predictions; }
+            private set { SetProperty<int>(ref _topic1Predictions, value); }
+        }
+
+        public int Topic2Predictions
+        {
+            get { return _topic2Predictions; }
+            private set { SetProperty<int>(ref _topic2Predictions, value); }
+        }
+
+        public int RecentlyChangedPredictions
+        {
+            get { return _recentlyChangedPredictions; }
+            private set { SetProperty<int>(ref _recentlyChangedPredictions, value); }
+        }
 
         #endregion
 
         #region Commands
-        
-        public ICommand UpdatePredictions { get; private set; }
-        public ICommand FileToUnknown { get; private set; }
-        public ICommand FileToTopic1 { get; private set; }
-        public ICommand FileToTopic2 { get; private set; }
+
+        public RelayCommand UpdatePredictions { get; private set; }
+        public RelayCommand FileToUnknown { get; private set; }
+        public RelayCommand FileToTopic1 { get; private set; }
+        public RelayCommand FileToTopic2 { get; private set; }
+
+        private bool CanPerformUpdatePredictions()
+        {
+            if (AutoUpdatePredictions)
+                return false;
+            else
+            {
+                // TODO also make sure something has changed
+                return true;
+            }
+        }
 
         private void PerformUpdatePredictions()
         {
             Console.WriteLine("Update predictions");
+        }
+
+        private bool CanPerformFileToUnknown()
+        {
+            if (CurrentMessage != null &&
+                GetFolderContainingMessage(CurrentMessage) != _unknownFolder)
+            {
+                return true;
+            }
+            else
+                return false;
         }
 
         private void PerformFileToUnknown()
@@ -228,10 +270,32 @@ namespace MessagePredictor
             MoveMessageToFolder(item, _unknownFolder);
         }
 
+        private bool CanPerformFileToTopic1()
+        {
+            if (CurrentMessage != null &&
+                GetFolderContainingMessage(CurrentMessage) != _topic1Folder)
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+
         private void PerformFileToTopic1()
         {
             NewsItem item = CurrentMessage;
             MoveMessageToFolder(item, _topic1Folder);
+        }
+
+        private bool CanPerformFileToTopic2()
+        {
+            if (CurrentMessage != null &&
+                GetFolderContainingMessage(CurrentMessage) != _topic2Folder)
+            {
+                return true;
+            }
+            else
+                return false;
         }
 
         private void PerformFileToTopic2()

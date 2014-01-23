@@ -15,7 +15,7 @@
             <Label VerticalContentAlignment="Center">
                 <TextBlock TextAlignment="Right">Update predictions<LineBreak />automatically</TextBlock>
             </Label>
-            <ToggleSwitch:HorizontalToggleSwitch Margin="5 0 50 0" IsChecked="{Binding AutoUpdatePredictions}">
+            <ToggleSwitch:HorizontalToggleSwitch Margin="5 0 50 0" IsChecked="{Binding AutoUpdatePredictions, Mode=TwoWay}">
 
             </ToggleSwitch:HorizontalToggleSwitch>
             <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center">
