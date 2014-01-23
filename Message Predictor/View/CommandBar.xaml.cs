@@ -24,5 +24,10 @@ namespace MessagePredictor
         {
             InitializeComponent();
         }
+
+        private void FileToFolder_Click(object sender, RoutedEventArgs e)
+        {
+            FileToMenu.IsOpen = false;
+        }
     }
 }

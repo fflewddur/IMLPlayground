@@ -66,7 +66,7 @@
         </Ribbon>-->
         
         <!-- Main window -->
-        <Grid Grid.Row="1" Margin="10, 10, 0, 10">
+        <Grid Grid.Row="1" Margin="10, 0, 0, 10">
             <!-- Two-column split -->
             <Grid>
                 <Grid.ColumnDefinitions>

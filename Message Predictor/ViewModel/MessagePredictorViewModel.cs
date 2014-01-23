@@ -318,6 +318,7 @@ namespace MessagePredictor
                 else
                 {
                     collection.Add(item);
+                    CurrentMessage = container.First();
                 }
             }
         }

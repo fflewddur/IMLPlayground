@@ -18,15 +18,20 @@
             <ToggleSwitch:HorizontalToggleSwitch Margin="5 0 50 0" IsChecked="{Binding AutoUpdatePredictions, Mode=TwoWay}">
 
             </ToggleSwitch:HorizontalToggleSwitch>
-            <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center">
+            <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center" Name="FileToMenu">
                 <xctk:DropDownButton.DropDownContent>
                     <StackPanel Orientation="Vertical">
-                        <Button Padding="10 5" Content="{Binding Folders[0].Title}" Command="{Binding FileToUnknown}"/>
-                        <Button Padding="10 5" Content="{Binding Folders[1].Title}" Command="{Binding FileToTopic1}"/>
-                        <Button Padding="10 5" Content="{Binding Folders[2].Title}" Command="{Binding FileToTopic2}"/>
+                        <Button Padding="10 5" Content="{Binding Folders[0].Title}" Command="{Binding FileToUnknown}" Click="FileToFolder_Click"/>
+                        <Button Padding="10 5" Content="{Binding Topic1UserLabel}" Command="{Binding FileToTopic1}" Click="FileToFolder_Click"/>
+                        <Button Padding="10 5" Content="{Binding Topic2UserLabel}" Command="{Binding FileToTopic2}" Click="FileToFolder_Click"/>
                     </StackPanel>
+                    <!--<Menu >
+                        <MenuItem Header="Unknown" Command="{Binding FileToUnknown}" />
+                        <MenuItem Header="{Binding Topic1UserLabel}" Command="{Binding FileToUnknown}" />
+                        <MenuItem Header="{Binding Topic2UserLabel}" Command="{Binding FileToUnknown}" />
+                    </Menu>-->
                 </xctk:DropDownButton.DropDownContent>
-                <TextBlock TextAlignment="Center">Move message<LineBreak />to folder..."</TextBlock>
+                <TextBlock TextAlignment="Center">Move message<LineBreak />to folder&#x2026;</TextBlock>
             </xctk:DropDownButton>
             <Label Margin="50 0 5 0" VerticalContentAlignment="Center">
                 <TextBlock TextAlignment="Right">Only show<LineBreak />recent changes</TextBlock>
