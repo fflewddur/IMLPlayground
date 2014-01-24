@@ -251,6 +251,8 @@ namespace MessagePredictor
         private void PerformUpdatePredictions()
         {
             Console.WriteLine("Update predictions");
+            TrainClassifier(_classifier, _topic1Folder, _topic2Folder);
+            PredictMessages(_classifier, _folders);
         }
 
         private bool CanPerformFileToUnknown()
@@ -306,7 +308,37 @@ namespace MessagePredictor
 
         #endregion
 
-        public void MoveMessageToFolder(NewsItem item, NewsCollection collection)
+        private void TrainClassifier(IClassifier classifier, IEnumerable<IInstance> topic1, IEnumerable<IInstance> topic2)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            _classifier.ClearInstances();
+            _classifier.AddInstances(topic1.Concat(topic2));
+
+            timer.Stop();
+            Console.WriteLine("Time to train classifier: {0}", timer.Elapsed);
+        }
+
+        private void PredictMessages(IClassifier classifier, IEnumerable<IEnumerable<IInstance>> folders)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            foreach (NewsCollection folder in folders)
+            {
+                foreach (IInstance instance in folder)
+                {
+                    Prediction prediction = classifier.PredictInstance(instance);
+                    instance.Prediction = prediction;
+                }
+            }
+
+            timer.Stop();
+            Console.WriteLine("Time to predict instances: {0}", timer.Elapsed);
+        }
+
+        private void MoveMessageToFolder(NewsItem item, NewsCollection collection)
         {
             NewsCollection container = GetFolderContainingMessage(item);
             if (container != null)
