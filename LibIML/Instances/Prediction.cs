@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace LibIML
 {
-    public class Prediction
+    public class Prediction : ViewModelBase
     {
+        Label _label;
+        Dictionary<Label, Evidence> _evidencePerClass;
+
         public Prediction()
         {
             EvidencePerClass = new Dictionary<Label, Evidence>();
@@ -15,8 +18,17 @@ namespace LibIML
 
         #region Properties
 
-        public Label Label;
-        public Dictionary<Label, Evidence> EvidencePerClass;
+        public Label Label
+        {
+            get { return _label; }
+            set { SetProperty<Label>(ref _label, value); }
+        }
+
+        public Dictionary<Label, Evidence> EvidencePerClass
+        {
+            get { return _evidencePerClass; }
+            set { SetProperty<Dictionary<Label, Evidence>>(ref _evidencePerClass, value); }
+        }
 
         #endregion
 
