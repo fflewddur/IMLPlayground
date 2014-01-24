@@ -72,14 +72,9 @@ namespace MessagePredictor
             Console.WriteLine("Time to update data for new vocab: {0}", timer.Elapsed);
 
             // Build a classifier
-            //timer.Restart();
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
-            
 
-            //_classifier.AddInstances(forVocab);
-            //timer.Stop();
-            //Console.WriteLine("Time to build classifier: {0}", timer.Elapsed);
-
+            // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
             FileToUnknown = new RelayCommand(PerformFileToUnknown, CanPerformFileToUnknown);
             FileToTopic1 = new RelayCommand(PerformFileToTopic1, CanPerformFileToTopic1);
@@ -91,7 +86,7 @@ namespace MessagePredictor
             CurrentMessage = CurrentFolder[0];
             AutoUpdatePredictions = (bool)App.Current.Properties[MessagePredictor.App.PropertyKey.AutoUpdatePredictions];
 
-            UpdatePredictions.Execute(null);
+            PerformUpdatePredictions();
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
@@ -231,8 +226,7 @@ namespace MessagePredictor
 
         private void PerformFileToUnknown()
         {
-            NewsItem item = CurrentMessage;
-            MoveMessageToFolder(item, _unknownFolder);
+            FileCurrentMessageToFolder(_unknownFolder);
         }
 
         private bool CanPerformFileToTopic1()
@@ -248,8 +242,7 @@ namespace MessagePredictor
 
         private void PerformFileToTopic1()
         {
-            NewsItem item = CurrentMessage;
-            MoveMessageToFolder(item, _topic1Folder);
+            FileCurrentMessageToFolder(_topic1Folder);
         }
 
         private bool CanPerformFileToTopic2()
@@ -265,8 +258,8 @@ namespace MessagePredictor
 
         private void PerformFileToTopic2()
         {
-            NewsItem item = CurrentMessage;
-            MoveMessageToFolder(item, _topic2Folder);
+            
+            FileCurrentMessageToFolder(_topic2Folder);
         }
 
         #endregion
@@ -307,19 +300,19 @@ namespace MessagePredictor
             Stopwatch timer = new Stopwatch();
             timer.Start();
             int pRight = 0;
-            Topic1Predictions = 0;
-            Topic2Predictions = 0;
-            RecentlyChangedPredictions = 0;
+            int topic1Predictions = 0;
+            int topic2Predictions = 0;
+            int recentlyChangedPredictions = 0;
             foreach (IInstance instance in _topic1Folder)
             {
                 Prediction pred = classifier.PredictInstance(instance);
                 if (pred.Label == instance.Label)
                 {
-                    Topic1Predictions++;
+                    topic1Predictions++;
                     pRight++;
                 }
                 else
-                    Topic2Predictions++;
+                    topic2Predictions++;
             }
             _topic1Folder.CorrectPredictions = pRight;
             pRight = 0;
@@ -328,31 +321,55 @@ namespace MessagePredictor
                 Prediction pred = classifier.PredictInstance(instance);
                 if (pred.Label == instance.Label)
                 {
-                    Topic2Predictions++;
+                    topic2Predictions++;
                     pRight++;
                 }
                 else
-                    Topic1Predictions++;
+                    topic1Predictions++;
             }
             _topic2Folder.CorrectPredictions = pRight;
             foreach (IInstance instance in _unknownFolder)
             {
                 Prediction pred = classifier.PredictInstance(instance);
                 if (pred.Label == _labels[0])
-                    Topic1Predictions++;
+                    topic1Predictions++;
                 else
-                    Topic2Predictions++;
+                    topic2Predictions++;
             }
+            Topic1Predictions = topic1Predictions;
+            Topic2Predictions = topic2Predictions;
+            RecentlyChangedPredictions = recentlyChangedPredictions;
             timer.Stop();
             Console.WriteLine("Time to evaluate classifier: {0}", timer.Elapsed);
         }
 
-        private void MoveMessageToFolder(NewsItem item, NewsCollection collection)
+        private void FileCurrentMessageToFolder(NewsCollection folder)
         {
+            NewsItem item = CurrentMessage;
+            if (MoveMessageToFolder(item, folder) && (bool)App.Current.Properties[App.PropertyKey.AutoUpdatePredictions])
+            {
+                // If we successfully moved this message and autoupdate is on, retrain the classifier
+                UpdatePredictions.Execute(null);
+            }
+        }
+
+        /// <summary>
+        /// Move a message to a different folder.
+        /// </summary>
+        /// <param name="item">The message to move.</param>
+        /// <param name="collection">The folder to move the item into.</param>
+        /// <returns>True on success, false on failure.</returns>
+        private bool MoveMessageToFolder(NewsItem item, NewsCollection collection)
+        {
+            bool retval = false;
             NewsCollection container = GetFolderContainingMessage(item);
             if (container != null)
             {
-                if (!container.Remove(item))
+                if (container == collection)
+                {
+                    Console.Error.WriteLine("Error: Cannot move item {0} into container {0} because it's already there.", item, container);
+                }
+                else if (!container.Remove(item))
                 {
                     Console.Error.WriteLine("Error removing item {0} from container {0}", item, container);
                 }
@@ -360,8 +377,11 @@ namespace MessagePredictor
                 {
                     collection.Add(item);
                     CurrentMessage = container.First();
+                    retval = true;
                 }
             }
+
+            return retval;
         }
 
         private NewsCollection GetFolderContainingMessage(NewsItem item)
