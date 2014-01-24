@@ -12,6 +12,7 @@ namespace LibIML
         Dictionary<string, int> TokenCounts { get; set; }
         Label Label { get; set; }
         SparseVector Features { get; }
+        Prediction Prediction { get; set; }
 
         void ComputeFeatureVector(Vocabulary vocab);
     }
