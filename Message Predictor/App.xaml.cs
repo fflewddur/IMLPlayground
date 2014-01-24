@@ -40,7 +40,8 @@ namespace MessagePredictor
             Topic2TestSize,
             Topic2VocabSize,
             Topic2SystemLabel,
-            Topic2UserLabel
+            Topic2UserLabel,
+            AutoUpdatePredictions
         }
 
         // Called on Application startup. Handle any command line arguments, load our configuration properties, 
@@ -143,6 +144,17 @@ namespace MessagePredictor
             this.Properties[keyUserLabel] = userLabel;
         }
 
+        private void LoadAutoUpdatePredictionsProperty(XElement element)
+        {
+            bool autoupdate = true;
+            if (!bool.TryParse(element.Value, out autoupdate))
+            {
+                Console.Error.WriteLine("Error parsing AutoUpdatePredictions property '{0}'", element.Value.ToString());
+            }
+
+            this.Properties[PropertyKey.AutoUpdatePredictions] = autoupdate;
+        }
+
         /// <summary>
         /// Load an XML file containing various runtime properties.
         /// </summary>
@@ -178,6 +190,10 @@ namespace MessagePredictor
                                 LoadTopicProperty(childElement, 2);
                             }
                         }
+                    }
+                    else if (element.Name == "AutoUpdatePredictions")
+                    {
+                        LoadAutoUpdatePredictionsProperty(element);
                     }
                 }
             }
