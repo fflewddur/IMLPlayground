@@ -16,7 +16,6 @@ namespace MessagePredictor
         private string _body;
         private string _author;
         private Dictionary<string, int> _tokenCounts;
-        //private SparseVector _featureWeights;
         private Prediction _prediction;
         private SparseVector _featureCounts;
         private Label _label;
@@ -80,12 +79,6 @@ namespace MessagePredictor
             get { return _prediction; }
             set { SetProperty<Prediction>(ref _prediction, value); }
         }
-
-        //public SparseVector FeatureWeights
-        //{
-        //    get { return _featureWeights; }
-        //    private set { SetProperty<SparseVector>(ref _featureWeights, value); }
-        //}
 
         public SparseVector Features
         {
