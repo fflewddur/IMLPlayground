@@ -44,6 +44,31 @@ namespace LibIML
         #region Public methods
 
         /// <summary>
+        /// Create a deep copy of this Vocabulary.
+        /// </summary>
+        /// <returns>A new Vocabulary.</returns>
+        public Vocabulary Clone()
+        {
+            Vocabulary v = new Vocabulary();
+            
+            v._nextId = this._nextId;
+            foreach (KeyValuePair<string, int> pair in _wordsToIds)
+            {
+                _wordsToIds[pair.Key] = pair.Value;
+            }
+            foreach (KeyValuePair<int, string> pair in _idsToWords)
+            {
+                _idsToWords[pair.Key] = pair.Value;
+            }
+            foreach (KeyValuePair<int, int> pair in _documentFreqs)
+            {
+                _documentFreqs[pair.Key] = pair.Value;
+            }
+
+            return v;
+        }
+
+        /// <summary>
         /// Get the number of documents a word appears in.
         /// </summary>
         /// <param name="wordId">The ID of the word to lookup.</param>
