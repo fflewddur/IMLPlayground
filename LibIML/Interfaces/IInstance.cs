@@ -13,6 +13,9 @@ namespace LibIML
         Label Label { get; set; }
         SparseVector Features { get; }
         Prediction Prediction { get; set; }
+        Prediction PreviousPrediction { get; set; }
+        bool RecentlyChanged { get; }
+        bool? IsPredictionCorrect { get; }
 
         void ComputeFeatureVector(Vocabulary vocab);
     }

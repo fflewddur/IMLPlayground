@@ -17,6 +17,9 @@ namespace MessagePredictor
         private string _author;
         private Dictionary<string, int> _tokenCounts;
         private Prediction _prediction;
+        private Prediction _previousPrediction;
+        private bool _recentlyChanged;
+        private bool? _isPredictionCorrect;
         private SparseVector _featureCounts;
         private Label _label;
 
@@ -77,7 +80,55 @@ namespace MessagePredictor
         public Prediction Prediction
         {
             get { return _prediction; }
-            set { SetProperty<Prediction>(ref _prediction, value); }
+            set {
+                Prediction prev = Prediction;
+                if (SetProperty<Prediction>(ref _prediction, value))
+                {
+                    // If our Prediction changed, store the old value in PreviousPrediction
+                    PreviousPrediction = prev;
+                    RecentlyChanged = true;
+                    // Is our prediction correct?
+                    if (Label != null)
+                    {
+                        if (Prediction.Label == Label)
+                        {
+                            IsPredictionCorrect = true;
+                        }
+                        else
+                        {
+                            IsPredictionCorrect = false;
+                        }
+                    }
+                    else
+                    {
+                        IsPredictionCorrect = null;
+                    }
+                }
+                else
+                {
+                    // Otherwise, ensure PreviosPrediction is null
+                    PreviousPrediction = null;
+                    RecentlyChanged = false;
+                }
+            }
+        }
+
+        public Prediction PreviousPrediction
+        {
+            get { return _previousPrediction; }
+            set { SetProperty<Prediction>(ref _previousPrediction, value); }
+        }
+
+        public bool RecentlyChanged
+        {
+            get { return _recentlyChanged; }
+            private set { SetProperty<bool>(ref _recentlyChanged, value); }
+        }
+
+        public bool? IsPredictionCorrect 
+        {
+            get { return _isPredictionCorrect; }
+            private set { SetProperty<bool?>(ref _isPredictionCorrect, value); }
         }
 
         public SparseVector Features
