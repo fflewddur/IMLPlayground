@@ -14,7 +14,8 @@
         
         <!-- Summary list -->
         <DataGrid Grid.Column="0" ItemsSource="{Binding CurrentFolder}" AutoGenerateColumns="False" SelectedItem="{Binding CurrentMessage}" 
-                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single">
+                  CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
+                  SelectionUnit="FullRow">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" />
                 <DataGridTemplateColumn>

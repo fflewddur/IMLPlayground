@@ -72,53 +72,13 @@ namespace MessagePredictor
             Console.WriteLine("Time to update data for new vocab: {0}", timer.Elapsed);
 
             // Build a classifier
-            timer.Restart();
+            //timer.Restart();
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
-            _classifier.AddInstances(forVocab);
-            timer.Stop();
-            Console.WriteLine("Time to build classifier: {0}", timer.Elapsed);
+            
 
-            // Evaluate the classifier
-            timer.Restart();
-            int pRight = 0;
-            Topic1Predictions = 0;
-            Topic2Predictions = 0;
-            RecentlyChangedPredictions = 0;
-            foreach (IInstance instance in _topic1Folder)
-            {
-                Prediction pred = _classifier.PredictInstance(instance);
-                if (pred.Label == instance.Label)
-                {
-                    Topic1Predictions++;
-                    pRight++;
-                }
-                else
-                    Topic2Predictions++;
-            }
-            _topic1Folder.CorrectPredictions = pRight;
-            pRight = 0;
-            foreach (IInstance instance in _topic2Folder)
-            {
-                Prediction pred = _classifier.PredictInstance(instance);
-                if (pred.Label == instance.Label)
-                {
-                    Topic2Predictions++;
-                    pRight++;
-                }
-                else
-                    Topic1Predictions++;
-            }
-            _topic2Folder.CorrectPredictions = pRight;
-            foreach (IInstance instance in _unknownFolder)
-            {
-                Prediction pred = _classifier.PredictInstance(instance);
-                if (pred.Label == _labels[0])
-                    Topic1Predictions++;
-                else
-                    Topic2Predictions++;
-            }
-            timer.Stop();
-            Console.WriteLine("Time to evaluate classifier: {0}", timer.Elapsed);
+            //_classifier.AddInstances(forVocab);
+            //timer.Stop();
+            //Console.WriteLine("Time to build classifier: {0}", timer.Elapsed);
 
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
             FileToUnknown = new RelayCommand(PerformFileToUnknown, CanPerformFileToUnknown);
@@ -129,7 +89,9 @@ namespace MessagePredictor
             Folders = folders;
             CurrentFolder = Folders[0];
             CurrentMessage = CurrentFolder[0];
-            AutoUpdatePredictions = true;
+            AutoUpdatePredictions = (bool)App.Current.Properties[MessagePredictor.App.PropertyKey.AutoUpdatePredictions];
+
+            UpdatePredictions.Execute(null);
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
@@ -253,6 +215,7 @@ namespace MessagePredictor
             Console.WriteLine("Update predictions");
             TrainClassifier(_classifier, _topic1Folder, _topic2Folder);
             PredictMessages(_classifier, _folders);
+            EvaluateClassifier(_classifier);
         }
 
         private bool CanPerformFileToUnknown()
@@ -336,6 +299,52 @@ namespace MessagePredictor
 
             timer.Stop();
             Console.WriteLine("Time to predict instances: {0}", timer.Elapsed);
+        }
+
+        private void EvaluateClassifier(IClassifier classifier)
+        {
+            // Evaluate the classifier
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+            int pRight = 0;
+            Topic1Predictions = 0;
+            Topic2Predictions = 0;
+            RecentlyChangedPredictions = 0;
+            foreach (IInstance instance in _topic1Folder)
+            {
+                Prediction pred = classifier.PredictInstance(instance);
+                if (pred.Label == instance.Label)
+                {
+                    Topic1Predictions++;
+                    pRight++;
+                }
+                else
+                    Topic2Predictions++;
+            }
+            _topic1Folder.CorrectPredictions = pRight;
+            pRight = 0;
+            foreach (IInstance instance in _topic2Folder)
+            {
+                Prediction pred = classifier.PredictInstance(instance);
+                if (pred.Label == instance.Label)
+                {
+                    Topic2Predictions++;
+                    pRight++;
+                }
+                else
+                    Topic1Predictions++;
+            }
+            _topic2Folder.CorrectPredictions = pRight;
+            foreach (IInstance instance in _unknownFolder)
+            {
+                Prediction pred = classifier.PredictInstance(instance);
+                if (pred.Label == _labels[0])
+                    Topic1Predictions++;
+                else
+                    Topic2Predictions++;
+            }
+            timer.Stop();
+            Console.WriteLine("Time to evaluate classifier: {0}", timer.Elapsed);
         }
 
         private void MoveMessageToFolder(NewsItem item, NewsCollection collection)
