@@ -86,6 +86,7 @@ namespace MessagePredictor
             CurrentMessage = CurrentFolder[0];
             AutoUpdatePredictions = (bool)App.Current.Properties[MessagePredictor.App.PropertyKey.AutoUpdatePredictions];
 
+            // Evaluate the classifier (so we can show predictions to the user)
             PerformUpdatePredictions();
 
             Console.WriteLine("MessagePredictorViewModel() end");
@@ -305,35 +306,37 @@ namespace MessagePredictor
             int recentlyChangedPredictions = 0;
             foreach (IInstance instance in _topic1Folder)
             {
-                Prediction pred = classifier.PredictInstance(instance);
-                if (pred.Label == instance.Label)
+                if (instance.IsPredictionCorrect == true)
                 {
                     topic1Predictions++;
                     pRight++;
                 }
                 else
+                {
                     topic2Predictions++;
+                }     
             }
             _topic1Folder.CorrectPredictions = pRight;
             pRight = 0;
             foreach (IInstance instance in _topic2Folder)
             {
-                Prediction pred = classifier.PredictInstance(instance);
-                if (pred.Label == instance.Label)
+                if (instance.IsPredictionCorrect == true)
                 {
                     topic2Predictions++;
                     pRight++;
                 }
                 else
+                {
                     topic1Predictions++;
+                }     
             }
             _topic2Folder.CorrectPredictions = pRight;
             foreach (IInstance instance in _unknownFolder)
             {
                 Prediction pred = classifier.PredictInstance(instance);
-                if (pred.Label == _labels[0])
+                if (instance.Label == _topic1Folder.Label)
                     topic1Predictions++;
-                else
+                else if (instance.Label == _topic2Folder.Label)
                     topic2Predictions++;
             }
             Topic1Predictions = topic1Predictions;
@@ -426,7 +429,8 @@ namespace MessagePredictor
         /// <returns></returns>
         private NewsCollection BuildTopicTrainingSet(NewsCollection source, Label label, int size)
         {
-            NewsCollection nc = new NewsCollection(label.UserLabel);
+            NewsCollection nc = new NewsCollection();
+            nc.Label = label;
 
             for (int i = 0; i < size; i++)
             {

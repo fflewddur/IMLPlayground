@@ -10,7 +10,7 @@
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Vertical">
-                        <Label Content="{Binding Title}" Style="{StaticResource headerStyle2}" />
+                        <Label Content="{Binding Label}" Style="{StaticResource headerStyle2}" />
                         <Label Content="{Binding Count}" ContentStringFormat="Items: {0}" Padding="20 2 2 2"/>
                         <Label Content="{Binding CorrectPredictions}" ContentStringFormat="Correct: {0}" Padding="20 2 2 2"/>
                     </StackPanel>

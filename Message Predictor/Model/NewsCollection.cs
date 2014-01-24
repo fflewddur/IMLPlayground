@@ -12,20 +12,29 @@ namespace MessagePredictor
 {
     class NewsCollection : ViewModelCollectionBase<NewsItem>
     {
-        string _title;
+        //string _title;
+        Label _label;
         int _correctPredictions;
 
-        public NewsCollection(string title) : base()
+        public NewsCollection() : base()
         {
-            Title = title;
+            //Title = title;
+            Label = null;
+            CorrectPredictions = 0;
         }
 
         #region Properties
 
-        public string Title
+        //public string Title
+        //{
+        //    get { return _title; }
+        //    set { SetProperty<string>(ref _title, value); }
+        //}
+
+        public Label Label
         {
-            get { return _title; }
-            set { SetProperty<string>(ref _title, value); }
+            get { return _label; }
+            set { SetProperty<Label>(ref _label, value); }
         }
 
         public int CorrectPredictions
@@ -44,7 +53,8 @@ namespace MessagePredictor
         /// <returns>A NewsCollection representing the newsgroup messages in the ZIP archive.</returns>
         public static NewsCollection CreateFromZip(string path, IEnumerable<Label> labels = null)
         {
-            NewsCollection nc = new NewsCollection(@"Unknown");
+            NewsCollection nc = new NewsCollection();
+            nc.Label = new Label("Unknown", "Unknown");
 
             if (!File.Exists(path))
             {
