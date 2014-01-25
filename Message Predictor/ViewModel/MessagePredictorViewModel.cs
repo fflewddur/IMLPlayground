@@ -22,12 +22,15 @@ namespace MessagePredictor
         NewsItem _currentMessage;
         List<Label> _labels;
         Vocabulary _vocab;
+        int _desiredVocabSize;
         MultinomialNaiveBayesFeedbackClassifier _classifier;
         bool _autoUpdatePredictions;
         bool _onlyShowRecentChanges;
         int _topic1Predictions;
         int _topic2Predictions;
         int _recentlyChangedPredictions;
+        string _topic1VocabString;
+        string _topic2VocabString;
 
         public MessagePredictorViewModel()
         {
@@ -55,7 +58,11 @@ namespace MessagePredictor
             List<NewsItem> forVocab = new List<NewsItem>();
             forVocab.AddRange(_topic1Folder.ToList());
             forVocab.AddRange(_topic2Folder.ToList());
-            _vocab = Vocabulary.CreateVocabulary(forVocab, _labels, (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize]);
+            _desiredVocabSize = (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize];
+            _vocab = Vocabulary.CreateVocabulary(forVocab, _labels, Vocabulary.Restriction.HighIG, _desiredVocabSize);
+            // FIXME find a better way to do this
+            Topic1VocabString = _vocab.ToString();
+            Topic2VocabString = _vocab.ToString();
             timer.Stop();
             Console.WriteLine("Time to build vocab: {0}", timer.Elapsed);
 
@@ -66,7 +73,7 @@ namespace MessagePredictor
                 PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
                 Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
-                instance.ComputeFeatureVector(_vocab);
+                instance.ComputeFeatureVector(_vocab, true);
             });
             timer.Stop();
             Console.WriteLine("Time to update data for new vocab: {0}", timer.Elapsed);
@@ -143,14 +150,16 @@ namespace MessagePredictor
             }
         }
 
-        public string Topic1VocabList
+        public string Topic1VocabString
         {
-            get { return _vocab.ToString(); }
+            get { return _topic1VocabString; }
+            private set { SetProperty<string>(ref _topic1VocabString, value); }
         }
 
-        public string Topic2VocabList
+        public string Topic2VocabString
         {
-            get { return _vocab.ToString(); }
+            get { return _topic2VocabString; }
+            private set { SetProperty<string>(ref _topic2VocabString, value); }
         }
 
         public bool AutoUpdatePredictions
@@ -333,10 +342,9 @@ namespace MessagePredictor
             _topic2Folder.CorrectPredictions = pRight;
             foreach (IInstance instance in _unknownFolder)
             {
-                Prediction pred = classifier.PredictInstance(instance);
-                if (instance.Label == _topic1Folder.Label)
+                if (instance.Prediction.Label == _topic1Folder.Label)
                     topic1Predictions++;
-                else if (instance.Label == _topic2Folder.Label)
+                else if (instance.Prediction.Label == _topic2Folder.Label)
                     topic2Predictions++;
             }
             Topic1Predictions = topic1Predictions;
@@ -349,10 +357,41 @@ namespace MessagePredictor
         private void FileCurrentMessageToFolder(NewsCollection folder)
         {
             NewsItem item = CurrentMessage;
-            if (MoveMessageToFolder(item, folder) && (bool)App.Current.Properties[App.PropertyKey.AutoUpdatePredictions])
+
+            if (MoveMessageToFolder(item, folder) )
             {
-                // If we successfully moved this message and autoupdate is on, retrain the classifier
-                UpdatePredictions.Execute(null);
+                // We successfully moved this message
+
+                if (folder == _unknownFolder)
+                {
+                    // If we moved something to Unknown, remove it from our vocabulary
+                    _vocab.RemoveInstanceTokens(item);
+                    UpdateInstanceFeatures(false);
+                    _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
+                    UpdateInstanceFeatures(true);
+                    // FIXME find a better way to do this
+                    Topic1VocabString = _vocab.ToString();
+                    Topic2VocabString = _vocab.ToString();
+                }
+                else
+                {
+                    // If we moved something from unknown to a different folder, add it to our vocabulary
+                    // (This is safe because we can't move items between the two topic folders--they can only be filed
+                    // to the correct folder.)
+                    _vocab.AddInstanceTokens(item);
+                    UpdateInstanceFeatures(false);
+                    _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
+                    UpdateInstanceFeatures(true);
+                    // FIXME find a better way to do this
+                    Topic1VocabString = _vocab.ToString();
+                    Topic2VocabString = _vocab.ToString();
+                }
+                
+                // If autoupdate is on, retrain the classifier
+                if ((bool)App.Current.Properties[App.PropertyKey.AutoUpdatePredictions])
+                {
+                    PerformUpdatePredictions();
+                }
             }
         }
 
@@ -403,6 +442,16 @@ namespace MessagePredictor
             return container;
         }
 
+        private void UpdateInstanceFeatures(bool isRestricted)
+        {
+            foreach (IEnumerable<IInstance> folder in _folders)
+            {
+                foreach (IInstance instance in folder)
+                {
+                    instance.ComputeFeatureVector(_vocab, isRestricted);
+                }
+            }
+        }
         /// <summary>
         /// Load the dataset specified in our configuration properties.
         /// </summary>

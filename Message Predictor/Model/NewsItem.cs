@@ -144,13 +144,13 @@ namespace MessagePredictor
         /// The values are stored in this item's FeatureCounts property.
         /// </summary>
         /// <param name="vocab">The vocabulary to restrict ourselves to.</param>
-        public void ComputeFeatureVector(Vocabulary vocab)
+        public void ComputeFeatureVector(Vocabulary vocab, bool isRestricted)
         {
             SparseVector features = new SparseVector();
 
             foreach (KeyValuePair<string, int> pair in TokenCounts)
             {
-                int wordId = vocab.GetWordId(pair.Key);
+                int wordId = vocab.GetWordId(pair.Key, isRestricted);
                 if (wordId > 0) // Make sure this token was included in our vocabulary
                     features.Set(wordId, pair.Value);
             }

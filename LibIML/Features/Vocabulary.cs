@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,32 +12,76 @@ namespace LibIML
     [Serializable]
     public class Vocabulary
     {
-        private int _nextId;
-        private Dictionary<string, int> _wordsToIds;
-        private Dictionary<int, string> _idsToWords;
-        private Dictionary<int, int> _documentFreqs; // number of documents each word appears in
+        public enum Restriction {
+            None,
+            HighIG
+        };
 
+        private Restriction _restriction;
+        private int _nextId;
+        private Dictionary<string, int> _allWordsToIds;
+        private Dictionary<int, string> _allIdsToWords;
+        private Dictionary<int, int> _allDocumentFreqs; // number of documents each word appears in
+        private HashSet<int> _restrictedIds;
+        
         public const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 1% of documents
         public const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
 
         public Vocabulary()
         {
             _nextId = 1;
-            _wordsToIds = new Dictionary<string, int>();
-            _idsToWords = new Dictionary<int, string>();
-            _documentFreqs = new Dictionary<int, int>();
+            _allWordsToIds = new Dictionary<string, int>();
+            _allIdsToWords = new Dictionary<int, string>();
+            _allDocumentFreqs = new Dictionary<int, int>();
+            _restrictedIds = new HashSet<int>();
+        }
+
+        public Vocabulary(Restriction restriction)
+            : this()
+        {
+            _restriction = restriction;
         }
 
         #region Properties
 
         public int Count
         {
-            get { return _wordsToIds.Count; }
+            get {
+                int result = 0;
+                switch (_restriction)
+                {
+                    case Restriction.None:
+                        result = _allWordsToIds.Count;
+                        break;
+                    case Restriction.HighIG:
+                        result = _restrictedIds.Count;
+                        break;
+                    default:
+                        Console.Error.WriteLine("Error: Unknown restriction type!");
+                        break;
+                }
+                return result;
+            }
         }
 
         public int[] FeatureIds
         {
-            get { return _wordsToIds.Values.ToArray(); }
+            get {
+                int[] result = null;
+                switch (_restriction)
+                {
+                    case Restriction.None:
+                        result = _allWordsToIds.Values.ToArray();
+                        break;
+                    case Restriction.HighIG:
+                        result = _restrictedIds.ToArray();
+                        break;
+                    default:
+                        Console.Error.WriteLine("Error: Unknown restriction type!");
+                        break;
+                }
+                return result;
+            }
         }
 
         #endregion
@@ -52,17 +97,22 @@ namespace LibIML
             Vocabulary v = new Vocabulary();
             
             v._nextId = this._nextId;
-            foreach (KeyValuePair<string, int> pair in _wordsToIds)
+            v._restriction = this._restriction;
+            foreach (KeyValuePair<string, int> pair in _allWordsToIds)
             {
-                _wordsToIds[pair.Key] = pair.Value;
+                v._allWordsToIds[pair.Key] = pair.Value;
             }
-            foreach (KeyValuePair<int, string> pair in _idsToWords)
+            foreach (KeyValuePair<int, string> pair in _allIdsToWords)
             {
-                _idsToWords[pair.Key] = pair.Value;
+                v._allIdsToWords[pair.Key] = pair.Value;
             }
-            foreach (KeyValuePair<int, int> pair in _documentFreqs)
+            foreach (KeyValuePair<int, int> pair in _allDocumentFreqs)
             {
-                _documentFreqs[pair.Key] = pair.Value;
+                v._allDocumentFreqs[pair.Key] = pair.Value;
+            }
+            foreach (int id in _restrictedIds)
+            {
+                v._restrictedIds.Add(id);
             }
 
             return v;
@@ -73,10 +123,10 @@ namespace LibIML
         /// </summary>
         /// <param name="wordId">The ID of the word to lookup.</param>
         /// <returns>Number of documents wordId appears in.</returns>
-        public int GetDocFreq(int wordId)
+        public int GetAllDocFreq(int wordId)
         {
             int freq;
-            _documentFreqs.TryGetValue(wordId, out freq);
+            _allDocumentFreqs.TryGetValue(wordId, out freq);
             return freq;
         }
 
@@ -85,11 +135,32 @@ namespace LibIML
         /// </summary>
         /// <param name="word">The word whose ID we want.</param>
         /// <returns>The ID of the provided word, or -1 if the ID is invalid.</returns>
-        public int GetWordId(string word)
+        public int GetWordId(string word, bool isRestricted)
         {
-            int id;
-            if (!_wordsToIds.TryGetValue(word, out id))
-                id = -1;
+            int id = -1;
+
+            if (isRestricted)
+            {
+                switch (_restriction)
+                {
+                    case Restriction.None:
+                        if (!_allWordsToIds.TryGetValue(word, out id))
+                            id = -1;
+                        break;
+                    case Restriction.HighIG:
+                        if (!_allWordsToIds.TryGetValue(word, out id))
+                            id = -1;
+                        else if (!_restrictedIds.Contains(id))
+                            id = -1;
+                        break;
+                }
+            }
+            else
+            {
+                if (!_allWordsToIds.TryGetValue(word, out id))
+                    id = -1;
+            }
+            
             return id;
         }
 
@@ -101,7 +172,7 @@ namespace LibIML
         public string GetWord(int id)
         {
             string word;
-            if (!_idsToWords.TryGetValue(id, out word))
+            if (!_allIdsToWords.TryGetValue(id, out word))
                 word = "[NOT FOUND]";
             return word;
         }
@@ -120,107 +191,169 @@ namespace LibIML
             {
                 if (nDocs < 0 || (tokenDf.Value >= min_df && tokenDf.Value <= max_df))
                 {
-                    _wordsToIds[tokenDf.Key] = _nextId;
-                    _idsToWords[_nextId] = tokenDf.Key;
-                    _documentFreqs[_nextId] = tokenDf.Value;
+                    _allWordsToIds[tokenDf.Key] = _nextId;
+                    _allIdsToWords[_nextId] = tokenDf.Key;
+                    _allDocumentFreqs[_nextId] = tokenDf.Value;
                     _nextId++;
                 }
             }
         }
 
         /// <summary>
+        /// Update vocabulary with a new IInstance. Add any tokens that aren't already in the vocab, and update frequency counts.
+        /// </summary>
+        /// <param name="instance">The new IInstance to add.</param>
+        public void AddInstanceTokens(IInstance instance)
+        {
+            foreach (string token in instance.TokenCounts.Keys)
+            {
+                int id;
+                if (!_allWordsToIds.TryGetValue(token, out id))
+                {
+                    _allWordsToIds[token] = _nextId;
+                    _allIdsToWords[_nextId] = token;
+                    _allDocumentFreqs[_nextId] = 1;
+                    _nextId++;
+                }
+                else 
+                {
+                    _allDocumentFreqs[id]++;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update vocabulary by removing an existing IInstance. Decrement frequency counts.
+        /// </summary>
+        /// <param name="instance"></param>
+        public void RemoveInstanceTokens(IInstance instance)
+        {
+            foreach (string token in instance.TokenCounts.Keys)
+            {
+                int id;
+                if (_allWordsToIds.TryGetValue(token, out id))
+                {
+                    _allDocumentFreqs[id]--;
+                }
+            }
+        }
+
+        public bool RestrictVocab(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int size)
+        {
+            bool retval = false;
+
+            if (_restriction == Restriction.HighIG)
+            {
+                RestrictToHighIG(instances, labels, size);
+                retval = true;
+            }
+
+            return retval;
+        }
+
+        /// <summary>
         /// Remove vocabulary elements that do not exist in a given set of Instances.
         /// </summary>
         /// <param name="instances">The collection of Instances to restrict our vocabulary to.</param>
-        public void RestrictToInstances(IEnumerable<IInstance> instances)
-        {
-            HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
-            HashSet<int> notInInstances = new HashSet<int>(); // Track the feature IDs to remove
+        //public void RestrictToInstances(IEnumerable<IInstance> instances)
+        //{
+        //    HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
+        //    HashSet<int> notInInstances = new HashSet<int>(); // Track the feature IDs to remove
 
-            // Build a set of features in instances
-            foreach (IInstance instance in instances)
-            {
-                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-                {
-                    inInstances.Add(pair.Key);
-                }
-            }
+        //    // Build a set of features in instances
+        //    foreach (IInstance instance in instances)
+        //    {
+        //        foreach (KeyValuePair<int, double> pair in instance.Features.Data)
+        //        {
+        //            inInstances.Add(pair.Key);
+        //        }
+        //    }
 
-            // Build a set of features to remove
-            foreach (int id in _idsToWords.Keys)
-            {
-                if (!inInstances.Contains(id))
-                    notInInstances.Add(id);
-            }
+        //    // Build a set of features to remove
+        //    foreach (int id in _allIdsToWords.Keys)
+        //    {
+        //        if (!inInstances.Contains(id))
+        //            notInInstances.Add(id);
+        //    }
 
-            // Remove features
-            RemoveElements(notInInstances);
+        //    // Remove features
+        //    RemoveElements(notInInstances);
 
-            return;
-        }
+        //    return;
+        //}
 
-        public Vocabulary GetSubset(IEnumerable<IInstance> instances)
-        {
-            HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
+        //public Vocabulary GetSubset(IEnumerable<IInstance> instances)
+        //{
+        //    HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
 
-            // Build a set of features in instances
-            foreach (IInstance instance in instances)
-            {
-                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-                {
-                    inInstances.Add(pair.Key);
-                }
-            }
+        //    // Build a set of features in instances
+        //    foreach (IInstance instance in instances)
+        //    {
+        //        foreach (KeyValuePair<int, double> pair in instance.Features.Data)
+        //        {
+        //            inInstances.Add(pair.Key);
+        //        }
+        //    }
 
-            return GetSubset(inInstances, instances.Count());
-        }
+        //    return GetSubset(inInstances, instances.Count());
+        //}
 
         /// <summary>
         /// Build a new Vocabulary that is restricted to the given collection of IDs.
         /// </summary>
         /// <param name="ids">The collection of IDs to restrict the new vocabulary to.</param>
         /// <returns>The new vocabulary object.</returns>
-        public Vocabulary GetSubset(IEnumerable<int> ids, int nDocs)
-        {
-            Vocabulary v = new Vocabulary();
-            Dictionary<string, int> tokens = new Dictionary<string, int>();
+        //public Vocabulary GetSubset(IEnumerable<int> ids, int nDocs)
+        //{
+        //    Vocabulary v = new Vocabulary();
+        //    Dictionary<string, int> tokens = new Dictionary<string, int>();
 
-            foreach (int id in ids)
-            {
-                tokens.Add(_idsToWords[id], _documentFreqs[id]);
-            }
+        //    foreach (int id in ids)
+        //    {
+        //        tokens.Add(_allIdsToWords[id], _allDocumentFreqs[id]);
+        //    }
 
-            v.AddTokens(tokens, nDocs, 0, 1.0);
+        //    v.AddTokens(tokens, nDocs, 0, 1.0);
 
-            return v;
-        }
+        //    return v;
+        //}
 
         /// <summary>
         /// Remove vocabulary elements that don't exist in a given collection of IDs.
         /// </summary>
         /// <param name="ids">The collection of IDs to restrict our vocabulary to.</param>
-        public void RestrictToSubset(IEnumerable<int> ids)
-        {
-            HashSet<int> toRemove = new HashSet<int>();
+        //public void RestrictToSubset(IEnumerable<int> ids)
+        //{
+        //    HashSet<int> toRemove = new HashSet<int>();
 
-            // Build a set of features to remove
-            foreach (int id in _idsToWords.Keys)
-            {
-                if (!ids.Contains(id))
-                {
-                    toRemove.Add(id);
-                }
-            }
+        //    // Build a set of features to remove
+        //    foreach (int id in _allIdsToWords.Keys)
+        //    {
+        //        if (!ids.Contains(id))
+        //        {
+        //            toRemove.Add(id);
+        //        }
+        //    }
 
-            // Remove features
-            RemoveElements(toRemove);
-        }
+        //    // Remove features
+        //    RemoveElements(toRemove);
+        //}
 
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (KeyValuePair<string, int> pair in _wordsToIds)
-                sb.Append(string.Format("{0}:{1} ", pair.Key, pair.Value));
+            switch (_restriction)
+            {
+                case Restriction.None:
+                    foreach (KeyValuePair<string, int> pair in _allWordsToIds)
+                        sb.Append(string.Format("{0}:{1} ", pair.Key, pair.Value));
+                    break;
+                case Restriction.HighIG:
+                    foreach (int id in _restrictedIds)
+                        sb.Append(string.Format("{0}:{1} ", id, _allIdsToWords[id]));
+                    break;
+            }
+            
             return sb.ToString();
         }
 
@@ -232,23 +365,33 @@ namespace LibIML
         /// Remove a specific element from this vocabulary.
         /// </summary>
         /// <param name="id">The ID of the element to remove.</param>
-        private void RemoveElement(int id)
+        private void RemoveElementFromRestricted(int id)
         {
-            string word = _idsToWords[id];
-            _wordsToIds.Remove(word);
-            _idsToWords.Remove(id);
-            _documentFreqs.Remove(id);
+            _restrictedIds.Remove(id);
         }
 
         /// <summary>
         /// Remove a collection of elements from this vocabulary.
         /// </summary>
         /// <param name="ids">The collection of element IDs to remove.</param>
-        private void RemoveElements(IEnumerable<int> ids)
+        private void RemoveElementsFromRestricted(IEnumerable<int> ids)
         {
             foreach (int id in ids)
             {
-                RemoveElement(id);
+                RemoveElementFromRestricted(id);
+            }
+        }
+
+        private void AddElementToRestricted(int id)
+        {
+            _restrictedIds.Add(id);
+        }
+
+        private void AddElementsToRestricted(IEnumerable<int> ids)
+        {
+            foreach (int id in ids)
+            {
+                AddElementToRestricted(id);
             }
         }
 
@@ -284,7 +427,7 @@ namespace LibIML
             Dictionary<int, double> PrT = new Dictionary<int, double>();
             Dictionary<int, int> featureCounts = new Dictionary<int, int>(); // The number of documents containing each feature
 
-            foreach (int featureId in _idsToWords.Keys)
+            foreach (int featureId in _allIdsToWords.Keys)
             {
                 featureCounts[featureId] = 0;
             }
@@ -297,7 +440,7 @@ namespace LibIML
                 }
             }
 
-            foreach (int featureId in _idsToWords.Keys)
+            foreach (int featureId in _allIdsToWords.Keys)
             {
                 PrT[featureId] = (double)featureCounts[featureId] / (double)featureCounts.Count;
             }
@@ -332,7 +475,7 @@ namespace LibIML
 
             foreach (Label label in labels)
             {
-                foreach (int featureId in _idsToWords.Keys)
+                foreach (int featureId in _allIdsToWords.Keys)
                 {
                     int count;
                     featureCountsPerClass[label].TryGetValue(featureId, out count);
@@ -348,31 +491,46 @@ namespace LibIML
             Dictionary<Label, Dictionary<int, double>> PrCGivenNotT = new Dictionary<Label, Dictionary<int, double>>();
             Dictionary<Label, Dictionary<int, int>> featureAbsencesPerClass = new Dictionary<Label, Dictionary<int, int>>();
             Dictionary<int, int> featureAbsences = new Dictionary<int, int>(); // The number of documents *not* containing each feature
+            Dictionary<Label, int> instancesPerLabel = new Dictionary<Label, int>();
 
             foreach (Label label in labels)
             {
                 featureAbsencesPerClass[label] = new Dictionary<int, int>();
                 PrCGivenNotT[label] = new Dictionary<int, double>();
-            }
+                instancesPerLabel[label] = 0;
 
-            foreach (int featureId in _idsToWords.Keys)
-            {
+                // How many instances are there for each label?
                 foreach (IInstance instance in instances)
                 {
-                    if (!instance.Features.Contains(featureId))
+                    if (instance.Label == label)
                     {
-                        int count;
-                        featureAbsencesPerClass[instance.Label].TryGetValue(featureId, out count);
-                        featureAbsencesPerClass[instance.Label][featureId] = count + 1;
-                        featureAbsences.TryGetValue(featureId, out count);
-                        featureAbsences[featureId] = count + 1;
+                        instancesPerLabel[label]++;
                     }
+                }
+            }
+
+            foreach (int featureId in _allIdsToWords.Keys)
+            {
+                featureAbsences[featureId] = instances.Count();
+                foreach (Label label in labels)
+                {
+                    featureAbsencesPerClass[label][featureId] = instancesPerLabel[label];
+                }
+            }
+
+            foreach (IInstance instance in instances)
+            {
+                foreach (int featureId in instance.Features.Data.Keys)
+                {
+                    // Start off assuming each feature is absent from each document; decrement counter each time we see a given feature.
+                    featureAbsencesPerClass[instance.Label][featureId]--;
+                    featureAbsences[featureId]--;
                 }
             }
 
             foreach (Label label in labels)
             {
-                foreach (int featureId in _idsToWords.Keys)
+                foreach (int featureId in _allIdsToWords.Keys)
                 {
                     int count;
                     featureAbsencesPerClass[label].TryGetValue(featureId, out count);
@@ -392,13 +550,27 @@ namespace LibIML
             Dictionary<int, double> IG = new Dictionary<int, double>();                
 
             // Compute class and feature probabilities
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
             PrC = ComputePrC(instances, labels);
+            timer.Stop();
+            Console.WriteLine("Vocab ComputePrC took {0}", timer.Elapsed);
+            timer.Restart();
             PrT = ComputePrT(instances, labels);
+            timer.Stop();
+            Console.WriteLine("Vocab ComputePrT took {0}", timer.Elapsed);
+            timer.Restart();
             PrCGivenT = ComputePrCGivenT(instances, labels);
+            timer.Stop();
+            Console.WriteLine("Vocab ComputePrCGivenT took {0}", timer.Elapsed);
+            timer.Restart();
             PrCGivenNotT = ComputePrCGivenNotT(instances, labels);
+            timer.Stop();
+            Console.WriteLine("Vocab ComputePrCGivenNotT took {0}", timer.Elapsed);
+            timer.Restart();
 
             // Compute information gain for each feature
-            foreach (int featureId in _idsToWords.Keys)
+            foreach (int featureId in _allIdsToWords.Keys)
             {
                 double PrCSum = 0;
                 double PrTSum = 0;
@@ -412,16 +584,18 @@ namespace LibIML
                 IG[featureId] = (-1.0 * PrCSum) + (PrT[featureId] * PrTSum) + ((1.0 - PrT[featureId]) * PrNotTSum);
             }
 
+            timer.Stop();
+            Console.WriteLine("Vocab computing IG took {0}", timer.Elapsed);
+
             // Find the features with the highest information gain
             List<KeyValuePair<int, double>> HighIG = IG.OrderBy(entry => entry.Value).Take(vocabSize).ToList();
 
-            // Reduce our vocabulary to this subset
-            List<int> featureIdsToRemove = _idsToWords.Keys.ToList();
+            // Add these features to our "restricted" set
+            _restrictedIds.Clear();
             foreach (KeyValuePair<int, double> pair in HighIG)
             {
-                featureIdsToRemove.Remove(pair.Key);
+                AddElementToRestricted(pair.Key);
             }
-            this.RemoveElements(featureIdsToRemove);
         }
 
         #endregion
@@ -433,7 +607,7 @@ namespace LibIML
         /// </summary>
         /// <param name="instances">A collection of items to use as the basis for this vocabulary.</param>
         /// <returns>A new Vocabulary object.</returns>
-        public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int desiredVocabSize)
+        public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances, IEnumerable<Label> labels, Restriction restriction, int desiredVocabSize)
         {
             ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
 
@@ -450,17 +624,20 @@ namespace LibIML
                     }
                 });
 
-            Vocabulary vocab = new Vocabulary();
+            Vocabulary vocab = new Vocabulary(restriction);
             vocab.AddTokens(tokenDocCounts, instances.Count());
 
             // Update the Feature vector for each instance
             Parallel.ForEach(instances, (instance, state, index) =>
                 {
-                    instance.ComputeFeatureVector(vocab);
+                    instance.ComputeFeatureVector(vocab, false);
                 });
 
             // Restrict our vocabulary to terms with high information gain
-            vocab.RestrictToHighIG(instances, labels, desiredVocabSize);
+            if (restriction == Restriction.HighIG)
+            {
+                vocab.RestrictToHighIG(instances, labels, desiredVocabSize);
+            }
 
             return vocab;
         }

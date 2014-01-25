@@ -17,6 +17,6 @@ namespace LibIML
         bool RecentlyChanged { get; }
         bool? IsPredictionCorrect { get; }
 
-        void ComputeFeatureVector(Vocabulary vocab);
+        void ComputeFeatureVector(Vocabulary vocab, bool isRestricted);
     }
 }
