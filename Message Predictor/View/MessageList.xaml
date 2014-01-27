@@ -18,7 +18,7 @@
                   SelectionUnit="FullRow">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" />
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn SortMemberPath="Prediction.Label">
                     <DataGridTemplateColumn.Header>
                         <TextBlock TextAlignment="Center">Predicted<LineBreak />topic</TextBlock>
                     </DataGridTemplateColumn.Header>

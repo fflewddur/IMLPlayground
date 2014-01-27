@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LibIML
 {
     [Serializable]
-    public class Label : ViewModelBase, IEquatable<Label>
+    public class Label : ViewModelBase, IEquatable<Label>, IComparable<Label>, IComparable
     {
         private string _userLabel;
         private string _systemLabel;
@@ -66,6 +66,22 @@ namespace LibIML
             hash = hash * 31 + SystemLabel.GetHashCode();
             hash = hash * 31 + UserLabel.GetHashCode();
             return hash;
+        }
+
+        public int CompareTo(Label other)
+        {
+            if (Equals(other))
+                return 0;
+
+            return _userLabel.CompareTo(other._userLabel);
+        }
+
+        int IComparable.CompareTo(object other)
+        {
+            if (!(other is Label))
+                throw new InvalidOperationException("CompareTo: Not a Label");
+
+            return CompareTo((Label)other);
         }
 
         #endregion
