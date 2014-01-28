@@ -12,7 +12,8 @@ namespace LibIML
     [Serializable]
     public class Vocabulary
     {
-        public enum Restriction {
+        public enum Restriction
+        {
             None,
             HighIG
         };
@@ -23,7 +24,8 @@ namespace LibIML
         private Dictionary<int, string> _allIdsToWords;
         private Dictionary<int, int> _allDocumentFreqs; // number of documents each word appears in
         private HashSet<int> _restrictedIds;
-        
+        private bool _hasUpdatedTokens;
+
         public const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 1% of documents
         public const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
 
@@ -34,6 +36,7 @@ namespace LibIML
             _allIdsToWords = new Dictionary<int, string>();
             _allDocumentFreqs = new Dictionary<int, int>();
             _restrictedIds = new HashSet<int>();
+            _hasUpdatedTokens = false;
         }
 
         public Vocabulary(Restriction restriction)
@@ -44,9 +47,16 @@ namespace LibIML
 
         #region Properties
 
+        public bool HasUpdatedTokens
+        {
+            get { return _hasUpdatedTokens; }
+            private set { _hasUpdatedTokens = value; }
+        }
+
         public int Count
         {
-            get {
+            get
+            {
                 int result = 0;
                 switch (_restriction)
                 {
@@ -66,7 +76,8 @@ namespace LibIML
 
         public int[] FeatureIds
         {
-            get {
+            get
+            {
                 int[] result = null;
                 switch (_restriction)
                 {
@@ -92,6 +103,7 @@ namespace LibIML
         /// Create a deep copy of this Vocabulary.
         /// </summary>
         /// <returns>A new Vocabulary.</returns>
+        /*
         public Vocabulary Clone()
         {
             Vocabulary v = new Vocabulary();
@@ -117,7 +129,7 @@ namespace LibIML
 
             return v;
         }
-
+        */
         /// <summary>
         /// Get the number of documents a word appears in.
         /// </summary>
@@ -160,7 +172,7 @@ namespace LibIML
                 if (!_allWordsToIds.TryGetValue(word, out id))
                     id = -1;
             }
-            
+
             return id;
         }
 
@@ -186,6 +198,7 @@ namespace LibIML
         {
             int min_df = (int)(min_df_percent * nDocs);
             int max_df = (int)(max_df_percent * nDocs);
+            int oldNextId = _nextId;
 
             foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)
             {
@@ -197,6 +210,12 @@ namespace LibIML
                     _nextId++;
                 }
             }
+
+            if (oldNextId != _nextId)
+            {
+                // We've updated our tokens
+                HasUpdatedTokens = true;
+            }
         }
 
         /// <summary>
@@ -205,6 +224,8 @@ namespace LibIML
         /// <param name="instance">The new IInstance to add.</param>
         public void AddInstanceTokens(IInstance instance)
         {
+            int oldNextId = _nextId;
+
             foreach (string token in instance.TokenCounts.Keys)
             {
                 int id;
@@ -215,10 +236,16 @@ namespace LibIML
                     _allDocumentFreqs[_nextId] = 1;
                     _nextId++;
                 }
-                else 
+                else
                 {
                     _allDocumentFreqs[id]++;
                 }
+            }
+
+            if (oldNextId != _nextId)
+            {
+                // We've updated our tokens
+                HasUpdatedTokens = true;
             }
         }
 
@@ -228,13 +255,22 @@ namespace LibIML
         /// <param name="instance"></param>
         public void RemoveInstanceTokens(IInstance instance)
         {
+            bool updated = false;
+
             foreach (string token in instance.TokenCounts.Keys)
             {
                 int id;
                 if (_allWordsToIds.TryGetValue(token, out id))
                 {
                     _allDocumentFreqs[id]--;
+                    updated = true;
                 }
+            }
+
+            if (updated)
+            {
+                // We've updated our tokens
+                HasUpdatedTokens = true;
             }
         }
 
@@ -246,6 +282,7 @@ namespace LibIML
             {
                 RestrictToHighIG(instances, labels, size);
                 retval = true;
+                HasUpdatedTokens = false;
             }
 
             return retval;
@@ -353,7 +390,7 @@ namespace LibIML
                         sb.Append(string.Format("{0}:{1} ", id, _allIdsToWords[id]));
                     break;
             }
-            
+
             return sb.ToString();
         }
 
@@ -547,7 +584,7 @@ namespace LibIML
             Dictionary<int, double> PrT; // Probability of each feature
             Dictionary<Label, Dictionary<int, double>> PrCGivenT;
             Dictionary<Label, Dictionary<int, double>> PrCGivenNotT;
-            Dictionary<int, double> IG = new Dictionary<int, double>();                
+            Dictionary<int, double> IG = new Dictionary<int, double>();
 
             // Compute class and feature probabilities
             Stopwatch timer = new Stopwatch();
