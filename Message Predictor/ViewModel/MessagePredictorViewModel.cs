@@ -361,7 +361,6 @@ namespace MessagePredictor
             if (MoveMessageToFolder(item, folder) )
             {
                 // We successfully moved this message
-
                 if (folder == _unknownFolder)
                 {
                     // If we moved something to Unknown, remove it from our vocabulary
@@ -388,7 +387,7 @@ namespace MessagePredictor
                 }
                 
                 // If autoupdate is on, retrain the classifier
-                if ((bool)App.Current.Properties[App.PropertyKey.AutoUpdatePredictions])
+                if (AutoUpdatePredictions)
                 {
                     PerformUpdatePredictions();
                 }
