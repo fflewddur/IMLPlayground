@@ -9,6 +9,7 @@ namespace LibIML
     public class Prediction : ViewModelBase
     {
         Label _label;
+        double _confidence;
         Dictionary<Label, Evidence> _evidencePerClass;
 
         public Prediction()
@@ -22,6 +23,12 @@ namespace LibIML
         {
             get { return _label; }
             set { SetProperty<Label>(ref _label, value); }
+        }
+
+        public double Confidence
+        {
+            get { return _confidence; }
+            set { SetProperty<double>(ref _confidence, value); }
         }
 
         public Dictionary<Label, Evidence> EvidencePerClass

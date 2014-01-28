@@ -15,8 +15,9 @@
         <!-- Summary list -->
         <DataGrid Grid.Column="0" ItemsSource="{Binding CurrentFolder}" AutoGenerateColumns="False" SelectedItem="{Binding CurrentMessage}" 
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
-                  SelectionUnit="FullRow">
+                  SelectionUnit="FullRow" GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" />
                 <DataGridTemplateColumn SortMemberPath="Prediction.Label">
                     <DataGridTemplateColumn.Header>
@@ -28,13 +29,13 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn>
+                <DataGridTemplateColumn SortMemberPath="Prediction.Confidence">
                     <DataGridTemplateColumn.Header>
                         <TextBlock TextAlignment="Center">Prediction<LineBreak />confidence</TextBlock>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock TextAlignment="Center" Text="{Binding Prediction.EvidencePerClass[Prediction.Label]}"/>
+                            <TextBlock TextAlignment="Center" Text="{Binding Prediction.Confidence}"/>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
