@@ -137,12 +137,12 @@ namespace LibIML
                     double pWord;
                     if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
                     {
-                        double weight = pair.Value * Math.Log(pWord);
-                        prob += weight;
+                        double weight = Math.Exp(pair.Value * Math.Log(pWord));
+                        prob += Math.Log(weight);
                         evidence.Weights[pair.Key] = weight;
                     }
                 }
-                pDocGivenClass[l] = prob;
+                pDocGivenClass[l] = Math.Exp(prob);
                 prediction.EvidencePerClass[l] = evidence;
             }
 
@@ -150,8 +150,7 @@ namespace LibIML
             double pDoc = 0;
             foreach (Label l in Labels)
             {
-                pDoc += (_pClass[l] * Math.Pow(Math.E, pDocGivenClass[l]));
-                //pDoc += (Math.Log(_pClass[l]) + pDocGivenClass[l]); // for log likelihood
+                pDoc += _pClass[l] * pDocGivenClass[l];
             }
             //Console.WriteLine("pDoc: {0}", pDoc);
 
@@ -159,9 +158,7 @@ namespace LibIML
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
-                //pClassGivenDoc[l] = _pClass[l] * Math.Pow(Math.E, pDocGivenClass[l]) / pDoc; // no log likelihood, with normalization
-                //pClassGivenDoc[l] = (Math.Log(_pClass[l]) + pDocGivenClass[l]) / pDoc; // for log likelihood, with normalization
-                pClassGivenDoc[l] = Math.Log(_pClass[l]) + pDocGivenClass[l]; // For log likelihood, no normalization
+                pClassGivenDoc[l] = (_pClass[l] * pDocGivenClass[l]) / pDoc; // For log likelihood, with normalization
             }
 
             // Find the class with the highest probability for this document
@@ -182,6 +179,8 @@ namespace LibIML
             }
 
             prediction.Label = label;
+            prediction.Confidence = prediction.EvidencePerClass[label].Confidence;
+
             return prediction;
         }
 
@@ -272,6 +271,9 @@ namespace LibIML
             ComputePrC();
             ComputePrWGivenC();
             UpdateFeaturesPerClass();
+
+            TestPrC(_pClass);
+            TestPrWGivenC(_pWordGivenClass);
         }
 
         /// <summary>
@@ -341,7 +343,12 @@ namespace LibIML
             {
                 // Sum up the feature counts
                 _pWordGivenClass[l] = new Dictionary<int, double>();
-                int sumFeatures = _perClassFeatureCounts[l].Values.Sum();
+                int sumFeatures = 0;
+                foreach (int id in Vocab.FeatureIds) {
+                    int count;
+                    _perClassFeatureCounts[l].TryGetValue(id, out count);
+                    sumFeatures += count;
+                }
 
                 // Sum up the priors
                 //double sumPriors = 0;
@@ -360,7 +367,7 @@ namespace LibIML
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
-                    _pWordGivenClass[l][id] = (prior + countFeature) / ((double)sumFeatures); // Removed + sumPriors // OLD VERSION
+                    _pWordGivenClass[l][id] = (prior + countFeature) / (Vocab.Count + (double)sumFeatures); // Removed + sumPriors // OLD VERSION
                     //_pWordGivenClass[l][id] = (1 + countFeature) / (double)sumFeatures;
                 }
             }
@@ -395,6 +402,43 @@ namespace LibIML
                     _featuresPerClass[label].Add(new Feature { Characters = characters, CountTraining = count, SystemWeight = systemWeight, UserWeight = userWeight });
                 }
             }
+        }
+
+        private bool TestPrC(Dictionary<Label, double> PrC)
+        {
+            double sum = 0;
+            foreach (Label l in _labels)
+            {
+                sum += PrC[l];
+            }
+
+            bool retval = (Math.Round(sum, 7) == Math.Round(1.0, 7));
+            if (!retval)
+                throw new ArithmeticException(string.Format("Error in PrC: Sum should be 1, but is {0}", sum));
+
+            return retval;
+        }
+
+        private bool TestPrWGivenC(Dictionary<Label, Dictionary<int, double>> PrWGivenC)
+        {
+            bool retval = true;
+            foreach (Label l in _labels)
+            {
+                double sum = 0;
+
+                foreach (double pr in PrWGivenC[l].Values)
+                {
+                    sum += pr;
+                }
+
+                if (Math.Round(sum, 7) != Math.Round(1.0, 7))
+                {
+                    retval = false;
+                    throw new ArithmeticException(string.Format("Error in PrWGivenC: Sum should be 1, but is {0} for class {1}", sum, l));
+                }
+            }
+
+            return retval;
         }
     }
 }
