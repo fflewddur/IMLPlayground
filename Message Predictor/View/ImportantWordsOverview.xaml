@@ -22,8 +22,30 @@
         <Label Grid.Row="1" Grid.Column="0" Content="{Binding Topic2UserLabel}" Style="{StaticResource headerStyle2}" VerticalContentAlignment="Center"/>
         
         <!-- List of words -->
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Topic1VocabString}" TextWrapping="Wrap" />
-        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Topic2VocabString}" TextWrapping="Wrap" />
+        <ItemsControl Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Topic1Features}" VerticalAlignment="Center">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Characters}" Margin="0 0 5 0" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Topic2Features}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Characters}" Margin="0 0 5 0" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
         
         <!-- Add word buttons -->
         <Button Grid.Row="0" Grid.Column="2" Content="{Binding Topic1UserLabel}" ContentStringFormat="Add a word about {0}" />
