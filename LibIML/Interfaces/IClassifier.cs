@@ -20,6 +20,7 @@ namespace LibIML
         Prediction PredictInstance(IInstance instance);
         void UpdatePrior(Label label, int feature, double prior);
         void Train(); // Train the classifier on all added training instances
+        IEnumerable<Feature> GetFeatures(Label label);
         void ClearInstances(); // Remove all existing training instances
 
         Task<bool> SaveArffFile(string filePath);

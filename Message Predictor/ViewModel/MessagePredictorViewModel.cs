@@ -29,8 +29,8 @@ namespace MessagePredictor
         int _topic1Predictions;
         int _topic2Predictions;
         int _recentlyChangedPredictions;
-        string _topic1VocabString;
-        string _topic2VocabString;
+        IEnumerable<Feature> _topic1Features;
+        IEnumerable<Feature> _topic2Features;
 
         public MessagePredictorViewModel()
         {
@@ -60,9 +60,6 @@ namespace MessagePredictor
             forVocab.AddRange(_topic2Folder.ToList());
             _desiredVocabSize = (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize];
             _vocab = Vocabulary.CreateVocabulary(forVocab, _labels, Vocabulary.Restriction.HighIG, _desiredVocabSize);
-            // FIXME find a better way to do this
-            Topic1VocabString = _vocab.ToString();
-            Topic2VocabString = _vocab.ToString();
             timer.Stop();
             Console.WriteLine("Time to build vocab: {0}", timer.Elapsed);
 
@@ -150,16 +147,16 @@ namespace MessagePredictor
             }
         }
 
-        public string Topic1VocabString
+        public IEnumerable<Feature> Topic1Features
         {
-            get { return _topic1VocabString; }
-            private set { SetProperty<string>(ref _topic1VocabString, value); }
+            get { return _topic1Features; }
+            private set { SetProperty<IEnumerable<Feature>>(ref _topic1Features, value); }
         }
 
-        public string Topic2VocabString
+        public IEnumerable<Feature> Topic2Features
         {
-            get { return _topic2VocabString; }
-            private set { SetProperty<string>(ref _topic2VocabString, value); }
+            get { return _topic2Features; }
+            private set { SetProperty<IEnumerable<Feature>>(ref _topic2Features, value); }
         }
 
         public bool AutoUpdatePredictions
@@ -219,6 +216,7 @@ namespace MessagePredictor
         {
             Console.WriteLine("Update predictions");
             TrainClassifier(_classifier, _topic1Folder, _topic2Folder);
+            UpdateImportantWords(_classifier, _topic1Folder.Label, _topic2Folder.Label);
             PredictMessages(_classifier, _folders);
             EvaluateClassifier(_classifier);
         }
@@ -284,6 +282,12 @@ namespace MessagePredictor
 
             timer.Stop();
             Console.WriteLine("Time to train classifier: {0}", timer.Elapsed);
+        }
+
+        private void UpdateImportantWords(IClassifier classifier, Label topic1, Label topic2)
+        {
+            Topic1Features = classifier.GetFeatures(topic1);
+            Topic2Features = classifier.GetFeatures(topic2);
         }
 
         private void PredictMessages(IClassifier classifier, IEnumerable<IEnumerable<IInstance>> folders)
@@ -365,12 +369,6 @@ namespace MessagePredictor
                 {
                     // If we moved something to Unknown, remove it from our vocabulary
                     _vocab.RemoveInstanceTokens(item);
-                    UpdateInstanceFeatures(false);
-                    _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
-                    UpdateInstanceFeatures(true);
-                    // FIXME find a better way to do this
-                    Topic1VocabString = _vocab.ToString();
-                    Topic2VocabString = _vocab.ToString();
                 }
                 else
                 {
@@ -378,14 +376,13 @@ namespace MessagePredictor
                     // (This is safe because we can't move items between the two topic folders--they can only be filed
                     // to the correct folder.)
                     _vocab.AddInstanceTokens(item);
-                    UpdateInstanceFeatures(false);
-                    _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
-                    UpdateInstanceFeatures(true);
-                    // FIXME find a better way to do this
-                    Topic1VocabString = _vocab.ToString();
-                    Topic2VocabString = _vocab.ToString();
                 }
-                
+
+                UpdateInstanceFeatures(false);
+                _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
+                UpdateInstanceFeatures(true);
+                UpdateImportantWords(_classifier, _topic1Folder.Label, _topic2Folder.Label);
+
                 // If autoupdate is on, retrain the classifier
                 if (AutoUpdatePredictions)
                 {

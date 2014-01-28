@@ -276,6 +276,20 @@ namespace LibIML
             TestPrWGivenC(_pWordGivenClass);
         }
 
+        public IEnumerable<Feature> GetFeatures(Label label)
+        {
+            List<Feature> features = new List<Feature>();
+
+            foreach (int id in Vocab.FeatureIds) {
+                Feature feature = new Feature();
+                feature.Characters = Vocab.GetWord(id);
+                feature.SystemWeight = _pWordGivenClass[label][id];
+                features.Add(feature);
+            }
+
+            return features;
+        }
+
         /// <summary>
         /// Initialize training data structures using our collection of potential output labels.
         /// </summary>
