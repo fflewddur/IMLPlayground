@@ -7,6 +7,7 @@
     <Style x:Key="headerStyle2">
         <Setter Property="Control.FontSize" Value="13" />
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
+        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
     </Style>
     <Style x:Key="contentStyle">
         <Setter Property="Control.FontSize" Value="12" />

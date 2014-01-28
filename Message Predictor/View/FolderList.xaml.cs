@@ -49,4 +49,31 @@ namespace MessagePredictor
         //    }
         //}
     }
+
+    public class FolderListItemTemplateSelector : DataTemplateSelector
+    {
+        public DataTemplate UnknownTemplate { get; set; }
+        public DataTemplate TopicTemplate { get; set; }
+
+        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        {
+            NewsCollection collection = item as NewsCollection;
+            if (collection != null)
+            {
+                if (collection.Label.UserLabel == "Unknown")
+                {
+                    return UnknownTemplate;
+                }
+                else
+                {
+                    return TopicTemplate;
+                }
+            }
+            else
+            {
+                // Something went wrong, return the default datatemplate
+                return base.SelectTemplate(item, container);
+            }
+        }
+    }
 }

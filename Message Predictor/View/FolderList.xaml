@@ -3,19 +3,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MessagePredictor" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="200">
     <Grid>
-        <ListView SelectionMode="Single" ItemsSource="{Binding Folders}" SelectedItem="{Binding CurrentFolder}">
-            <ListView.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Vertical">
-                        <Label Content="{Binding Label}" Style="{StaticResource headerStyle2}" />
-                        <Label Content="{Binding Count}" ContentStringFormat="Items: {0}" Padding="20 2 2 2"/>
-                        <Label Content="{Binding CorrectPredictions}" ContentStringFormat="Correct: {0}" Padding="20 2 2 2"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
+        <ListView SelectionMode="Single" ItemsSource="{Binding Folders}" SelectedItem="{Binding CurrentFolder}" Margin="0,1,0,-1">
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <UniformGrid Columns="1"></UniformGrid>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+            <ListView.ItemTemplateSelector>
+                <local:FolderListItemTemplateSelector>
+                    <local:FolderListItemTemplateSelector.UnknownTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Text="{Binding Label}" Style="{StaticResource headerStyle2}" TextAlignment="Center"/>
+                                <Label Grid.Row="1" Content="{Binding Count}" ContentStringFormat="({0:N0} messages)" HorizontalContentAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </local:FolderListItemTemplateSelector.UnknownTemplate>
+                    <local:FolderListItemTemplateSelector.TopicTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Row="0" Content="{Binding Label}" Style="{StaticResource headerStyle2}" HorizontalContentAlignment="Center"/>
+                                <TextBlock Grid.Row="1" TextAlignment="Center">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0:N0}/{1:N0}">
+                                            <Binding Path="CorrectPredictions" />
+                                            <Binding Path="Count" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <Label Grid.Row="2" Content="correct predictions" HorizontalContentAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </local:FolderListItemTemplateSelector.TopicTemplate>
+                </local:FolderListItemTemplateSelector>
+            </ListView.ItemTemplateSelector>
         </ListView>
     </Grid>
 </UserControl>
