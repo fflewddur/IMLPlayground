@@ -17,11 +17,11 @@
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
                   SelectionUnit="FullRow" GridLinesVisibility="Horizontal">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
-                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" />
-                <DataGridTemplateColumn SortMemberPath="Prediction.Label">
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="auto" />
+                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="6*"/>
+                <DataGridTemplateColumn SortMemberPath="Prediction.Label" Width="1*">
                     <DataGridTemplateColumn.Header>
-                        <TextBlock TextAlignment="Center">Predicted<LineBreak />topic</TextBlock>
+                        <TextBlock TextAlignment="Center" >Predicted<LineBreak />topic</TextBlock>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
@@ -29,13 +29,13 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn SortMemberPath="Prediction.Confidence">
+                <DataGridTemplateColumn SortMemberPath="Prediction.Confidence" Width="1*">
                     <DataGridTemplateColumn.Header>
                         <TextBlock TextAlignment="Center">Prediction<LineBreak />confidence</TextBlock>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <TextBlock TextAlignment="Center" Text="{Binding Prediction.Confidence}"/>
+                            <TextBlock TextAlignment="Center" Text="{Binding Prediction.Confidence, StringFormat={}{0:P0}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
