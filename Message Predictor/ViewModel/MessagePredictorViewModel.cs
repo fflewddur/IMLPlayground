@@ -381,6 +381,7 @@ namespace MessagePredictor
                 UpdateInstanceFeatures(false);
                 _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
                 UpdateInstanceFeatures(true);
+                TrainClassifier(_classifier, _topic1Folder, _topic2Folder);
                 UpdateImportantWords(_classifier, _topic1Folder.Label, _topic2Folder.Label);
 
                 // If autoupdate is on, retrain the classifier

@@ -281,10 +281,22 @@ namespace LibIML
             List<Feature> features = new List<Feature>();
 
             foreach (int id in Vocab.FeatureIds) {
-                Feature feature = new Feature();
-                feature.Characters = Vocab.GetWord(id);
-                feature.SystemWeight = _pWordGivenClass[label][id];
-                features.Add(feature);
+                bool thisLabelHighest = true;
+                foreach (Label otherLabel in _labels)
+                {
+                    if (otherLabel == label)
+                        continue;
+                    if (_pWordGivenClass[otherLabel][id] > _pWordGivenClass[label][id])
+                        thisLabelHighest = false;
+                }
+
+                if (thisLabelHighest)
+                {
+                    Feature feature = new Feature();
+                    feature.Characters = Vocab.GetWord(id);
+                    feature.SystemWeight = _pWordGivenClass[label][id];
+                    features.Add(feature);
+                }
             }
 
             return features;

@@ -30,7 +30,11 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Characters}" Margin="0 0 5 0" />
+                    <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="{Binding Characters}" Margin="0 0 3 0" />
+                    <Label ContentStringFormat="{}{0:N3}" Content="{Binding SystemWeight}" Margin="0 0 15 0" />
+                        
+                    </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -42,7 +46,11 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Characters}" Margin="0 0 5 0" />
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding Characters}" Margin="0 0 3 0" />
+                        <Label ContentStringFormat="{}{0:N3}" Content="{Binding SystemWeight}" Margin="0 0 15 0" />
+
+                    </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

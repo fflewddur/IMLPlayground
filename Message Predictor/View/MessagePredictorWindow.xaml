@@ -11,60 +11,6 @@
         
         <local:CommandBar Grid.Row="0" />
         
-        <!-- Ribbon -->
-        <!--<Ribbon Name="Ribbon" Title="Ribbon" RenderOptions.BitmapScalingMode="HighQuality">
-            <Ribbon.ApplicationMenu>
-                --><!-- Hide the Application Menu --><!--
-                <RibbonApplicationMenu Visibility="Collapsed">
-                </RibbonApplicationMenu>
-            </Ribbon.ApplicationMenu>
-            <Ribbon.QuickAccessToolBar>
-                <RibbonQuickAccessToolBar>
-                    <RibbonButton QuickAccessToolBarId="undo" Label="Undo" SmallImageSource="Art/Arrow_UndoRevertRestore_16xLG.png" KeyTip="Z" />
-                    <RibbonButton QuickAccessToolBarId="redo" Label="Redo" SmallImageSource="Art/Arrow_RedoRetry_16xLG.png" KeyTip="Y" />
-                </RibbonQuickAccessToolBar>
-            </Ribbon.QuickAccessToolBar>
-            <RibbonTab Header="Home" KeyTip="H">
-                <RibbonGroup Header="Predictions">
-                    <RibbonButton Label="Update predictions" LargeImageSource="Art/refresh_16xLG.png" KeyTip="U" Command="{Binding UpdatePredictions}"/>
-                    <RibbonToggleButton Label="Automatically update predictions" SmallImageSource="Art/lightningBolt_16xLG.png" IsChecked="True"/>
-                    <RibbonToggleButton Label="Only show recent changes" SmallImageSource="Art/FindResults1_6264.png" KeyTip="R"/>
-                </RibbonGroup>
-                <RibbonGroup Header="File">
-                    <RibbonTwoLineText Text="Move to folder..." />
-                    <RibbonControlGroup>
-                        <RibbonButton Label="{Binding Folders[0].Title}" />
-                        <RibbonButton Label="{Binding Folders[1].Title}" />
-                        <RibbonButton Label="{Binding Folders[2].Title}" />
-                    </RibbonControlGroup>
-                    <RibbonSplitButton Label="Label">
-                        <RibbonGallery>
-                            <RibbonGalleryCategory>
-                                <RibbonGalleryItem Content="Unknown" />
-                                <RibbonGalleryItem Content="Hockey" />
-                                <RibbonGalleryItem Content="Baseball" />
-                            </RibbonGalleryCategory>
-                        </RibbonGallery>
-                    </RibbonSplitButton>
-                    <RibbonMenuButton Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png">
-                        <RibbonGallery ItemsSource="{Binding Folders}" Command="{Binding FileTo}" SelectedItem="{Binding FileToSelectedItem, Mode=TwoWay}">
-                            --><!--<RibbonGalleryCategory ItemsSource="{Binding Folders}" MaxColumnCount="1" DisplayMemberPath="Title" />--><!--
-                        </RibbonGallery>
-                    </RibbonMenuButton>
-                    --><!--
-                    <RibbonComboBox Label="File to..." LargeImageSource="Art/folder_Closed_32xLG.png">
-                        <RibbonGallery Command="{Binding FileTo}" SelectedItem="{Binding FileToSelectedItem, Mode=TwoWay}">
-                            <RibbonGalleryCategory ItemsSource="{Binding Folders}" MaxColumnCount="1" DisplayMemberPath="Title" />
-                        </RibbonGallery>
-                    </RibbonComboBox>
-                    --><!--
-                </RibbonGroup>
-                <RibbonGroup Header="Search">
-                    <RibbonTextBox Label="Find" SmallImageSource="Art/Find_5650.png" KeyTip="F"/>
-                </RibbonGroup>
-            </RibbonTab>
-        </Ribbon>-->
-        
         <!-- Main window -->
         <Grid Grid.Row="1" Margin="10, 0, 0, 10">
             <!-- Two-column split -->
