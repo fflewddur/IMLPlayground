@@ -13,8 +13,9 @@
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
             <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
         
         <!-- Topic labels-->
@@ -56,7 +57,7 @@
         </ItemsControl>
         
         <!-- Add word buttons -->
-        <Button Grid.Row="0" Grid.Column="2" Content="{Binding Topic1UserLabel}" ContentStringFormat="Add a word about {0}" />
-        <Button Grid.Row="1" Grid.Column="2" Content="{Binding Topic2UserLabel}" ContentStringFormat="Add a word about {0}" />
+        <Button Grid.Row="0" Grid.Column="2" Content="{Binding Topic1UserLabel}" ContentStringFormat="Add a word about {0}" Style="{StaticResource buttonStyle}"/>
+        <Button Grid.Row="1" Grid.Column="2" Content="{Binding Topic2UserLabel}" ContentStringFormat="Add a word about {0}" Style="{StaticResource buttonStyle}"/>
     </Grid>
 </UserControl>

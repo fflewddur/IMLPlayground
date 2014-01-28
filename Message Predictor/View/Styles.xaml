@@ -14,4 +14,8 @@
         <Setter Property="Control.FontSize" Value="12" />
         <Setter Property="Control.FontFamily" Value="Segoe UI" />
     </Style>
+    <Style x:Key="buttonStyle">
+        <Setter Property="Control.Padding" Value="10 5" />
+        <Setter Property="Control.VerticalAlignment" Value="Center" />
+    </Style>
 </ResourceDictionary>
