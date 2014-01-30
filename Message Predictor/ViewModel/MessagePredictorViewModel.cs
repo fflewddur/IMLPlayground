@@ -31,6 +31,7 @@ namespace MessagePredictor
         int _recentlyChangedPredictions;
         IEnumerable<Feature> _topic1Features;
         IEnumerable<Feature> _topic2Features;
+        List<string> _textToHighlight;
 
         public MessagePredictorViewModel()
         {
@@ -192,6 +193,12 @@ namespace MessagePredictor
             private set { SetProperty<int>(ref _recentlyChangedPredictions, value); }
         }
 
+        public List<string> TextToHighlight
+        {
+            get { return _textToHighlight; }
+            private set { SetProperty<List<string>>(ref _textToHighlight, value); }
+        }
+
         #endregion
 
         #region Commands
@@ -220,6 +227,7 @@ namespace MessagePredictor
                 UpdateInstanceFeatures(false);
                 _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
                 UpdateInstanceFeatures(true);
+                TextToHighlight = _vocab.GetFeatureWords();
             }
 
             TrainClassifier(_classifier, _topic1Folder, _topic2Folder);

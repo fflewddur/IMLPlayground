@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using LibIML;
 using System.IO;
 using System.Windows.Documents;
+using System.Xml.Linq;
 
 namespace MessagePredictor
 {
@@ -23,10 +24,14 @@ namespace MessagePredictor
         private bool? _isPredictionCorrect;
         private SparseVector _featureCounts;
         private Label _label;
+        private string _document; // The message in XML for easier displaying (including highlighting of features)
+        private Vocabulary _vocab; // Keep a reference to the most recent Vocabulary we've computed features for; needed for displaying _document with features highlighted
 
-        public NewsItem() : base()
+        public NewsItem()
+            : base()
         {
-            
+            _document = null;
+            _vocab = null;
         }
 
         #region Properties
@@ -69,7 +74,29 @@ namespace MessagePredictor
 
         public string AllText
         {
-            get { return Subject + "\n" + Author + "\n\n" + Body; }
+            get { return Subject + "\n" + Author + "\n" + Body; }
+        }
+
+        public string Document
+        {
+            get
+            {
+                // If our display document has been invalidated by feature changes, rebuild it.
+                if (_document == null)
+                    UpdateDocument(_vocab);
+
+                return _document;
+            }
+            set
+            {
+                if (SetProperty<string>(ref _document, value))
+                    this.OnPropertyChanged("DocumentReadOnly");
+            }
+        }
+
+        public string DocumentReadOnly
+        {
+            get { return Document; }
             set { /* This needs to be public because of a bug in RichTextBox, but don't do anything here. */ }
         }
 
@@ -78,11 +105,12 @@ namespace MessagePredictor
             get { return _tokenCounts; }
             set { SetProperty<Dictionary<string, int>>(ref _tokenCounts, value); }
         }
-        
+
         public Prediction Prediction
         {
             get { return _prediction; }
-            set {
+            set
+            {
                 Prediction prev = Prediction;
                 if (SetProperty<Prediction>(ref _prediction, value))
                 {
@@ -127,7 +155,7 @@ namespace MessagePredictor
             private set { SetProperty<bool>(ref _recentlyChanged, value); }
         }
 
-        public bool? IsPredictionCorrect 
+        public bool? IsPredictionCorrect
         {
             get { return _isPredictionCorrect; }
             private set { SetProperty<bool?>(ref _isPredictionCorrect, value); }
@@ -158,6 +186,35 @@ namespace MessagePredictor
             }
 
             Features = features;
+            _vocab = vocab; // Track our most-recently used vocabulary (for highlighting features)
+            Document = null; // force our document to re-parse the next time it's requested for display
+        }
+
+        private void UpdateDocument(Vocabulary vocab)
+        {
+            string[] lines = AllText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+            
+            XElement root = new XElement("message");
+
+            if (lines.Length > 1)
+            {
+                // Get the Subject (1st line)
+                root.Add(new XElement("subject", lines[0]));
+
+                // Get the Sender (2nd line)
+                root.Add(new XElement("sender", lines[1]));
+
+                // Get everything else
+                for (int i = 2; i < lines.Length; i++)
+                {
+                    root.Add(new XElement("line", lines[i]));
+                }
+            }
+
+            XDocument doc = new XDocument(root);
+
+            Document = doc.ToString();
         }
 
         #region Static methods

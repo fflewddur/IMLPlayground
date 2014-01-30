@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibIML;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 using Xceed.Wpf.Toolkit;
 
 namespace MessagePredictor
@@ -29,6 +31,7 @@ namespace MessagePredictor
 
     public class MyFormatter : ITextFormatter
     {
+
         public string GetText(System.Windows.Documents.FlowDocument document)
         {
             return new TextRange(document.ContentStart, document.ContentEnd).Text;
@@ -36,37 +39,33 @@ namespace MessagePredictor
 
         public void SetText(System.Windows.Documents.FlowDocument document, string text)
         {
-            string[] lines = text.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
-
+            XDocument doc = XDocument.Parse(text);
             document.Blocks.Clear();
 
-            if (lines.Length > 1)
+            Paragraph p = new Paragraph();
+            foreach (XElement line in doc.Root.Elements())
             {
-                // Get the Subject (1st line)
-                Paragraph p = new Paragraph();
-                Bold bTxt = new Bold();
-                bTxt.Inlines.Add(lines[0]);
-                p.Inlines.Add(bTxt);
-                p.Inlines.Add(new LineBreak());
-
-                // Get the Sender (2nd line)
-                Italic iTxt = new Italic();
-                p.Inlines.Add("From ");
-                iTxt.Inlines.Add(lines[1]);
-                p.Inlines.Add(iTxt);
-
-                document.Blocks.Add(p);
-
-                // Get everything else
-                p = new Paragraph();
-                for (int i = 2; i < lines.Length; i++)
+                if (line.Name == "subject")
                 {
-                    p.Inlines.Add(lines[i]);
+                    Bold b = new Bold(new Run(line.Value.ToString()));
+                    p.Inlines.Add(b);
                     p.Inlines.Add(new LineBreak());
                 }
-
-                document.Blocks.Add(p);
+                else if (line.Name == "sender") 
+                {
+                    p.Inlines.Add("From: ");
+                    Italic em = new Italic(new Run(line.Value.ToString()));
+                    p.Inlines.Add(em);
+                    p.Inlines.Add(new LineBreak());
+                }
+                else
+                {
+                    p.Inlines.Add(line.Value.ToString());
+                    p.Inlines.Add(new LineBreak());
+                }
             }
+
+            document.Blocks.Add(p);
         }
     }
 }
