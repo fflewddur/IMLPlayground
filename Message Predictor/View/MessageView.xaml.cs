@@ -39,8 +39,12 @@ namespace MessagePredictor
 
         public void SetText(System.Windows.Documents.FlowDocument document, string text)
         {
-            XDocument doc = XDocument.Parse(text);
             document.Blocks.Clear();
+
+            if (string.IsNullOrWhiteSpace(text))
+                return;
+
+            XDocument doc = XDocument.Parse(text);
 
             Paragraph p = new Paragraph();
             foreach (XElement line in doc.Root.Elements())
@@ -58,9 +62,22 @@ namespace MessagePredictor
                     p.Inlines.Add(em);
                     p.Inlines.Add(new LineBreak());
                 }
-                else
+                else if (line.Name == "line")
                 {
-                    p.Inlines.Add(line.Value.ToString());
+                    foreach (XElement element in line.Elements())
+                    {
+                        if (element.Name == "normal")
+                        {
+                            p.Inlines.Add(line.Value.ToString());
+                        }
+                        else if (element.Name == "feature")
+                        {
+                            Run r = new Run(line.Value.ToString());
+                            r.Background = Brushes.SkyBlue;
+                            p.Inlines.Add(r);
+                        }
+                    }
+                    
                     p.Inlines.Add(new LineBreak());
                 }
             }

@@ -7,6 +7,7 @@ using LibIML;
 using System.IO;
 using System.Windows.Documents;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace MessagePredictor
 {
@@ -193,8 +194,13 @@ namespace MessagePredictor
         private void UpdateDocument(Vocabulary vocab)
         {
             string[] lines = AllText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            List<string> featureWords = vocab.GetFeatureWords();
+            string featurePattern = "(" + string.Join("|", featureWords) + ")";
+            Console.WriteLine("FeaturePattern: {0}", featurePattern);
+            Regex replace = new Regex(featurePattern);
+            string replaced = replace.Replace(AllText, "<feature>$1<feature>");
+            lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
-            
             XElement root = new XElement("message");
 
             if (lines.Length > 1)
@@ -208,7 +214,19 @@ namespace MessagePredictor
                 // Get everything else
                 for (int i = 2; i < lines.Length; i++)
                 {
-                    root.Add(new XElement("line", lines[i]));
+                    XElement line = new XElement("line");
+                    line.Add(new XElement("normal", lines[i]));
+
+
+                    string[] words = lines[i].Split((char[])null); // Split on whitespace
+                    //// FIXME check whether these words are in our vocab or not
+                    XElement feature = new XElement("feature");
+                    XElement normal = new XElement("normal");
+                    foreach (string word in words)
+                    {
+                        //if (string.IsNullOrWhiteSpace(word))
+                    }
+                    root.Add(line);
                 }
             }
 
