@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using LibIML;
 using System.IO;
+using System.Windows.Documents;
 
 namespace MessagePredictor
 {
@@ -68,7 +69,8 @@ namespace MessagePredictor
 
         public string AllText
         {
-            get { return Id + "\n" + Subject + "\n" + Author + "\n\n" + Body; }
+            get { return Subject + "\n" + Author + "\n\n" + Body; }
+            set { /* This needs to be public because of a bug in RichTextBox, but don't do anything here. */ }
         }
 
         public Dictionary<string, int> TokenCounts
