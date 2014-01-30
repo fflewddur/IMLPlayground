@@ -189,6 +189,18 @@ namespace LibIML
             return word;
         }
 
+        public List<string> GetFeatureWords()
+        {
+            List<string> words = new List<string>();
+
+            foreach (int id in FeatureIds)
+            {
+                words.Add(_allIdsToWords[id]);
+            }
+
+            return words;
+        }
+
         /// <summary>
         /// Add a collection of tokens and their corresponding frequency counts to our vocabulary.
         /// </summary>
