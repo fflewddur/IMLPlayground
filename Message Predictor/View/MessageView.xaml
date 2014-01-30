@@ -10,12 +10,11 @@
     <Grid>
         <TabControl>
             <TabItem Header="Message">
-                <xctk:RichTextBox Text="{Binding CurrentMessage.AllText}" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+                <xctk:RichTextBox Text="{Binding CurrentMessage.DocumentReadOnly}" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto">
                     <xctk:RichTextBox.TextFormatter>
                         <local:MyFormatter />
                     </xctk:RichTextBox.TextFormatter>
                 </xctk:RichTextBox>
-                <!-- {Binding CurrentMessage.Document, Mode=OneWay, UpdateSourceTrigger=PropertyChanged}  -->
             </TabItem>
             <TabItem Header="Explanation"></TabItem>
         </TabControl>
