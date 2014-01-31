@@ -68,11 +68,11 @@ namespace MessagePredictor
                     {
                         if (element.Name == "normal")
                         {
-                            p.Inlines.Add(line.Value.ToString());
+                            p.Inlines.Add(element.Value.ToString());
                         }
                         else if (element.Name == "feature")
                         {
-                            Run r = new Run(line.Value.ToString());
+                            Run r = new Run(element.Value.ToString());
                             r.Background = Brushes.SkyBlue;
                             p.Inlines.Add(r);
                         }

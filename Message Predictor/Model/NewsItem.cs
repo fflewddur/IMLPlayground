@@ -191,15 +191,17 @@ namespace MessagePredictor
             Document = null; // force our document to re-parse the next time it's requested for display
         }
 
+        /// <summary>
+        /// Create an XML document that includes tags describing which features to highlight.
+        /// </summary>
+        /// <param name="vocab"></param>
         private void UpdateDocument(Vocabulary vocab)
         {
-            string[] lines = AllText.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
             List<string> featureWords = vocab.GetFeatureWords();
             string featurePattern = "(" + string.Join("|", featureWords) + ")";
-            Console.WriteLine("FeaturePattern: {0}", featurePattern);
-            Regex replace = new Regex(featurePattern);
-            string replaced = replace.Replace(AllText, "<feature>$1<feature>");
-            lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+            Regex featureRegex = new Regex(featurePattern);
+            string replaced = featureRegex.Replace(AllText, "<feature>$1<feature>");
+            string[] lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             XElement root = new XElement("message");
 
@@ -215,17 +217,24 @@ namespace MessagePredictor
                 for (int i = 2; i < lines.Length; i++)
                 {
                     XElement line = new XElement("line");
-                    line.Add(new XElement("normal", lines[i]));
-
-
-                    string[] words = lines[i].Split((char[])null); // Split on whitespace
-                    //// FIXME check whether these words are in our vocab or not
-                    XElement feature = new XElement("feature");
-                    XElement normal = new XElement("normal");
-                    foreach (string word in words)
+                    string[] phrases = lines[i].Split(new string[] { "<feature>" }, StringSplitOptions.None); // Split on features/non-features
+                    
+                    foreach (string phrase in phrases)
                     {
-                        //if (string.IsNullOrWhiteSpace(word))
+                        XElement phraseElement;
+
+                        if (featureWords.Contains(phrase))
+                        {
+                            phraseElement = new XElement("feature", phrase);
+                        }
+                        else
+                        {
+                            phraseElement = new XElement("normal", phrase);
+                        }
+
+                        line.Add(phraseElement);
                     }
+
                     root.Add(line);
                 }
             }
