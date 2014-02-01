@@ -9,6 +9,13 @@ namespace LibIML
     [Serializable]
     public class Feature
     {
+        public enum Weight
+        {
+            None,
+            Medium,
+            High
+        };
+
         private string _characters;
         private int _countTraining;
         private int _countTesting;

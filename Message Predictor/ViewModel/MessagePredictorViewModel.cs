@@ -1,5 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LibIML;
+using MessagePredictor.View;
+using MessagePredictor.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -84,6 +86,8 @@ namespace MessagePredictor
             FileToUnknown = new RelayCommand(PerformFileToUnknown, CanPerformFileToUnknown);
             FileToTopic1 = new RelayCommand(PerformFileToTopic1, CanPerformFileToTopic1);
             FileToTopic2 = new RelayCommand(PerformFileToTopic2, CanPerformFileToTopic2);
+            AddFeatureTopic1 = new RelayCommand(PerformAddFeatureTopic1);
+            AddFeatureTopic2 = new RelayCommand(PerformAddFeatureTopic2);
 
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
@@ -207,6 +211,8 @@ namespace MessagePredictor
         public RelayCommand FileToUnknown { get; private set; }
         public RelayCommand FileToTopic1 { get; private set; }
         public RelayCommand FileToTopic2 { get; private set; }
+        public RelayCommand AddFeatureTopic1 { get; private set; }
+        public RelayCommand AddFeatureTopic2 { get; private set; }
 
         private bool CanPerformUpdatePredictions()
         {
@@ -283,6 +289,24 @@ namespace MessagePredictor
         {
             
             FileCurrentMessageToFolder(_topic2Folder);
+        }
+
+        private void PerformAddFeatureTopic1()
+        {
+            AddFeatureDialog dialog = new AddFeatureDialog();
+            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel() { Topic = _topic1Folder.Label.UserLabel };
+            dialog.DataContext = vm;
+            dialog.ShowDialog();
+            Console.WriteLine("add word: {0}", vm.Word);
+        }
+
+        private void PerformAddFeatureTopic2()
+        {
+            AddFeatureDialog dialog = new AddFeatureDialog();
+            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel() { Topic = _topic2Folder.Label.UserLabel };
+            dialog.DataContext = vm;
+            dialog.ShowDialog();
+            Console.WriteLine("add word: {0}", vm.Word);
         }
 
         #endregion
@@ -458,6 +482,7 @@ namespace MessagePredictor
                 }
             }
         }
+
         /// <summary>
         /// Load the dataset specified in our configuration properties.
         /// </summary>

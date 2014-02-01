@@ -57,7 +57,7 @@
         </ItemsControl>
         
         <!-- Add word buttons -->
-        <Button Grid.Row="0" Grid.Column="2" Content="{Binding Topic1UserLabel}" ContentStringFormat="Add a word about {0}" Style="{StaticResource buttonStyle}"/>
-        <Button Grid.Row="1" Grid.Column="2" Content="{Binding Topic2UserLabel}" ContentStringFormat="Add a word about {0}" Style="{StaticResource buttonStyle}"/>
+        <Button Grid.Row="0" Grid.Column="2" Content="{Binding Topic1UserLabel}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeatureTopic1}" Style="{StaticResource buttonStyle}"/>
+        <Button Grid.Row="1" Grid.Column="2" Content="{Binding Topic2UserLabel}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeatureTopic2}" Style="{StaticResource buttonStyle}"/>
     </Grid>
 </UserControl>

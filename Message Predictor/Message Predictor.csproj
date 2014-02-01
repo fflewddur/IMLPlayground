@@ -94,9 +94,13 @@
     </ApplicationDefinition>
     <Compile Include="Model\NewsCollection.cs" />
     <Compile Include="Model\NewsItem.cs" />
+    <Compile Include="ViewModel\AddFeatureDialogViewModel.cs" />
     <Compile Include="ViewModel\Base\ViewModelCollectionBase.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
     <Compile Include="ViewModel\MessagePredictorViewModel.cs" />
+    <Compile Include="View\AddFeatureDialog.xaml.cs">
+      <DependentUpon>AddFeatureDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CommandBar.xaml.cs">
       <DependentUpon>CommandBar.xaml</DependentUpon>
     </Compile>
@@ -125,6 +129,10 @@
     <Compile Include="View\PredictionOverview.xaml.cs">
       <DependentUpon>PredictionOverview.xaml</DependentUpon>
     </Compile>
+    <Page Include="View\AddFeatureDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\CommandBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

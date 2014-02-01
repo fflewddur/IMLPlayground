@@ -1,0 +1,46 @@
+﻿<Window x:Class="MessagePredictor.View.AddFeatureDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
+        Title="{Binding Path=Topic, Mode=OneWay, StringFormat=Add a word or phrase about {0}}" Height="160" Width="300" ResizeMode="CanResizeWithGrip" SizeToContent="Height">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBox Grid.Row="0" Text="{Binding Word}" Padding="2 5">
+            <TextBox.Style>
+                <Style TargetType="TextBox">
+                    <Setter Property="Background" Value="White" />
+                    <Style.Resources>
+                        <VisualBrush x:Key="CueBannerBrush" AlignmentX="Left" AlignmentY="Center" Stretch="None">
+                            <VisualBrush.Visual>
+                                <Label Content="Word or phrase" Foreground="Gray" Padding="5"/>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </Style.Resources>
+                    <Style.Triggers>
+                        <Trigger Property="Text" Value="{x:Static sys:String.Empty}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                        <Trigger Property="Text" Value="{x:Null}">
+                            <Setter Property="Background" Value="{StaticResource CueBannerBrush}" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </TextBox.Style>
+        </TextBox>
+
+        <ComboBox Grid.Row="1" SelectedIndex="0" Margin="0 10 0 10" Padding="5">
+            <ComboBoxItem Padding="5">Very important</ComboBoxItem>
+            <ComboBoxItem Padding="5">Somewhat important</ComboBoxItem>
+        </ComboBox>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Margin="0 0 10 0" Padding="5">Cancel</Button>
+            <Button Padding="5">Done</Button>
+        </StackPanel>
+    </Grid>
+</Window>
