@@ -297,7 +297,7 @@ namespace MessagePredictor
             AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel() { Topic = _topic1Folder.Label.UserLabel };
             dialog.DataContext = vm;
             dialog.ShowDialog();
-            Console.WriteLine("add word: {0}", vm.Word);
+            Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Topic);
         }
 
         private void PerformAddFeatureTopic2()
@@ -306,7 +306,7 @@ namespace MessagePredictor
             AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel() { Topic = _topic2Folder.Label.UserLabel };
             dialog.DataContext = vm;
             dialog.ShowDialog();
-            Console.WriteLine("add word: {0}", vm.Word);
+            Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Topic);
         }
 
         #endregion

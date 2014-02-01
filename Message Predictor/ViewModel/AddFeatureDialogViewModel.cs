@@ -10,11 +10,17 @@ namespace MessagePredictor.ViewModel
     {
         private string _topic;
         private string _word;
-        
+        private List<string> _weights;
+        private string _selectedWeight;
+
         public AddFeatureDialogViewModel() : base()
         {
             Topic = "Unknown";
             Word = ""; // use an empty string, not null, to make it easier to style the empty string with placeholder text.
+            Weights = new List<string>();
+            Weights.Add("Very important");
+            Weights.Add("Somewhat important");
+            SelectedWeight = Weights[0];
         }
 
         public string Topic
@@ -27,6 +33,18 @@ namespace MessagePredictor.ViewModel
         {
             get { return _word; }
             set { SetProperty<string>(ref _word, value); }
+        }
+
+        public List<string> Weights
+        {
+            get { return _weights; }
+            set { SetProperty<List<String>>(ref _weights, value); }
+        }
+
+        public string SelectedWeight
+        {
+            get { return _selectedWeight; }
+            set { SetProperty<string>(ref _selectedWeight, value); }
         }
     }
 }

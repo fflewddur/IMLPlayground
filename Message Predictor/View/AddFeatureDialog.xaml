@@ -33,9 +33,7 @@
             </TextBox.Style>
         </TextBox>
 
-        <ComboBox Grid.Row="1" SelectedIndex="0" Margin="0 10 0 10" Padding="5">
-            <ComboBoxItem Padding="5">Very important</ComboBoxItem>
-            <ComboBoxItem Padding="5">Somewhat important</ComboBoxItem>
+        <ComboBox Grid.Row="1" SelectedIndex="0" Margin="0 10 0 10" Padding="5" ItemsSource="{Binding Weights}" SelectedItem="{Binding SelectedWeight}">
         </ComboBox>
         
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
