@@ -18,4 +18,9 @@
         <Setter Property="Control.Padding" Value="10 5" />
         <Setter Property="Control.VerticalAlignment" Value="Center" />
     </Style>
+    <Style x:Key="headerStyleDialog">
+        <Setter Property="Control.FontSize" Value="14"/>
+        <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
+        <Setter Property="Control.Margin" Value="0 0 0 10"/>
+    </Style>
 </ResourceDictionary>

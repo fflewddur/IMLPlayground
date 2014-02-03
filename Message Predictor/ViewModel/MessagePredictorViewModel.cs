@@ -293,23 +293,28 @@ namespace MessagePredictor
 
         private void PerformAddFeatureTopic1()
         {
-            AddFeatureDialog dialog = new AddFeatureDialog();
-            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel() { Topic = _topic1Folder.Label.UserLabel };
-            dialog.DataContext = vm;
-            dialog.ShowDialog();
-            Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Topic);
+            AddFeature(_topic1Folder.Label);
         }
 
         private void PerformAddFeatureTopic2()
         {
-            AddFeatureDialog dialog = new AddFeatureDialog();
-            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel() { Topic = _topic2Folder.Label.UserLabel };
-            dialog.DataContext = vm;
-            dialog.ShowDialog();
-            Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Topic);
+            AddFeature(_topic2Folder.Label);
         }
 
         #endregion
+
+        private void AddFeature(Label label)
+        {
+            AddFeatureDialog dialog = new AddFeatureDialog();
+            dialog.Owner = App.Current.MainWindow;
+            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(label);
+            dialog.DataContext = vm;
+            bool? result = dialog.ShowDialog();
+            if (result == true)
+            {
+                Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
+            }
+        }
 
         private void TrainClassifier(IClassifier classifier, IEnumerable<IInstance> topic1, IEnumerable<IInstance> topic2)
         {
