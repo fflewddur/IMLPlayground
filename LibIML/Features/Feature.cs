@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LibIML
 {
     [Serializable]
-    public class Feature
+    public class Feature : IEquatable<Feature>
     {
         public enum Weight
         {
@@ -52,6 +52,35 @@ namespace LibIML
         {
             get { return _userWeight; }
             set { _userWeight = value; }
+        }
+
+        #endregion
+
+        #region Override methods
+
+        public override string ToString()
+        {
+            return Characters;
+        }
+
+        public override bool Equals(object other)
+        {
+            if (!(other is Feature))
+                return false;
+
+            return Equals((Feature)other);
+        }
+
+        public bool Equals(Feature other)
+        {
+            return Characters == other.Characters;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            hash = hash * 31 + Characters.GetHashCode();
+            return hash;
         }
 
         #endregion

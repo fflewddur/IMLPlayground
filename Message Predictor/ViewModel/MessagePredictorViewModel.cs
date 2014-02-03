@@ -34,11 +34,16 @@ namespace MessagePredictor
         IEnumerable<Feature> _topic1Features;
         IEnumerable<Feature> _topic2Features;
         List<string> _textToHighlight;
+        List<Feature> _userAddedFeatures;
+        List<Feature> _userRemovedFeatures;
 
         public MessagePredictorViewModel()
         {
             Console.WriteLine("MessagePredictorViewModel() start");
             Stopwatch timer = new Stopwatch();
+
+            _userAddedFeatures = new List<Feature>();
+            _userRemovedFeatures = new List<Feature>();
 
             timer.Start();
             List<NewsCollection> folders = new List<NewsCollection>();
@@ -231,7 +236,7 @@ namespace MessagePredictor
             if (_vocab.HasUpdatedTokens)
             {
                 UpdateInstanceFeatures(false);
-                _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _desiredVocabSize);
+                _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _userAddedFeatures, _userRemovedFeatures, _desiredVocabSize);
                 UpdateInstanceFeatures(true);
                 TextToHighlight = _vocab.GetFeatureWords();
             }
@@ -313,7 +318,15 @@ namespace MessagePredictor
             if (result == true)
             {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
+                Feature f = new Feature() { Characters = vm.Word };
+                _userAddedFeatures.Remove(f); // If the Feature already exists, replace it
+                _userAddedFeatures.Add(f);
             }
+        }
+
+        private void RemoveFeature()
+        {
+
         }
 
         private void TrainClassifier(IClassifier classifier, IEnumerable<IInstance> topic1, IEnumerable<IInstance> topic2)

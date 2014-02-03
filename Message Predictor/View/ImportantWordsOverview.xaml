@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:local="clr-namespace:MessagePredictor" 
              mc:Ignorable="d" 
              d:DesignHeight="250" d:DesignWidth="600">
@@ -17,11 +18,11 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        
+
         <!-- Topic labels-->
         <Label Grid.Row="0" Grid.Column="0" Content="{Binding Topic1UserLabel}" Style="{StaticResource headerStyle2}" VerticalContentAlignment="Center"/>
         <Label Grid.Row="1" Grid.Column="0" Content="{Binding Topic2UserLabel}" Style="{StaticResource headerStyle2}" VerticalContentAlignment="Center"/>
-        
+
         <!-- List of words -->
         <ItemsControl Grid.Row="0" Grid.Column="1" ItemsSource="{Binding Topic1Features}" VerticalAlignment="Center">
             <ItemsControl.ItemsPanel>
@@ -31,11 +32,24 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding Characters}" Margin="0 0 3 0" />
-                    <Label ContentStringFormat="{}{0:N3}" Content="{Binding SystemWeight}" Margin="0 0 15 0" />
-                        
-                    </StackPanel>
+                    <xctk:DropDownButton>
+                        <xctk:DropDownButton.DropDownContent>
+                            <StackPanel Orientation="Vertical">
+                                <Menu>
+                                    <MenuItem Header="Very important" CommandParameter="{Binding Characters}" Command="{Binding FeatureVeryImportant}"/>
+                                    <MenuItem Header="Somewhat important" CommandParameter="{Binding Characters}" Command="{Binding FeatureSomewhatImportant}"/>
+                                    <Separator />
+                                    <MenuItem Header="Remove" CommandParameter="{Binding Characters}" Command="{Binding FeatureRemove}"/>
+                                    <Menu.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </Menu.ItemsPanel>
+                                </Menu>
+                            </StackPanel>
+                        </xctk:DropDownButton.DropDownContent>
+                        <TextBlock Text="{Binding Characters}" />
+                    </xctk:DropDownButton>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -48,14 +62,14 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding Characters}" Margin="0 0 3 0" />
-                        <Label ContentStringFormat="{}{0:N3}" Content="{Binding SystemWeight}" Margin="0 0 15 0" />
+                        <TextBlock Text="{Binding Characters}" Margin="0 0 15 0" />
+                        <!--<Label ContentStringFormat="{}{0:N3}" Content="{Binding SystemWeight}" Margin="0 0 15 0" />-->
 
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
-        
+
         <!-- Add word buttons -->
         <Button Grid.Row="0" Grid.Column="2" Content="{Binding Topic1UserLabel}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeatureTopic1}" Style="{StaticResource buttonStyle}"/>
         <Button Grid.Row="1" Grid.Column="2" Content="{Binding Topic2UserLabel}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeatureTopic2}" Style="{StaticResource buttonStyle}"/>

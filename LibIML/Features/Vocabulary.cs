@@ -286,7 +286,7 @@ namespace LibIML
             }
         }
 
-        public bool RestrictVocab(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int size)
+        public bool RestrictVocab(IEnumerable<IInstance> instances, IEnumerable<Label> labels, IEnumerable<Feature> forceInclude, IEnumerable<Feature> forceExclude, int size)
         {
             bool retval = false;
 
@@ -590,7 +590,8 @@ namespace LibIML
             return PrCGivenNotT;
         }
 
-        private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize)
+        private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize, 
+            IEnumerable<Feature> forceInclude = null, IEnumerable<Feature> forceExclude = null)
         {
             Dictionary<Label, double> PrC; // Probability of each class
             Dictionary<int, double> PrT; // Probability of each feature
@@ -643,7 +644,13 @@ namespace LibIML
             _restrictedIds.Clear();
             foreach (KeyValuePair<int, double> pair in HighIG)
             {
-                AddElementToRestricted(pair.Key);
+                string word = _allIdsToWords[pair.Key];
+                Feature feature = new Feature() { Characters = word };
+                // Ensure the user didn't remove this feature
+                if (forceExclude == null || !forceExclude.Contains(feature))
+                {
+                    AddElementToRestricted(pair.Key);
+                }
             }
         }
 
