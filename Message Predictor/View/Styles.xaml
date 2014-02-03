@@ -17,10 +17,20 @@
     <Style x:Key="buttonStyle">
         <Setter Property="Control.Padding" Value="10 5" />
         <Setter Property="Control.VerticalAlignment" Value="Center" />
+        <Setter Property="Control.MinWidth" Value="40" />
     </Style>
     <Style x:Key="headerStyleDialog">
         <Setter Property="Control.FontSize" Value="14"/>
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
         <Setter Property="Control.Margin" Value="0 0 0 10"/>
+    </Style>
+    <Style x:Key="comboBoxStyle">
+        <Setter Property="Control.Padding" Value="10 5"/>
+    </Style>
+    <Style x:Key="comboBoxItemContainerStyle">
+        <Setter Property="Control.Padding" Value="10 5"/>
+    </Style>
+    <Style x:Key="textBoxStyle">
+        <Setter Property="Control.Padding" Value="10 5"/>
     </Style>
 </ResourceDictionary>
