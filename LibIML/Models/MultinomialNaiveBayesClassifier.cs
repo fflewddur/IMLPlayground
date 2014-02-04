@@ -5,10 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+// WARNINGS: this code is unmaintained. I doubt it still does anything useful.
+
 namespace LibIML
 {
     [Serializable]
-    public class MultinomialNaiveBayesClassifier : ViewModelBase, IClassifier
+    public class MultinomialNaiveBayesClassifier : ViewModelBase
     {
         private const double _defaultPrior = 1.0;
 
@@ -74,6 +76,18 @@ namespace LibIML
         public Label NegativeLabel
         {
             get { return _labels.ToList()[1]; }
+        }
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler<EventArgs> Retrained;
+
+        protected virtual void OnRetrained(EventArgs e)
+        {
+            if (Retrained != null)
+                Retrained(this, e);
         }
 
         #endregion

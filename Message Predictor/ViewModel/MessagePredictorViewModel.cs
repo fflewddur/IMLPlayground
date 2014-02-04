@@ -16,6 +16,7 @@ namespace MessagePredictor
 {
     class MessagePredictorViewModel : ViewModelBase
     {
+        FeatureSetViewModel _featureSetVM;
         List<NewsCollection> _folders; // Collection of all our folders
         NewsCollection _unknownFolder;
         NewsCollection _topic1Folder;
@@ -85,6 +86,8 @@ namespace MessagePredictor
 
             // Build a classifier
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
+
+            _featureSetVM = new FeatureSetViewModel(_classifier, _vocab);
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);

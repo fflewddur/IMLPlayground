@@ -94,6 +94,18 @@ namespace LibIML
 
         #endregion
 
+        #region Events
+
+        public event EventHandler<EventArgs> Updated;
+
+        protected virtual void OnUpdated(EventArgs e)
+        {
+            if (Updated != null)
+                Updated(this, e);
+        }
+
+        #endregion
+
         #region Public methods
 
         /// <summary>
@@ -292,35 +304,35 @@ namespace LibIML
         /// Remove a specific element from this vocabulary.
         /// </summary>
         /// <param name="id">The ID of the element to remove.</param>
-        private void RemoveElementFromRestricted(int id)
-        {
-            _restrictedIds.Remove(id);
-        }
+        //private void RemoveElementFromRestricted(int id)
+        //{
+        //    _restrictedIds.Remove(id);
+        //}
 
         /// <summary>
         /// Remove a collection of elements from this vocabulary.
         /// </summary>
         /// <param name="ids">The collection of element IDs to remove.</param>
-        private void RemoveElementsFromRestricted(IEnumerable<int> ids)
-        {
-            foreach (int id in ids)
-            {
-                RemoveElementFromRestricted(id);
-            }
-        }
+        //private void RemoveElementsFromRestricted(IEnumerable<int> ids)
+        //{
+        //    foreach (int id in ids)
+        //    {
+        //        RemoveElementFromRestricted(id);
+        //    }
+        //}
 
         private void AddElementToRestricted(int id)
         {
             _restrictedIds.Add(id);
         }
 
-        private void AddElementsToRestricted(IEnumerable<int> ids)
-        {
-            foreach (int id in ids)
-            {
-                AddElementToRestricted(id);
-            }
-        }
+        //private void AddElementsToRestricted(IEnumerable<int> ids)
+        //{
+        //    foreach (int id in ids)
+        //    {
+        //        AddElementToRestricted(id);
+        //    }
+        //}
 
         #endregion
 
@@ -530,6 +542,7 @@ namespace LibIML
                     AddElementToRestricted(pair.Key);
                 }
             }
+            this.OnUpdated(new EventArgs());
         }
 
         #endregion

@@ -52,7 +52,7 @@ namespace LibIML
         public Vocabulary Vocab
         {
             get { return _vocab; }
-            set
+            private set
             {
                 if (SetProperty<Vocabulary>(ref _vocab, value))
                 {
@@ -66,17 +66,31 @@ namespace LibIML
         //    get { return _featuresPerClass; }
         //}
 
-        public Label PositiveLabel
-        {
-            get { return _labels.ToList()[0]; }
-        }
+        //public Label PositiveLabel
+        //{
+        //    get { return _labels.ToList()[0]; }
+        //}
 
-        public Label NegativeLabel
+        //public Label NegativeLabel
+        //{
+        //    get { return _labels.ToList()[1]; }
+        //}
+
+        #endregion
+
+        #region Events
+
+        public event EventHandler<EventArgs> Retrained;
+
+        protected virtual void OnRetrained(EventArgs e)
         {
-            get { return _labels.ToList()[1]; }
+            if (Retrained != null)
+                Retrained(this, e);
         }
 
         #endregion
+
+        # region Public methods
 
         /// <summary>
         /// Remove all training information.
@@ -274,6 +288,7 @@ namespace LibIML
 
             TestPrC(_pClass);
             TestPrWGivenC(_pWordGivenClass);
+            OnRetrained(new EventArgs());
         }
 
         //public IEnumerable<Feature> GetFeatures()
@@ -295,6 +310,8 @@ namespace LibIML
 
         //    return features;
         //}
+
+        #endregion
 
         /// <summary>
         /// Initialize training data structures using our collection of potential output labels.

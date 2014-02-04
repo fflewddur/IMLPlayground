@@ -8,9 +8,11 @@ namespace LibIML
 {
     public interface IClassifier
     {
+        event EventHandler<EventArgs> Retrained;
+
         string Name { get; }
         IEnumerable<Label> Labels { get; }
-        Vocabulary Vocab { get; set; }
+        Vocabulary Vocab { get; }
         //IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
         //Label PositiveLabel { get; }
         //Label NegativeLabel { get; }
