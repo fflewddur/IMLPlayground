@@ -18,37 +18,47 @@ namespace LibIML
         };
 
         private string _characters;
-        private Dictionary<Label, Weight> _weights;
-        private Dictionary<Label, double> _systemWeights;
-        private Dictionary<Label, double> _userWeights;
+        private Label _label;
+        private Weight _weightType;
+        private double _systemWeight;
+        private double _userWeight;
 
-        public Feature() : base()
-        { }
+        public Feature(string characters, Label label) : base()
+        {
+            _characters = characters;
+            _label = label;
+        }
 
         #region Properties
 
         public string Characters
         {
             get { return _characters; }
-            set { _characters = value; }
+            private set { _characters = value; }
         }
 
-        public Dictionary<Label, Weight> Weights
+        public Label Label
         {
-            get { return _weights; }
-            set { _weights = value; }
+            get { return _label; }
+            private set { _label = Label; }
         }
 
-        public Dictionary<Label, double> SystemWeight
+        public Weight WeightType
         {
-            get { return _systemWeights; }
-            set { _systemWeights = value; }
+            get { return _weightType; }
+            set { _weightType = value; }
         }
 
-        public Dictionary<Label, double> UserWeight
+        public double SystemWeight
         {
-            get { return _userWeights; }
-            set { _userWeights = value; }
+            get { return _systemWeight; }
+            set { _systemWeight = value; }
+        }
+
+        public double UserWeight
+        {
+            get { return _userWeight; }
+            set { _userWeight = value; }
         }
 
         #endregion
@@ -57,7 +67,11 @@ namespace LibIML
 
         public override string ToString()
         {
-            return Characters;
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("{0} (label={1}, weight type={2}, user weight={3}, system weight={4})", Characters, Label, this.WeightType, UserWeight, SystemWeight);
+
+            return sb.ToString();
         }
 
         public override bool Equals(object other)
@@ -70,13 +84,18 @@ namespace LibIML
 
         public bool Equals(Feature other)
         {
-            return Characters == other.Characters;
+            if (Label != Label.AnyLabel && other.Label != Label.AnyLabel)
+                return (Characters == other.Characters) && (Label == other.Label);
+            else
+                return (Characters == other.Characters);
         }
 
         public override int GetHashCode()
         {
             int hash = 17;
             hash = hash * 31 + Characters.GetHashCode();
+            //if (Label != Label.AnyLabel)
+            hash += hash * 31 + Label.GetHashCode();
             return hash;
         }
 

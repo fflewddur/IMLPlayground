@@ -535,7 +535,7 @@ namespace LibIML
             foreach (KeyValuePair<int, double> pair in HighIG)
             {
                 string word = _allIdsToWords[pair.Key];
-                Feature feature = new Feature() { Characters = word };
+                Feature feature = new Feature(word, Label.AnyLabel); // FIXME this can probably be done by passing in a list of Features, not strings
                 // Ensure the user didn't remove this feature
                 if (forceExclude == null || !forceExclude.Contains(feature))
                 {

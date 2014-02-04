@@ -11,11 +11,17 @@ namespace LibIML
     {
         private string _userLabel;
         private string _systemLabel;
+        private static readonly Label _anyLabel;
 
         public Label(string userLabel, string systemLabel)
         {
             UserLabel = userLabel;
             SystemLabel = systemLabel;
+        }
+
+        static Label()
+        {
+            _anyLabel = new Label("__anyLabel", "__anyLabel");
         }
 
         #region Properties
@@ -37,7 +43,12 @@ namespace LibIML
             get { return _systemLabel; }
             private set { SetProperty<string>(ref _systemLabel, value); }
         }
-        
+
+        public static Label AnyLabel
+        {
+            get { return _anyLabel; }
+        }
+
         #endregion
 
         #region Override methods

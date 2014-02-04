@@ -32,19 +32,12 @@ namespace MessagePredictor
         int _topic1Predictions;
         int _topic2Predictions;
         int _recentlyChangedPredictions;
-        IEnumerable<Feature> _topic1Features;
-        IEnumerable<Feature> _topic2Features;
         List<string> _textToHighlight;
-        List<Feature> _userAddedFeatures;
-        List<Feature> _userRemovedFeatures;
 
         public MessagePredictorViewModel()
         {
             Console.WriteLine("MessagePredictorViewModel() start");
             Stopwatch timer = new Stopwatch();
-
-            _userAddedFeatures = new List<Feature>();
-            _userRemovedFeatures = new List<Feature>();
 
             timer.Start();
             List<NewsCollection> folders = new List<NewsCollection>();
@@ -123,7 +116,7 @@ namespace MessagePredictor
             set
             {
                 if (SetProperty<NewsCollection>(ref _currentFolder, value))
-                { 
+                {
                     CurrentMessage = CurrentFolder[0]; // Go to the first message in this folder
                     FileToUnknown.RaiseCanExecuteChanged();
                     FileToTopic1.RaiseCanExecuteChanged();
@@ -160,22 +153,11 @@ namespace MessagePredictor
             }
         }
 
-        public IEnumerable<Feature> Topic1Features
-        {
-            get { return _topic1Features; }
-            private set { SetProperty<IEnumerable<Feature>>(ref _topic1Features, value); }
-        }
-
-        public IEnumerable<Feature> Topic2Features
-        {
-            get { return _topic2Features; }
-            private set { SetProperty<IEnumerable<Feature>>(ref _topic2Features, value); }
-        }
-
         public bool AutoUpdatePredictions
         {
             get { return _autoUpdatePredictions; }
-            set {
+            set
+            {
                 if (SetProperty<bool>(ref _autoUpdatePredictions, value))
                     UpdatePredictions.RaiseCanExecuteChanged();
             }
@@ -239,7 +221,8 @@ namespace MessagePredictor
             if (_vocab.HasUpdatedTokens)
             {
                 UpdateInstanceFeatures(false);
-                _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels, _userAddedFeatures, _userRemovedFeatures, _desiredVocabSize);
+                _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels,
+                    _featureSetVM.UserAddedFeatures, _featureSetVM.UserRemovedFeatures, _desiredVocabSize);
                 UpdateInstanceFeatures(true);
                 TextToHighlight = _vocab.GetFeatureWords();
             }
@@ -295,7 +278,7 @@ namespace MessagePredictor
 
         private void PerformFileToTopic2()
         {
-            
+
             FileCurrentMessageToFolder(_topic2Folder);
         }
 
@@ -321,9 +304,13 @@ namespace MessagePredictor
             if (result == true)
             {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
-                Feature f = new Feature() { Characters = vm.Word };
-                _userAddedFeatures.Remove(f); // If the Feature already exists, replace it
-                _userAddedFeatures.Add(f);
+                Feature f = new Feature(vm.Word, label);
+                if (vm.SelectedWeight == vm.Weights[0])
+                    f.WeightType = Feature.Weight.High;
+                else if (vm.SelectedWeight == vm.Weights[1])
+                    f.WeightType = Feature.Weight.Medium;
+
+                _featureSetVM.AddUserFeature(f);
             }
         }
 
@@ -388,7 +375,7 @@ namespace MessagePredictor
                 else
                 {
                     topic2Predictions++;
-                }     
+                }
             }
             _topic1Folder.CorrectPredictions = pRight;
             pRight = 0;
@@ -402,7 +389,7 @@ namespace MessagePredictor
                 else
                 {
                     topic1Predictions++;
-                }     
+                }
             }
             _topic2Folder.CorrectPredictions = pRight;
             foreach (IInstance instance in _unknownFolder)
@@ -423,7 +410,7 @@ namespace MessagePredictor
         {
             NewsItem item = CurrentMessage;
 
-            if (MoveMessageToFolder(item, folder) )
+            if (MoveMessageToFolder(item, folder))
             {
                 // We successfully moved this message
                 if (folder == _unknownFolder)

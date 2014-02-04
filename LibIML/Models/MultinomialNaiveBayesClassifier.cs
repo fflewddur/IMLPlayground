@@ -288,26 +288,6 @@ namespace LibIML
             //UpdateFeaturesPerClass();
         }
 
-        public IEnumerable<Feature> GetFeatures()
-        {
-            List<Feature> features = new List<Feature>();
-
-            foreach (int id in Vocab.FeatureIds)
-            {
-                Feature feature = new Feature();
-                feature.Characters = Vocab.GetWord(id);
-
-                foreach (Label label in Labels)
-                {
-                    feature.SystemWeight[label] = _pWordGivenClass[label][id];
-                }
-
-                features.Add(feature);
-            }
-
-            return features;
-        }
-
         /// <summary>
         /// Initialize training data structures using our collection of potential output labels.
         /// </summary>
