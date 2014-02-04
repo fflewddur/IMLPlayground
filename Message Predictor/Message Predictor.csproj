@@ -97,6 +97,7 @@
     <Compile Include="ViewModel\AddFeatureDialogViewModel.cs" />
     <Compile Include="ViewModel\Base\ViewModelCollectionBase.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
+    <Compile Include="ViewModel\FeatureSetViewModel.cs" />
     <Compile Include="ViewModel\MessagePredictorViewModel.cs" />
     <Compile Include="View\AddFeatureDialog.xaml.cs">
       <DependentUpon>AddFeatureDialog.xaml</DependentUpon>

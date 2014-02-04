@@ -17,7 +17,7 @@ namespace LibIML
         private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
         private Dictionary<Label, HashSet<IInstance>> _trainingSet;
-        private Dictionary<Label, HashSet<Feature>> _featuresPerClass; // This gives us a single property to expose with all of the feature data for each class
+        //private Dictionary<Label, HashSet<Feature>> _featuresPerClass; // This gives us a single property to expose with all of the feature data for each class
 
         // Store these for efficiency
         private Dictionary<Label, double> _pClass;
@@ -27,7 +27,7 @@ namespace LibIML
         {
             _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
-            _featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
+            //_featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
             _trainingSet = new Dictionary<Label, HashSet<IInstance>>();
             _pClass = new Dictionary<Label, double>();
             _pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
@@ -61,10 +61,10 @@ namespace LibIML
             }
         }
 
-        public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
-        {
-            get { return _featuresPerClass; }
-        }
+        //public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
+        //{
+        //    get { return _featuresPerClass; }
+        //}
 
         public Label PositiveLabel
         {
@@ -85,7 +85,7 @@ namespace LibIML
         {
             _perClassFeatureCounts.Clear();
             _perClassFeaturePriors.Clear();
-            _featuresPerClass.Clear();
+            //_featuresPerClass.Clear();
             _pClass.Clear();
             _trainingSet.Clear();
             _pWordGivenClass.Clear();
@@ -270,37 +270,31 @@ namespace LibIML
         {
             ComputePrC();
             ComputePrWGivenC();
-            UpdateFeaturesPerClass();
+            //UpdateFeaturesPerClass();
 
             TestPrC(_pClass);
             TestPrWGivenC(_pWordGivenClass);
         }
 
-        public IEnumerable<Feature> GetFeatures(Label label)
-        {
-            List<Feature> features = new List<Feature>();
+        //public IEnumerable<Feature> GetFeatures()
+        //{
+        //    List<Feature> features = new List<Feature>();
 
-            foreach (int id in Vocab.FeatureIds) {
-                bool thisLabelHighest = true;
-                foreach (Label otherLabel in _labels)
-                {
-                    if (otherLabel == label)
-                        continue;
-                    if (_pWordGivenClass[otherLabel][id] > _pWordGivenClass[label][id])
-                        thisLabelHighest = false;
-                }
+        //    foreach (int id in Vocab.FeatureIds)
+        //    {
+        //        Feature feature = new Feature();
+        //        feature.Characters = Vocab.GetWord(id);
 
-                if (thisLabelHighest)
-                {
-                    Feature feature = new Feature();
-                    feature.Characters = Vocab.GetWord(id);
-                    feature.SystemWeight = _pWordGivenClass[label][id];
-                    features.Add(feature);
-                }
-            }
+        //        foreach (Label label in Labels)
+        //        {
+        //            feature.SystemWeight[label] = _pWordGivenClass[label][id];
+        //        }
 
-            return features;
-        }
+        //        features.Add(feature);
+        //    }
+
+        //    return features;
+        //}
 
         /// <summary>
         /// Initialize training data structures using our collection of potential output labels.
@@ -312,7 +306,7 @@ namespace LibIML
                 _perClassFeatureCounts[l] = new Dictionary<int, int>();
                 _perClassFeaturePriors[l] = new Dictionary<int, double>();
                 _trainingSet[l] = new HashSet<IInstance>();
-                _featuresPerClass[l] = new HashSet<Feature>();
+                //_featuresPerClass[l] = new HashSet<Feature>();
             }
         }
 
@@ -402,6 +396,7 @@ namespace LibIML
         /// <summary>
         /// Create collections of Features for each Label, using our current training set as the source data.
         /// </summary>
+        /*
         private void UpdateFeaturesPerClass()
         {
             _featuresPerClass.Clear();
@@ -429,7 +424,7 @@ namespace LibIML
                 }
             }
         }
-
+        */
         private bool TestPrC(Dictionary<Label, double> PrC)
         {
             double sum = 0;

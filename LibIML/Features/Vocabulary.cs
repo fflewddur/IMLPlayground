@@ -26,9 +26,6 @@ namespace LibIML
         private HashSet<int> _restrictedIds;
         private bool _hasUpdatedTokens;
 
-        public const double MIN_DF_PERCENT = 0.01; // Tokens must appear in at least 1% of documents
-        public const double MAX_DF_PERCENT = 0.90; // Tokens must not appear in more than 90% of documents
-
         public Vocabulary()
         {
             _nextId = 1;
@@ -99,37 +96,6 @@ namespace LibIML
 
         #region Public methods
 
-        /// <summary>
-        /// Create a deep copy of this Vocabulary.
-        /// </summary>
-        /// <returns>A new Vocabulary.</returns>
-        /*
-        public Vocabulary Clone()
-        {
-            Vocabulary v = new Vocabulary();
-            
-            v._nextId = this._nextId;
-            v._restriction = this._restriction;
-            foreach (KeyValuePair<string, int> pair in _allWordsToIds)
-            {
-                v._allWordsToIds[pair.Key] = pair.Value;
-            }
-            foreach (KeyValuePair<int, string> pair in _allIdsToWords)
-            {
-                v._allIdsToWords[pair.Key] = pair.Value;
-            }
-            foreach (KeyValuePair<int, int> pair in _allDocumentFreqs)
-            {
-                v._allDocumentFreqs[pair.Key] = pair.Value;
-            }
-            foreach (int id in _restrictedIds)
-            {
-                v._restrictedIds.Add(id);
-            }
-
-            return v;
-        }
-        */
         /// <summary>
         /// Get the number of documents a word appears in.
         /// </summary>
@@ -299,94 +265,6 @@ namespace LibIML
 
             return retval;
         }
-
-        /// <summary>
-        /// Remove vocabulary elements that do not exist in a given set of Instances.
-        /// </summary>
-        /// <param name="instances">The collection of Instances to restrict our vocabulary to.</param>
-        //public void RestrictToInstances(IEnumerable<IInstance> instances)
-        //{
-        //    HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
-        //    HashSet<int> notInInstances = new HashSet<int>(); // Track the feature IDs to remove
-
-        //    // Build a set of features in instances
-        //    foreach (IInstance instance in instances)
-        //    {
-        //        foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-        //        {
-        //            inInstances.Add(pair.Key);
-        //        }
-        //    }
-
-        //    // Build a set of features to remove
-        //    foreach (int id in _allIdsToWords.Keys)
-        //    {
-        //        if (!inInstances.Contains(id))
-        //            notInInstances.Add(id);
-        //    }
-
-        //    // Remove features
-        //    RemoveElements(notInInstances);
-
-        //    return;
-        //}
-
-        //public Vocabulary GetSubset(IEnumerable<IInstance> instances)
-        //{
-        //    HashSet<int> inInstances = new HashSet<int>(); // Track the feature IDs in instances
-
-        //    // Build a set of features in instances
-        //    foreach (IInstance instance in instances)
-        //    {
-        //        foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-        //        {
-        //            inInstances.Add(pair.Key);
-        //        }
-        //    }
-
-        //    return GetSubset(inInstances, instances.Count());
-        //}
-
-        /// <summary>
-        /// Build a new Vocabulary that is restricted to the given collection of IDs.
-        /// </summary>
-        /// <param name="ids">The collection of IDs to restrict the new vocabulary to.</param>
-        /// <returns>The new vocabulary object.</returns>
-        //public Vocabulary GetSubset(IEnumerable<int> ids, int nDocs)
-        //{
-        //    Vocabulary v = new Vocabulary();
-        //    Dictionary<string, int> tokens = new Dictionary<string, int>();
-
-        //    foreach (int id in ids)
-        //    {
-        //        tokens.Add(_allIdsToWords[id], _allDocumentFreqs[id]);
-        //    }
-
-        //    v.AddTokens(tokens, nDocs, 0, 1.0);
-
-        //    return v;
-        //}
-
-        /// <summary>
-        /// Remove vocabulary elements that don't exist in a given collection of IDs.
-        /// </summary>
-        /// <param name="ids">The collection of IDs to restrict our vocabulary to.</param>
-        //public void RestrictToSubset(IEnumerable<int> ids)
-        //{
-        //    HashSet<int> toRemove = new HashSet<int>();
-
-        //    // Build a set of features to remove
-        //    foreach (int id in _allIdsToWords.Keys)
-        //    {
-        //        if (!ids.Contains(id))
-        //        {
-        //            toRemove.Add(id);
-        //        }
-        //    }
-
-        //    // Remove features
-        //    RemoveElements(toRemove);
-        //}
 
         public override string ToString()
         {

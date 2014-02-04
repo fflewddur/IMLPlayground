@@ -11,16 +11,16 @@ namespace LibIML
         string Name { get; }
         IEnumerable<Label> Labels { get; }
         Vocabulary Vocab { get; set; }
-        IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
-        Label PositiveLabel { get; }
-        Label NegativeLabel { get; }
+        //IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
+        //Label PositiveLabel { get; }
+        //Label NegativeLabel { get; }
 
         void AddInstance(IInstance instance);
         void AddInstances(IEnumerable<IInstance> instances);
         Prediction PredictInstance(IInstance instance);
-        void UpdatePrior(Label label, int feature, double prior);
+        //void UpdatePrior(Label label, int feature, double prior);
         void Train(); // Train the classifier on all added training instances
-        IEnumerable<Feature> GetFeatures(Label label);
+        //IEnumerable<Feature> GetFeatures();
         void ClearInstances(); // Remove all existing training instances
 
         Task<bool> SaveArffFile(string filePath);

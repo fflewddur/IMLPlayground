@@ -7,20 +7,23 @@ using System.Threading.Tasks;
 namespace LibIML
 {
     [Serializable]
-    public class Feature : IEquatable<Feature>
+    public class Feature : ViewModelBase, IEquatable<Feature>
     {
         public enum Weight
         {
             None,
+            Custom,
             Medium,
             High
         };
 
         private string _characters;
-        private int _countTraining;
-        private int _countTesting;
-        private double _systemWeight;
-        private double _userWeight;
+        private Dictionary<Label, Weight> _weights;
+        private Dictionary<Label, double> _systemWeights;
+        private Dictionary<Label, double> _userWeights;
+
+        public Feature() : base()
+        { }
 
         #region Properties
 
@@ -30,28 +33,22 @@ namespace LibIML
             set { _characters = value; }
         }
 
-        public int CountTraining
+        public Dictionary<Label, Weight> Weights
         {
-            get { return _countTraining; }
-            set { _countTraining = value; }
+            get { return _weights; }
+            set { _weights = value; }
         }
 
-        public int CountTesting
+        public Dictionary<Label, double> SystemWeight
         {
-            get { return _countTesting; }
-            set { _countTesting = value; }
+            get { return _systemWeights; }
+            set { _systemWeights = value; }
         }
 
-        public double SystemWeight
+        public Dictionary<Label, double> UserWeight
         {
-            get { return _systemWeight; }
-            set { _systemWeight = value; }
-        }
-
-        public double UserWeight
-        {
-            get { return _userWeight; }
-            set { _userWeight = value; }
+            get { return _userWeights; }
+            set { _userWeights = value; }
         }
 
         #endregion

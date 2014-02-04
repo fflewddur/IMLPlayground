@@ -343,8 +343,9 @@ namespace MessagePredictor
 
         private void UpdateImportantWords(IClassifier classifier, Label topic1, Label topic2)
         {
-            Topic1Features = classifier.GetFeatures(topic1);
-            Topic2Features = classifier.GetFeatures(topic2);
+            // FIXME 
+            //Topic1Features = classifier.GetFeatures(topic1);
+            //Topic2Features = classifier.GetFeatures(topic2);
         }
 
         private void PredictMessages(IClassifier classifier, IEnumerable<IEnumerable<IInstance>> folders)

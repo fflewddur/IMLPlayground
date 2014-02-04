@@ -61,10 +61,10 @@ namespace LibIML
             }
         }
 
-        public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
-        {
-            get { return _featuresPerClass; }
-        }
+        //public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
+        //{
+        //    get { return _featuresPerClass; }
+        //}
 
         public Label PositiveLabel
         {
@@ -271,10 +271,10 @@ namespace LibIML
         {
             ComputePrC();
             ComputePrWGivenC();
-            UpdateFeaturesPerClass();
+            //UpdateFeaturesPerClass();
         }
 
-        public IEnumerable<Feature> GetFeatures(Label label)
+        public IEnumerable<Feature> GetFeatures()
         {
             List<Feature> features = new List<Feature>();
 
@@ -282,7 +282,12 @@ namespace LibIML
             {
                 Feature feature = new Feature();
                 feature.Characters = Vocab.GetWord(id);
-                feature.SystemWeight = _pWordGivenClass[label][id];
+
+                foreach (Label label in Labels)
+                {
+                    feature.SystemWeight[label] = _pWordGivenClass[label][id];
+                }
+
                 features.Add(feature);
             }
 
@@ -383,6 +388,8 @@ namespace LibIML
         /// <summary>
         /// Create collections of Features for each Label, using our current training set as the source data.
         /// </summary>
+        /// 
+        /*
         private void UpdateFeaturesPerClass()
         {
             _featuresPerClass.Clear();
@@ -410,5 +417,6 @@ namespace LibIML
                 }
             }
         }
+         */
     }
 }
