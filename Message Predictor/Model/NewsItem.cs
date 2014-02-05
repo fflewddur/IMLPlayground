@@ -196,7 +196,8 @@ namespace MessagePredictor.Model
         public bool TokenizeForString(string token)
         {
             int count = new Regex(Regex.Escape(token)).Matches(AllText).Count;
-            TokenCounts[token] = count;
+            if (count > 0)
+                TokenCounts[token] = count;
 
             return (count > 0);
         }

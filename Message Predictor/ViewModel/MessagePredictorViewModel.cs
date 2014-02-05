@@ -473,7 +473,6 @@ namespace MessagePredictor
 
         private void featureSetVM_FeatureAdded(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
         {
-
             Console.WriteLine("added feature {0}", e.Tokens);
             // Ensure the vocabulary includes the token for this feature
             if (_vocab.AddToken(e.Tokens, -1)) // Use -1 for doc frequency for now, we'll fix it below
@@ -494,6 +493,7 @@ namespace MessagePredictor
             }
 
             UpdateVocab();
+            _classifier.UpdateCountsForNewFeature(_vocab.GetWordId(e.Tokens, true));
             if (AutoUpdatePredictions)
             {
                 PerformUpdatePredictions();

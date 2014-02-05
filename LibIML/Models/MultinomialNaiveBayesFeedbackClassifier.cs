@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -117,6 +118,35 @@ namespace LibIML
             }
 
             return (mostImportantLabel == label);
+        }
+        
+        /// <summary>
+        /// When the user adds a new feature, we need to update our document frequency counts for our training set
+        /// so that the classifier can estimate the probabilities of this feature per class.
+        /// </summary>
+        /// <param name="id">The ID of the newly added feature.</param>
+        public void UpdateCountsForNewFeature(int id)
+        {
+            Debug.Assert(id > 0, "The ID of a feature cannot be < 1");
+
+            // Update our feature counts for each item in our training set
+            foreach (Label label in _labels)
+            {
+                foreach (IInstance instance in _trainingSet[label])
+                {
+                    double count;
+                    if (instance.Features.Data.TryGetValue(id, out count))
+                    {
+                        int df;
+                        _perClassFeatureCounts[instance.Label].TryGetValue(id, out df);
+                        df += (int)count;
+                        _perClassFeatureCounts[instance.Label][id] = df;
+                    }
+                }
+                int totalDf;
+                _perClassFeatureCounts[label].TryGetValue(id, out totalDf);
+                Console.WriteLine("Total DF of {0} for {1}: {2}", _vocab.GetWord(id), label, totalDf);
+            }
         }
 
         /// <summary>
@@ -423,7 +453,7 @@ namespace LibIML
                 //        prior = _defaultPrior; // Use a default value if the user didn't provide one.
                 //    sumPriors += prior;
                 //}
-
+                Console.Write("PrWGivenC for {0}: ", l);
                 foreach (int id in Vocab.FeatureIds)
                 {
                     int countFeature;
@@ -432,8 +462,10 @@ namespace LibIML
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
                     _pWordGivenClass[l][id] = (prior + countFeature) / (Vocab.Count + (double)sumFeatures); // Removed + sumPriors // OLD VERSION
+                    Console.Write("{0}={1:N4} ", Vocab.GetWord(id), _pWordGivenClass[l][id]);
                     //_pWordGivenClass[l][id] = (1 + countFeature) / (double)sumFeatures;
                 }
+                Console.WriteLine();
             }
         }
 

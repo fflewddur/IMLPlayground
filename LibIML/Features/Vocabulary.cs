@@ -451,9 +451,10 @@ namespace LibIML
             {
                 foreach (int featureId in _allIdsToWords.Keys)
                 {
-                    int count;
-                    featureCountsPerClass[label].TryGetValue(featureId, out count);
-                    PrCGivenT[label][featureId] = (double)(count + 1) / (double)(featureCounts[featureId] + labels.Count()); // Add a smoothing term
+                    int countPerClass, countTotal;
+                    featureCountsPerClass[label].TryGetValue(featureId, out countPerClass);
+                    featureCounts.TryGetValue(featureId, out countTotal);
+                    PrCGivenT[label][featureId] = (double)(countPerClass + 1) / (double)(countTotal + labels.Count()); // Add a smoothing term
                 }
             }
 
