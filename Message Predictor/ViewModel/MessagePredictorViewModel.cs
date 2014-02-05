@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LibIML;
+using MessagePredictor.Model;
 using MessagePredictor.View;
 using MessagePredictor.ViewModel;
 using System;

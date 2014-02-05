@@ -18,7 +18,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Xceed.Wpf.Toolkit;
 
-namespace MessagePredictor
+namespace MessagePredictor.View
 {
     /// <summary>
     /// Interaction logic for ImportantWordsOverview.xaml

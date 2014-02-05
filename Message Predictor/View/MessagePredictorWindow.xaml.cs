@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using LibIML;
 
-namespace MessagePredictor
+namespace MessagePredictor.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

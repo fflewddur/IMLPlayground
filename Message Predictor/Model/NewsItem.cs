@@ -9,7 +9,7 @@ using System.Windows.Documents;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 
-namespace MessagePredictor
+namespace MessagePredictor.Model
 {
     class NewsItem : ViewModelBase, IInstance
     {

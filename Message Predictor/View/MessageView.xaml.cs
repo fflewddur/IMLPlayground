@@ -16,7 +16,7 @@ using System.Windows.Shapes;
 using System.Xml.Linq;
 using Xceed.Wpf.Toolkit;
 
-namespace MessagePredictor
+namespace MessagePredictor.View
 {
     /// <summary>
     /// Interaction logic for MessageView.xaml

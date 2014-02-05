@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MessagePredictor
+namespace MessagePredictor.Model
 {
     class NewsCollection : ViewModelCollectionBase<NewsItem>
     {
