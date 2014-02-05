@@ -75,6 +75,28 @@ namespace MessagePredictor.ViewModel
 
         #endregion
 
+        #region Events
+
+        public class FeatureAddedEventArgs : EventArgs
+        {
+            public readonly string Tokens;
+
+            public FeatureAddedEventArgs(string tokens)
+            {
+                Tokens = tokens;
+            }
+        }
+
+        public event EventHandler<FeatureAddedEventArgs> FeatureAdded;
+
+        protected virtual void OnFeatureAdded(FeatureAddedEventArgs e)
+        {
+            if (FeatureAdded != null)
+                FeatureAdded(this, e);
+        }
+
+        #endregion
+
         #region Public methods
 
         public void AddUserFeature(Feature feature)
@@ -84,8 +106,8 @@ namespace MessagePredictor.ViewModel
             // If the user already added this feature, overwrite the previous version
             _userAdded.Remove(feature);
             _userAdded.Add(feature);
-            // Ensure the vocabulary includes to token for this feature
-            _vocab.AddToken(feature.Characters, 1); // FIXME get the right document frequency
+
+            OnFeatureAdded(new FeatureAddedEventArgs(feature.Characters));
         }
 
         public void RemoveUserFeature(Feature feature)
@@ -146,7 +168,7 @@ namespace MessagePredictor.ViewModel
             if (result == true)
             {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
-                Feature f = new Feature(vm.Word, label);
+                Feature f = new Feature(vm.Word.ToLower(), label);
                 if (vm.SelectedWeight == vm.Weights[0])
                     f.WeightType = Feature.Weight.High;
                 else if (vm.SelectedWeight == vm.Weights[1])

@@ -70,7 +70,8 @@ namespace MessagePredictor
             Parallel.ForEach(_unknownFolder, (instance, state, index) =>
             {
                 PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
-                Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(_vocab, true);
             });
@@ -81,6 +82,7 @@ namespace MessagePredictor
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
 
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
+            _featureSetVM.FeatureAdded += featureSetVM_FeatureAdded;
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
@@ -455,6 +457,34 @@ namespace MessagePredictor
                 foreach (IInstance instance in folder)
                 {
                     instance.ComputeFeatureVector(_vocab, isRestricted);
+                }
+            }
+        }
+
+        private void featureSetVM_FeatureAdded(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
+        {
+
+            Console.WriteLine("added feature {0}", e.Tokens);
+            // Ensure the vocabulary includes the token for this feature
+            if (_vocab.AddToken(e.Tokens, -1)) // Use -1 for doc frequency for now, we'll fix it below
+            {
+                // If we created a new vocab element, include it in our documents' tokenizations
+                //int id = _vocab.GetWordId(e.Tokens, false);
+                int df = 0;
+                foreach (IEnumerable<IInstance> folder in _folders)
+                {
+                    foreach (IInstance instance in folder)
+                    {
+                        if (instance.TokenizeForString(e.Tokens))
+                            df++;
+                    }
+                }
+                // Update our vocab with the correct document frequency
+                _vocab.AddToken(e.Tokens, df);
+
+                if (AutoUpdatePredictions)
+                {
+                    PerformUpdatePredictions();
                 }
             }
         }
