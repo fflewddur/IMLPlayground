@@ -83,6 +83,7 @@ namespace MessagePredictor
 
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
             _featureSetVM.FeatureAdded += featureSetVM_FeatureAdded;
+            _featureSetVM.FeatureRemoved += featureSetVM_FeatureRemoved;
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
@@ -224,11 +225,7 @@ namespace MessagePredictor
             Console.WriteLine("Update predictions");
             if (_vocab.HasUpdatedTokens)
             {
-                UpdateInstanceFeatures(false);
-                _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels,
-                    _featureSetVM.UserAddedFeatures, _featureSetVM.UserRemovedFeatures, _desiredVocabSize);
-                UpdateInstanceFeatures(true);
-                TextToHighlight = _vocab.GetFeatureWords();
+                UpdateVocab();
             }
 
             TrainClassifier(_classifier, _topic1Folder, _topic2Folder);
@@ -288,13 +285,25 @@ namespace MessagePredictor
 
         #endregion
 
+        /// <summary>
+        /// Update the vocabulary in response to the user adding or removing tokens, or adjusting the training set
+        /// </summary>
+        private void UpdateVocab()
+        {
+            UpdateInstanceFeatures(false);
+            _vocab.RestrictVocab(_topic1Folder.Concat(_topic2Folder), _labels,
+                _featureSetVM.UserAddedFeatures, _featureSetVM.UserRemovedFeatures, _desiredVocabSize);
+            UpdateInstanceFeatures(true);
+            TextToHighlight = _vocab.GetFeatureWords();
+        }
+
         private void TrainClassifier(IClassifier classifier, IEnumerable<IInstance> topic1, IEnumerable<IInstance> topic2)
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
-            _classifier.ClearInstances();
-            _classifier.AddInstances(topic1.Concat(topic2));
+            classifier.ClearInstances();
+            classifier.AddInstances(topic1.Concat(topic2));
 
             timer.Stop();
             Console.WriteLine("Time to train classifier: {0}", timer.Elapsed);
@@ -482,10 +491,20 @@ namespace MessagePredictor
                 // Update our vocab with the correct document frequency
                 _vocab.AddToken(e.Tokens, df);
 
+                UpdateVocab();
                 if (AutoUpdatePredictions)
                 {
                     PerformUpdatePredictions();
                 }
+            }
+        }
+
+        private void featureSetVM_FeatureRemoved(object sender, EventArgs e)
+        {
+            UpdateVocab();
+            if (AutoUpdatePredictions)
+            {
+                PerformUpdatePredictions();
             }
         }
 

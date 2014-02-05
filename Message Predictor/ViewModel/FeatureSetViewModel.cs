@@ -33,6 +33,9 @@ namespace MessagePredictor.ViewModel
             _collectionViewSources = BuildCollectionViewSources(labels);
 
             AddFeature = new RelayCommand<Label>(PerformAddFeature);
+            FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature);
+            FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
+            FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
 
             _classifier.Retrained += classifier_Retrained;
             _vocab.Updated += vocab_Updated;
@@ -72,6 +75,9 @@ namespace MessagePredictor.ViewModel
         #region Commands
 
         public RelayCommand<Label> AddFeature { get; private set; }
+        public RelayCommand<Feature> FeatureRemove { get; private set; }
+        public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
+        public RelayCommand<Feature> FeatureSomewhatImportant { get; private set; }
 
         #endregion
 
@@ -88,11 +94,18 @@ namespace MessagePredictor.ViewModel
         }
 
         public event EventHandler<FeatureAddedEventArgs> FeatureAdded;
+        public event EventHandler<EventArgs> FeatureRemoved;
 
         protected virtual void OnFeatureAdded(FeatureAddedEventArgs e)
         {
             if (FeatureAdded != null)
                 FeatureAdded(this, e);
+        }
+
+        protected virtual void OnFeatureRemoved(EventArgs e)
+        {
+            if (FeatureRemoved != null)
+                FeatureRemoved(this, e);
         }
 
         #endregion
@@ -107,6 +120,9 @@ namespace MessagePredictor.ViewModel
             _userAdded.Remove(feature);
             _userAdded.Add(feature);
 
+            // Update the UI right away, even if we don't retrain
+            FeatureSet.Add(feature);
+
             OnFeatureAdded(new FeatureAddedEventArgs(feature.Characters));
         }
 
@@ -117,6 +133,11 @@ namespace MessagePredictor.ViewModel
             // Ensure we don't add this feature to the list multiple times
             if (!_userRemoved.Contains(feature))
                 _userRemoved.Add(feature);
+
+            // Update the UI right away, even if we don't retrain
+            FeatureSet.Remove(feature);
+
+            OnFeatureRemoved(new EventArgs());
         }
 
         #endregion
@@ -194,7 +215,17 @@ namespace MessagePredictor.ViewModel
 
         private void PerformRemoveFeature(Feature feature)
         {
-            Console.WriteLine("PerformRemoveFeature() on {0}", feature);
+            RemoveUserFeature(feature);
+        }
+
+        private void PerformFeatureVeryImportant(Feature feature)
+        {
+            Console.WriteLine("PerformFeatureVeryImportant on {0}", feature);
+        }
+
+        private void PerformFeatureSomewhatImportant(Feature feature)
+        {
+            Console.WriteLine("PerformFeatureSomewhatImportant on {0}", feature);
         }
 
         private IReadOnlyList<CollectionViewSource> BuildCollectionViewSources(IReadOnlyList<Label> labels)

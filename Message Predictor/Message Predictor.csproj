@@ -94,6 +94,7 @@
     </ApplicationDefinition>
     <Compile Include="Model\NewsCollection.cs" />
     <Compile Include="Model\NewsItem.cs" />
+    <Compile Include="Utilities.cs" />
     <Compile Include="ViewModel\AddFeatureDialogViewModel.cs" />
     <Compile Include="ViewModel\Base\ViewModelCollectionBase.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />

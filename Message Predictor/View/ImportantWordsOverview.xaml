@@ -24,11 +24,58 @@
         <Label Grid.Row="1" Grid.Column="0" Content="{Binding Labels[1]}" Style="{StaticResource headerStyle2}" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
 
         <!-- List of words -->
-        <ItemsControl Name="Topic1Features" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSources[0].View}" VerticalAlignment="Center" 
-                      ItemsPanel="{StaticResource ResourceKey=importantWordsOverviewPanel}" ItemTemplate="{StaticResource ResourceKey=importantWordsOverviewItem}" />
+        <ItemsControl Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSources[0].View}" VerticalAlignment="Center" 
+                      ItemsPanel="{StaticResource ResourceKey=importantWordsOverviewPanel}"  >
+            <!-- ItemTemplate="{StaticResource ResourceKey=importantWordsOverviewItem}" -->
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <xctk:DropDownButton Margin="5">
+                        <xctk:DropDownButton.DropDownContent>
+                            <StackPanel Orientation="Vertical">
+                                    <Menu>
+                                        <MenuItem Header="Very important" Click="FeatureVeryImportant_Click"/>
+                                        <MenuItem Header="Somewhat important" Click="FeatureSomewhatImportant_Click"/>
+                                        <Separator />
+                                        <MenuItem Header="Remove" Click="FeatureRemove_Click" />
+                                        <Menu.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Vertical"/>
+                                            </ItemsPanelTemplate>
+                                        </Menu.ItemsPanel>
+                                    </Menu>
+                            </StackPanel>
+                        </xctk:DropDownButton.DropDownContent>
+                        <TextBlock Text="{Binding Characters}" />
+                    </xctk:DropDownButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
         <!--  -->
-        <ItemsControl Name="Topic2Features" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSources[1].View}" VerticalAlignment="Center" 
-                      ItemsPanel="{StaticResource ResourceKey=importantWordsOverviewPanel}" ItemTemplate="{StaticResource ResourceKey=importantWordsOverviewItem}" />
+        <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSources[1].View}" VerticalAlignment="Center" 
+                      ItemsPanel="{StaticResource ResourceKey=importantWordsOverviewPanel}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <xctk:DropDownButton Margin="5">
+                        <xctk:DropDownButton.DropDownContent>
+                            <StackPanel Orientation="Vertical">
+                                <Menu>
+                                    <MenuItem Header="Very important" Click="FeatureVeryImportant_Click"/>
+                                    <MenuItem Header="Somewhat important" Click="FeatureSomewhatImportant_Click"/>
+                                    <Separator />
+                                    <MenuItem Header="Remove" Click="FeatureRemove_Click" />
+                                    <Menu.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Vertical"/>
+                                        </ItemsPanelTemplate>
+                                    </Menu.ItemsPanel>
+                                </Menu>
+                            </StackPanel>
+                        </xctk:DropDownButton.DropDownContent>
+                        <TextBlock Text="{Binding Characters}" />
+                    </xctk:DropDownButton>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
 
         <!-- Add word buttons -->
         <Button Grid.Row="0" Grid.Column="2" Content="{Binding Labels[0]}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeature}" CommandParameter="{Binding Labels[0]}" Style="{StaticResource buttonStyle}"/>
