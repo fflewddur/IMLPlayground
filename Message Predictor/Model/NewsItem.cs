@@ -209,8 +209,9 @@ namespace MessagePredictor
         /// <param name="vocab"></param>
         private void UpdateDocument(Vocabulary vocab)
         {
-            List<string> featureWords = vocab.GetFeatureWords();
-            string featurePattern = @"\b(" + string.Join("|", featureWords) + ")";
+            // Use the largest first, so that sub-features don't get broken up (e.g., if "team" and "teams" are features, don't split "teams" into "team" and "s")
+            List<string> featureWords = vocab.GetFeatureWords().OrderByDescending(s => s.Length).ToList(); 
+            string featurePattern = @"\b(" + string.Join("|", featureWords) + @")\b";
             Regex featureRegex = new Regex(featurePattern, RegexOptions.IgnoreCase);
             string replaced = featureRegex.Replace(AllText, "<feature>$1<feature>");
             string[] lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
