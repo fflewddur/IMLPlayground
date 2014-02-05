@@ -29,6 +29,9 @@ namespace LibIML
             _characters = characters;
             _label = label;
             _mostImportantLabel = false;
+            _weightType = Weight.None;
+            _userWeight = 0;
+            _systemWeight = 0;
         }
 
         #region Properties

@@ -141,17 +141,30 @@ namespace MessagePredictor.ViewModel
             FeatureSet.Clear();
             foreach (int id in _vocab.FeatureIds)
             {
-                foreach (Label label in _labels)
+
+                string word = _vocab.GetWord(id);
+                Feature userFeature = _userAdded.Find(p => p.Characters == word);
+                // First, see if the user added this feature manually; if so, keep associating it with the label the user requested
+                if (userFeature != null)
                 {
-                    try
+                    FeatureSet.Add(userFeature);
+                }
+                else
+                {
+                    // Otherwise, figure out which label this feature is more important for
+                    foreach (Label label in _labels)
                     {
-                        Feature f = new Feature(_vocab.GetWord(id), label);
-                        f.SystemWeight = _classifier.GetFeatureWeight(id, label);
-                        f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
-                        FeatureSet.Add(f);
-                    } catch (KeyNotFoundException e)
-                    {
-                        Console.Error.WriteLine("Warning: {0}", e.Message);
+                        try
+                        {
+                            Feature f = new Feature(word, label);
+                            f.SystemWeight = _classifier.GetFeatureWeight(id, label);
+                            f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
+                            FeatureSet.Add(f);
+                        }
+                        catch (KeyNotFoundException e)
+                        {
+                            Console.Error.WriteLine("Warning: {0}", e.Message);
+                        }
                     }
                 }
 
@@ -173,12 +186,11 @@ namespace MessagePredictor.ViewModel
                     f.WeightType = Feature.Weight.High;
                 else if (vm.SelectedWeight == vm.Weights[1])
                     f.WeightType = Feature.Weight.Medium;
+                f.MostImportant = true; // If the user added this to a given label, then it's always most important to that label.
 
                 AddUserFeature(f);
             }
         }
-
-
 
         private void PerformRemoveFeature(Feature feature)
         {
