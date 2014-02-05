@@ -264,13 +264,38 @@ namespace LibIML
             }
         }
 
+        /// <summary>
+        /// Add a new token to the vocabulary, along with its document frequency.
+        /// </summary>
+        /// <param name="token">New token to add</param>
+        /// <param name="df"></param>
+        public void AddToken(string token, int df)
+        {
+            int oldNextId = _nextId;
+
+            int id;
+            if (!_allWordsToIds.TryGetValue(token, out id)) // Ensure this token doesn't already exist
+            {
+                _allWordsToIds[token] = _nextId;
+                _allIdsToWords[_nextId] = token;
+                _allDocumentFreqs[_nextId] = df;
+                _nextId++;
+            }
+
+            if (oldNextId != _nextId)
+            {
+                // We've updated our tokens
+                HasUpdatedTokens = true;
+            }
+        }
+
         public bool RestrictVocab(IEnumerable<IInstance> instances, IEnumerable<Label> labels, IEnumerable<Feature> forceInclude, IEnumerable<Feature> forceExclude, int size)
         {
             bool retval = false;
 
             if (_restriction == Restriction.HighIG)
             {
-                RestrictToHighIG(instances, labels, size);
+                RestrictToHighIG(instances, labels, size, forceInclude, forceExclude);
                 retval = true;
                 HasUpdatedTokens = false;
             }
@@ -480,7 +505,7 @@ namespace LibIML
             return PrCGivenNotT;
         }
 
-        private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize, 
+        private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize,
             IEnumerable<Feature> forceInclude = null, IEnumerable<Feature> forceExclude = null)
         {
             Dictionary<Label, double> PrC; // Probability of each class
@@ -535,13 +560,29 @@ namespace LibIML
             foreach (KeyValuePair<int, double> pair in HighIG)
             {
                 string word = _allIdsToWords[pair.Key];
-                Feature feature = new Feature(word, Label.AnyLabel); // FIXME this can probably be done by passing in a list of Features, not strings
+                Feature feature = new Feature(word, Label.AnyLabel);
                 // Ensure the user didn't remove this feature
                 if (forceExclude == null || !forceExclude.Contains(feature))
                 {
                     AddElementToRestricted(pair.Key);
                 }
             }
+            // Now add features the user requested
+            if (forceInclude != null)
+            {
+                foreach (Feature f in forceInclude)
+                {
+                    int id;
+                    if (_allWordsToIds.TryGetValue(f.Characters, out id))
+                    {
+                        AddElementToRestricted(id);
+                    }
+                    else
+                        Console.Error.WriteLine("Error: could not find '{0}' in vocabulary", f.Characters);
+                }
+            }
+
+            // Fire the Updated event
             this.OnUpdated(new EventArgs());
         }
 

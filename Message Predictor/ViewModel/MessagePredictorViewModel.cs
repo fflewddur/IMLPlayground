@@ -80,15 +80,13 @@ namespace MessagePredictor
             // Build a classifier
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
 
-            _featureSetVM = new FeatureSetViewModel(_classifier, _vocab);
+            _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
             FileToUnknown = new RelayCommand(PerformFileToUnknown, CanPerformFileToUnknown);
             FileToTopic1 = new RelayCommand(PerformFileToTopic1, CanPerformFileToTopic1);
             FileToTopic2 = new RelayCommand(PerformFileToTopic2, CanPerformFileToTopic2);
-            AddFeatureTopic1 = new RelayCommand(PerformAddFeatureTopic1);
-            AddFeatureTopic2 = new RelayCommand(PerformAddFeatureTopic2);
 
             // Start with our current folder pointing at the collection of unlabeled items.
             Folders = folders;
@@ -130,7 +128,7 @@ namespace MessagePredictor
             get { return _currentMessage; }
             set { SetProperty<NewsItem>(ref _currentMessage, value); }
         }
-
+        
         public string Topic1UserLabel
         {
             get
@@ -152,7 +150,7 @@ namespace MessagePredictor
                     return "[None]";
             }
         }
-
+        
         public bool AutoUpdatePredictions
         {
             get { return _autoUpdatePredictions; }
@@ -193,6 +191,12 @@ namespace MessagePredictor
             private set { SetProperty<List<string>>(ref _textToHighlight, value); }
         }
 
+        public FeatureSetViewModel FeatureSetVM
+        {
+            get { return _featureSetVM; }
+            private set { SetProperty<FeatureSetViewModel>(ref _featureSetVM, value); }
+        }
+
         #endregion
 
         #region Commands
@@ -201,8 +205,6 @@ namespace MessagePredictor
         public RelayCommand FileToUnknown { get; private set; }
         public RelayCommand FileToTopic1 { get; private set; }
         public RelayCommand FileToTopic2 { get; private set; }
-        public RelayCommand AddFeatureTopic1 { get; private set; }
-        public RelayCommand AddFeatureTopic2 { get; private set; }
 
         private bool CanPerformUpdatePredictions()
         {
@@ -282,42 +284,7 @@ namespace MessagePredictor
             FileCurrentMessageToFolder(_topic2Folder);
         }
 
-        private void PerformAddFeatureTopic1()
-        {
-            AddFeature(_topic1Folder.Label);
-        }
-
-        private void PerformAddFeatureTopic2()
-        {
-            AddFeature(_topic2Folder.Label);
-        }
-
         #endregion
-
-        private void AddFeature(Label label)
-        {
-            AddFeatureDialog dialog = new AddFeatureDialog();
-            dialog.Owner = App.Current.MainWindow;
-            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(label);
-            dialog.DataContext = vm;
-            bool? result = dialog.ShowDialog();
-            if (result == true)
-            {
-                Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
-                Feature f = new Feature(vm.Word, label);
-                if (vm.SelectedWeight == vm.Weights[0])
-                    f.WeightType = Feature.Weight.High;
-                else if (vm.SelectedWeight == vm.Weights[1])
-                    f.WeightType = Feature.Weight.Medium;
-
-                _featureSetVM.AddUserFeature(f);
-            }
-        }
-
-        private void RemoveFeature()
-        {
-
-        }
 
         private void TrainClassifier(IClassifier classifier, IEnumerable<IInstance> topic1, IEnumerable<IInstance> topic2)
         {

@@ -24,6 +24,8 @@ namespace LibIML
         void Train(); // Train the classifier on all added training instances
         //IEnumerable<Feature> GetFeatures();
         void ClearInstances(); // Remove all existing training instances
+        double GetFeatureWeight(int id, Label label);
+        bool IsFeatureMostImportantForLabel(int id, Label label);
 
         Task<bool> SaveArffFile(string filePath);
     }

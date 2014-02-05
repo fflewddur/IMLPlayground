@@ -1,5 +1,8 @@
-﻿using System;
+﻿using LibIML;
+using MessagePredictor.ViewModel;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +26,6 @@ namespace MessagePredictor
         public ImportantWordsOverview()
         {
             InitializeComponent();
-        }
+        }   
     }
 }

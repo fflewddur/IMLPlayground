@@ -92,6 +92,33 @@ namespace LibIML
 
         # region Public methods
 
+        public double GetFeatureWeight(int id, Label label)
+        {
+            double weight;
+            _pWordGivenClass[label].TryGetValue(id, out weight);
+
+            return weight;
+        }
+        
+        public bool IsFeatureMostImportantForLabel(int id, Label label)
+        {
+            Label mostImportantLabel = null;
+            double mostImportantWeight = 0;
+
+            foreach (Label l in _labels)
+            {
+                double weight;
+                _pWordGivenClass[l].TryGetValue(id, out weight);
+                if (weight > mostImportantWeight)
+                {
+                    mostImportantWeight = weight;
+                    mostImportantLabel = l;
+                }
+            }
+
+            return (mostImportantLabel == label);
+        }
+
         /// <summary>
         /// Remove all training information.
         /// </summary>

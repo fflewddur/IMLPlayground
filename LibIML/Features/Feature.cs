@@ -22,11 +22,13 @@ namespace LibIML
         private Weight _weightType;
         private double _systemWeight;
         private double _userWeight;
+        private bool _mostImportantLabel;
 
         public Feature(string characters, Label label) : base()
         {
             _characters = characters;
             _label = label;
+            _mostImportantLabel = false;
         }
 
         #region Properties
@@ -59,6 +61,12 @@ namespace LibIML
         {
             get { return _userWeight; }
             set { _userWeight = value; }
+        }
+
+        public bool MostImportant
+        {
+            get { return _mostImportantLabel; }
+            set { _mostImportantLabel = value; }
         }
 
         #endregion
