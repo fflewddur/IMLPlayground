@@ -269,7 +269,8 @@ namespace LibIML
         /// </summary>
         /// <param name="token">New token to add</param>
         /// <param name="df"></param>
-        public void AddToken(string token, int df)
+        /// <returns>True if the token was added to the vocabulary, false otherwise.</returns>
+        public bool AddToken(string token, int df)
         {
             int oldNextId = _nextId;
 
@@ -281,12 +282,20 @@ namespace LibIML
                 _allDocumentFreqs[_nextId] = df;
                 _nextId++;
             }
+            else
+            {
+                _allDocumentFreqs[id] = df;
+            }
 
+            bool retval = false;
             if (oldNextId != _nextId)
             {
                 // We've updated our tokens
                 HasUpdatedTokens = true;
+                retval = true;
             }
+
+            return retval;
         }
 
         public bool RestrictVocab(IEnumerable<IInstance> instances, IEnumerable<Label> labels, IEnumerable<Feature> forceInclude, IEnumerable<Feature> forceExclude, int size)
@@ -603,7 +612,8 @@ namespace LibIML
             Parallel.ForEach(instances, (instance, state, index) =>
                 {
                     PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
-                    Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                    //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                    Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                     instance.TokenCounts = tokens;
                     foreach (KeyValuePair<string, int> pair in tokens)
                     {
