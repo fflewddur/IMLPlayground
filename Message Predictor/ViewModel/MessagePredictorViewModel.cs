@@ -490,12 +490,12 @@ namespace MessagePredictor
                 }
                 // Update our vocab with the correct document frequency
                 _vocab.AddToken(e.Tokens, df);
+            }
 
-                UpdateVocab();
-                if (AutoUpdatePredictions)
-                {
-                    PerformUpdatePredictions();
-                }
+            UpdateVocab();
+            if (AutoUpdatePredictions)
+            {
+                PerformUpdatePredictions();
             }
         }
 

@@ -357,7 +357,8 @@ namespace LibIML
 
         private void AddElementToRestricted(int id)
         {
-            _restrictedIds.Add(id);
+            if (!_restrictedIds.Contains(id))
+                _restrictedIds.Add(id);
         }
 
         //private void AddElementsToRestricted(IEnumerable<int> ids)
