@@ -170,6 +170,8 @@ namespace MessagePredictor
 
         #endregion
 
+        #region Public methods
+
         /// <summary>
         /// Given a vocabulary, compute the number of instances of each vocabulary member in this document.
         /// The values are stored in this item's FeatureCounts property.
@@ -191,6 +193,16 @@ namespace MessagePredictor
             Document = null; // force our document to re-parse the next time it's requested for display
         }
 
+        public bool TokenizeForString(string token)
+        {
+            int count = new Regex(Regex.Escape(token)).Matches(AllText).Count;
+            TokenCounts[token] = count;
+
+            return (count > 0);
+        }
+
+        #endregion
+
         /// <summary>
         /// Create an XML document that includes tags describing which features to highlight.
         /// </summary>
@@ -198,8 +210,8 @@ namespace MessagePredictor
         private void UpdateDocument(Vocabulary vocab)
         {
             List<string> featureWords = vocab.GetFeatureWords();
-            string featurePattern = "(" + string.Join("|", featureWords) + ")";
-            Regex featureRegex = new Regex(featurePattern);
+            string featurePattern = @"\b(" + string.Join("|", featureWords) + ")";
+            Regex featureRegex = new Regex(featurePattern, RegexOptions.IgnoreCase);
             string replaced = featureRegex.Replace(AllText, "<feature>$1<feature>");
             string[] lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
@@ -223,7 +235,7 @@ namespace MessagePredictor
                     {
                         XElement phraseElement;
 
-                        if (featureWords.Contains(phrase))
+                        if (featureWords.Contains(phrase, StringComparer.InvariantCultureIgnoreCase))
                         {
                             phraseElement = new XElement("feature", phrase);
                         }

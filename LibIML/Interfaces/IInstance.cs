@@ -16,7 +16,8 @@ namespace LibIML
         Prediction PreviousPrediction { get; set; }
         bool RecentlyChanged { get; }
         bool? IsPredictionCorrect { get; }
-
+        
+        bool TokenizeForString(string token);
         void ComputeFeatureVector(Vocabulary vocab, bool isRestricted);
     }
 }
