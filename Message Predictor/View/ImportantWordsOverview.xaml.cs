@@ -30,12 +30,45 @@ namespace MessagePredictor.View
             InitializeComponent();
         }
 
-        private void CloseParentDropDownButton(DependencyObject o)
+        private void CloseDropDownButton(object o)
         {
+            DropDownButton ddb = o as DropDownButton;
+            if (ddb != null)
+                ddb.IsOpen = false;
+        }
 
-            //DropDownButton ddb = Utilities.FindParent<DropDownButton>(o);
-            //if (ddb != null)
-            //    ddb.IsOpen = false;
+        // Surely there's a better way to close a DropDownButton after the user interacts with it?
+        private void CloseAllDropDownButtons()
+        {
+            for (int i = 0; i < Topic1Features.Items.Count; i++)
+            {
+                var uiElement = (UIElement)Topic1Features.ItemContainerGenerator.ContainerFromIndex(i).FindVisualChild<DropDownButton>();
+                CloseDropDownButton(uiElement);
+            }
+            for (int i = 0; i < Topic2Features.Items.Count; i++)
+            {
+                UIElement uiElement = (UIElement)Topic2Features.ItemContainerGenerator.ContainerFromIndex(i);
+                CloseDropDownButton(uiElement);
+            }
+        }
+
+        private void CheckMenuItem(MenuItem item)
+        {
+            StackPanel panel = item.Parent as StackPanel;
+            if (panel != null)
+            {
+                foreach (UIElement element in panel.Children)
+                {
+                    MenuItem otherItem = element as MenuItem;
+                    if (otherItem != null)
+                    {
+                        if (otherItem != item)
+                            otherItem.IsChecked = false;
+                        else
+                            otherItem.IsChecked = true;
+                    }
+                }
+            }
         }
 
         private void FeatureVeryImportant_Click(object sender, RoutedEventArgs e)
@@ -48,8 +81,8 @@ namespace MessagePredictor.View
                 if (fsvm != null && f != null)
                 {
                     fsvm.FeatureVeryImportant.Execute(f);
+                    CheckMenuItem(item);
                 }
-                CloseParentDropDownButton(item);
             }
         }
 
@@ -63,8 +96,8 @@ namespace MessagePredictor.View
                 if (fsvm != null && f != null)
                 {
                     fsvm.FeatureSomewhatImportant.Execute(f);
+                    CheckMenuItem(item);
                 }
-                CloseParentDropDownButton(item);
             }
         }
 
@@ -79,7 +112,6 @@ namespace MessagePredictor.View
                 {
                     fsvm.FeatureRemove.Execute(f);
                 }
-                CloseParentDropDownButton(item);
             }
         }
     }
