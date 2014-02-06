@@ -8,7 +8,7 @@ using System.Windows.Media;
 
 namespace MessagePredictor
 {
-    class Utilities
+    public static class Utilities
     {
         public static T FindParent<T>(DependencyObject child) where T : DependencyObject
         {
@@ -24,6 +24,27 @@ namespace MessagePredictor
                 return parent;
             else
                 return FindParent<T>(parentObject);
+        }
+
+        // From http://stackoverflow.com/questions/2336989/enumerate-itemscontrol-items-as-uielements
+        public static T FindVisualChild<T>(this DependencyObject instance) where T : DependencyObject
+        {
+            T control = default(T);
+
+            if (instance != null)
+            {
+                for (int i = 0; i < VisualTreeHelper.GetChildrenCount(instance); i++)
+                {
+                    if ((control = VisualTreeHelper.GetChild(instance, i) as T) != null)
+                    {
+                        break;
+                    }
+
+                    control = FindVisualChild<T>(VisualTreeHelper.GetChild(instance, i));
+                }
+            }
+
+            return control;
         }
     }
 }
