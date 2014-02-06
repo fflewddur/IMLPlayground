@@ -42,26 +42,24 @@
     <Style x:Key="featureMenuCheckable" TargetType="MenuItem">
         <Setter Property="IsCheckable" Value="True"/>
     </Style>
-
-    <!--<DataTemplate x:Key="importantWordsOverviewItem">
-        <xctk:DropDownButton Margin="5">
-            <xctk:DropDownButton.DropDownContent>
-                <StackPanel Orientation="Vertical">
-                    <Button Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=FeatureVeryImportant}">Test</Button>
-                    <Menu>
-                        <MenuItem Header="Very important" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=FeatureVeryImportant}"/>
-                        <MenuItem Header="Somewhat important" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=DataContext.FeatureVeryImportant}"/>
-                        <Separator />
-                        <MenuItem Header="Remove" CommandParameter="{Binding}" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}, Path=FeatureRemove}" />
-                        <Menu.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </Menu.ItemsPanel>
-                    </Menu>
-                </StackPanel>
-            </xctk:DropDownButton.DropDownContent>
-            <TextBlock Text="{Binding Characters}" />
-        </xctk:DropDownButton>
-    </DataTemplate>-->
+    <ItemsPanelTemplate x:Key="heatMapPanel">
+        <WrapPanel Orientation="Horizontal" />
+    </ItemsPanelTemplate>
+    <DataTemplate x:Key="heatMapItemTemplate">
+        <Rectangle Width="10" Height="10" Margin="1 2" SnapsToDevicePixels="True">
+            <Rectangle.Style>
+                <Style TargetType="Rectangle">
+                    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" />
+                    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.InactiveBorderBrush}}" />
+                    <Setter Property="StrokeThickness" Value="1" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                            <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                            <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.ActiveBorderBrush}}"/>
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Rectangle.Style>
+        </Rectangle>
+    </DataTemplate>
 </ResourceDictionary>

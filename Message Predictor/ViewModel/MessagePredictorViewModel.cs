@@ -18,6 +18,7 @@ namespace MessagePredictor
     class MessagePredictorViewModel : ViewModelBase
     {
         FeatureSetViewModel _featureSetVM;
+        HeatMapViewModel _heatMapVM;
         List<NewsCollection> _folders; // Collection of all our folders
         NewsCollection _unknownFolder;
         NewsCollection _topic1Folder;
@@ -85,6 +86,8 @@ namespace MessagePredictor
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
             _featureSetVM.FeatureAdded += featureSetVM_FeatureAdded;
             _featureSetVM.FeatureRemoved += featureSetVM_FeatureRemoved;
+
+            _heatMapVM = new HeatMapViewModel(_unknownFolder, _topic1Folder, _topic2Folder);
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
@@ -199,6 +202,12 @@ namespace MessagePredictor
         {
             get { return _featureSetVM; }
             private set { SetProperty<FeatureSetViewModel>(ref _featureSetVM, value); }
+        }
+
+        public HeatMapViewModel HeatMapVM
+        {
+            get { return _heatMapVM; }
+            private set { SetProperty<HeatMapViewModel>(ref _heatMapVM, value); }
         }
 
         #endregion

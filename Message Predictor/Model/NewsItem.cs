@@ -25,6 +25,7 @@ namespace MessagePredictor.Model
         private bool? _isPredictionCorrect;
         private SparseVector _featureCounts;
         private Label _label;
+        private bool _isHighlighted; // Should this message be highlighted in the heatmap?
         private string _document; // The message in XML for easier displaying (including highlighting of features)
         private Vocabulary _vocab; // Keep a reference to the most recent Vocabulary we've computed features for; needed for displaying _document with features highlighted
 
@@ -71,6 +72,12 @@ namespace MessagePredictor.Model
         {
             get { return _label; }
             set { SetProperty<Label>(ref _label, value); }
+        }
+
+        public bool IsHighlighted
+        {
+            get { return _isHighlighted; }
+            set { SetProperty<bool>(ref _isHighlighted, value); }
         }
 
         public string AllText

@@ -16,7 +16,7 @@
             <!-- Two-column split -->
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="1*" />
                     <ColumnDefinition Width="7*" />
                 </Grid.ColumnDefinitions>
                 
@@ -41,6 +41,7 @@
                     
                     <!-- Word overview -->
                     <Label Grid.Row="4" Style="{StaticResource headerStyle1}">Words</Label>
+                    <local:MessageHeatMap Grid.Row="5" Style="{StaticResource contentStyle}"  DataContext="{Binding HeatMapVM}"/>
                 </Grid>
                 
                 <!-- Right column -->
