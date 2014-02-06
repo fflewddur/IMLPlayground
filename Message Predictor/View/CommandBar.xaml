@@ -21,9 +21,9 @@
             <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center" Name="FileToMenu">
                 <xctk:DropDownButton.DropDownContent>
                     <StackPanel Orientation="Vertical">
-                        <Button Padding="10 5" Content="{Binding Folders[0].Label}" Command="{Binding FileToUnknown}" Click="FileToFolder_Click"/>
-                        <Button Padding="10 5" Content="{Binding Topic1UserLabel}" Command="{Binding FileToTopic1}" Click="FileToFolder_Click"/>
-                        <Button Padding="10 5" Content="{Binding Topic2UserLabel}" Command="{Binding FileToTopic2}" Click="FileToFolder_Click"/>
+                        <MenuItem Header="{Binding Folders[0].Label}" Command="{Binding FileToUnknown}" Click="FileToFolder_Click"/>
+                        <MenuItem Header="{Binding Topic1UserLabel}" Command="{Binding FileToTopic1}" Click="FileToFolder_Click"/>
+                        <MenuItem Header="{Binding Topic2UserLabel}" Command="{Binding FileToTopic2}" Click="FileToFolder_Click"/>
                     </StackPanel>
                 </xctk:DropDownButton.DropDownContent>
                 <TextBlock TextAlignment="Center">Move message<LineBreak />to folder&#x2026;</TextBlock>
