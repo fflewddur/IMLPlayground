@@ -100,7 +100,7 @@ namespace LibIML
 
             return weight;
         }
-        
+
         public bool IsFeatureMostImportantForLabel(int id, Label label)
         {
             Label mostImportantLabel = null;
@@ -119,7 +119,7 @@ namespace LibIML
 
             return (mostImportantLabel == label);
         }
-        
+
         /// <summary>
         /// When the user adds a new feature, we need to update our document frequency counts for our training set
         /// so that the classifier can estimate the probabilities of this feature per class.
@@ -380,6 +380,7 @@ namespace LibIML
                 _perClassFeatureCounts[l] = new Dictionary<int, int>();
                 _perClassFeaturePriors[l] = new Dictionary<int, double>();
                 _trainingSet[l] = new HashSet<IInstance>();
+                _pWordGivenClass[l] = new Dictionary<int, double>();
                 //_featuresPerClass[l] = new HashSet<Feature>();
             }
         }
@@ -438,7 +439,8 @@ namespace LibIML
                 // Sum up the feature counts
                 _pWordGivenClass[l] = new Dictionary<int, double>();
                 int sumFeatures = 0;
-                foreach (int id in Vocab.FeatureIds) {
+                foreach (int id in Vocab.FeatureIds)
+                {
                     int count;
                     _perClassFeatureCounts[l].TryGetValue(id, out count);
                     sumFeatures += count;

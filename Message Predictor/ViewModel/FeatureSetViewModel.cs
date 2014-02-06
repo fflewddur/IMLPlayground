@@ -162,7 +162,6 @@ namespace MessagePredictor.ViewModel
             FeatureSet.Clear();
             foreach (int id in _vocab.FeatureIds)
             {
-
                 string word = _vocab.GetWord(id);
                 Feature userFeature = _userAdded.Find(p => p.Characters == word);
                 // First, see if the user added this feature manually; if so, keep associating it with the label the user requested
@@ -175,20 +174,12 @@ namespace MessagePredictor.ViewModel
                     // Otherwise, figure out which label this feature is more important for
                     foreach (Label label in _labels)
                     {
-                        try
-                        {
-                            Feature f = new Feature(word, label);
-                            f.SystemWeight = _classifier.GetFeatureWeight(id, label);
-                            f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
-                            FeatureSet.Add(f);
-                        }
-                        catch (KeyNotFoundException e)
-                        {
-                            Console.Error.WriteLine("Warning: {0}", e.Message);
-                        }
+                        Feature f = new Feature(word, label);
+                        f.SystemWeight = _classifier.GetFeatureWeight(id, label);
+                        f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
+                        FeatureSet.Add(f);
                     }
                 }
-
             }
         }
 
