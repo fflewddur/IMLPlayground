@@ -230,7 +230,6 @@ namespace MessagePredictor
             }
 
             TrainClassifier(_classifier, _topic1Folder, _topic2Folder);
-            UpdateImportantWords(_classifier, _topic1Folder.Label, _topic2Folder.Label);
             PredictMessages(_classifier, _folders);
             EvaluateClassifier(_classifier);
         }
@@ -298,6 +297,12 @@ namespace MessagePredictor
             TextToHighlight = _vocab.GetFeatureWords();
         }
 
+        /// <summary>
+        /// Clear the classifier's current training data and re-train it using instances in 'topic1' and 'topic2'.
+        /// </summary>
+        /// <param name="classifier">The classifier to train.</param>
+        /// <param name="topic1">The first classification of training data.</param>
+        /// <param name="topic2">The second classification of training data.</param>
         private void TrainClassifier(IClassifier classifier, IEnumerable<IInstance> topic1, IEnumerable<IInstance> topic2)
         {
             Stopwatch timer = new Stopwatch();
@@ -310,13 +315,11 @@ namespace MessagePredictor
             Console.WriteLine("Time to train classifier: {0}", timer.Elapsed);
         }
 
-        private void UpdateImportantWords(IClassifier classifier, Label topic1, Label topic2)
-        {
-            // FIXME 
-            //Topic1Features = classifier.GetFeatures(topic1);
-            //Topic2Features = classifier.GetFeatures(topic2);
-        }
-
+        /// <summary>
+        /// Update predictions for every message in the provided folders.
+        /// </summary>
+        /// <param name="classifier">The classifier to use</param>
+        /// <param name="folders">The folders to run predictions for.</param>
         private void PredictMessages(IClassifier classifier, IEnumerable<IEnumerable<IInstance>> folders)
         {
             Stopwatch timer = new Stopwatch();
@@ -444,6 +447,11 @@ namespace MessagePredictor
             return retval;
         }
 
+        /// <summary>
+        /// Find the collection containing a given item.
+        /// </summary>
+        /// <param name="item">The NewsItem to search for.</param>
+        /// <returns>The collection containing 'item', or null if not found.</returns>
         private NewsCollection GetFolderContainingMessage(NewsItem item)
         {
             NewsCollection container = null;
@@ -460,6 +468,13 @@ namespace MessagePredictor
             return container;
         }
 
+        /// <summary>
+        /// Recompute the feature vector for every item in every folder.
+        /// This is a brute-force way to ensure that our feature vectors are always in sync
+        /// with a user's feature adjustments.
+        /// </summary>
+        /// <param name="isRestricted">If true, restrict feature vectors to the "restricted" 
+        /// set of features in our vocabular. Otherwise, use all available features.</param>
         private void UpdateInstanceFeatures(bool isRestricted)
         {
             foreach (IEnumerable<IInstance> folder in _folders)
