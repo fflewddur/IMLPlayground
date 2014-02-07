@@ -34,6 +34,7 @@ namespace MessagePredictor.Model
         {
             _document = null;
             _vocab = null;
+            _isHighlighted = false;
         }
 
         #region Properties

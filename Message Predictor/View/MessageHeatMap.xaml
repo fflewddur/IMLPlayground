@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="200">
     <Grid>
@@ -17,14 +18,14 @@
 
         <Label Grid.Row="0" Content="{Binding Topic1Folder.Label}" Style="{StaticResource ResourceKey=headerStyle2}" />
         <ItemsControl Grid.Row="1" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      ItemsSource="{Binding Topic1Folder}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}" />
-        
+                      ItemsSource="{Binding Topic1View.View}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}" />
+
         <Label Grid.Row="2" Content="{Binding Topic2Folder.Label}" Style="{StaticResource ResourceKey=headerStyle2}" />
         <ItemsControl Grid.Row="3" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      ItemsSource="{Binding Topic2Folder}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}" />
+                      ItemsSource="{Binding Topic2View.View}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}" />
         
         <Label Grid.Row="4" Content="{Binding UnknownFolder.Label}" Style="{StaticResource ResourceKey=headerStyle2}" />
         <ItemsControl Grid.Row="5" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
-                      ItemsSource="{Binding UnknownFolder}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}"/>
+                      ItemsSource="{Binding UnknownView.View}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}"/>
     </Grid>
 </UserControl>
