@@ -91,7 +91,7 @@ namespace LibIML
 
         #endregion
 
-        # region Public methods
+        #region Public methods
 
         public double GetFeatureWeight(int id, Label label)
         {
@@ -187,6 +187,24 @@ namespace LibIML
             Train();
         }
 
+        public void AddPriors(IEnumerable<Feature> priors)
+        {
+            foreach (Feature f in priors)
+            {
+                double weight;
+                if (f.WeightType == Feature.Weight.High)
+                    weight = 50;
+                else if (f.WeightType == Feature.Weight.Medium)
+                    weight = 25;
+                else
+                    weight = f.UserWeight;
+
+                int id = _vocab.GetWordId(f.Characters, true);
+                _perClassFeaturePriors[f.Label][id] = weight;
+            }
+            Train();
+        }
+
         /// <summary>
         /// Run the classifier on a single instance.
         /// </summary>
@@ -253,17 +271,6 @@ namespace LibIML
             prediction.Confidence = prediction.EvidencePerClass[label].Confidence;
 
             return prediction;
-        }
-
-        /// <summary>
-        /// Update the prior weight for a given feature, with respect to a given class.
-        /// </summary>
-        /// <param name="label">The class which this prior value applies to.</param>
-        /// <param name="feature">The feature which this prior value applies to.</param>
-        /// <param name="prior">The new prior value for this feature/class tuple.</param>
-        public void UpdatePrior(Label label, int feature, double prior)
-        {
-            _perClassFeaturePriors[label][feature] = prior;
         }
 
         public async Task<bool> SaveArffFile(string filePath)
@@ -447,14 +454,14 @@ namespace LibIML
                 }
 
                 // Sum up the priors
-                //double sumPriors = 0;
-                //foreach (int id in Vocab.FeatureIds)
-                //{
-                //    double prior;
-                //    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
-                //        prior = _defaultPrior; // Use a default value if the user didn't provide one.
-                //    sumPriors += prior;
-                //}
+                double sumPriors = 0;
+                foreach (int id in Vocab.FeatureIds)
+                {
+                    double prior;
+                    if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
+                        prior = _defaultPrior; // Use a default value if the user didn't provide one.
+                    sumPriors += prior;
+                }
                 Console.Write("PrWGivenC for {0}: ", l);
                 foreach (int id in Vocab.FeatureIds)
                 {
@@ -463,9 +470,8 @@ namespace LibIML
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
-                    _pWordGivenClass[l][id] = (prior + countFeature) / (Vocab.Count + (double)sumFeatures); // Removed + sumPriors // OLD VERSION
+                    _pWordGivenClass[l][id] = (prior + countFeature) / (sumPriors + (double)sumFeatures);
                     Console.Write("{0}={1:N4} ", Vocab.GetWord(id), _pWordGivenClass[l][id]);
-                    //_pWordGivenClass[l][id] = (1 + countFeature) / (double)sumFeatures;
                 }
                 Console.WriteLine();
             }

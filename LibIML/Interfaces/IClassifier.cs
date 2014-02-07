@@ -19,6 +19,7 @@ namespace LibIML
 
         void AddInstance(IInstance instance);
         void AddInstances(IEnumerable<IInstance> instances);
+        void AddPriors(IEnumerable<Feature> priors);
         void UpdateCountsForNewFeature(int id);
         Prediction PredictInstance(IInstance instance);
         //void UpdatePrior(Label label, int feature, double prior);

@@ -310,6 +310,7 @@ namespace MessagePredictor
 
             classifier.ClearInstances();
             classifier.AddInstances(topic1.Concat(topic2));
+            classifier.AddPriors(FeatureSetVM.UserAddedFeatures);
 
             timer.Stop();
             Console.WriteLine("Time to train classifier: {0}", timer.Elapsed);
