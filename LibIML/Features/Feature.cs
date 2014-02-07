@@ -51,7 +51,7 @@ namespace LibIML
         public Weight WeightType
         {
             get { return _weightType; }
-            set { _weightType = value; }
+            set { SetProperty<Weight>(ref _weightType, value); }
         }
 
         public double SystemWeight

@@ -21,9 +21,9 @@
             <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center" Name="FileToMenu">
                 <xctk:DropDownButton.DropDownContent>
                     <StackPanel Orientation="Vertical">
-                        <Button Padding="10 5" Content="{Binding Folders[0].Label}" Command="{Binding FileToUnknown}" Click="FileToFolder_Click"/>
-                        <Button Padding="10 5" Content="{Binding Topic1UserLabel}" Command="{Binding FileToTopic1}" Click="FileToFolder_Click"/>
-                        <Button Padding="10 5" Content="{Binding Topic2UserLabel}" Command="{Binding FileToTopic2}" Click="FileToFolder_Click"/>
+                        <MenuItem Header="{Binding Folders[0].Label}" Command="{Binding FileToUnknown}" Click="FileToFolder_Click"/>
+                        <MenuItem Header="{Binding Topic1UserLabel}" Command="{Binding FileToTopic1}" Click="FileToFolder_Click"/>
+                        <MenuItem Header="{Binding Topic2UserLabel}" Command="{Binding FileToTopic2}" Click="FileToFolder_Click"/>
                     </StackPanel>
                 </xctk:DropDownButton.DropDownContent>
                 <TextBlock TextAlignment="Center">Move message<LineBreak />to folder&#x2026;</TextBlock>
@@ -33,7 +33,8 @@
             </Label>
             <ToggleSwitch:HorizontalToggleSwitch IsChecked="{Binding OnlyShowRecentChanges}" />
             <Label Margin="50 0 5 0" VerticalContentAlignment="Center">Find</Label>
-            <TextBox MaxLines="1" MinWidth="150" Height="25" SpellCheck.IsEnabled="True" VerticalContentAlignment="Center"></TextBox>
+            <TextBox MaxLines="1" MinWidth="150" Height="25" SpellCheck.IsEnabled="True" VerticalContentAlignment="Center" 
+                     Text="{Binding HeatMapVM.ToHighlight, Delay=200, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}" />
         </StackPanel>
     </Grid>
 </UserControl>

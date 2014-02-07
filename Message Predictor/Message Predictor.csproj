@@ -99,6 +99,7 @@
     <Compile Include="ViewModel\Base\ViewModelCollectionBase.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
     <Compile Include="ViewModel\FeatureSetViewModel.cs" />
+    <Compile Include="ViewModel\HeatMapViewModel.cs" />
     <Compile Include="ViewModel\MessagePredictorViewModel.cs" />
     <Compile Include="View\AddFeatureDialog.xaml.cs">
       <DependentUpon>AddFeatureDialog.xaml</DependentUpon>
@@ -114,6 +115,9 @@
     </Compile>
     <Compile Include="View\ImportantWordsOverview.xaml.cs">
       <DependentUpon>ImportantWordsOverview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\MessageHeatMap.xaml.cs">
+      <DependentUpon>MessageHeatMap.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\MessageList.xaml.cs">
       <DependentUpon>MessageList.xaml</DependentUpon>
@@ -144,6 +148,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ImportantWordsOverview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\MessageHeatMap.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

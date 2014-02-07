@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Threading;
 
 namespace MessagePredictor.ViewModel
 {
@@ -20,6 +21,8 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
         private IReadOnlyList<CollectionViewSource> _collectionViewSources;
+        private string _featureText; // The feature the user is currently typing in
+        private DispatcherTimer _featureTextEditedTimer;
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels)
             : base()
@@ -31,6 +34,8 @@ namespace MessagePredictor.ViewModel
             _userAdded = new List<Feature>();
             _userRemoved = new List<Feature>();
             _collectionViewSources = BuildCollectionViewSources(labels);
+            _featureText = null;
+            _featureTextEditedTimer = new DispatcherTimer();
 
             AddFeature = new RelayCommand<Label>(PerformAddFeature);
             FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature);
@@ -39,6 +44,8 @@ namespace MessagePredictor.ViewModel
 
             _classifier.Retrained += classifier_Retrained;
             _vocab.Updated += vocab_Updated;
+            _featureTextEditedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
+            _featureTextEditedTimer.Tick += _featureTextEditedTimer_Tick;
         }
 
         #region Properties
@@ -95,6 +102,7 @@ namespace MessagePredictor.ViewModel
 
         public event EventHandler<FeatureAddedEventArgs> FeatureAdded;
         public event EventHandler<EventArgs> FeatureRemoved;
+        public event EventHandler<FeatureAddedEventArgs> FeatureTextEdited;
 
         protected virtual void OnFeatureAdded(FeatureAddedEventArgs e)
         {
@@ -106,6 +114,12 @@ namespace MessagePredictor.ViewModel
         {
             if (FeatureRemoved != null)
                 FeatureRemoved(this, e);
+        }
+
+        protected virtual void OnFeatureTextEdited(FeatureAddedEventArgs e)
+        {
+            if (FeatureTextEdited != null)
+                FeatureTextEdited(this, e);
         }
 
         #endregion
@@ -143,6 +157,12 @@ namespace MessagePredictor.ViewModel
         #endregion
 
         #region Private methods
+
+        private void _featureTextEditedTimer_Tick(object sender, EventArgs e)
+        {
+            _featureTextEditedTimer.Stop();
+            OnFeatureTextEdited(new FeatureAddedEventArgs(_featureText));
+        }
 
         private void classifier_Retrained(object sender, EventArgs e)
         {
@@ -188,6 +208,7 @@ namespace MessagePredictor.ViewModel
             AddFeatureDialog dialog = new AddFeatureDialog();
             dialog.Owner = App.Current.MainWindow;
             AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(label);
+            vm.PropertyChanged += AddFeatureVM_PropertyChanged;
             dialog.DataContext = vm;
             bool? result = dialog.ShowDialog();
             if (result == true)
@@ -199,8 +220,20 @@ namespace MessagePredictor.ViewModel
                 else if (vm.SelectedWeight == vm.Weights[1])
                     f.WeightType = Feature.Weight.Medium;
                 f.MostImportant = true; // If the user added this to a given label, then it's always most important to that label.
-
+                
                 AddUserFeature(f);
+            }
+        }
+
+        private void AddFeatureVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Word")
+            {
+                _featureTextEditedTimer.Stop();
+                AddFeatureDialogViewModel vm = sender as AddFeatureDialogViewModel;
+                if (vm != null)
+                    _featureText = vm.Word;
+                _featureTextEditedTimer.Start();
             }
         }
 

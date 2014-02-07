@@ -220,6 +220,7 @@ namespace LibIML
             foreach (Label l in Labels)
             {
                 Evidence evidence = new Evidence(Vocab); // Store our evidence in favor of each class
+                evidence.ClassPr = _pClass[l];
                 double prob = 0;
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data)
                 {
