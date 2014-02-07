@@ -86,6 +86,7 @@ namespace MessagePredictor
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
             _featureSetVM.FeatureAdded += featureSetVM_FeatureAdded;
             _featureSetVM.FeatureRemoved += featureSetVM_FeatureRemoved;
+            _featureSetVM.FeatureTextEdited += featureSetVM_FeatureTextEdited;
 
             _heatMapVM = new HeatMapViewModel(_unknownFolder, _topic1Folder, _topic2Folder);
 
@@ -531,6 +532,12 @@ namespace MessagePredictor
             {
                 PerformUpdatePredictions();
             }
+        }
+
+        // Tell the heatmap to show messages containing the feature the user is currently editing
+        void featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
+        {
+            HeatMapVM.ToHighlight = e.Tokens;
         }
 
         /// <summary>
