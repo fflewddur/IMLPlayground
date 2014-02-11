@@ -89,6 +89,7 @@ namespace MessagePredictor
             _featureSetVM.FeatureTextEdited += featureSetVM_FeatureTextEdited;
 
             _heatMapVM = new HeatMapViewModel(_unknownFolder, _topic1Folder, _topic2Folder);
+            _heatMapVM.HighlightTextChanged += _heatMapVM_HighlightTextChanged;
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
@@ -539,6 +540,12 @@ namespace MessagePredictor
         void featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
         {
             HeatMapVM.ToHighlight = e.Tokens;
+        }
+
+        void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
+        {
+            if (CurrentMessage != null)
+                CurrentMessage.HighlightWithWord(e.Text);
         }
 
         /// <summary>

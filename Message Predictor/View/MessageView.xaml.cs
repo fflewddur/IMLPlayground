@@ -73,7 +73,15 @@ namespace MessagePredictor.View
                         else if (element.Name == "feature")
                         {
                             Run r = new Run(element.Value.ToString());
-                            r.Background = Brushes.SkyBlue;
+                            r.Background = SystemColors.ActiveCaptionBrush;
+                            p.Inlines.Add(r);
+                        } 
+                        else if (element.Name == "highlightedFeature")
+                        {
+                            Run r = new Run(element.Value.ToString());
+                            r.Background = SystemColors.HighlightBrush;
+                            r.Foreground = SystemColors.HighlightTextBrush;
+                            
                             p.Inlines.Add(r);
                         }
                     }

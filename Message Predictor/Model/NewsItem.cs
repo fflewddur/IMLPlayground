@@ -225,19 +225,33 @@ namespace MessagePredictor.Model
             return (count > 0);
         }
 
+        public void HighlightWithWord(string word)
+        {
+            UpdateDocument(_vocab, word);
+        }
+
         #endregion
 
         /// <summary>
         /// Create an XML document that includes tags describing which features to highlight.
         /// </summary>
         /// <param name="vocab"></param>
-        private void UpdateDocument(Vocabulary vocab)
+        private void UpdateDocument(Vocabulary vocab, string highlightedFeature = null)
         {
             // Use the largest first, so that sub-features don't get broken up (e.g., if "team" and "teams" are features, don't split "teams" into "team" and "s")
-            List<string> featureWords = vocab.GetFeatureWords().OrderByDescending(s => s.Length).ToList(); 
+            List<string> featureWords = vocab.GetFeatureWords().OrderByDescending(s => s.Length).ToList();
+            
+            // Ensure the list of features to highlight includes the specifically requested one
+            if (!string.IsNullOrWhiteSpace(highlightedFeature) && !featureWords.Contains(highlightedFeature))
+            {
+                featureWords.Add(highlightedFeature);
+            }
+
+            // Split the text on the features, then join it back together with <feature> tags surrounding each feature
             string featurePattern = @"\b(" + string.Join("|", featureWords) + @")\b";
             Regex featureRegex = new Regex(featurePattern, RegexOptions.IgnoreCase);
             string replaced = featureRegex.Replace(AllText, "<feature>$1<feature>");
+            // Split the text on newlines
             string[] lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             XElement root = new XElement("message");
@@ -260,12 +274,19 @@ namespace MessagePredictor.Model
                     {
                         XElement phraseElement;
 
-                        if (featureWords.Contains(phrase, StringComparer.InvariantCultureIgnoreCase))
+                        // If this is our highlighted feature, tag it appropriately
+                        if (string.Equals(phrase, highlightedFeature, StringComparison.InvariantCultureIgnoreCase))
                         {
+                            phraseElement = new XElement("highlightedFeature", phrase);
+                        }
+                        else if (featureWords.Contains(phrase, StringComparer.InvariantCultureIgnoreCase))
+                        {
+                            // Otherwise, see if this is a feature
                             phraseElement = new XElement("feature", phrase);
                         }
                         else
                         {
+                            // Or just normal text
                             phraseElement = new XElement("normal", phrase);
                         }
 

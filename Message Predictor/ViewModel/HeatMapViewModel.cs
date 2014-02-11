@@ -81,14 +81,20 @@ namespace MessagePredictor.ViewModel
             set
             {
                 if (SetProperty<string>(ref _toHighlight, value))
+                {
+                    OnHighlightTextChanged(new HighlightTextChangedEventArgs(_toHighlight));
                     MarkMessagesContainingWord(ToHighlight);
+                    if (CurrentMessage != null)
+                        CurrentMessage.HighlightWithWord(ToHighlight);
+                }
             }
         }
 
         public NewsItem CurrentMessage
         {
             get { return _currentMessage; }
-            set {
+            set
+            {
                 NewsItem temp = _currentMessage;
                 if (SetProperty<NewsItem>(ref _currentMessage, value))
                 {
@@ -98,6 +104,7 @@ namespace MessagePredictor.ViewModel
                     if (CurrentMessage != null)
                     {
                         CurrentMessage.IsSelected = true;
+                        CurrentMessage.HighlightWithWord(ToHighlight);
                         if (_messageWindow == null)
                         {
                             _messageWindow = new MessageWindow();
@@ -111,19 +118,41 @@ namespace MessagePredictor.ViewModel
                             _messageWindow.Activate();
                         }
                     }
-                } 
+                }
             }
         }
+
+        #endregion
+
+        #region Events
+
+        public class HighlightTextChangedEventArgs : EventArgs
+        {
+            public readonly string Text;
+
+            public HighlightTextChangedEventArgs(string tokens)
+            {
+                Text = tokens;
+            }
+        }
+
+        public event EventHandler<HighlightTextChangedEventArgs> HighlightTextChanged;
+
+        protected virtual void OnHighlightTextChanged(HighlightTextChangedEventArgs e)
+        {
+            if (HighlightTextChanged != null)
+                HighlightTextChanged(this, e);
+        }
+
+        #endregion
+
+        #region Private methods
 
         void _messageWindow_Closed(object sender, EventArgs e)
         {
             _messageWindow = null;
             CurrentMessage = null;
         }
-
-        #endregion
-
-        #region Private methods
 
         private void MarkMessagesContainingWord(string word)
         {
@@ -132,14 +161,21 @@ namespace MessagePredictor.ViewModel
 
             //Stopwatch timer = new Stopwatch();
             //timer.Start();
+            IDisposable disUnknown = UnknownView.DeferRefresh();
+            IDisposable disTopic1 = Topic1View.DeferRefresh();
+            IDisposable disTopic2 = Topic2View.DeferRefresh();
 
-                Parallel.ForEach(_unknownFolder.Concat(_topic1Folder).Concat(_topic2Folder), (item, state, index) =>
-                {
-                    if (!isEmpty && containsWord.Match(item.AllText).Success)
-                        item.IsHighlighted = true;
-                    else
-                        item.IsHighlighted = false;
-                });
+            Parallel.ForEach(_unknownFolder.Concat(_topic1Folder).Concat(_topic2Folder), (item, state, index) =>
+            {
+                if (!isEmpty && containsWord.Match(item.AllText).Success)
+                    item.IsHighlighted = true;
+                else
+                    item.IsHighlighted = false;
+            });
+
+            disUnknown.Dispose();
+            disTopic1.Dispose();
+            disTopic2.Dispose();
 
             //timer.Stop();
             //Console.WriteLine("Time to highlight word: {0}", timer.Elapsed);
