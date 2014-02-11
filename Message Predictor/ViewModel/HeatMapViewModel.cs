@@ -1,4 +1,5 @@
 ﻿using MessagePredictor.Model;
+using MessagePredictor.View;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,6 +22,8 @@ namespace MessagePredictor.ViewModel
         private CollectionViewSource _topic1View;
         private CollectionViewSource _topic2View;
         private string _toHighlight;
+        private NewsItem _currentMessage;
+        private MessageWindow _messageWindow;
 
         public HeatMapViewModel(NewsCollection unknown, NewsCollection topic1, NewsCollection topic2)
             : base()
@@ -31,6 +34,7 @@ namespace MessagePredictor.ViewModel
             _unknownView = BuildCollectionViewSourceForCollection(unknown);
             _topic1View = BuildCollectionViewSourceForCollection(topic1);
             _topic2View = BuildCollectionViewSourceForCollection(topic2);
+            _currentMessage = null;
         }
 
         #region Properties
@@ -79,6 +83,42 @@ namespace MessagePredictor.ViewModel
                 if (SetProperty<string>(ref _toHighlight, value))
                     MarkMessagesContainingWord(ToHighlight);
             }
+        }
+
+        public NewsItem CurrentMessage
+        {
+            get { return _currentMessage; }
+            set {
+                NewsItem temp = _currentMessage;
+                if (SetProperty<NewsItem>(ref _currentMessage, value))
+                {
+                    if (temp != null)
+                        temp.IsSelected = false;
+
+                    if (CurrentMessage != null)
+                    {
+                        CurrentMessage.IsSelected = true;
+                        if (_messageWindow == null)
+                        {
+                            _messageWindow = new MessageWindow();
+                            _messageWindow.Closed += _messageWindow_Closed;
+                            _messageWindow.DataContext = this;
+                            _messageWindow.Owner = App.Current.MainWindow;
+                            _messageWindow.Show();
+                        }
+                        else
+                        {
+                            _messageWindow.Activate();
+                        }
+                    }
+                } 
+            }
+        }
+
+        void _messageWindow_Closed(object sender, EventArgs e)
+        {
+            _messageWindow = null;
+            CurrentMessage = null;
         }
 
         #endregion

@@ -1,0 +1,16 @@
+﻿<Window x:Class="MessagePredictor.View.MessageWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        xmlns:local="clr-namespace:MessagePredictor.View" 
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="ToolWindow"
+        Title="MessageWindow" Height="700" Width="700">
+    <Grid>
+        <xctk:RichTextBox Text="{Binding CurrentMessage.DocumentReadOnly}" IsReadOnly="True" ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <xctk:RichTextBox.TextFormatter>
+                <local:MyFormatter />
+            </xctk:RichTextBox.TextFormatter>
+        </xctk:RichTextBox>
+    </Grid>
+</Window>

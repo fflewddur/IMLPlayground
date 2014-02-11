@@ -26,6 +26,8 @@ namespace MessagePredictor.Model
         private SparseVector _featureCounts;
         private Label _label;
         private bool _isHighlighted; // Should this message be highlighted in the heatmap?
+        private bool _isMouseOver; // Is the mouse hovering over this message in the heatmap?
+        private bool _isSelected; // Is this the selected message in the heatmap?
         private string _document; // The message in XML for easier displaying (including highlighting of features)
         private Vocabulary _vocab; // Keep a reference to the most recent Vocabulary we've computed features for; needed for displaying _document with features highlighted
 
@@ -35,6 +37,7 @@ namespace MessagePredictor.Model
             _document = null;
             _vocab = null;
             _isHighlighted = false;
+            _isMouseOver = false;
         }
 
         #region Properties
@@ -174,6 +177,18 @@ namespace MessagePredictor.Model
         {
             get { return _featureCounts; }
             private set { SetProperty<SparseVector>(ref _featureCounts, value); }
+        }
+
+        public bool IsMouseOver
+        {
+            get { return _isMouseOver; }
+            set { SetProperty<bool>(ref _isMouseOver, value); }
+        }
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { SetProperty<bool>(ref _isSelected, value); }
         }
 
         #endregion

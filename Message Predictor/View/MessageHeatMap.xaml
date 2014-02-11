@@ -4,8 +4,46 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:scm="clr-namespace:System.ComponentModel;assembly=WindowsBase"
+             xmlns:local="clr-namespace:MessagePredictor.View" 
+             xmlns:model="clr-namespace:MessagePredictor.Model" 
              mc:Ignorable="d" 
              d:DesignHeight="400" d:DesignWidth="200">
+    <UserControl.Resources>
+        <DataTemplate x:Key="heatMapItemTemplate" DataType="model:NewsItem">
+            <Grid MouseDown="Message_Selected" MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave" Background="Transparent">
+                <Rectangle Width="12" Height="12" Margin="1" SnapsToDevicePixels="True">
+                    <Rectangle.Style>
+                        <Style TargetType="Rectangle">
+                            <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" />
+                            <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.InactiveBorderBrush}}" />
+                            <Setter Property="StrokeThickness" Value="1" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                                    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                                    <!--<Setter Property="Stroke" Value="Gray"/>-->
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsMouseOver}" Value="True">
+                                    <Setter Property="Stroke" Value="Gray"/>
+                                    <!--<Setter Property="Cursor" Value="Hand"/>-->
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding IsSelected}" Value="True">
+                                    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"/>
+                                    <Setter Property="Stroke" Value="Black"/>
+                                </DataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding IsHighlighted}" Value="True"/>
+                                        <Condition Binding="{Binding IsMouseOver}" Value="True"/>
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Stroke" Value="Black"/>
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Rectangle.Style>
+                </Rectangle>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -23,7 +61,7 @@
         <Label Grid.Row="2" Content="{Binding Topic2Folder.Label}" Style="{StaticResource ResourceKey=headerStyle2}" />
         <ItemsControl Grid.Row="3" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ItemsSource="{Binding Topic2View.View}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}" />
-        
+
         <Label Grid.Row="4" Content="{Binding UnknownFolder.Label}" Style="{StaticResource ResourceKey=headerStyle2}" />
         <ItemsControl Grid.Row="5" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Auto"
                       ItemsSource="{Binding UnknownView.View}" ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}"/>
