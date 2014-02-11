@@ -370,6 +370,8 @@ namespace MessagePredictor
                 {
                     topic2Predictions++;
                 }
+                if (instance.RecentlyChanged)
+                    recentlyChangedPredictions++;
             }
             _topic1Folder.CorrectPredictions = pRight;
             pRight = 0;
@@ -384,6 +386,8 @@ namespace MessagePredictor
                 {
                     topic1Predictions++;
                 }
+                if (instance.RecentlyChanged)
+                    recentlyChangedPredictions++;
             }
             _topic2Folder.CorrectPredictions = pRight;
             foreach (IInstance instance in _unknownFolder)
@@ -392,6 +396,8 @@ namespace MessagePredictor
                     topic1Predictions++;
                 else if (instance.Prediction.Label == _topic2Folder.Label)
                     topic2Predictions++;
+                if (instance.RecentlyChanged)
+                    recentlyChangedPredictions++;
             }
             Topic1Predictions = topic1Predictions;
             Topic2Predictions = topic2Predictions;

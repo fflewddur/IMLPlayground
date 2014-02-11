@@ -22,6 +22,8 @@ namespace MessagePredictor.Model
         private Prediction _prediction;
         private Prediction _previousPrediction;
         private bool _recentlyChanged;
+        private bool _confidenceUp;
+        private bool _confidenceDown;
         private bool? _isPredictionCorrect;
         private SparseVector _featureCounts;
         private Label _label;
@@ -124,11 +126,46 @@ namespace MessagePredictor.Model
             set
             {
                 Prediction prev = Prediction;
+                //RecentlyChanged = false;
                 if (SetProperty<Prediction>(ref _prediction, value))
                 {
                     // If our Prediction changed, store the old value in PreviousPrediction
                     PreviousPrediction = prev;
-                    RecentlyChanged = true;
+                    if (PreviousPrediction != null && PreviousPrediction.Label != Prediction.Label)
+                        RecentlyChanged = true;
+                    else
+                        RecentlyChanged = false;
+
+                    // Did the confidence go up or down? If the prediction just changed, it obviously went up.
+                    if (PreviousPrediction != null && RecentlyChanged == false)
+                    {
+                        if (PreviousPrediction.Confidence > Prediction.Confidence)
+                        {
+                            ConfidenceDown = true;
+                            ConfidenceUp = false;
+                        }
+                        else if (PreviousPrediction.Confidence < Prediction.Confidence)
+                        {
+                            ConfidenceUp = true;
+                            ConfidenceDown = false;
+                        }
+                        else
+                        {
+                            ConfidenceDown = false;
+                            ConfidenceUp = false;
+                        }
+                    }
+                    else if (RecentlyChanged == true)
+                    {
+                        ConfidenceDown = false;
+                        ConfidenceUp = true;
+                    }
+                    else
+                    {
+                        ConfidenceUp = false;
+                        ConfidenceDown = false;
+                    }
+
                     // Is our prediction correct?
                     if (Label != null)
                     {
@@ -149,7 +186,7 @@ namespace MessagePredictor.Model
                 else
                 {
                     // Otherwise, ensure PreviosPrediction is null
-                    PreviousPrediction = null;
+                    //PreviousPrediction = null;
                     RecentlyChanged = false;
                 }
             }
@@ -165,6 +202,18 @@ namespace MessagePredictor.Model
         {
             get { return _recentlyChanged; }
             private set { SetProperty<bool>(ref _recentlyChanged, value); }
+        }
+
+        public bool ConfidenceUp
+        {
+            get { return _confidenceUp; }
+            private set { SetProperty<bool>(ref _confidenceUp, value); }
+        }
+
+        public bool ConfidenceDown
+        {
+            get { return _confidenceDown; }
+            private set { SetProperty<bool>(ref _confidenceDown, value); }
         }
 
         public bool? IsPredictionCorrect

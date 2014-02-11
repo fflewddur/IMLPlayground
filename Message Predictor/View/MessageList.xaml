@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              xmlns:local="clr-namespace:MessagePredictor.View" 
+             xmlns:model="clr-namespace:MessagePredictor.Model" 
              d:DesignHeight="300" d:DesignWidth="600">
     <Grid>
         <Grid.ColumnDefinitions>
@@ -24,8 +25,19 @@
                         <TextBlock TextAlignment="Center" >Predicted<LineBreak />topic</TextBlock>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock TextAlignment="Center" Text="{Binding Prediction.Label}"/>
+                        <DataTemplate DataType="model:NewsItem">
+                            <TextBlock TextAlignment="Center" Text="{Binding Prediction.Label}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding RecentlyChanged}" Value="True">
+                                                <Setter Property="Background" Value="LightSalmon" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+
+                            </TextBlock>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
@@ -34,8 +46,55 @@
                         <TextBlock TextAlignment="Center">Prediction<LineBreak />confidence</TextBlock>
                     </DataGridTemplateColumn.Header>
                     <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate>
-                            <TextBlock TextAlignment="Center" Text="{Binding Prediction.Confidence, StringFormat={}{0:P0}}" />
+                        <DataTemplate DataType="model:NewsItem">
+                            <StackPanel Orientation="Horizontal" Background="Transparent" HorizontalAlignment="Center">
+                                <TextBlock TextAlignment="Center" Text="{Binding Prediction.Confidence, StringFormat={}{0:P0}}">
+                                    
+                                </TextBlock>
+                                <Polygon Points="0,0 12,0 6,12" SnapsToDevicePixels="True" Fill="Red" Stroke="DarkRed" StrokeThickness="2" Margin="8 2" Name="DownArrow">
+                                    <Polygon.Style>
+                                        <Style TargetType="Polygon">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ConfidenceDown}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Polygon.Style>
+                                </Polygon>
+                                <Polygon Points="0,12 12,12, 6,0" SnapsToDevicePixels="True" Fill="Green" Stroke="DarkGreen" StrokeThickness="2" Margin="8 2" Name="UpArrow">
+                                    <Polygon.Style>
+                                        <Style TargetType="Polygon">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ConfidenceUp}" Value="True">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Polygon.Style>
+                                </Polygon>
+                                <StackPanel.ToolTip>
+                                    <ToolTip>
+                                        <Label Content="{Binding PreviousPrediction.Confidence}" ContentStringFormat="Prior confidence was {0:P0}" />
+                                        <ToolTip.Style>
+                                            <Style TargetType="ToolTip">
+                                                <Setter Property="Visibility" Value="Visible"/>
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding ConfidenceUp}" Value="False"/>
+                                                            <Condition Binding="{Binding ConfidenceDown}" Value="False"/>
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Collapsed"/>
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ToolTip.Style>
+                                    </ToolTip>
+                                </StackPanel.ToolTip>
+                            </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
