@@ -48,10 +48,39 @@
     <Style x:Key="featureMenuCheckable" TargetType="MenuItem">
         <Setter Property="IsCheckable" Value="True"/>
     </Style>
+    
+    <!-- Heat map -->
+    
     <ItemsPanelTemplate x:Key="heatMapPanel">
-        <WrapPanel Orientation="Horizontal" />
+        <WrapPanel Orientation="Horizontal"  />
     </ItemsPanelTemplate>
 
+    <Style x:Key="heatMapItemContainer" TargetType="ListViewItem">
+        <Setter Property="Margin" Value="0" />
+        <Setter Property="Padding" Value="2" />
+    </Style>
+
+
+    <DataTemplate x:Key="heatMapItemTemplate" DataType="model:NewsItem">
+        <Rectangle Width="10" Height="10" Margin="0" SnapsToDevicePixels="True">
+            <Rectangle.Style>
+                <Style TargetType="Rectangle">
+                    <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.ControlLightBrushKey}}" />
+                    <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.InactiveBorderBrush}}" />
+                    <Setter Property="StrokeThickness" Value="1" />
+                    <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                            <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
+                            <!--<Setter Property="Stroke" Value="Gray"/>-->
+                        </DataTrigger>
+                    </Style.Triggers>
+                </Style>
+            </Rectangle.Style>
+        </Rectangle>
+    </DataTemplate>
+    
+    <!-- End heat map -->
+    
     <!-- Folder list -->
     <ItemsPanelTemplate x:Key="folderListPanel">
         <UniformGrid Columns="1"></UniformGrid>

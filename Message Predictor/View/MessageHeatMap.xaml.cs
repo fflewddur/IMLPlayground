@@ -26,45 +26,5 @@ namespace MessagePredictor.View
         {
             InitializeComponent();
         }
-
-        private void Message_Selected(object sender, MouseEventArgs e)
-        {
-            HeatMapViewModel vm = this.DataContext as HeatMapViewModel;
-            FrameworkElement element = sender as FrameworkElement;
-            NewsItem item = null;
-            if (element != null)
-                item = element.DataContext as NewsItem;
-
-            if (vm != null && item != null)
-            {
-                vm.CurrentMessage = item;
-            }
-        }
-
-        private void Grid_MouseEnter(object sender, MouseEventArgs e)
-        {
-            FrameworkElement element = sender as FrameworkElement;
-            NewsItem item = null;
-            if (element != null)
-                item = element.DataContext as NewsItem;
-
-            if (item != null)
-            {
-                item.IsMouseOver = true;
-            }
-        }
-
-        private void Grid_MouseLeave(object sender, MouseEventArgs e)
-        {
-            FrameworkElement element = sender as FrameworkElement;
-            NewsItem item = null;
-            if (element != null)
-                item = element.DataContext as NewsItem;
-
-            if (item != null)
-            {
-                item.IsMouseOver = false;
-            }
-        }
     }
 }

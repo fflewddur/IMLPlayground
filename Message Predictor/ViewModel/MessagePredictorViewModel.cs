@@ -445,8 +445,9 @@ namespace MessagePredictor
 
         private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
         {
-            if (FolderListVM.SelectedFolder.SelectedMessage != null)
+            if (FolderListVM.SelectedFolder.SelectedMessage != null) {
                 FolderListVM.SelectedFolder.SelectedMessage.HighlightWithWord(e.Text);
+            }
         }
 
         private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
