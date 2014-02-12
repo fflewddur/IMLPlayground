@@ -133,6 +133,8 @@
     <Compile Include="ViewModel\Base\ViewModelCollectionBase.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
     <Compile Include="ViewModel\FeatureSetViewModel.cs" />
+    <Compile Include="ViewModel\FolderListViewModel.cs" />
+    <Compile Include="ViewModel\FolderViewModel.cs" />
     <Compile Include="ViewModel\HeatMapViewModel.cs" />
     <Compile Include="ViewModel\MessagePredictorViewModel.cs" />
     <Compile Include="View\AddFeatureDialog.xaml.cs">

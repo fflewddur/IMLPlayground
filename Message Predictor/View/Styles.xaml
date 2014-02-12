@@ -13,6 +13,12 @@
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
         <Setter Property="TextBlock.TextAlignment" Value="Center"/>
     </Style>
+    <Style x:Key="headerStyle3">
+        <Setter Property="Control.FontSize" Value="13" />
+        <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
+        <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+        <Setter Property="TextBlock.Margin" Value="0"/>
+    </Style>
     <Style x:Key="contentStyle">
         <Setter Property="Control.FontSize" Value="12" />
         <Setter Property="Control.FontFamily" Value="Segoe UI" />
@@ -45,4 +51,51 @@
     <ItemsPanelTemplate x:Key="heatMapPanel">
         <WrapPanel Orientation="Horizontal" />
     </ItemsPanelTemplate>
+
+    <!-- Folder list -->
+    <ItemsPanelTemplate x:Key="folderListPanel">
+        <UniformGrid Columns="1"></UniformGrid>
+    </ItemsPanelTemplate>
+
+    <Style x:Key="folderListItem" TargetType="ListBoxItem">
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+    </Style>
+
+    <local:FolderListItemTemplateSelector x:Key="folderListItemTemplateSelector">
+        <local:FolderListItemTemplateSelector.UnknownTemplate>
+            <DataTemplate>
+                <Grid VerticalAlignment="Center" Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="{Binding Label}" Style="{StaticResource headerStyle3}" TextAlignment="Center"/>
+                    <Label Grid.Row="1" Content="{Binding MessageCount}" ContentStringFormat="({0:N0} messages)" HorizontalContentAlignment="Center"/>
+                </Grid>
+            </DataTemplate>
+        </local:FolderListItemTemplateSelector.UnknownTemplate>
+        <local:FolderListItemTemplateSelector.TopicTemplate>
+            <DataTemplate>
+                <Grid VerticalAlignment="Center" Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Label Grid.Row="0" Content="{Binding Label}" Style="{StaticResource headerStyle3}" HorizontalContentAlignment="Center"/>
+                    <TextBlock Grid.Row="1" TextAlignment="Center" Margin="0" Padding="0">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat="{}{0:N0}/{1:N0}">
+                                <Binding Path="CorrectPredictionCount" />
+                                <Binding Path="MessageCount" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <Label Grid.Row="2" Content="correct predictions" HorizontalContentAlignment="Center" Margin="0" Padding="0"/>
+                </Grid>
+            </DataTemplate>
+        </local:FolderListItemTemplateSelector.TopicTemplate>
+    </local:FolderListItemTemplateSelector>
+    
+    <!-- End Folder list -->
 </ResourceDictionary>

@@ -138,9 +138,9 @@ namespace LibIML
                     if (instance.Features.Data.TryGetValue(id, out count))
                     {
                         int df;
-                        _perClassFeatureCounts[instance.Label].TryGetValue(id, out df);
+                        _perClassFeatureCounts[instance.GroundTruthLabel].TryGetValue(id, out df);
                         df += (int)count;
-                        _perClassFeatureCounts[instance.Label][id] = df;
+                        _perClassFeatureCounts[instance.GroundTruthLabel][id] = df;
                     }
                 }
                 int totalDf;
@@ -333,7 +333,7 @@ namespace LibIML
                         itemFeatures[index] = string.Format("{0} {1}", pair.Key - 1, pair.Value); // Subtract 1 because ARFF features are 0-indexed, but our are 1-indexed
                         index++;
                     }
-                    itemFeatures[index] = string.Format("{0} \"{1}\"", classIndex, instance.Label.SystemLabel);
+                    itemFeatures[index] = string.Format("{0} \"{1}\"", classIndex, instance.GroundTruthLabel.SystemLabel);
                     string featureString = string.Join(", ", itemFeatures);
                     await writer.WriteLineAsync(string.Format("{{{0}}}", featureString));
                 }
@@ -403,13 +403,13 @@ namespace LibIML
             foreach (KeyValuePair<int, double> pair in instance.Features.Data)
             {
                 int count;
-                _perClassFeatureCounts[instance.Label].TryGetValue(pair.Key, out count);
+                _perClassFeatureCounts[instance.GroundTruthLabel].TryGetValue(pair.Key, out count);
                 count += (int)pair.Value;
-                _perClassFeatureCounts[instance.Label][pair.Key] = count;
+                _perClassFeatureCounts[instance.GroundTruthLabel][pair.Key] = count;
             }
 
             // Store this feature vector
-            _trainingSet[instance.Label].Add(instance);
+            _trainingSet[instance.GroundTruthLabel].Add(instance);
         }
 
         /// <summary>

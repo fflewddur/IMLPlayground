@@ -385,7 +385,7 @@ namespace LibIML
 
             foreach (IInstance instance in instances)
             {
-                labelCounts[instance.Label]++;
+                labelCounts[instance.GroundTruthLabel]++;
             }
 
             foreach (Label label in labels)
@@ -439,8 +439,8 @@ namespace LibIML
                 foreach (int featureId in instance.Features.Data.Keys)
                 {
                     int count;
-                    featureCountsPerClass[instance.Label].TryGetValue(featureId, out count);
-                    featureCountsPerClass[instance.Label][featureId] = count + 1; // Increment this feature's count for this class
+                    featureCountsPerClass[instance.GroundTruthLabel].TryGetValue(featureId, out count);
+                    featureCountsPerClass[instance.GroundTruthLabel][featureId] = count + 1; // Increment this feature's count for this class
                     featureCounts.TryGetValue(featureId, out count);
                     featureCounts[featureId] = count + 1; // Increment the number of document's we've seen this feature in
 
@@ -477,7 +477,7 @@ namespace LibIML
                 // How many instances are there for each label?
                 foreach (IInstance instance in instances)
                 {
-                    if (instance.Label == label)
+                    if (instance.GroundTruthLabel == label)
                     {
                         instancesPerLabel[label]++;
                     }
@@ -498,7 +498,7 @@ namespace LibIML
                 foreach (int featureId in instance.Features.Data.Keys)
                 {
                     // Start off assuming each feature is absent from each document; decrement counter each time we see a given feature.
-                    featureAbsencesPerClass[instance.Label][featureId]--;
+                    featureAbsencesPerClass[instance.GroundTruthLabel][featureId]--;
                     featureAbsences[featureId]--;
                 }
             }

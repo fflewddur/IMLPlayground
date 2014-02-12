@@ -78,7 +78,7 @@ namespace MessagePredictor.Model
                                 {
                                     item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
                                     if (item != null)
-                                        item.Label = label;
+                                        item.GroundTruthLabel = label;
                                     break;
                                 }
                             }

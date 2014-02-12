@@ -65,7 +65,7 @@ namespace LibIML
             {
                 Prediction prediction = Classifier.PredictInstance(instance);
                 Console.WriteLine(prediction);
-                if (prediction.Label == instance.Label)
+                if (prediction.Label == instance.GroundTruthLabel)
                 {
                     // Correct prediction.
                     int index = _labelIndices[prediction.Label];
@@ -76,7 +76,7 @@ namespace LibIML
                 {
                     // Incorrect prediction. Increment [column(actual class), row(predicted class)]
                     int indexPredicted = _labelIndices[prediction.Label];
-                    int indexActual = _labelIndices[instance.Label];
+                    int indexActual = _labelIndices[instance.GroundTruthLabel];
                     _confusionMatrix[indexPredicted, indexActual]++;
                     incorrect++;
                 }

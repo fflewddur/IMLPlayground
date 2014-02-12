@@ -10,7 +10,8 @@ namespace LibIML
     {
         string AllText { get; }
         Dictionary<string, int> TokenCounts { get; set; }
-        Label Label { get; set; }
+        Label UserLabel { get; set; }
+        Label GroundTruthLabel { get; set; }
         SparseVector Features { get; }
         Prediction Prediction { get; set; }
         Prediction PreviousPrediction { get; set; }

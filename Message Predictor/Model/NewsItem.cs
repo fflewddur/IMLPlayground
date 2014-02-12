@@ -26,7 +26,8 @@ namespace MessagePredictor.Model
         private bool _confidenceDown;
         private bool? _isPredictionCorrect;
         private SparseVector _featureCounts;
-        private Label _label;
+        private Label _userLabel;
+        private Label _groundTruthLabel;
         private bool _isHighlighted; // Should this message be highlighted in the heatmap?
         private bool _isMouseOver; // Is the mouse hovering over this message in the heatmap?
         private bool _isSelected; // Is this the selected message in the heatmap?
@@ -74,10 +75,16 @@ namespace MessagePredictor.Model
             private set { SetProperty<string>(ref _author, value); }
         }
 
-        public Label Label
+        public Label UserLabel
         {
-            get { return _label; }
-            set { SetProperty<Label>(ref _label, value); }
+            get { return _userLabel; }
+            set { SetProperty<Label>(ref _userLabel, value); }
+        }
+
+        public Label GroundTruthLabel
+        {
+            get { return _groundTruthLabel; }
+            set { SetProperty<Label>(ref _groundTruthLabel, value); }
         }
 
         public bool IsHighlighted
@@ -167,9 +174,9 @@ namespace MessagePredictor.Model
                     }
 
                     // Is our prediction correct?
-                    if (Label != null)
+                    if (GroundTruthLabel != null)
                     {
-                        if (Prediction.Label == Label)
+                        if (Prediction.Label == GroundTruthLabel)
                         {
                             IsPredictionCorrect = true;
                         }
