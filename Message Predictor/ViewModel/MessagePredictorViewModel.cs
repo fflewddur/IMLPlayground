@@ -30,7 +30,7 @@ namespace MessagePredictor
         //NewsCollection _topic1Folder;
         //NewsCollection _topic2Folder;
         //NewsCollection _currentFolder;
-        NewsItem _currentMessage;
+        //NewsItem _currentMessage;
         List<Label> _labels;
         Vocabulary _vocab;
         int _desiredVocabSize;
@@ -97,9 +97,9 @@ namespace MessagePredictor
             _folderListVM.SelectedFolderChanged += _folderListVM_SelectedFolderChanged;
 
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
-            _featureSetVM.FeatureAdded += featureSetVM_FeatureAdded;
-            _featureSetVM.FeatureRemoved += featureSetVM_FeatureRemoved;
-            _featureSetVM.FeatureTextEdited += featureSetVM_FeatureTextEdited;
+            _featureSetVM.FeatureAdded += _featureSetVM_FeatureAdded;
+            _featureSetVM.FeatureRemoved += _featureSetVM_FeatureRemoved;
+            _featureSetVM.FeatureTextEdited += _featureSetVM_FeatureTextEdited;
 
             _heatMapVM = new HeatMapViewModel(_messages);
             _heatMapVM.HighlightTextChanged += _heatMapVM_HighlightTextChanged;
@@ -109,46 +109,21 @@ namespace MessagePredictor
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
-            FileToUnknown = new RelayCommand(PerformFileToUnknown, CanPerformFileToUnknown);
-            FileToTopic1 = new RelayCommand(PerformFileToTopic1, CanPerformFileToTopic1);
-            FileToTopic2 = new RelayCommand(PerformFileToTopic2, CanPerformFileToTopic2);
+            LabelMessage = new RelayCommand<Label>(PerformLabelMessage, CanPerformLabelMessage);
 
             // Start with our current folder pointing at the collection of unlabeled items.
-            //Folders = folders;
-            //CurrentFolder = Folders[0];
-            //CurrentMessage = CurrentFolder[0];
             AutoUpdatePredictions = (bool)App.Current.Properties[MessagePredictor.App.PropertyKey.AutoUpdatePredictions];
 
             // Evaluate the classifier (so we can show predictions to the user)
             PerformUpdatePredictions();
-            
+
+            // TODO select the first message of the Unknown folder by default
             _folderListVM.SelectFolderByIndex(0);
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
 
         #region Properties
-
-        //public List<NewsCollection> Folders
-        //{
-        //    get { return _folders; }
-        //    private set { SetProperty<List<NewsCollection>>(ref _folders, value); }
-        //}
-
-        //public NewsCollection CurrentFolder
-        //{
-        //    get { return _currentFolder; }
-        //    set
-        //    {
-        //        if (SetProperty<NewsCollection>(ref _currentFolder, value))
-        //        {
-        //            CurrentMessage = CurrentFolder[0]; // Go to the first message in this folder
-        //            FileToUnknown.RaiseCanExecuteChanged();
-        //            FileToTopic1.RaiseCanExecuteChanged();
-        //            FileToTopic2.RaiseCanExecuteChanged();
-        //        }
-        //    }
-        //}
 
         public CollectionViewSource MessageListViewSource
         {
@@ -160,12 +135,6 @@ namespace MessagePredictor
         {
             get { return _folderListViewSource; }
             private set { SetProperty<CollectionViewSource>(ref _folderListViewSource, value); }
-        }
-
-        public NewsItem CurrentMessage
-        {
-            get { return _currentMessage; }
-            set { SetProperty<NewsItem>(ref _currentMessage, value); }
         }
 
         public string Topic1UserLabel
@@ -253,9 +222,7 @@ namespace MessagePredictor
         #region Commands
 
         public RelayCommand UpdatePredictions { get; private set; }
-        public RelayCommand FileToUnknown { get; private set; }
-        public RelayCommand FileToTopic1 { get; private set; }
-        public RelayCommand FileToTopic2 { get; private set; }
+        public RelayCommand<Label> LabelMessage { get; private set; }
 
         private bool CanPerformUpdatePredictions()
         {
@@ -278,55 +245,42 @@ namespace MessagePredictor
             PredictMessages(_classifier, _messages);
             EvaluateClassifier(_classifier);
             _folderListVM.UpdateFolderCounts(_messages);
+            _messageListViewSource.View.Refresh();
         }
 
-        private bool CanPerformFileToUnknown()
+        private bool CanPerformLabelMessage(Label label)
         {
-            //if (CurrentMessage != null &&
-            //    GetFolderContainingMessage(CurrentMessage) != _unknownFolder)
-            //{
-            //    return true;
-            //}
-            //else
-            return false;
+            return true;
         }
 
-        private void PerformFileToUnknown()
+        private void PerformLabelMessage(Label label)
         {
-            //FileCurrentMessageToFolder(_unknownFolder);
-        }
+            NewsItem item = FolderListVM.SelectedFolder.SelectedMessage;
+            item.UserLabel = label;
 
-        private bool CanPerformFileToTopic1()
-        {
-            //if (CurrentMessage != null &&
-            //    GetFolderContainingMessage(CurrentMessage) != _topic1Folder)
-            //{
-            //    return true;
-            //}
-            //else
-            return false;
-        }
+            // Try to select the next message. If there is no next message, select the previous message.
+            if (!_messageListViewSource.View.MoveCurrentToNext()) {
+                _messageListViewSource.View.MoveCurrentToPrevious();
+            }
 
-        private void PerformFileToTopic1()
-        {
-            //FileCurrentMessageToFolder(_topic1Folder);
-        }
+            if (label == null) {
+                // If we moved something to Unknown, remove it from our vocabulary
+                _vocab.RemoveInstanceTokens(item);
+            } else {
+                // If we moved something from unknown to a different folder, add it to our vocabulary
+                // (This is safe because we can't move items between the two topic folders--they can only be filed
+                // to the correct folder.)
+                _vocab.AddInstanceTokens(item);
+            }
 
-        private bool CanPerformFileToTopic2()
-        {
-            //if (CurrentMessage != null &&
-            //    GetFolderContainingMessage(CurrentMessage) != _topic2Folder)
-            //{
-            //    return true;
-            //}
-            //else
-            return false;
-        }
-
-        private void PerformFileToTopic2()
-        {
-
-            //FileCurrentMessageToFolder(_topic2Folder);
+            // If autoupdate is on, retrain the classifier
+            if (AutoUpdatePredictions) {
+                PerformUpdatePredictions();
+            } else {
+                // Still need to update our view
+                _folderListVM.UpdateFolderCounts(_messages);
+                _messageListViewSource.View.Refresh(); 
+            }
         }
 
         #endregion
@@ -437,86 +391,6 @@ namespace MessagePredictor
             Console.WriteLine("Time to evaluate classifier: {0}", timer.Elapsed);
         }
 
-        //private void FileCurrentMessageToFolder(NewsCollection folder)
-        //{
-        //    NewsItem item = CurrentMessage;
-
-        //    if (MoveMessageToFolder(item, folder))
-        //    {
-        //        // We successfully moved this message
-        //        if (folder == _unknownFolder)
-        //        {
-        //            // If we moved something to Unknown, remove it from our vocabulary
-        //            _vocab.RemoveInstanceTokens(item);
-        //        }
-        //        else
-        //        {
-        //            // If we moved something from unknown to a different folder, add it to our vocabulary
-        //            // (This is safe because we can't move items between the two topic folders--they can only be filed
-        //            // to the correct folder.)
-        //            _vocab.AddInstanceTokens(item);
-        //        }
-
-        //        // If autoupdate is on, retrain the classifier
-        //        if (AutoUpdatePredictions)
-        //        {
-        //            PerformUpdatePredictions();
-        //        }
-        //    }
-        //}
-
-        /// <summary>
-        /// Move a message to a different folder.
-        /// </summary>
-        /// <param name="item">The message to move.</param>
-        /// <param name="collection">The folder to move the item into.</param>
-        /// <returns>True on success, false on failure.</returns>
-        //private bool MoveMessageToFolder(NewsItem item, NewsCollection collection)
-        //{
-        //    bool retval = false;
-        //    NewsCollection container = GetFolderContainingMessage(item);
-        //    if (container != null)
-        //    {
-        //        if (container == collection)
-        //        {
-        //            Console.Error.WriteLine("Error: Cannot move item {0} into container {0} because it's already there.", item, container);
-        //        }
-        //        else if (!container.Remove(item))
-        //        {
-        //            Console.Error.WriteLine("Error removing item {0} from container {0}", item, container);
-        //        }
-        //        else
-        //        {
-        //            collection.Add(item);
-        //            CurrentMessage = container.First();
-        //            retval = true;
-        //        }
-        //    }
-
-        //    return retval;
-        //}
-
-        /// <summary>
-        /// Find the collection containing a given item.
-        /// </summary>
-        /// <param name="item">The NewsItem to search for.</param>
-        /// <returns>The collection containing 'item', or null if not found.</returns>
-        //private NewsCollection GetFolderContainingMessage(NewsItem item)
-        //{
-        //    NewsCollection container = null;
-
-        //    foreach (NewsCollection collection in Folders)
-        //    {
-        //        if (collection.Contains(item))
-        //        {
-        //            container = collection;
-        //            break;
-        //        }
-        //    }
-
-        //    return container;
-        //}
-
         /// <summary>
         /// Recompute the feature vector for every item in every folder.
         /// This is a brute-force way to ensure that our feature vectors are always in sync
@@ -531,7 +405,7 @@ namespace MessagePredictor
             }
         }
 
-        private void featureSetVM_FeatureAdded(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
+        private void _featureSetVM_FeatureAdded(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
         {
             Console.WriteLine("added feature {0}", e.Tokens);
             // Ensure the vocabulary includes the token for this feature
@@ -555,7 +429,7 @@ namespace MessagePredictor
             }
         }
 
-        private void featureSetVM_FeatureRemoved(object sender, EventArgs e)
+        private void _featureSetVM_FeatureRemoved(object sender, EventArgs e)
         {
             UpdateVocab();
             if (AutoUpdatePredictions) {
@@ -564,18 +438,18 @@ namespace MessagePredictor
         }
 
         // Tell the heatmap to show messages containing the feature the user is currently editing
-        void featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
+        private void _featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
         {
             HeatMapVM.ToHighlight = e.Tokens;
         }
 
-        void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
+        private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
         {
-            if (CurrentMessage != null)
-                CurrentMessage.HighlightWithWord(e.Text);
+            if (FolderListVM.SelectedFolder.SelectedMessage != null)
+                FolderListVM.SelectedFolder.SelectedMessage.HighlightWithWord(e.Text);
         }
 
-        void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
+        private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
         {
             FolderListViewModel vm = sender as FolderListViewModel;
             // If this is the Unknown folder, look for items without a user label.
@@ -584,6 +458,11 @@ namespace MessagePredictor
             } else {
                 // Otherwise, look for items with the same label as the selected folder
                 _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == e.Folder.Label);
+            }
+
+            //if (vm.SelectedFolder.SelectedMessage == null) {
+            if (_messageListViewSource.View.CurrentItem == null) {
+                _messageListViewSource.View.MoveCurrentToFirst();
             }
         }
 

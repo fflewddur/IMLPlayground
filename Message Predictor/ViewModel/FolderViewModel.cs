@@ -1,4 +1,5 @@
 ﻿using LibIML;
+using MessagePredictor.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace MessagePredictor.ViewModel
         private int _messageCount;
         private int _correctPredictionCount;
         private int _priorCorrectPredictionCount;
+        private NewsItem _selectedMessage;
 
         public FolderViewModel(Label label)
             : base()
@@ -44,6 +46,12 @@ namespace MessagePredictor.ViewModel
         {
             get { return _priorCorrectPredictionCount; }
             set { SetProperty<int>(ref _priorCorrectPredictionCount, value); }
+        }
+
+        public NewsItem SelectedMessage
+        {
+            get { return _selectedMessage; }
+            set { SetProperty<NewsItem>(ref _selectedMessage, value); }
         }
 
         #endregion

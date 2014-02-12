@@ -18,7 +18,7 @@ namespace MessagePredictor
     public partial class App : Application
     {
         public const string DataDir = "Datasets";
-        
+
         public enum Condition
         {
             Control,
@@ -117,8 +117,7 @@ namespace MessagePredictor
             PropertyKey keyVocabSize = PropertyKey.Unknown;
             PropertyKey keySystemLabel = PropertyKey.Unknown;
             PropertyKey keyUserLabel = PropertyKey.Unknown;
-            switch (topic)
-            {
+            switch (topic) {
                 case 1:
                     keyTrainSize = PropertyKey.Topic1TrainSize;
                     keyTestSize = PropertyKey.Topic1TestSize;
@@ -137,7 +136,7 @@ namespace MessagePredictor
                     Console.Error.WriteLine("Unknown topic: {0}", topic);
                     break;
             }
-            
+
             this.Properties[keyTrainSize] = trainSize;
             this.Properties[keyTestSize] = testSize;
             this.Properties[keyVocabSize] = vocabSize;
@@ -148,8 +147,7 @@ namespace MessagePredictor
         private void LoadAutoUpdatePredictionsProperty(XElement element)
         {
             bool autoupdate = true;
-            if (!bool.TryParse(element.Value, out autoupdate))
-            {
+            if (!bool.TryParse(element.Value, out autoupdate)) {
                 Console.Error.WriteLine("Error parsing AutoUpdatePredictions property '{0}'", element.Value.ToString());
             }
 
@@ -162,44 +160,31 @@ namespace MessagePredictor
         private void LoadPropertiesFile()
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "properties.xml");
-            try
-            {
+            try {
                 XDocument xdoc = XDocument.Load(path);
-                foreach (XElement element in xdoc.Root.Elements())
-                {
+                foreach (XElement element in xdoc.Root.Elements()) {
                     if (element.Name == "Condition") // Are we running control or treatment?
                     {
                         LoadConditionProperty(element);
-                    }
-                    else if (element.Name == "TimeLimit") // How long should we let the program run?
+                    } else if (element.Name == "TimeLimit") // How long should we let the program run?
                     {
                         LoadTimeLimitProperty(element);
-                    }
-                    else if (element.Name == "DataSet")
-                    {
+                    } else if (element.Name == "DataSet") {
                         if (element.Attribute("file") != null)
                             this.Properties[PropertyKey.DatasetFile] = element.Attribute("file").Value.ToString();
 
-                        foreach (XElement childElement in element.Elements())
-                        {
-                            if (childElement.Name == "Topic1")
-                            {
+                        foreach (XElement childElement in element.Elements()) {
+                            if (childElement.Name == "Topic1") {
                                 LoadTopicProperty(childElement, 1);
-                            }
-                            else if (childElement.Name == "Topic2")
-                            {
+                            } else if (childElement.Name == "Topic2") {
                                 LoadTopicProperty(childElement, 2);
                             }
                         }
-                    }
-                    else if (element.Name == "AutoUpdatePredictions")
-                    {
+                    } else if (element.Name == "AutoUpdatePredictions") {
                         LoadAutoUpdatePredictionsProperty(element);
                     }
                 }
-            }
-            catch (FileNotFoundException e)
-            {
+            } catch (FileNotFoundException e) {
                 Console.Error.WriteLine("Could not load properties file: {0}", e.Message);
             }
         }

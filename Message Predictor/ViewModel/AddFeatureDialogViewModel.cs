@@ -16,7 +16,8 @@ namespace MessagePredictor.ViewModel
         private string _selectedWeight;
         private bool _addIsEnabled;
 
-        public AddFeatureDialogViewModel(Label label) : base()
+        public AddFeatureDialogViewModel(Label label)
+            : base()
         {
             Label = label;
             Word = ""; // use an empty string, not null, to make it easier to style the empty string with placeholder text.
@@ -38,8 +39,7 @@ namespace MessagePredictor.ViewModel
             get { return _word; }
             set
             {
-                if (SetProperty<string>(ref _word, value))
-                {
+                if (SetProperty<string>(ref _word, value)) {
                     if (string.IsNullOrWhiteSpace(Word))
                         AddIsEnabled = false;
                     else

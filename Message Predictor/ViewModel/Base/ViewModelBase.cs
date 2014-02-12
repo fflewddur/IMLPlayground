@@ -28,8 +28,7 @@ namespace MessagePredictor
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var eventHandler = this.PropertyChanged;
-            if (eventHandler != null)
-            {
+            if (eventHandler != null) {
                 eventHandler(this, new PropertyChangedEventArgs(propertyName));
             }
         }

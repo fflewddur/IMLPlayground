@@ -26,6 +26,6 @@ namespace MessagePredictor
             return true;
         }
 
-        
+
     }
 }

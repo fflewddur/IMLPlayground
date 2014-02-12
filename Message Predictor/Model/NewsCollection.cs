@@ -13,14 +13,15 @@ namespace MessagePredictor.Model
     class NewsCollection : ViewModelCollectionBase<NewsItem>
     {
         //string _title;
-        Label _label;
-        int _correctPredictions;
+        //Label _label;
+        //int _correctPredictions;
 
-        public NewsCollection() : base()
+        public NewsCollection()
+            : base()
         {
             //Title = title;
-            Label = null;
-            CorrectPredictions = 0;
+            //Label = null;
+            //CorrectPredictions = 0;
         }
 
         #region Properties
@@ -31,17 +32,17 @@ namespace MessagePredictor.Model
         //    set { SetProperty<string>(ref _title, value); }
         //}
 
-        public Label Label
-        {
-            get { return _label; }
-            set { SetProperty<Label>(ref _label, value); }
-        }
+        //public Label Label
+        //{
+        //    get { return _label; }
+        //    set { SetProperty<Label>(ref _label, value); }
+        //}
 
-        public int CorrectPredictions
-        {
-            get { return _correctPredictions; }
-            set { SetProperty<int>(ref _correctPredictions, value); }
-        }
+        //public int CorrectPredictions
+        //{
+        //    get { return _correctPredictions; }
+        //    set { SetProperty<int>(ref _correctPredictions, value); }
+        //}
 
         #endregion
 
@@ -54,36 +55,28 @@ namespace MessagePredictor.Model
         public static NewsCollection CreateFromZip(string path, IEnumerable<Label> labels = null)
         {
             NewsCollection nc = new NewsCollection();
-            nc.Label = new Label("Unknown", "Unknown");
 
-            if (!File.Exists(path))
-            {
+            if (!File.Exists(path)) {
                 Console.Error.WriteLine("Error: file '{0}' not found.", path);
                 return null;
             }
 
-            using (ZipArchive zip = ZipFile.OpenRead(path))
-            {
-                foreach (ZipArchiveEntry entry in zip.Entries)
-                {
+            using (ZipArchive zip = ZipFile.OpenRead(path)) {
+                foreach (ZipArchiveEntry entry in zip.Entries) {
                     // Don't bother with directory entries
-                    if (entry.FullName != null && !entry.FullName.EndsWith("/"))
-                    {
+                    if (entry.FullName != null && !entry.FullName.EndsWith("/")) {
                         NewsItem item = null;
-                        if (labels != null && labels.Count() > 0)
-                        {
+                        if (labels != null && labels.Count() > 0) {
                             foreach (Label label in labels) // Did we ask to include this group?
                             {
-                                if (entry.FullName.StartsWith(label.SystemLabel, StringComparison.InvariantCultureIgnoreCase))
-                                {
+                                if (entry.FullName.StartsWith(label.SystemLabel, StringComparison.InvariantCultureIgnoreCase)) {
                                     item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
                                     if (item != null)
                                         item.GroundTruthLabel = label;
                                     break;
                                 }
                             }
-                        }
-                        else
+                        } else
                             item = NewsItem.CreateFromStream(entry.Open(), entry.FullName);
 
                         if (item != null)

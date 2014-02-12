@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePredictor.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -25,7 +26,7 @@ namespace MessagePredictor.View
             InitializeComponent();
         }
 
-        private void FileToFolder_Click(object sender, RoutedEventArgs e)
+        private void LabelMessage_Click(object sender, RoutedEventArgs e)
         {
             FileToMenu.IsOpen = false;
         }

@@ -84,8 +84,7 @@ namespace MessagePredictor.ViewModel
             get { return _toHighlight; }
             set
             {
-                if (SetProperty<string>(ref _toHighlight, value))
-                {
+                if (SetProperty<string>(ref _toHighlight, value)) {
                     OnHighlightTextChanged(new HighlightTextChangedEventArgs(_toHighlight));
                     MarkMessagesContainingWord(ToHighlight);
                     if (CurrentMessage != null)
@@ -100,25 +99,20 @@ namespace MessagePredictor.ViewModel
             set
             {
                 NewsItem temp = _currentMessage;
-                if (SetProperty<NewsItem>(ref _currentMessage, value))
-                {
+                if (SetProperty<NewsItem>(ref _currentMessage, value)) {
                     if (temp != null)
                         temp.IsSelected = false;
 
-                    if (CurrentMessage != null)
-                    {
+                    if (CurrentMessage != null) {
                         CurrentMessage.IsSelected = true;
                         CurrentMessage.HighlightWithWord(ToHighlight);
-                        if (_messageWindow == null)
-                        {
+                        if (_messageWindow == null) {
                             _messageWindow = new MessageWindow();
                             _messageWindow.Closed += _messageWindow_Closed;
                             _messageWindow.DataContext = this;
                             _messageWindow.Owner = App.Current.MainWindow;
                             _messageWindow.Show();
-                        }
-                        else
-                        {
+                        } else {
                             _messageWindow.Activate();
                         }
                     }
@@ -165,9 +159,8 @@ namespace MessagePredictor.ViewModel
 
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            
-            using (_heatMapView.DeferRefresh())
-            {
+
+            using (_heatMapView.DeferRefresh()) {
                 Parallel.ForEach(_messages, (item, state, index) =>
                 {
                     if (!isEmpty && containsWord.Match(item.AllText).Success)

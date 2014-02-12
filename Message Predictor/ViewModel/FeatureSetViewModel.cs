@@ -180,20 +180,15 @@ namespace MessagePredictor.ViewModel
         {
             Console.WriteLine("UpdateFeatures()");
             FeatureSet.Clear();
-            foreach (int id in _vocab.FeatureIds)
-            {
+            foreach (int id in _vocab.FeatureIds) {
                 string word = _vocab.GetWord(id);
                 Feature userFeature = _userAdded.Find(p => p.Characters == word);
                 // First, see if the user added this feature manually; if so, keep associating it with the label the user requested
-                if (userFeature != null)
-                {
+                if (userFeature != null) {
                     FeatureSet.Add(userFeature);
-                }
-                else
-                {
+                } else {
                     // Otherwise, figure out which label this feature is more important for
-                    foreach (Label label in _labels)
-                    {
+                    foreach (Label label in _labels) {
                         Feature f = new Feature(word, label);
                         f.SystemWeight = _classifier.GetFeatureWeight(id, label);
                         f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
@@ -211,8 +206,7 @@ namespace MessagePredictor.ViewModel
             vm.PropertyChanged += AddFeatureVM_PropertyChanged;
             dialog.DataContext = vm;
             bool? result = dialog.ShowDialog();
-            if (result == true)
-            {
+            if (result == true) {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
                 Feature f = new Feature(vm.Word.ToLower(), label);
                 if (vm.SelectedWeight == vm.Weights[0])
@@ -220,15 +214,14 @@ namespace MessagePredictor.ViewModel
                 else if (vm.SelectedWeight == vm.Weights[1])
                     f.WeightType = Feature.Weight.Medium;
                 f.MostImportant = true; // If the user added this to a given label, then it's always most important to that label.
-                
+
                 AddUserFeature(f);
             }
         }
 
         private void AddFeatureVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Word")
-            {
+            if (e.PropertyName == "Word") {
                 _featureTextEditedTimer.Stop();
                 AddFeatureDialogViewModel vm = sender as AddFeatureDialogViewModel;
                 if (vm != null)
@@ -255,15 +248,13 @@ namespace MessagePredictor.ViewModel
         private IReadOnlyList<CollectionViewSource> BuildCollectionViewSources(IReadOnlyList<Label> labels)
         {
             List<CollectionViewSource> collectionViewSources = new List<CollectionViewSource>();
-            foreach (Label label in labels)
-            {
+            foreach (Label label in labels) {
                 CollectionViewSource cvs = new CollectionViewSource();
                 cvs.Source = FeatureSet;
                 cvs.Filter += (o, e) =>
                 {
                     Feature f = e.Item as Feature;
-                    if (f != null)
-                    {
+                    if (f != null) {
                         // Only display features that are more important for this label than other labels
                         if (f.Label == label && f.MostImportant)
                             e.Accepted = true;

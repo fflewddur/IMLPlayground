@@ -134,8 +134,7 @@ namespace MessagePredictor.Model
             {
                 Prediction prev = Prediction;
                 //RecentlyChanged = false;
-                if (SetProperty<Prediction>(ref _prediction, value))
-                {
+                if (SetProperty<Prediction>(ref _prediction, value)) {
                     // If our Prediction changed, store the old value in PreviousPrediction
                     PreviousPrediction = prev;
                     if (PreviousPrediction != null && PreviousPrediction.Label != Prediction.Label)
@@ -144,54 +143,36 @@ namespace MessagePredictor.Model
                         RecentlyChanged = false;
 
                     // Did the confidence go up or down? If the prediction just changed, it obviously went up.
-                    if (PreviousPrediction != null && RecentlyChanged == false)
-                    {
-                        if (PreviousPrediction.Confidence > Prediction.Confidence)
-                        {
+                    if (PreviousPrediction != null && RecentlyChanged == false) {
+                        if (PreviousPrediction.Confidence > Prediction.Confidence) {
                             ConfidenceDown = true;
                             ConfidenceUp = false;
-                        }
-                        else if (PreviousPrediction.Confidence < Prediction.Confidence)
-                        {
+                        } else if (PreviousPrediction.Confidence < Prediction.Confidence) {
                             ConfidenceUp = true;
                             ConfidenceDown = false;
-                        }
-                        else
-                        {
+                        } else {
                             ConfidenceDown = false;
                             ConfidenceUp = false;
                         }
-                    }
-                    else if (RecentlyChanged == true)
-                    {
+                    } else if (RecentlyChanged == true) {
                         ConfidenceDown = false;
                         ConfidenceUp = true;
-                    }
-                    else
-                    {
+                    } else {
                         ConfidenceUp = false;
                         ConfidenceDown = false;
                     }
 
                     // Is our prediction correct?
-                    if (GroundTruthLabel != null)
-                    {
-                        if (Prediction.Label == GroundTruthLabel)
-                        {
+                    if (GroundTruthLabel != null) {
+                        if (Prediction.Label == GroundTruthLabel) {
                             IsPredictionCorrect = true;
-                        }
-                        else
-                        {
+                        } else {
                             IsPredictionCorrect = false;
                         }
-                    }
-                    else
-                    {
+                    } else {
                         IsPredictionCorrect = null;
                     }
-                }
-                else
-                {
+                } else {
                     // Otherwise, ensure PreviosPrediction is null
                     //PreviousPrediction = null;
                     RecentlyChanged = false;
@@ -260,8 +241,7 @@ namespace MessagePredictor.Model
         {
             SparseVector features = new SparseVector();
 
-            foreach (KeyValuePair<string, int> pair in TokenCounts)
-            {
+            foreach (KeyValuePair<string, int> pair in TokenCounts) {
                 int wordId = vocab.GetWordId(pair.Key, isRestricted);
                 if (wordId > 0) // Make sure this token was included in our vocabulary
                     features.Set(wordId, pair.Value);
@@ -296,10 +276,9 @@ namespace MessagePredictor.Model
         {
             // Use the largest first, so that sub-features don't get broken up (e.g., if "team" and "teams" are features, don't split "teams" into "team" and "s")
             List<string> featureWords = vocab.GetFeatureWords().OrderByDescending(s => s.Length).ToList();
-            
+
             // Ensure the list of features to highlight includes the specifically requested one
-            if (!string.IsNullOrWhiteSpace(highlightedFeature) && !featureWords.Contains(highlightedFeature))
-            {
+            if (!string.IsNullOrWhiteSpace(highlightedFeature) && !featureWords.Contains(highlightedFeature)) {
                 featureWords.Add(highlightedFeature);
             }
 
@@ -312,8 +291,7 @@ namespace MessagePredictor.Model
 
             XElement root = new XElement("message");
 
-            if (lines.Length > 1)
-            {
+            if (lines.Length > 1) {
                 // Get the Subject (1st line)
                 root.Add(new XElement("subject", lines[0]));
 
@@ -321,27 +299,20 @@ namespace MessagePredictor.Model
                 root.Add(new XElement("sender", lines[1]));
 
                 // Get everything else
-                for (int i = 2; i < lines.Length; i++)
-                {
+                for (int i = 2; i < lines.Length; i++) {
                     XElement line = new XElement("line");
                     string[] phrases = lines[i].Split(new string[] { "<feature>" }, StringSplitOptions.None); // Split on features/non-features
-                    
-                    foreach (string phrase in phrases)
-                    {
+
+                    foreach (string phrase in phrases) {
                         XElement phraseElement;
 
                         // If this is our highlighted feature, tag it appropriately
-                        if (string.Equals(phrase, highlightedFeature, StringComparison.InvariantCultureIgnoreCase))
-                        {
+                        if (string.Equals(phrase, highlightedFeature, StringComparison.InvariantCultureIgnoreCase)) {
                             phraseElement = new XElement("highlightedFeature", phrase);
-                        }
-                        else if (featureWords.Contains(phrase, StringComparer.InvariantCultureIgnoreCase))
-                        {
+                        } else if (featureWords.Contains(phrase, StringComparer.InvariantCultureIgnoreCase)) {
                             // Otherwise, see if this is a feature
                             phraseElement = new XElement("feature", phrase);
-                        }
-                        else
-                        {
+                        } else {
                             // Or just normal text
                             phraseElement = new XElement("normal", phrase);
                         }
@@ -370,8 +341,7 @@ namespace MessagePredictor.Model
         {
             NewsItem item = null;
 
-            using (TextReader reader = new StreamReader(stream))
-            {
+            using (TextReader reader = new StreamReader(stream)) {
                 string line;
                 StringBuilder body = new StringBuilder();
                 string subject = null;
@@ -383,8 +353,7 @@ namespace MessagePredictor.Model
                 if (!GetGroupAndId(filePath, out originalGroup, out id))
                     Console.Error.WriteLine("Warning: could not get group and ID from file '{0}'.", filePath);
 
-                while ((line = reader.ReadLine()) != null)
-                {
+                while ((line = reader.ReadLine()) != null) {
                     if (body.Length > 0 || // We've already found the body of the message, keep adding to it.
                         (prevLineBlank && !line.Contains(':')) || // This isn't a header line, and we found the empty line denoting the start of the message.
                         (prevLineBlank && line.Contains("writes"))) // This line references the re: message, and we found the empty line denoting the start of the message.
