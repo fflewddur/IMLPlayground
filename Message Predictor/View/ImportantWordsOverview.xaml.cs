@@ -38,19 +38,19 @@ namespace MessagePredictor.View
         }
 
         // Surely there's a better way to close a DropDownButton after the user interacts with it?
-        private void CloseAllDropDownButtons()
-        {
-            for (int i = 0; i < Topic1Features.Items.Count; i++)
-            {
-                var uiElement = (UIElement)Topic1Features.ItemContainerGenerator.ContainerFromIndex(i).FindVisualChild<DropDownButton>();
-                CloseDropDownButton(uiElement);
-            }
-            for (int i = 0; i < Topic2Features.Items.Count; i++)
-            {
-                UIElement uiElement = (UIElement)Topic2Features.ItemContainerGenerator.ContainerFromIndex(i);
-                CloseDropDownButton(uiElement);
-            }
-        }
+        //private void CloseAllDropDownButtons()
+        //{
+        //    for (int i = 0; i < Topic1Features.Items.Count; i++)
+        //    {
+        //        var uiElement = (UIElement)Topic1Features.ItemContainerGenerator.ContainerFromIndex(i).FindVisualChild<DropDownButton>();
+        //        CloseDropDownButton(uiElement);
+        //    }
+        //    for (int i = 0; i < Topic2Features.Items.Count; i++)
+        //    {
+        //        UIElement uiElement = (UIElement)Topic2Features.ItemContainerGenerator.ContainerFromIndex(i);
+        //        CloseDropDownButton(uiElement);
+        //    }
+        //}
 
         private void CheckMenuItem(MenuItem item)
         {

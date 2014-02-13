@@ -143,6 +143,7 @@
     <Compile Include="View\CommandBar.xaml.cs">
       <DependentUpon>CommandBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\Converters.cs" />
     <Compile Include="View\FolderList.xaml.cs">
       <DependentUpon>FolderList.xaml</DependentUpon>
     </Compile>

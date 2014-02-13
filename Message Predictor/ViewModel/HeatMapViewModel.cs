@@ -1,4 +1,5 @@
-﻿using MessagePredictor.Model;
+﻿using MessagePredictor.Converters;
+using MessagePredictor.Model;
 using MessagePredictor.View;
 using System;
 using System.Collections;
@@ -101,6 +102,7 @@ namespace MessagePredictor.ViewModel
 
         void _messageWindow_Closed(object sender, EventArgs e)
         {
+            _messageWindow.Close();
             _messageWindow = null;
             CurrentMessage = null;
         }
@@ -134,7 +136,7 @@ namespace MessagePredictor.ViewModel
             ListCollectionView view = cvs.View as ListCollectionView;
             //view.CustomSort = new SortByHighlight();
             view.GroupDescriptions.Clear();
-            view.GroupDescriptions.Add(new PropertyGroupDescription("UserLabel"));
+            view.GroupDescriptions.Add(new PropertyGroupDescription("UserLabel", new LabelToStringConverter()));
             view.IsLiveGrouping = true;
             //cvs.IsLiveGroupingRequested = true;
             //cvs.IsLiveSortingRequested = true;

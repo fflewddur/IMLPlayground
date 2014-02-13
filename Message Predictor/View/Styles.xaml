@@ -88,31 +88,39 @@
 
     <Style x:Key="folderListItem" TargetType="ListBoxItem">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
     </Style>
 
+    <Style x:Key="folderDetails" TargetType="TextBlock">
+        <Setter Property="Margin" Value="0"/>
+        <Setter Property="Padding" Value="0"/>
+        <Setter Property="TextAlignment" Value="Center"/>
+    </Style>
+    
     <local:FolderListItemTemplateSelector x:Key="folderListItemTemplateSelector">
         <local:FolderListItemTemplateSelector.UnknownTemplate>
             <DataTemplate>
-                <Grid VerticalAlignment="Center" Margin="10">
+                <Grid VerticalAlignment="Center" Margin="5">
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <TextBlock Grid.Row="0" Text="{Binding Label}" Style="{StaticResource headerStyle3}" TextAlignment="Center"/>
-                    <Label Grid.Row="1" Content="{Binding MessageCount}" ContentStringFormat="({0:N0} messages)" HorizontalContentAlignment="Center"/>
+                    <TextBlock Grid.Row="0" Text="{Binding Label}" Style="{StaticResource headerStyle3}"/>
+                    <TextBlock Grid.Row="1" Text="{Binding MessageCount, StringFormat=({0:N0} messages)}" Style="{StaticResource folderDetails}"/>
                 </Grid>
             </DataTemplate>
         </local:FolderListItemTemplateSelector.UnknownTemplate>
         <local:FolderListItemTemplateSelector.TopicTemplate>
             <DataTemplate>
-                <Grid VerticalAlignment="Center" Margin="10">
+                <Grid VerticalAlignment="Center" Margin="5">
                     <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                        <RowDefinition />
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
+                        <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
-                    <Label Grid.Row="0" Content="{Binding Label}" Style="{StaticResource headerStyle3}" HorizontalContentAlignment="Center"/>
-                    <TextBlock Grid.Row="1" TextAlignment="Center" Margin="0" Padding="0">
+                    <TextBlock Grid.Row="0" Text="{Binding Label}" Style="{StaticResource headerStyle3}"/>
+                    <TextBlock Grid.Row="1" Style="{StaticResource folderDetails}">
                         <TextBlock.Text>
                             <MultiBinding StringFormat="{}{0:N0}/{1:N0}">
                                 <Binding Path="CorrectPredictionCount" />
@@ -120,7 +128,8 @@
                             </MultiBinding>
                         </TextBlock.Text>
                     </TextBlock>
-                    <Label Grid.Row="2" Content="correct predictions" HorizontalContentAlignment="Center" Margin="0" Padding="0"/>
+                    <TextBlock Grid.Row="2" Text="correct predictions" 
+                           Style="{StaticResource folderDetails}"/>
                 </Grid>
             </DataTemplate>
         </local:FolderListItemTemplateSelector.TopicTemplate>
