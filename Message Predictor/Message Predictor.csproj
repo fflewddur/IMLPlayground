@@ -126,6 +126,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Enums.cs" />
     <Compile Include="Model\Evaluator.cs" />
     <Compile Include="Model\NewsCollection.cs" />
     <Compile Include="Model\NewsItem.cs" />
@@ -146,6 +147,9 @@
       <DependentUpon>CommandBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Converters.cs" />
+    <Compile Include="View\DirectionArrow.xaml.cs">
+      <DependentUpon>DirectionArrow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FolderList.xaml.cs">
       <DependentUpon>FolderList.xaml</DependentUpon>
     </Compile>
@@ -182,6 +186,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CommandBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\DirectionArrow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

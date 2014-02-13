@@ -190,7 +190,7 @@ namespace MessagePredictor
         {
             Window window = sender as Window;
             MessagePredictorViewModel vm = window.DataContext as MessagePredictorViewModel;
-            vm.SelectFirstItem();
+            vm.SelectDefaultMessage();
         }
 
         #endregion

@@ -1,0 +1,40 @@
+﻿<UserControl x:Class="MessagePredictor.View.DirectionArrow"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MessagePredictor.View" 
+             xmlns:model="clr-namespace:MessagePredictor.Model" 
+             mc:Ignorable="d" 
+             x:Name="root"
+             d:DesignHeight="30" d:DesignWidth="30">
+    <UserControl.Resources>
+        <ControlTemplate x:Key="arrowTemplate">
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent">
+                <Polygon Points="0,0 12,0 6,12" SnapsToDevicePixels="True" Fill="Red" Stroke="DarkRed" StrokeThickness="2" Margin="8 2" Name="DownArrow">
+                    <Polygon.Style>
+                        <Style TargetType="Polygon">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Style>
+                    </Polygon.Style>
+                </Polygon>
+                <Polygon Points="0,12 12,12, 6,0" SnapsToDevicePixels="True" Fill="Green" Stroke="DarkGreen" StrokeThickness="2" Margin="8 2" Name="UpArrow">
+                    <Polygon.Style>
+                        <Style TargetType="Polygon">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                        </Style>
+                    </Polygon.Style>
+                </Polygon>
+            </Grid>
+            <ControlTemplate.Triggers>
+                <DataTrigger Binding="{Binding Direction, ElementName=root}" Value="{x:Static model:Direction.Up}">
+                    <Setter TargetName="UpArrow" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Direction, ElementName=root}" Value="{x:Static model:Direction.Down}">
+                    <Setter TargetName="DownArrow" Property="Visibility" Value="Visible" />
+                </DataTrigger>
+            </ControlTemplate.Triggers>
+        </ControlTemplate>
+    </UserControl.Resources>
+    <Label Template="{StaticResource arrowTemplate}" />
+</UserControl>

@@ -7,14 +7,14 @@ namespace MessagePredictor.ViewModel
     {
         private Label _label;
         private int _messageCount;
-        private int _correctPredictionCount;
-        private int _priorCorrectPredictionCount;
         private NewsItem _selectedMessage;
+        private Evaluator _evaluator; // Reference to the evaluator for this folder.
 
-        public FolderViewModel(Label label)
+        public FolderViewModel(Label label, Evaluator evaluator)
             : base()
         {
             _label = label;
+            _evaluator = evaluator;
         }
 
         #region Properties
@@ -31,16 +31,10 @@ namespace MessagePredictor.ViewModel
             set { SetProperty<int>(ref _messageCount, value); }
         }
 
-        public int CorrectPredictionCount
+        public Evaluator Evaluator
         {
-            get { return _correctPredictionCount; }
-            set { SetProperty<int>(ref _correctPredictionCount, value); }
-        }
-
-        public int PriorCorrectPredictionCount
-        {
-            get { return _priorCorrectPredictionCount; }
-            set { SetProperty<int>(ref _priorCorrectPredictionCount, value); }
+            get { return _evaluator; }
+            private set { SetProperty<Evaluator>(ref _evaluator, value); }
         }
 
         public NewsItem SelectedMessage

@@ -14,22 +14,27 @@ namespace MessagePredictor
 {
     class MessagePredictorViewModel : ViewModelBase
     {
+        // Models
+        private NewsCollection _messages;
+        List<Label> _labels;
+        Vocabulary _vocab;
+        MultinomialNaiveBayesFeedbackClassifier _classifier;
+
+        // Viewmodels (and data for this viewmodel)
         private FolderListViewModel _folderListVM;
         private FeatureSetViewModel _featureSetVM;
         private HeatMapViewModel _heatMapVM;
-        private NewsCollection _messages;
+        private EvaluatorViewModel _evaluatorVM;
         private CollectionViewSource _messageListViewSource;
         private CollectionViewSource _folderListViewSource;
-        List<Label> _labels;
-        Vocabulary _vocab;
+        List<string> _textToHighlight;
+
+        // Application settings (set at startup)
         int _desiredVocabSize;
-        MultinomialNaiveBayesFeedbackClassifier _classifier;
+
+        // UI preferences (user-modifiable)
         bool _autoUpdatePredictions;
         bool _onlyShowRecentChanges;
-        //int _topic1Predictions;
-        //int _topic2Predictions;
-        //int _recentlyChangedPredictions;
-        List<string> _textToHighlight;
 
         public MessagePredictorViewModel()
         {
@@ -71,7 +76,9 @@ namespace MessagePredictor
             // Build a classifier
             _classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
 
-            _folderListVM = new FolderListViewModel(_labels);
+            _evaluatorVM = new EvaluatorViewModel(_labels);
+
+            _folderListVM = new FolderListViewModel(_evaluatorVM.Evaluators);
             _folderListVM.SelectedFolderChanged += _folderListVM_SelectedFolderChanged;
 
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
@@ -94,10 +101,8 @@ namespace MessagePredictor
 
             // Evaluate the classifier (so we can show predictions to the user)
             PerformUpdatePredictions();
+            PerformUpdatePredictions(); // Do this twice to avoid showing any change indicators at the start
 
-            // TODO select the first message of the Unknown folder by default
-            
-            
             Console.WriteLine("MessagePredictorViewModel() end");
         }
 
@@ -115,26 +120,9 @@ namespace MessagePredictor
             private set { SetProperty<CollectionViewSource>(ref _folderListViewSource, value); }
         }
 
-        public string Topic1UserLabel
+        public IReadOnlyList<Label> Labels
         {
-            get
-            {
-                if (_labels != null && _labels.Count > 0)
-                    return _labels[0].UserLabel;
-                else
-                    return "[None]";
-            }
-        }
-
-        public string Topic2UserLabel
-        {
-            get
-            {
-                if (_labels != null && _labels.Count > 1)
-                    return _labels[1].UserLabel;
-                else
-                    return "[None]";
-            }
+            get { return _labels; }
         }
 
         public bool AutoUpdatePredictions
@@ -152,24 +140,6 @@ namespace MessagePredictor
             get { return _onlyShowRecentChanges; }
             set { SetProperty<bool>(ref _onlyShowRecentChanges, value); }
         }
-
-        //public int Topic1Predictions
-        //{
-        //    get { return _topic1Predictions; }
-        //    private set { SetProperty<int>(ref _topic1Predictions, value); }
-        //}
-
-        //public int Topic2Predictions
-        //{
-        //    get { return _topic2Predictions; }
-        //    private set { SetProperty<int>(ref _topic2Predictions, value); }
-        //}
-
-        //public int RecentlyChangedPredictions
-        //{
-        //    get { return _recentlyChangedPredictions; }
-        //    private set { SetProperty<int>(ref _recentlyChangedPredictions, value); }
-        //}
 
         public List<string> TextToHighlight
         {
@@ -193,6 +163,12 @@ namespace MessagePredictor
         {
             get { return _heatMapVM; }
             private set { SetProperty<HeatMapViewModel>(ref _heatMapVM, value); }
+        }
+
+        public EvaluatorViewModel EvaluatorVM
+        {
+            get { return _evaluatorVM; }
+            private set { SetProperty<EvaluatorViewModel>(ref _evaluatorVM, value); }
         }
 
         #endregion
@@ -221,7 +197,7 @@ namespace MessagePredictor
 
             TrainClassifier(_classifier, FilterToTrainingSet(_messages));
             PredictMessages(_classifier, _messages);
-            //EvaluateClassifier(_classifier);
+            _evaluatorVM.EvaluatePredictions(_messages);
             _folderListVM.UpdateFolderCounts(_messages);
             _messageListViewSource.View.Refresh();
         }
@@ -265,7 +241,10 @@ namespace MessagePredictor
 
         #region Public methods
 
-        public void SelectFirstItem()
+        /// <summary>
+        /// Select the first message in the first folder.
+        /// </summary>
+        public void SelectDefaultMessage()
         {
             _folderListVM.SelectFolderByIndex(0);
         }

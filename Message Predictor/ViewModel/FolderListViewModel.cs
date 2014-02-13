@@ -1,4 +1,5 @@
 ﻿using LibIML;
+using MessagePredictor.Model;
 using System;
 using System.Collections.Generic;
 
@@ -10,22 +11,20 @@ namespace MessagePredictor.ViewModel
         Label _unknownLabel;
         FolderViewModel _selectedFolder;
 
-        public FolderListViewModel(List<Label> labels)
+        public FolderListViewModel(IReadOnlyList<Evaluator> evaluators)
             : base()
         {
             _folders = new List<FolderViewModel>();
 
             // First add an "Unlabeled" folder
             _unknownLabel = new Label("Unknown", "Unknown");
-            _folders.Add(new FolderViewModel(_unknownLabel));
+            _folders.Add(new FolderViewModel(_unknownLabel, null));
 
             // Now add all of the classification labels
-            foreach (Label label in labels) {
-                FolderViewModel vm = new FolderViewModel(label);
+            foreach (Evaluator evaluator in evaluators) {
+                FolderViewModel vm = new FolderViewModel(evaluator.Label, evaluator);
                 _folders.Add(vm);
             }
-
-            //SelectedFolder = _folders[0]; // Select the first folder by default
         }
 
         #region Properties
@@ -83,10 +82,14 @@ namespace MessagePredictor.ViewModel
             SelectedFolder = _folders[index];
         }
 
+        /// <summary>
+        /// Count the number of messages in this folder.
+        /// </summary>
+        /// <param name="messages">The set of all messages (in all folders)</param>
         public void UpdateFolderCounts(IEnumerable<IInstance> messages)
         {
             foreach (FolderViewModel folder in _folders) {
-                int count = 0, correct = 0;
+                int count = 0;
                 Label label;
 
                 if (folder.Label == _unknownLabel) {
@@ -98,15 +101,10 @@ namespace MessagePredictor.ViewModel
                 foreach (IInstance message in messages) {
                     if (message.UserLabel == label) {
                         count++;
-                        if (message.Prediction.Label == label) {
-                            correct++;
-                        }
                     }
                 }
 
                 folder.MessageCount = count;
-                folder.PriorCorrectPredictionCount = folder.CorrectPredictionCount;
-                folder.CorrectPredictionCount = correct;
             }
         }
 

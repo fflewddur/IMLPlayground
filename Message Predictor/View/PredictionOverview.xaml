@@ -8,8 +8,9 @@
              d:DesignHeight="300" d:DesignWidth="200">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition />
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -18,13 +19,18 @@
         </Grid.RowDefinitions>
         
         <!-- Labels -->
-        <Label Grid.Row="0" Grid.Column="0" Content="{Binding Topic1UserLabel}"/>
-        <Label Grid.Row="1" Grid.Column="0" Content="{Binding Topic2UserLabel}"/>
+        <Label Grid.Row="0" Grid.Column="0" Content="{Binding EvaluatorVM.Evaluators[0].Label}"/>
+        <Label Grid.Row="1" Grid.Column="0" Content="{Binding EvaluatorVM.Evaluators[1].Label}"/>
         <Label Grid.Row="2" Grid.Column="0" Content="Recently changed"/>
         
         <!-- Values -->
-        <Label Grid.Row="0" Grid.Column="1" Content="{Binding Topic1Predictions}"/>
-        <Label Grid.Row="1" Grid.Column="1" Content="{Binding Topic2Predictions}"/>
+        <Label Grid.Row="0" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].TotalPredictionCount}"/>
+        <Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].TotalPredictionCount}"/>
         <Label Grid.Row="2" Grid.Column="1" Content="{Binding RecentlyChangedPredictions}"/>
+        
+        <!-- Direction arrows -->
+        <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" ToolTip="{Binding EvaluatorVM.Evaluators[0].PriorTotalPredictionCount}"/>
+        <local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDirection}" ToolTip="{Binding EvaluatorVM.Evaluators[1].PriorTotalPredictionCount}"/>
+        <local:DirectionArrow Grid.Row="2" Grid.Column="2" />
     </Grid>
 </UserControl>

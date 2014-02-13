@@ -24,5 +24,10 @@ namespace MessagePredictor.View
         {
             InitializeComponent();
         }
+
+        private void ColumnDefinition_IsKeyboardFocusWithinChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+
+        }
     }
 }
