@@ -1,19 +1,14 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LibIML;
 using MessagePredictor.Model;
-using MessagePredictor.View;
 using MessagePredictor.ViewModel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
-using System.Windows.Input;
 
 namespace MessagePredictor
 {
@@ -37,9 +32,9 @@ namespace MessagePredictor
         MultinomialNaiveBayesFeedbackClassifier _classifier;
         bool _autoUpdatePredictions;
         bool _onlyShowRecentChanges;
-        int _topic1Predictions;
-        int _topic2Predictions;
-        int _recentlyChangedPredictions;
+        //int _topic1Predictions;
+        //int _topic2Predictions;
+        //int _recentlyChangedPredictions;
         List<string> _textToHighlight;
 
         public MessagePredictorViewModel()
@@ -175,23 +170,23 @@ namespace MessagePredictor
             set { SetProperty<bool>(ref _onlyShowRecentChanges, value); }
         }
 
-        public int Topic1Predictions
-        {
-            get { return _topic1Predictions; }
-            private set { SetProperty<int>(ref _topic1Predictions, value); }
-        }
+        //public int Topic1Predictions
+        //{
+        //    get { return _topic1Predictions; }
+        //    private set { SetProperty<int>(ref _topic1Predictions, value); }
+        //}
 
-        public int Topic2Predictions
-        {
-            get { return _topic2Predictions; }
-            private set { SetProperty<int>(ref _topic2Predictions, value); }
-        }
+        //public int Topic2Predictions
+        //{
+        //    get { return _topic2Predictions; }
+        //    private set { SetProperty<int>(ref _topic2Predictions, value); }
+        //}
 
-        public int RecentlyChangedPredictions
-        {
-            get { return _recentlyChangedPredictions; }
-            private set { SetProperty<int>(ref _recentlyChangedPredictions, value); }
-        }
+        //public int RecentlyChangedPredictions
+        //{
+        //    get { return _recentlyChangedPredictions; }
+        //    private set { SetProperty<int>(ref _recentlyChangedPredictions, value); }
+        //}
 
         public List<string> TextToHighlight
         {
@@ -243,7 +238,7 @@ namespace MessagePredictor
 
             TrainClassifier(_classifier, FilterToTrainingSet(_messages));
             PredictMessages(_classifier, _messages);
-            EvaluateClassifier(_classifier);
+            //EvaluateClassifier(_classifier);
             _folderListVM.UpdateFolderCounts(_messages);
             _messageListViewSource.View.Refresh();
         }
@@ -335,15 +330,15 @@ namespace MessagePredictor
             Console.WriteLine("Time to predict instances: {0}", timer.Elapsed);
         }
 
-        private void EvaluateClassifier(IClassifier classifier)
+        private void EvaluateClassifier(IClassifier classifier, IEnumerable<IInstance> instances)
         {
             // Evaluate the classifier
             Stopwatch timer = new Stopwatch();
             timer.Start();
-            int pRight = 0;
-            int topic1Predictions = 0;
-            int topic2Predictions = 0;
-            int recentlyChangedPredictions = 0;
+            //int pRight = 0;
+            //int topic1Predictions = 0;
+            //int topic2Predictions = 0;
+            //int recentlyChangedPredictions = 0;
             //foreach (IInstance instance in _topic1Folder)
             //{
             //    if (instance.IsPredictionCorrect == true)
@@ -384,9 +379,9 @@ namespace MessagePredictor
             //    if (instance.RecentlyChanged)
             //        recentlyChangedPredictions++;
             //}
-            Topic1Predictions = topic1Predictions;
-            Topic2Predictions = topic2Predictions;
-            RecentlyChangedPredictions = recentlyChangedPredictions;
+            //Topic1Predictions = topic1Predictions;
+            //Topic2Predictions = topic2Predictions;
+            //RecentlyChangedPredictions = recentlyChangedPredictions;
             timer.Stop();
             Console.WriteLine("Time to evaluate classifier: {0}", timer.Elapsed);
         }

@@ -126,12 +126,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Model\Evaluator.cs" />
     <Compile Include="Model\NewsCollection.cs" />
     <Compile Include="Model\NewsItem.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="ViewModel\AddFeatureDialogViewModel.cs" />
     <Compile Include="ViewModel\Base\ViewModelCollectionBase.cs" />
     <Compile Include="ViewModel\Base\ViewModelBase.cs" />
+    <Compile Include="ViewModel\EvaluatorViewModel.cs" />
     <Compile Include="ViewModel\FeatureSetViewModel.cs" />
     <Compile Include="ViewModel\FolderListViewModel.cs" />
     <Compile Include="ViewModel\FolderViewModel.cs" />
