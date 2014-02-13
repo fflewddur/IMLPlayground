@@ -20,12 +20,6 @@ namespace MessagePredictor
         private NewsCollection _messages;
         private CollectionViewSource _messageListViewSource;
         private CollectionViewSource _folderListViewSource;
-        //List<NewsCollection> _folders; // Collection of all our folders
-        //NewsCollection _unknownFolder;
-        //NewsCollection _topic1Folder;
-        //NewsCollection _topic2Folder;
-        //NewsCollection _currentFolder;
-        //NewsItem _currentMessage;
         List<Label> _labels;
         Vocabulary _vocab;
         int _desiredVocabSize;
@@ -44,7 +38,6 @@ namespace MessagePredictor
 
             timer.Start();
             List<NewsCollection> folders = new List<NewsCollection>();
-            //_unknownFolder = LoadDataset();
             _messages = LoadDataset();
             timer.Stop();
             Console.WriteLine("Time to load data set: {0}", timer.Elapsed);
@@ -52,22 +45,12 @@ namespace MessagePredictor
             timer.Restart();
             LabelTrainingSet(_messages, _labels[0], (int)App.Current.Properties[App.PropertyKey.Topic1TrainSize]);
             LabelTrainingSet(_messages, _labels[1], (int)App.Current.Properties[App.PropertyKey.Topic2TrainSize]);
-            //_topic1Folder = BuildTopicTrainingSet(_unknownFolder, _labels[0], (int)App.Current.Properties[App.PropertyKey.Topic1TrainSize]);
-            //_topic2Folder = BuildTopicTrainingSet(_unknownFolder, _labels[1], (int)App.Current.Properties[App.PropertyKey.Topic2TrainSize]);
             timer.Stop();
             Console.WriteLine("Time to build topic training sets: {0}", timer.Elapsed);
 
-            //folders.Add(_unknownFolder);
-            //folders.Add(_topic1Folder);
-            //folders.Add(_topic2Folder);
-
             // Build a vocab from our training set
             timer.Restart();
-            //List<NewsItem> forVocab = new List<NewsItem>();
-            //forVocab.AddRange(_topic1Folder.ToList());
-            //forVocab.AddRange(_topic2Folder.ToList());
             _desiredVocabSize = (int)App.Current.Properties[App.PropertyKey.Topic1VocabSize] + (int)App.Current.Properties[App.PropertyKey.Topic2VocabSize];
-
             _vocab = Vocabulary.CreateVocabulary(FilterToTrainingSet(_messages), _labels, Vocabulary.Restriction.HighIG, _desiredVocabSize);
             timer.Stop();
             Console.WriteLine("Time to build vocab: {0}", timer.Elapsed);
@@ -113,8 +96,8 @@ namespace MessagePredictor
             PerformUpdatePredictions();
 
             // TODO select the first message of the Unknown folder by default
-            _folderListVM.SelectFolderByIndex(0);
-
+            
+            
             Console.WriteLine("MessagePredictorViewModel() end");
         }
 
@@ -280,6 +263,17 @@ namespace MessagePredictor
 
         #endregion
 
+        #region Public methods
+
+        public void SelectFirstItem()
+        {
+            _folderListVM.SelectFolderByIndex(0);
+        }
+
+        #endregion
+
+        #region Private methods
+
         /// <summary>
         /// Update the vocabulary in response to the user adding or removing tokens, or adjusting the training set
         /// </summary>
@@ -400,68 +394,6 @@ namespace MessagePredictor
             }
         }
 
-        private void _featureSetVM_FeatureAdded(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
-        {
-            Console.WriteLine("added feature {0}", e.Tokens);
-            // Ensure the vocabulary includes the token for this feature
-            if (_vocab.AddToken(e.Tokens, -1)) // Use -1 for doc frequency for now, we'll fix it below
-            {
-                // If we created a new vocab element, include it in our documents' tokenizations
-                //int id = _vocab.GetWordId(e.Tokens, false);
-                int df = 0;
-                foreach (IInstance instance in _messages) {
-                    if (instance.TokenizeForString(e.Tokens))
-                        df++;
-                }
-                // Update our vocab with the correct document frequency
-                _vocab.AddToken(e.Tokens, df);
-            }
-
-            UpdateVocab();
-            _classifier.UpdateCountsForNewFeature(_vocab.GetWordId(e.Tokens, true));
-            if (AutoUpdatePredictions) {
-                PerformUpdatePredictions();
-            }
-        }
-
-        private void _featureSetVM_FeatureRemoved(object sender, EventArgs e)
-        {
-            UpdateVocab();
-            if (AutoUpdatePredictions) {
-                PerformUpdatePredictions();
-            }
-        }
-
-        // Tell the heatmap to show messages containing the feature the user is currently editing
-        private void _featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
-        {
-            HeatMapVM.ToHighlight = e.Tokens;
-        }
-
-        private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
-        {
-            if (FolderListVM.SelectedFolder.SelectedMessage != null) {
-                FolderListVM.SelectedFolder.SelectedMessage.HighlightWithWord(e.Text);
-            }
-        }
-
-        private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
-        {
-            FolderListViewModel vm = sender as FolderListViewModel;
-            // If this is the Unknown folder, look for items without a user label.
-            if (e.Folder.Label == vm.UnknownLabel) {
-                _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null);
-            } else {
-                // Otherwise, look for items with the same label as the selected folder
-                _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == e.Folder.Label);
-            }
-
-            //if (vm.SelectedFolder.SelectedMessage == null) {
-            if (_messageListViewSource.View.CurrentItem == null) {
-                _messageListViewSource.View.MoveCurrentToFirst();
-            }
-        }
-
         /// <summary>
         /// Load the dataset specified in our configuration properties.
         /// </summary>
@@ -511,5 +443,76 @@ namespace MessagePredictor
 
             return fullSet.Where(item => !_labels.Contains(item.UserLabel));
         }
+
+        #endregion
+
+        #region Event handlers
+
+        private void _featureSetVM_FeatureAdded(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
+        {
+            Console.WriteLine("added feature {0}", e.Tokens);
+            // Ensure the vocabulary includes the token for this feature
+            if (_vocab.AddToken(e.Tokens, -1)) // Use -1 for doc frequency for now, we'll fix it below
+            {
+                // If we created a new vocab element, include it in our documents' tokenizations
+                //int id = _vocab.GetWordId(e.Tokens, false);
+                int df = 0;
+                foreach (IInstance instance in _messages) {
+                    if (instance.TokenizeForString(e.Tokens))
+                        df++;
+                }
+                // Update our vocab with the correct document frequency
+                _vocab.AddToken(e.Tokens, df);
+            }
+
+            UpdateVocab();
+            _classifier.UpdateCountsForNewFeature(_vocab.GetWordId(e.Tokens, true));
+            if (AutoUpdatePredictions) {
+                PerformUpdatePredictions();
+            }
+        }
+
+        private void _featureSetVM_FeatureRemoved(object sender, EventArgs e)
+        {
+            UpdateVocab();
+            if (AutoUpdatePredictions) {
+                PerformUpdatePredictions();
+            }
+        }
+
+        // Tell the heatmap to show messages containing the feature the user is currently editing
+        private void _featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
+        {
+            HeatMapVM.ToHighlight = e.Tokens;
+        }
+
+        private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
+        {
+            if (FolderListVM.SelectedFolder != null && FolderListVM.SelectedFolder.SelectedMessage != null) {
+                FolderListVM.SelectedFolder.SelectedMessage.HighlightWithWord(e.Text);
+            }
+        }
+
+        private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
+        {
+            FolderListViewModel vm = sender as FolderListViewModel;
+            // If this is the Unknown folder, look for items without a user label.
+            using (_messageListViewSource.View.DeferRefresh()) {
+                if (e.Folder.Label == vm.UnknownLabel) {
+                    _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null);
+                } else {
+                    // Otherwise, look for items with the same label as the selected folder
+                    _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == e.Folder.Label);
+                }
+            }
+
+            if (_messageListViewSource.View.CurrentItem == null || 
+                _messageListViewSource.View.IsCurrentAfterLast || 
+                _messageListViewSource.View.IsCurrentBeforeFirst) {
+                _messageListViewSource.View.MoveCurrentToFirst();
+            }
+        }
+
+        #endregion
     }
 }

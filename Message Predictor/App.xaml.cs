@@ -1,12 +1,6 @@
-﻿using LibIML;
-using MessagePredictor.View;
+﻿using MessagePredictor.View;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Xml.Linq;
 
@@ -56,6 +50,7 @@ namespace MessagePredictor
             MessagePredictorViewModel vm = new MessagePredictorViewModel();
             var window = new MessagePredictorWindow();
             window.DataContext = vm;
+            window.Loaded += window_Loaded;
             window.Show();
         }
 
@@ -188,5 +183,16 @@ namespace MessagePredictor
                 Console.Error.WriteLine("Could not load properties file: {0}", e.Message);
             }
         }
+
+        #region Event handlers
+
+        private void window_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window window = sender as Window;
+            MessagePredictorViewModel vm = window.DataContext as MessagePredictorViewModel;
+            vm.SelectFirstItem();
+        }
+
+        #endregion
     }
 }
