@@ -210,6 +210,13 @@ namespace MessagePredictor
         private void PerformLabelMessage(Label label)
         {
             NewsItem item = FolderListVM.SelectedFolder.SelectedMessage;
+
+            // Don't do anything if the message already has the desired label
+            if (item.UserLabel == label ||
+                (item.UserLabel == null && label == FolderListVM.UnknownLabel)) {
+                return;
+            }
+
             item.UserLabel = label;
 
             // Try to select the next message. If there is no next message, select the previous message.
