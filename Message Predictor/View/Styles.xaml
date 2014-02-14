@@ -48,11 +48,12 @@
     <Style x:Key="featureMenuCheckable" TargetType="MenuItem">
         <Setter Property="IsCheckable" Value="True"/>
     </Style>
-    
+
     <!-- Heat map -->
-    
+
     <ItemsPanelTemplate x:Key="heatMapPanel">
-        <WrapPanel Orientation="Horizontal"  />
+        <WrapPanel Orientation="Horizontal" VirtualizingPanel.VirtualizationMode="Recycling" 
+                   VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" />
     </ItemsPanelTemplate>
 
     <Style x:Key="heatMapItemContainer" TargetType="ListViewItem">
@@ -77,11 +78,11 @@
             </Rectangle.Style>
         </Rectangle>
     </DataTemplate>
-    
+
     <!-- End heat map -->
-    
+
     <!-- Folder list -->
-    
+
     <ItemsPanelTemplate x:Key="folderListPanel">
         <UniformGrid Columns="1"></UniformGrid>
     </ItemsPanelTemplate>
@@ -97,7 +98,7 @@
         <Setter Property="Padding" Value="0"/>
         <Setter Property="TextAlignment" Value="Center"/>
     </Style>
-    
+
     <local:FolderListItemTemplateSelector x:Key="folderListItemTemplateSelector">
         <local:FolderListItemTemplateSelector.UnknownTemplate>
             <DataTemplate>
@@ -120,20 +121,27 @@
                         <RowDefinition Height="auto"/>
                     </Grid.RowDefinitions>
                     <TextBlock Grid.Row="0" Text="{Binding Label}" Style="{StaticResource headerStyle3}"/>
-                    <TextBlock Grid.Row="1" Style="{StaticResource folderDetails}">
-                        <TextBlock.Text>
-                            <MultiBinding StringFormat="{}{0:N0}/{1:N0}">
-                                <Binding Path="Evaluator.CorrectPredictionCount" />
-                                <Binding Path="MessageCount" />
-                            </MultiBinding>
-                        </TextBlock.Text>
-                    </TextBlock>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Style="{StaticResource folderDetails}" TextAlignment="Right">
+                            <TextBlock.Text>
+                                <MultiBinding StringFormat="{}{0:N0}/{1:N0}">
+                                    <Binding Path="Evaluator.CorrectPredictionCount" />
+                                    <Binding Path="MessageCount" />
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
+                        <local:DirectionArrow Grid.Column="1" Direction="{Binding Evaluator.CorrectPredictionDirection}" ToolTip="{Binding Evaluator.PriorCorrectPredictionCount, StringFormat=Had been {0}}"/>
+                    </Grid>
                     <TextBlock Grid.Row="2" Text="correct predictions" 
                            Style="{StaticResource folderDetails}"/>
                 </Grid>
             </DataTemplate>
         </local:FolderListItemTemplateSelector.TopicTemplate>
     </local:FolderListItemTemplateSelector>
-    
+
     <!-- End Folder list -->
 </ResourceDictionary>

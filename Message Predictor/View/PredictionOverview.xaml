@@ -8,9 +8,9 @@
              d:DesignHeight="300" d:DesignWidth="200">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="3*"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -21,16 +21,18 @@
         <!-- Labels -->
         <Label Grid.Row="0" Grid.Column="0" Content="{Binding EvaluatorVM.Evaluators[0].Label}"/>
         <Label Grid.Row="1" Grid.Column="0" Content="{Binding EvaluatorVM.Evaluators[1].Label}"/>
-        <Label Grid.Row="2" Grid.Column="0" Content="Recently changed"/>
+        <Label Grid.Row="2" Grid.Column="0" Content="Total changed" FontStyle="Italic"/>
         
         <!-- Values -->
         <Label Grid.Row="0" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].TotalPredictionCount}"/>
         <Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].TotalPredictionCount}"/>
-        <Label Grid.Row="2" Grid.Column="1" Content="{Binding RecentlyChangedPredictions}"/>
+        <Label Grid.Row="2" Grid.Column="1" Content="{Binding EvaluatorVM.RecentlyChangedCount}"/>
         
         <!-- Direction arrows -->
-        <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" ToolTip="{Binding EvaluatorVM.Evaluators[0].PriorTotalPredictionCount}"/>
-        <local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDirection}" ToolTip="{Binding EvaluatorVM.Evaluators[1].PriorTotalPredictionCount}"/>
+        <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" 
+                              ToolTip="{Binding EvaluatorVM.Evaluators[0].PriorTotalPredictionCount,StringFormat=Had been {0}}"/>
+        <local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDirection}" 
+                              ToolTip="{Binding EvaluatorVM.Evaluators[1].PriorTotalPredictionCount,StringFormat=Had been {0}}"/>
         <local:DirectionArrow Grid.Row="2" Grid.Column="2" />
     </Grid>
 </UserControl>

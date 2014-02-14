@@ -7,7 +7,8 @@
              xmlns:model="clr-namespace:MessagePredictor.Model" 
              mc:Ignorable="d" 
              x:Name="root"
-             d:DesignHeight="30" d:DesignWidth="30">
+             Width="40" Height="20"
+             d:DesignHeight="20" d:DesignWidth="40">
     <UserControl.Resources>
         <ControlTemplate x:Key="arrowTemplate">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent">

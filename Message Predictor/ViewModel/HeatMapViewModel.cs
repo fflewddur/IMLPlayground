@@ -137,13 +137,14 @@ namespace MessagePredictor.ViewModel
             //view.CustomSort = new SortByHighlight();
             view.GroupDescriptions.Clear();
             view.GroupDescriptions.Add(new PropertyGroupDescription("UserLabel", new LabelToStringConverter()));
-            view.IsLiveGrouping = true;
+            //view.IsLiveGrouping = true;
             //cvs.IsLiveGroupingRequested = true;
-            //cvs.IsLiveSortingRequested = true;
+            
             view.SortDescriptions.Clear();
             view.SortDescriptions.Add(new SortDescription("UserLabel", ListSortDirection.Descending));
             view.SortDescriptions.Add(new SortDescription("IsHighlighted", ListSortDirection.Descending));
             view.IsLiveSorting = true;
+            //cvs.IsLiveSortingRequested = true;
 
             return cvs;
         }

@@ -131,49 +131,49 @@ namespace MessagePredictor.Model
             {
                 Prediction prev = Prediction;
                 //RecentlyChanged = false;
-                if (SetProperty<Prediction>(ref _prediction, value)) {
-                    // If our Prediction changed, store the old value in PreviousPrediction
-                    PreviousPrediction = prev;
-                    if (PreviousPrediction != null && PreviousPrediction.Label != Prediction.Label)
-                        RecentlyChanged = true;
-                    else
-                        RecentlyChanged = false;
+                SetProperty<Prediction>(ref _prediction, value);
+                // If our Prediction changed, store the old value in PreviousPrediction
+                PreviousPrediction = prev;
+                if (PreviousPrediction != null && PreviousPrediction.Label != Prediction.Label)
+                    RecentlyChanged = true;
+                else
+                    RecentlyChanged = false;
 
-                    // Did the confidence go up or down? If the prediction just changed, it obviously went up.
-                    if (PreviousPrediction != null && RecentlyChanged == false) {
-                        if (PreviousPrediction.Confidence > Prediction.Confidence) {
-                            ConfidenceDown = true;
-                            ConfidenceUp = false;
-                        } else if (PreviousPrediction.Confidence < Prediction.Confidence) {
-                            ConfidenceUp = true;
-                            ConfidenceDown = false;
-                        } else {
-                            ConfidenceDown = false;
-                            ConfidenceUp = false;
-                        }
-                    } else if (RecentlyChanged == true) {
-                        ConfidenceDown = false;
-                        ConfidenceUp = true;
-                    } else {
+                // Did the confidence go up or down? If the prediction just changed, it obviously went up.
+                if (PreviousPrediction != null && RecentlyChanged == false) {
+                    if (PreviousPrediction.Confidence > Prediction.Confidence) {
+                        ConfidenceDown = true;
                         ConfidenceUp = false;
+                    } else if (PreviousPrediction.Confidence < Prediction.Confidence) {
+                        ConfidenceUp = true;
                         ConfidenceDown = false;
-                    }
-
-                    // Is our prediction correct?
-                    if (GroundTruthLabel != null) {
-                        if (Prediction.Label == GroundTruthLabel) {
-                            IsPredictionCorrect = true;
-                        } else {
-                            IsPredictionCorrect = false;
-                        }
                     } else {
-                        IsPredictionCorrect = null;
+                        ConfidenceDown = false;
+                        ConfidenceUp = false;
+                    }
+                } else if (RecentlyChanged == true) {
+                    ConfidenceDown = false;
+                    ConfidenceUp = true;
+                } else {
+                    ConfidenceUp = false;
+                    ConfidenceDown = false;
+                }
+
+                // Is our prediction correct?
+                if (GroundTruthLabel != null) {
+                    if (Prediction.Label == GroundTruthLabel) {
+                        IsPredictionCorrect = true;
+                    } else {
+                        IsPredictionCorrect = false;
                     }
                 } else {
-                    // Otherwise, ensure PreviosPrediction is null
-                    //PreviousPrediction = null;
-                    RecentlyChanged = false;
+                    IsPredictionCorrect = null;
                 }
+                //} else {
+                //    // Otherwise, ensure PreviosPrediction is null
+                //    //PreviousPrediction = null;
+                //    RecentlyChanged = false;
+                //}
             }
         }
 
