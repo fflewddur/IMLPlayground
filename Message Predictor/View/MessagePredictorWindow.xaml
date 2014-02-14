@@ -40,7 +40,7 @@
                     <local:PredictionOverview Grid.Row="3" Style="{StaticResource contentStyle}"/>
                     
                     <!-- Word overview -->
-                    <Label Grid.Row="4" Style="{StaticResource headerStyle1}">Words</Label>
+                    <!--<Label Grid.Row="4" Style="{StaticResource headerStyle1}">Words</Label>-->
                     <local:MessageHeatMap Grid.Row="5" Style="{StaticResource contentStyle}"  DataContext="{Binding HeatMapVM}"/>
                 </Grid>
                 

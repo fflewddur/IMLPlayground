@@ -109,6 +109,11 @@ namespace MessagePredictor.ViewModel
 
         private void MarkMessagesContainingWord(string word)
         {
+            // Null strings crash our Regex
+            if (word == null) {
+                word = "";
+            }
+
             Regex containsWord = new Regex(@"\b(" + word.Trim() + @")\b", RegexOptions.IgnoreCase);
             bool isEmpty = string.IsNullOrWhiteSpace(word);
 

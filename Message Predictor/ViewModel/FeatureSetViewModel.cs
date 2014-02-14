@@ -217,6 +217,10 @@ namespace MessagePredictor.ViewModel
 
                 AddUserFeature(f);
             }
+
+            // Let anyone watching know that the user has closed the dialog, so _featureText is now empty.
+            _featureText = "";
+            OnFeatureTextEdited(new FeatureAddedEventArgs(_featureText));
         }
 
         private void AddFeatureVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

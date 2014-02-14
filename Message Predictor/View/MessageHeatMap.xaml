@@ -7,14 +7,19 @@
              xmlns:local="clr-namespace:MessagePredictor.View" 
              xmlns:model="clr-namespace:MessagePredictor.Model" 
              mc:Ignorable="d" 
-             Style="{StaticResource ResourceKey=messageHeatMapStyle}"
              d:DesignHeight="400" d:DesignWidth="200">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <ListView SelectionMode="Single" ItemsSource="{Binding HeatMapView.View}" SelectedItem="{Binding CurrentMessage}"
+        <TextBlock Grid.Row="0" Text="{Binding ToHighlight, StringFormat='Messages containing &quot;{0}&quot;'}" Style="{StaticResource ResourceKey=heatMapHeaderStyle}"/>
+        
+        <TextBlock Grid.Row="1" Name="NoContentMessage" Style="{StaticResource ResourceKey=heatMapNoContentStyle}">Search for a word to see which messages it is in.</TextBlock>
+
+        <ListView Grid.Row="1" Name="HeatMap" Style="{StaticResource ResourceKey=heatMapListViewStyle}"
+                  SelectionMode="Single" ItemsSource="{Binding HeatMapView.View}" SelectedItem="{Binding CurrentMessage}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible" 
                   ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}"
                   ItemContainerStyle="{StaticResource ResourceKey=heatMapItemContainer}"
@@ -29,5 +34,6 @@
                 </GroupStyle>
             </ListView.GroupStyle>
         </ListView>
+        
     </Grid>
 </UserControl>
