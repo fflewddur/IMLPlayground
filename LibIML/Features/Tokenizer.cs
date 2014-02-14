@@ -23,7 +23,7 @@ namespace LibIML
         {
             // Read in our stopwords file
             _stopWords = new HashSet<string>();
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Datasets", STOPWORDS_FILENAME);
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", STOPWORDS_FILENAME);
             string[] stopwords = File.ReadAllLines(path);
             foreach (string word in stopwords)
                 _stopWords.Add(word);

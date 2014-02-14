@@ -11,7 +11,7 @@ namespace MessagePredictor
     /// </summary>
     public partial class App : Application
     {
-        public const string DataDir = "Datasets";
+        public const string DataDir = "Data";
 
         public enum Condition
         {
@@ -154,7 +154,7 @@ namespace MessagePredictor
         /// </summary>
         private void LoadPropertiesFile()
         {
-            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "properties.xml");
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "Properties.xml");
             try {
                 XDocument xdoc = XDocument.Load(path);
                 foreach (XElement element in xdoc.Root.Elements()) {
