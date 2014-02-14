@@ -13,6 +13,8 @@ namespace MessagePredictor.Model
 {
     class NewsItem : ViewModelBase, IInstance
     {
+        private readonly double MIN_CONFIDENCE_CHANGE = .01;
+
         private int _id;
         private string _originalGroup;
         private string _subject;
@@ -21,10 +23,9 @@ namespace MessagePredictor.Model
         private Dictionary<string, int> _tokenCounts;
         private Prediction _prediction;
         private Prediction _previousPrediction;
+        private Direction _predictionConfidenceDirection;
+        private double _predictionConfidenceDifference;
         private bool _recentlyChanged;
-        private bool _confidenceUp;
-        private bool _confidenceDown;
-        private bool? _isPredictionCorrect;
         private SparseVector _featureCounts;
         private Label _userLabel;
         private Label _groundTruthLabel;
@@ -105,7 +106,7 @@ namespace MessagePredictor.Model
 
                 return _document;
             }
-            set
+            private set
             {
                 if (SetProperty<string>(ref _document, value))
                     this.OnPropertyChanged("DocumentReadOnly");
@@ -134,41 +135,62 @@ namespace MessagePredictor.Model
                 SetProperty<Prediction>(ref _prediction, value);
                 // If our Prediction changed, store the old value in PreviousPrediction
                 PreviousPrediction = prev;
-                if (PreviousPrediction != null && PreviousPrediction.Label != Prediction.Label)
-                    RecentlyChanged = true;
-                else
-                    RecentlyChanged = false;
+                
+                if (PreviousPrediction != null) {
+                    if (PreviousPrediction.Label == Prediction.Label) {
+                        PredictionConfidenceDifference = Math.Abs(Prediction.Confidence - PreviousPrediction.Confidence);
+                        RecentlyChanged = false;
+                        // If our label hasn't changed, check the direction of the confidence change.
+                        // (Only show a confidence change if the difference is more than 1%)
+                        if (Prediction.Confidence - PreviousPrediction.Confidence >= MIN_CONFIDENCE_CHANGE) {
+                            PredictionConfidenceDirection = Direction.Up;
+                        } else if (PreviousPrediction.Confidence - Prediction.Confidence >= MIN_CONFIDENCE_CHANGE) {
+                            PredictionConfidenceDirection = Direction.Down;
+                        } else {
+                            PredictionConfidenceDirection = Direction.None;
+                        }
+                    } else {
+                        // If the label changed, the prior confidence doesn't really matter.
+                        RecentlyChanged = true;
+                        PredictionConfidenceDirection = Direction.None;
+                        PredictionConfidenceDifference = 0;
+                    }
+                }
+                //if (PreviousPrediction != null && PreviousPrediction.Label != Prediction.Label)
+                //    RecentlyChanged = true;
+                //else
+                //    RecentlyChanged = false;
 
                 // Did the confidence go up or down? If the prediction just changed, it obviously went up.
-                if (PreviousPrediction != null && RecentlyChanged == false) {
-                    if (PreviousPrediction.Confidence > Prediction.Confidence) {
-                        ConfidenceDown = true;
-                        ConfidenceUp = false;
-                    } else if (PreviousPrediction.Confidence < Prediction.Confidence) {
-                        ConfidenceUp = true;
-                        ConfidenceDown = false;
-                    } else {
-                        ConfidenceDown = false;
-                        ConfidenceUp = false;
-                    }
-                } else if (RecentlyChanged == true) {
-                    ConfidenceDown = false;
-                    ConfidenceUp = true;
-                } else {
-                    ConfidenceUp = false;
-                    ConfidenceDown = false;
-                }
+                //if (PreviousPrediction != null && RecentlyChanged == false) {
+                //    if (PreviousPrediction.Confidence > Prediction.Confidence) {
+                //        ConfidenceDown = true;
+                //        ConfidenceUp = false;
+                //    } else if (PreviousPrediction.Confidence < Prediction.Confidence) {
+                //        ConfidenceUp = true;
+                //        ConfidenceDown = false;
+                //    } else {
+                //        ConfidenceDown = false;
+                //        ConfidenceUp = false;
+                //    }
+                //} else if (RecentlyChanged == true) {
+                //    ConfidenceDown = false;
+                //    ConfidenceUp = true;
+                //} else {
+                //    ConfidenceUp = false;
+                //    ConfidenceDown = false;
+                //}
 
                 // Is our prediction correct?
-                if (GroundTruthLabel != null) {
-                    if (Prediction.Label == GroundTruthLabel) {
-                        IsPredictionCorrect = true;
-                    } else {
-                        IsPredictionCorrect = false;
-                    }
-                } else {
-                    IsPredictionCorrect = null;
-                }
+                //if (GroundTruthLabel != null) {
+                //    if (Prediction.Label == GroundTruthLabel) {
+                //        IsPredictionCorrect = true;
+                //    } else {
+                //        IsPredictionCorrect = false;
+                //    }
+                //} else {
+                //    IsPredictionCorrect = null;
+                //}
                 //} else {
                 //    // Otherwise, ensure PreviosPrediction is null
                 //    //PreviousPrediction = null;
@@ -180,7 +202,19 @@ namespace MessagePredictor.Model
         public Prediction PreviousPrediction
         {
             get { return _previousPrediction; }
-            set { SetProperty<Prediction>(ref _previousPrediction, value); }
+            private set { SetProperty<Prediction>(ref _previousPrediction, value); }
+        }
+
+        public Direction PredictionConfidenceDirection
+        {
+            get { return _predictionConfidenceDirection; }
+            private set { SetProperty<Direction>(ref _predictionConfidenceDirection, value); }
+        }
+
+        public double PredictionConfidenceDifference
+        {
+            get { return _predictionConfidenceDifference; }
+            private set { SetProperty<double>(ref _predictionConfidenceDifference, value); }
         }
 
         public bool RecentlyChanged
@@ -189,23 +223,29 @@ namespace MessagePredictor.Model
             private set { SetProperty<bool>(ref _recentlyChanged, value); }
         }
 
-        public bool ConfidenceUp
-        {
-            get { return _confidenceUp; }
-            private set { SetProperty<bool>(ref _confidenceUp, value); }
-        }
+        //public bool RecentlyChanged
+        //{
+        //    get { return _recentlyChanged; }
+        //    private set { SetProperty<bool>(ref _recentlyChanged, value); }
+        //}
 
-        public bool ConfidenceDown
-        {
-            get { return _confidenceDown; }
-            private set { SetProperty<bool>(ref _confidenceDown, value); }
-        }
+        //public bool ConfidenceUp
+        //{
+        //    get { return _confidenceUp; }
+        //    private set { SetProperty<bool>(ref _confidenceUp, value); }
+        //}
 
-        public bool? IsPredictionCorrect
-        {
-            get { return _isPredictionCorrect; }
-            private set { SetProperty<bool?>(ref _isPredictionCorrect, value); }
-        }
+        //public bool ConfidenceDown
+        //{
+        //    get { return _confidenceDown; }
+        //    private set { SetProperty<bool>(ref _confidenceDown, value); }
+        //}
+
+        //public bool? IsPredictionCorrect
+        //{
+        //    get { return _isPredictionCorrect; }
+        //    private set { SetProperty<bool?>(ref _isPredictionCorrect, value); }
+        //}
 
         public SparseVector Features
         {

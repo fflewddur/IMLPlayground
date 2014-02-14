@@ -26,6 +26,24 @@ namespace MessagePredictor.View
             InitializeComponent();
         }
 
+        public string Difference
+        {
+            get { return (string)GetValue(DifferenceProperty); }
+            set { SetValue(DifferenceProperty, value); }
+        }
+
+        public static void OnDifferenceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
+            (obj as DirectionArrow).OnDifferenceChanged(args);
+        }
+
+        private void OnDifferenceChanged(DependencyPropertyChangedEventArgs args)
+        {
+            UpdateTooltip(Direction, Difference);
+        }
+
+        public static readonly DependencyProperty DifferenceProperty =
+            DependencyProperty.Register("Difference", typeof(string), typeof(DirectionArrow), new PropertyMetadata(OnDifferenceChanged));
 
         public Direction Direction
         {
@@ -33,11 +51,33 @@ namespace MessagePredictor.View
             set { SetValue(DirectionProperty, value); }
         }
 
-        // Using a DependencyProperty as the backing store for MyProperty.  This enables animation, styling, binding, etc...
+        public static void OnDirectionChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        {
+            (obj as DirectionArrow).OnDirectionChanged(args);
+        }
+
+        private void OnDirectionChanged(DependencyPropertyChangedEventArgs args)
+        {
+            UpdateTooltip(Direction, Difference);
+        }
+
         public static readonly DependencyProperty DirectionProperty =
-            DependencyProperty.Register("Direction", typeof(Direction), typeof(DirectionArrow), new PropertyMetadata(Direction.None));
+            DependencyProperty.Register("Direction", typeof(Direction), typeof(DirectionArrow), new PropertyMetadata(OnDirectionChanged));
 
-        
-
+        /// <summary>
+        /// When the direction or difference changes, update our tooltip appropriately.
+        /// </summary>
+        /// <param name="direction"></param>
+        /// <param name="Difference"></param>
+        private void UpdateTooltip(Direction direction, string Difference)
+        {
+            if (direction == Direction.Down) {
+                Arrow.ToolTip = string.Format("Decreased by {0}", Difference);
+            } else if (direction == Direction.Up) {
+                Arrow.ToolTip = string.Format("Increased by {0}", Difference);
+            } else {
+                Arrow.ToolTip = null;
+            }
+        }
     }
 }

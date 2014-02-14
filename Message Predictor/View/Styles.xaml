@@ -2,7 +2,11 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
                     xmlns:local="clr-namespace:MessagePredictor.View"
+                    xmlns:conv="clr-namespace:MessagePredictor.Converters"
                     xmlns:libiml="clr-namespace:LibIML;assembly=LibIML">
+    
+    <conv:StringFormatConverter x:Key="convStringFormat" />
+    
     <Style x:Key="headerStyle1">
         <Setter Property="Control.FontSize" Value="16" />
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
@@ -49,6 +53,40 @@
         <Setter Property="IsCheckable" Value="True"/>
     </Style>
 
+    <!-- Message list -->
+
+    <TextBlock TextAlignment="Center" x:Key="messageListTopicHeader">
+        Predicted<LineBreak />topic
+    </TextBlock>
+
+    <Style x:Key="messageListTopicStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding RecentlyChanged}" Value="True">
+                <Setter Property="Background" Value="LightSalmon" />
+                <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='Had been {0}', Converter={StaticResource ResourceKey=convStringFormat}}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <DataTemplate x:Key="messageListTopicTemplate" DataType="model:NewsItem">
+        <TextBlock TextAlignment="Center" Text="{Binding Prediction.Label}" Style="{StaticResource ResourceKey=messageListTopicStyle}" />
+    </DataTemplate>
+
+    <TextBlock TextAlignment="Center" x:Key="messageListConfHeader">
+        Prediction<LineBreak />confidence
+    </TextBlock>
+
+    <DataTemplate x:Key="messageListConfTemplate" DataType="model:NewsItem">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" TextAlignment="Center" Text="{Binding Prediction.Confidence, StringFormat='{}{0:P0}'}" />
+            <local:DirectionArrow Grid.Column="1" Direction="{Binding PredictionConfidenceDirection}" Difference="{Binding PredictionConfidenceDifference, StringFormat='{}{0:P0}'}" HorizontalAlignment="Left"/>
+        </Grid>
+    </DataTemplate>
+    
     <!-- Heat map -->
 
     <ItemsPanelTemplate x:Key="heatMapPanel">
@@ -134,7 +172,7 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
-                        <local:DirectionArrow Grid.Column="1" Direction="{Binding Evaluator.CorrectPredictionDirection}" ToolTip="{Binding Evaluator.PriorCorrectPredictionCount, StringFormat=Had been {0}}"/>
+                        <local:DirectionArrow Grid.Column="1" Direction="{Binding Evaluator.CorrectPredictionDirection}" Difference="{Binding Evaluator.CorrectPredictionDifference}"/>
                     </Grid>
                     <TextBlock Grid.Row="2" Text="correct predictions" 
                            Style="{StaticResource folderDetails}"/>

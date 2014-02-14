@@ -30,9 +30,9 @@
         
         <!-- Direction arrows -->
         <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" 
-                              ToolTip="{Binding EvaluatorVM.Evaluators[0].PriorTotalPredictionCount,StringFormat=Had been {0}}"/>
+                              Difference="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDifference}"/>
         <local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDirection}" 
-                              ToolTip="{Binding EvaluatorVM.Evaluators[1].PriorTotalPredictionCount,StringFormat=Had been {0}}"/>
+                              Difference="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDifference}"/>
         <local:DirectionArrow Grid.Row="2" Grid.Column="2" />
     </Grid>
 </UserControl>

@@ -7,19 +7,19 @@
              xmlns:model="clr-namespace:MessagePredictor.Model" 
              mc:Ignorable="d" 
              x:Name="root"
-             Width="40" Height="20"
-             d:DesignHeight="20" d:DesignWidth="40">
+             Width="20" Height="18"
+             d:DesignHeight="18" d:DesignWidth="20">
     <UserControl.Resources>
         <ControlTemplate x:Key="arrowTemplate">
             <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Background="Transparent">
-                <Polygon Points="0,0 12,0 6,12" SnapsToDevicePixels="True" Fill="Red" Stroke="DarkRed" StrokeThickness="2" Margin="8 2" Name="DownArrow">
+                <Polygon Points="4,3 15,3 10,15" SnapsToDevicePixels="True" Fill="Red" Stroke="DarkRed" StrokeThickness="2" Margin="0" Name="DownArrow">
                     <Polygon.Style>
                         <Style TargetType="Polygon">
                             <Setter Property="Visibility" Value="Collapsed"/>
                         </Style>
                     </Polygon.Style>
                 </Polygon>
-                <Polygon Points="0,12 12,12, 6,0" SnapsToDevicePixels="True" Fill="Green" Stroke="DarkGreen" StrokeThickness="2" Margin="8 2" Name="UpArrow">
+                <Polygon Points="4,15 16,15, 10,3" SnapsToDevicePixels="True" Fill="Green" Stroke="DarkGreen" StrokeThickness="2" Margin="0" Name="UpArrow">
                     <Polygon.Style>
                         <Style TargetType="Polygon">
                             <Setter Property="Visibility" Value="Collapsed"/>
@@ -37,5 +37,5 @@
             </ControlTemplate.Triggers>
         </ControlTemplate>
     </UserControl.Resources>
-    <Label Template="{StaticResource arrowTemplate}" />
+    <Label Template="{StaticResource arrowTemplate}" Name="Arrow" />
 </UserControl>

@@ -14,9 +14,7 @@ namespace LibIML
         Label GroundTruthLabel { get; set; }
         SparseVector Features { get; }
         Prediction Prediction { get; set; }
-        Prediction PreviousPrediction { get; set; }
-        bool RecentlyChanged { get; }
-        bool? IsPredictionCorrect { get; }
+        Prediction PreviousPrediction { get; }
         
         bool TokenizeForString(string token);
         void ComputeFeatureVector(Vocabulary vocab, bool isRestricted);

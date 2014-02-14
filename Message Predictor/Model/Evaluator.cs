@@ -1,5 +1,6 @@
 ﻿using LibIML;
 using MessagePredictor.Model;
+using System;
 using System.Collections.Generic;
 
 namespace MessagePredictor.Model
@@ -14,16 +15,13 @@ namespace MessagePredictor.Model
         private int _trainingSetCount;
         private Direction _correctPredictionDirection;
         private Direction _totalPredictionDirection;
+        private int _totalPredictionDifference;
+        private int _correctPredictionDifference;
 
         public Evaluator(Label label)
             : base()
         {
             _label = label;
-            _correctPredictionCount = 0;
-            _totalPredictionCount = 0;
-            _trainingSetCount = 0;
-            _priorCorrectPredictionCount = 0;
-            _priorTotalPredictionCount = 0;
             _correctPredictionDirection = Direction.None;
             _totalPredictionDirection = Direction.None;
         }
@@ -44,12 +42,14 @@ namespace MessagePredictor.Model
                 int prior = _correctPredictionCount;
                 SetProperty<int>(ref _correctPredictionCount, value);
                 PriorCorrectPredictionCount = prior;
-                if (prior < value)
+                CorrectPredictionDifference = Math.Abs(CorrectPredictionCount - PriorCorrectPredictionCount);
+                if (prior < value) {
                     CorrectPredictionDirection = Direction.Up;
-                else if (prior > value)
+                } else if (prior > value) {
                     CorrectPredictionDirection = Direction.Down;
-                else
+                } else {
                     CorrectPredictionDirection = Direction.None;
+                }
             }
         }
 
@@ -61,12 +61,14 @@ namespace MessagePredictor.Model
                 int prior = _totalPredictionCount;
                 SetProperty<int>(ref _totalPredictionCount, value);
                 PriorTotalPredictionCount = prior;
-                if (prior < value)
+                TotalPredictionDifference = Math.Abs(TotalPredictionCount - PriorTotalPredictionCount);
+                if (prior < value) {
                     TotalPredictionDirection = Direction.Up;
-                else if (prior > value)
+                } else if (prior > value) {
                     TotalPredictionDirection = Direction.Down;
-                else
+                } else {
                     TotalPredictionDirection = Direction.None;
+                }
             }
         }
 
@@ -98,6 +100,18 @@ namespace MessagePredictor.Model
         {
             get { return _totalPredictionDirection; }
             private set { SetProperty<Direction>(ref _totalPredictionDirection, value); }
+        }
+        
+        public int TotalPredictionDifference
+        {
+            get { return _totalPredictionDifference; }
+            private set { SetProperty<int>(ref _totalPredictionDifference, value); }
+        }
+
+        public int CorrectPredictionDifference
+        {
+            get { return _correctPredictionDifference; }
+            private set { SetProperty<int>(ref _correctPredictionDifference, value); }
         }
 
         #endregion
