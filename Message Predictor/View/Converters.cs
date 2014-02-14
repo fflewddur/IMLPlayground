@@ -40,5 +40,23 @@ namespace MessagePredictor.Converters
             return DependencyProperty.UnsetValue;
         }
     }
+
+    public class LabelToBoolConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            Label label = value as Label;
+            if (label != null) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culter)
+        {
+            return DependencyProperty.UnsetValue;
+        }
+    }
 }
 

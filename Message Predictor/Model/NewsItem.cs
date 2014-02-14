@@ -26,6 +26,7 @@ namespace MessagePredictor.Model
         private Direction _predictionConfidenceDirection;
         private double _predictionConfidenceDifference;
         private bool _recentlyChanged;
+        private bool? _isPredictionCorrect;
         private SparseVector _featureCounts;
         private Label _userLabel;
         private Label _groundTruthLabel;
@@ -135,7 +136,11 @@ namespace MessagePredictor.Model
                 SetProperty<Prediction>(ref _prediction, value);
                 // If our Prediction changed, store the old value in PreviousPrediction
                 PreviousPrediction = prev;
-                
+                if (Prediction.Label == GroundTruthLabel)
+                    IsPredictionCorrect = true;
+                else
+                    IsPredictionCorrect = false;
+
                 if (PreviousPrediction != null) {
                     if (PreviousPrediction.Label == Prediction.Label) {
                         PredictionConfidenceDifference = Math.Abs(Prediction.Confidence - PreviousPrediction.Confidence);
@@ -215,6 +220,12 @@ namespace MessagePredictor.Model
         {
             get { return _predictionConfidenceDifference; }
             private set { SetProperty<double>(ref _predictionConfidenceDifference, value); }
+        }
+
+        public bool? IsPredictionCorrect
+        {
+            get { return _isPredictionCorrect; }
+            private set { SetProperty<bool?>(ref _isPredictionCorrect, value); }
         }
 
         public bool RecentlyChanged

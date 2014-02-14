@@ -6,6 +6,7 @@
                     xmlns:libiml="clr-namespace:LibIML;assembly=LibIML">
     
     <conv:StringFormatConverter x:Key="convStringFormat" />
+    <conv:LabelToBoolConverter x:Key="convLabelToBool" />
     
     <Style x:Key="headerStyle1">
         <Setter Property="Control.FontSize" Value="16" />
@@ -61,10 +62,28 @@
 
     <Style x:Key="messageListTopicStyle" TargetType="TextBlock">
         <Style.Triggers>
-            <DataTrigger Binding="{Binding RecentlyChanged}" Value="True">
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="False"/>
+                    <Condition Binding="{Binding RecentlyChanged}" Value="True"/>
+                </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="LightSalmon" />
                 <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='Had been {0}', Converter={StaticResource ResourceKey=convStringFormat}}"/>
-            </DataTrigger>
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True"/>
+                    <Condition Binding="{Binding IsPredictionCorrect}" Value="True"/>
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="LightGreen" />
+            </MultiDataTrigger>
+            <MultiDataTrigger>
+                <MultiDataTrigger.Conditions>
+                    <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True"/>
+                    <Condition Binding="{Binding IsPredictionCorrect}" Value="False"/>
+                </MultiDataTrigger.Conditions>
+                <Setter Property="Background" Value="LightPink" />
+            </MultiDataTrigger>
         </Style.Triggers>
     </Style>
     
