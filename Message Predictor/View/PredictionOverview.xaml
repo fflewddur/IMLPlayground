@@ -8,9 +8,9 @@
              d:DesignHeight="300" d:DesignWidth="200">
     <Grid>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
             <ColumnDefinition Width="3*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition />
@@ -24,15 +24,18 @@
         <Label Grid.Row="2" Grid.Column="0" Content="Total changed" FontStyle="Italic"/>
         
         <!-- Values -->
-        <Label Grid.Row="0" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].TotalPredictionCount}" ContentStringFormat="{}{0:N0}"/>
-        <Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].TotalPredictionCount}" ContentStringFormat="{}{0:N0}"/>
-        <Label Grid.Row="2" Grid.Column="1" Content="{Binding EvaluatorVM.RecentlyChangedCount}" ContentStringFormat="{}{0:N0}"/>
+        <Label Grid.Row="0" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].TotalPredictionCount}" ContentStringFormat="{}{0:N0}" 
+               HorizontalContentAlignment="Center"/>
+        <Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].TotalPredictionCount}" ContentStringFormat="{}{0:N0}"
+               HorizontalContentAlignment="Center"/>
+        <Label Grid.Row="2" Grid.Column="1" Content="{Binding EvaluatorVM.RecentlyChangedCount}" ContentStringFormat="{}{0:N0}"
+               HorizontalContentAlignment="Center"/>
         
         <!-- Direction arrows -->
         <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" 
-                              Difference="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDifference}"/>
+                              Difference="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDifference}" HorizontalContentAlignment="Left"/>
         <local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDirection}" 
-                              Difference="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDifference}"/>
-        <local:DirectionArrow Grid.Row="2" Grid.Column="2" />
+                              Difference="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDifference}" HorizontalContentAlignment="Left"/>
+        <!--<local:DirectionArrow Grid.Row="2" Grid.Column="2" />-->
     </Grid>
 </UserControl>
