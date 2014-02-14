@@ -138,7 +138,7 @@ namespace MessagePredictor.Model
                 PreviousPrediction = prev;
                 if (Prediction.Label == GroundTruthLabel)
                     IsPredictionCorrect = true;
-                else
+                else 
                     IsPredictionCorrect = false;
 
                 if (PreviousPrediction != null) {
@@ -160,47 +160,11 @@ namespace MessagePredictor.Model
                         PredictionConfidenceDirection = Direction.None;
                         PredictionConfidenceDifference = 0;
                     }
+                } else {
+                    RecentlyChanged = false;
+                    PredictionConfidenceDirection = Direction.None;
+                    PredictionConfidenceDifference = 0;
                 }
-                //if (PreviousPrediction != null && PreviousPrediction.Label != Prediction.Label)
-                //    RecentlyChanged = true;
-                //else
-                //    RecentlyChanged = false;
-
-                // Did the confidence go up or down? If the prediction just changed, it obviously went up.
-                //if (PreviousPrediction != null && RecentlyChanged == false) {
-                //    if (PreviousPrediction.Confidence > Prediction.Confidence) {
-                //        ConfidenceDown = true;
-                //        ConfidenceUp = false;
-                //    } else if (PreviousPrediction.Confidence < Prediction.Confidence) {
-                //        ConfidenceUp = true;
-                //        ConfidenceDown = false;
-                //    } else {
-                //        ConfidenceDown = false;
-                //        ConfidenceUp = false;
-                //    }
-                //} else if (RecentlyChanged == true) {
-                //    ConfidenceDown = false;
-                //    ConfidenceUp = true;
-                //} else {
-                //    ConfidenceUp = false;
-                //    ConfidenceDown = false;
-                //}
-
-                // Is our prediction correct?
-                //if (GroundTruthLabel != null) {
-                //    if (Prediction.Label == GroundTruthLabel) {
-                //        IsPredictionCorrect = true;
-                //    } else {
-                //        IsPredictionCorrect = false;
-                //    }
-                //} else {
-                //    IsPredictionCorrect = null;
-                //}
-                //} else {
-                //    // Otherwise, ensure PreviosPrediction is null
-                //    //PreviousPrediction = null;
-                //    RecentlyChanged = false;
-                //}
             }
         }
 
@@ -233,30 +197,6 @@ namespace MessagePredictor.Model
             get { return _recentlyChanged; }
             private set { SetProperty<bool>(ref _recentlyChanged, value); }
         }
-
-        //public bool RecentlyChanged
-        //{
-        //    get { return _recentlyChanged; }
-        //    private set { SetProperty<bool>(ref _recentlyChanged, value); }
-        //}
-
-        //public bool ConfidenceUp
-        //{
-        //    get { return _confidenceUp; }
-        //    private set { SetProperty<bool>(ref _confidenceUp, value); }
-        //}
-
-        //public bool ConfidenceDown
-        //{
-        //    get { return _confidenceDown; }
-        //    private set { SetProperty<bool>(ref _confidenceDown, value); }
-        //}
-
-        //public bool? IsPredictionCorrect
-        //{
-        //    get { return _isPredictionCorrect; }
-        //    private set { SetProperty<bool?>(ref _isPredictionCorrect, value); }
-        //}
 
         public SparseVector Features
         {

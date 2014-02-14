@@ -106,8 +106,14 @@
         </Grid>
     </DataTemplate>
     
+    <!-- End message list -->
+    
     <!-- Heat map -->
 
+    <Style x:Key="messageHeatMapStyle">
+        
+    </Style>
+    
     <ItemsPanelTemplate x:Key="heatMapPanel">
         <WrapPanel Orientation="Horizontal" VirtualizingPanel.VirtualizationMode="Recycling" 
                    VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" />

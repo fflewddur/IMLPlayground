@@ -7,6 +7,7 @@
              xmlns:local="clr-namespace:MessagePredictor.View" 
              xmlns:model="clr-namespace:MessagePredictor.Model" 
              mc:Ignorable="d" 
+             Style="{StaticResource ResourceKey=messageHeatMapStyle}"
              d:DesignHeight="400" d:DesignWidth="200">
     <Grid>
         <Grid.RowDefinitions>

@@ -123,20 +123,17 @@ namespace MessagePredictor.Model
         /// </summary>
         /// <param name="instances">The full set of instances.</param>
         /// <returns>The number of predictions that changed output labels</returns>
-        public int Evaluate(IEnumerable<IInstance> instances)
+        public void Evaluate(IEnumerable<IInstance> instances)
         {
             int correctPredictionCount = 0;
             int totalPredictionCount = 0;
             int trainingSetCount = 0;
-            int changedCount = 0;
+
             foreach (IInstance instance in instances) {
                 if (instance.Prediction.Label == _label) {
                     totalPredictionCount++;
                     if (instance.UserLabel == _label) {
                         correctPredictionCount++;
-                    }
-                    if (instance.PreviousPrediction != null && instance.Prediction.Label != instance.PreviousPrediction.Label) {
-                        changedCount++;
                     }
                 }
                 if (instance.UserLabel == _label) {
@@ -148,8 +145,6 @@ namespace MessagePredictor.Model
             CorrectPredictionCount = correctPredictionCount;
             TotalPredictionCount = totalPredictionCount;
             TrainingSetCount = trainingSetCount;
-
-            return changedCount;
         }
 
         #endregion

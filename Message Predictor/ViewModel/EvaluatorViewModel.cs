@@ -1,5 +1,6 @@
 ﻿using LibIML;
 using MessagePredictor.Model;
+using System;
 using System.Collections.Generic;
 
 namespace MessagePredictor.ViewModel
@@ -40,9 +41,13 @@ namespace MessagePredictor.ViewModel
         {
             int recentlyChanged = 0;
             foreach (Evaluator evaluator in _evaluators) {
-                recentlyChanged += evaluator.Evaluate(instances);
+                evaluator.Evaluate(instances);
             }
-            
+            foreach (IInstance instance in instances) {
+                if (instance.RecentlyChanged) {
+                    recentlyChanged++;
+                }
+            }
             RecentlyChangedCount = recentlyChanged;
         }
 

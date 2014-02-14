@@ -24,9 +24,9 @@
         <Label Grid.Row="2" Grid.Column="0" Content="Total changed" FontStyle="Italic"/>
         
         <!-- Values -->
-        <Label Grid.Row="0" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].TotalPredictionCount}"/>
-        <Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].TotalPredictionCount}"/>
-        <Label Grid.Row="2" Grid.Column="1" Content="{Binding EvaluatorVM.RecentlyChangedCount}"/>
+        <Label Grid.Row="0" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].TotalPredictionCount}" ContentStringFormat="{}{0:N0}"/>
+        <Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].TotalPredictionCount}" ContentStringFormat="{}{0:N0}"/>
+        <Label Grid.Row="2" Grid.Column="1" Content="{Binding EvaluatorVM.RecentlyChangedCount}" ContentStringFormat="{}{0:N0}"/>
         
         <!-- Direction arrows -->
         <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" 

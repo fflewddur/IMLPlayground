@@ -15,6 +15,7 @@ namespace LibIML
         SparseVector Features { get; }
         Prediction Prediction { get; set; }
         Prediction PreviousPrediction { get; }
+        bool RecentlyChanged { get; }
         
         bool TokenizeForString(string token);
         void ComputeFeatureVector(Vocabulary vocab, bool isRestricted);
