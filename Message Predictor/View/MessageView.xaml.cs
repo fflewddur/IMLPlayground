@@ -21,7 +21,7 @@ namespace MessagePredictor.View
         {
             Xceed.Wpf.Toolkit.RichTextBox tb = sender as Xceed.Wpf.Toolkit.RichTextBox;
             MessagePredictorViewModel vm = tb.DataContext as MessagePredictorViewModel;
-            vm.FeatureSetVM.HighlightFeature.Execute(tb.Selection.Text);
+            vm.FeatureSetVM.HighlightFeature.Execute(tb.Selection.Text.Trim());
         }
     }
 

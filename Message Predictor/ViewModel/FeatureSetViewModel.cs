@@ -217,6 +217,7 @@ namespace MessagePredictor.ViewModel
             AddFeatureDialog dialog = new AddFeatureDialog();
             dialog.Owner = App.Current.MainWindow;
             AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(label);
+            vm.Word = _featureText;
             vm.PropertyChanged += AddFeatureVM_PropertyChanged;
             dialog.DataContext = vm;
             bool? result = dialog.ShowDialog();
