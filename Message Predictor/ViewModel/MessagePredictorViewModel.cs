@@ -445,11 +445,13 @@ namespace MessagePredictor
 
         private void UpdateFilters(bool onlyShowRecentChanges)
         {
+            Mouse.OverrideCursor = Cursors.Wait;
+
             using (_messageListViewSource.View.DeferRefresh()) {
                 // If this is the Unknown folder, look for items without a user label.
                 if (FolderListVM.SelectedFolder.Label == FolderListVM.UnknownLabel) {
                     if (onlyShowRecentChanges)
-                        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null && 
+                        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null &&
                             ((item as NewsItem).RecentlyChanged || (item as NewsItem).PredictionConfidenceDirection != Direction.None));
                     else
                         _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null);
@@ -468,6 +470,8 @@ namespace MessagePredictor
                 _messageListViewSource.View.IsCurrentBeforeFirst) {
                 _messageListViewSource.View.MoveCurrentToFirst();
             }
+
+            Mouse.OverrideCursor = null;
         }
 
         #endregion

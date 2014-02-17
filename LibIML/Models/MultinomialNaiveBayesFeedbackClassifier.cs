@@ -513,12 +513,15 @@ namespace LibIML
         private bool TestPrC(Dictionary<Label, double> PrC)
         {
             double sum = 0;
+            int count = 0;
+
             foreach (Label l in _labels)
             {
                 sum += PrC[l];
+                count++;
             }
 
-            bool retval = (Math.Round(sum, 7) == Math.Round(1.0, 7));
+            bool retval = (count > 0 && (Math.Round(sum, 7) == Math.Round(1.0, 7)));
             if (!retval)
                 throw new ArithmeticException(string.Format("Error in PrC: Sum should be 1, but is {0}", sum));
 
@@ -531,13 +534,15 @@ namespace LibIML
             foreach (Label l in _labels)
             {
                 double sum = 0;
+                int count = 0;
 
                 foreach (double pr in PrWGivenC[l].Values)
                 {
                     sum += pr;
+                    count++;
                 }
 
-                if (Math.Round(sum, 7) != Math.Round(1.0, 7))
+                if (count > 0 && Math.Round(sum, 7) != Math.Round(1.0, 7))
                 {
                     retval = false;
                     throw new ArithmeticException(string.Format("Error in PrWGivenC: Sum should be 1, but is {0} for class {1}", sum, l));

@@ -259,10 +259,13 @@ namespace MessagePredictor.Model
             }
 
             // Split the text on the features, then join it back together with <feature> tags surrounding each feature
-            string featurePattern = @"\b(" + string.Join("|", featureWords) + @")\b";
-            Regex featureRegex = new Regex(featurePattern, RegexOptions.IgnoreCase);
-            string replaced = featureRegex.Replace(AllText, "<feature>$1<feature>");
-            // Split the text on newlines
+            string replaced = AllText;
+            if (featureWords.Count > 0) {
+                string featurePattern = @"\b(" + string.Join("|", featureWords) + @")\b";
+                Regex featureRegex = new Regex(featurePattern, RegexOptions.IgnoreCase);
+                replaced = featureRegex.Replace(replaced, "<feature>$1<feature>");
+                // Split the text on newlines
+            }
             string[] lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
 
             XElement root = new XElement("message");
