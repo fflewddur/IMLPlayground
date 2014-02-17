@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace MessagePredictor
 {
@@ -138,7 +139,12 @@ namespace MessagePredictor
         public bool OnlyShowRecentChanges
         {
             get { return _onlyShowRecentChanges; }
-            set { SetProperty<bool>(ref _onlyShowRecentChanges, value); }
+            set
+            {
+                if (SetProperty<bool>(ref _onlyShowRecentChanges, value)) {
+                    UpdateFilters(_onlyShowRecentChanges);
+                }
+            }
         }
 
         public List<string> TextToHighlight
@@ -190,6 +196,8 @@ namespace MessagePredictor
 
         private void PerformUpdatePredictions()
         {
+            Mouse.OverrideCursor = Cursors.Wait;
+
             Console.WriteLine("Update predictions");
             if (_vocab.HasUpdatedTokens) {
                 UpdateVocab();
@@ -200,6 +208,8 @@ namespace MessagePredictor
             _evaluatorVM.EvaluatePredictions(_messages);
             _folderListVM.UpdateFolderCounts(_messages);
             _messageListViewSource.View.Refresh();
+
+            Mouse.OverrideCursor = null;
         }
 
         private bool CanPerformLabelMessage(Label label)
@@ -210,6 +220,7 @@ namespace MessagePredictor
         private void PerformLabelMessage(Label label)
         {
             NewsItem item = FolderListVM.SelectedFolder.SelectedMessage;
+            Mouse.OverrideCursor = Cursors.Wait;
 
             // Don't do anything if the message already has the desired label
             if (item.UserLabel == label ||
@@ -240,8 +251,10 @@ namespace MessagePredictor
             } else {
                 // Still need to update our view
                 _folderListVM.UpdateFolderCounts(_messages);
-                _messageListViewSource.View.Refresh(); 
+                _messageListViewSource.View.Refresh();
             }
+
+            Mouse.OverrideCursor = null;
         }
 
         #endregion
@@ -430,6 +443,33 @@ namespace MessagePredictor
             return fullSet.Where(item => !_labels.Contains(item.UserLabel));
         }
 
+        private void UpdateFilters(bool onlyShowRecentChanges)
+        {
+            using (_messageListViewSource.View.DeferRefresh()) {
+                // If this is the Unknown folder, look for items without a user label.
+                if (FolderListVM.SelectedFolder.Label == FolderListVM.UnknownLabel) {
+                    if (onlyShowRecentChanges)
+                        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null && 
+                            ((item as NewsItem).RecentlyChanged || (item as NewsItem).PredictionConfidenceDirection != Direction.None));
+                    else
+                        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null);
+                } else {
+                    // Otherwise, look for items with the same label as the selected folder
+                    if (onlyShowRecentChanges)
+                        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == FolderListVM.SelectedFolder.Label &&
+                            ((item as NewsItem).RecentlyChanged || (item as NewsItem).PredictionConfidenceDirection != Direction.None));
+                    else
+                        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == FolderListVM.SelectedFolder.Label);
+                }
+            }
+
+            if (_messageListViewSource.View.CurrentItem == null ||
+                _messageListViewSource.View.IsCurrentAfterLast ||
+                _messageListViewSource.View.IsCurrentBeforeFirst) {
+                _messageListViewSource.View.MoveCurrentToFirst();
+            }
+        }
+
         #endregion
 
         #region Event handlers
@@ -482,21 +522,22 @@ namespace MessagePredictor
         private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
         {
             FolderListViewModel vm = sender as FolderListViewModel;
+            UpdateFilters(_onlyShowRecentChanges);
             // If this is the Unknown folder, look for items without a user label.
-            using (_messageListViewSource.View.DeferRefresh()) {
-                if (e.Folder.Label == vm.UnknownLabel) {
-                    _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null);
-                } else {
-                    // Otherwise, look for items with the same label as the selected folder
-                    _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == e.Folder.Label);
-                }
-            }
+            //using (_messageListViewSource.View.DeferRefresh()) {
+            //    if (e.Folder.Label == vm.UnknownLabel) {
+            //        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null);
+            //    } else {
+            //        // Otherwise, look for items with the same label as the selected folder
+            //        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == e.Folder.Label);
+            //    }
+            //}
 
-            if (_messageListViewSource.View.CurrentItem == null || 
-                _messageListViewSource.View.IsCurrentAfterLast || 
-                _messageListViewSource.View.IsCurrentBeforeFirst) {
-                _messageListViewSource.View.MoveCurrentToFirst();
-            }
+            //if (_messageListViewSource.View.CurrentItem == null ||
+            //    _messageListViewSource.View.IsCurrentAfterLast ||
+            //    _messageListViewSource.View.IsCurrentBeforeFirst) {
+            //    _messageListViewSource.View.MoveCurrentToFirst();
+            //}
         }
 
         #endregion

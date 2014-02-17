@@ -145,7 +145,7 @@ namespace LibIML
                 }
                 int totalDf;
                 _perClassFeatureCounts[label].TryGetValue(id, out totalDf);
-                Console.WriteLine("Total DF of {0} for {1}: {2}", _vocab.GetWord(id), label, totalDf);
+                //Console.WriteLine("Total DF of {0} for {1}: {2}", _vocab.GetWord(id), label, totalDf);
             }
         }
 
@@ -463,7 +463,7 @@ namespace LibIML
                         prior = _defaultPrior; // Use a default value if the user didn't provide one.
                     sumPriors += prior;
                 }
-                Console.Write("PrWGivenC for {0}: ", l);
+                //Console.Write("PrWGivenC for {0}: ", l);
                 foreach (int id in Vocab.FeatureIds)
                 {
                     int countFeature;
@@ -472,9 +472,9 @@ namespace LibIML
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
                     _pWordGivenClass[l][id] = (prior + countFeature) / (sumPriors + (double)sumFeatures);
-                    Console.Write("{0}={1:N4} ", Vocab.GetWord(id), _pWordGivenClass[l][id]);
+                    //Console.Write("{0}={1:N4} ", Vocab.GetWord(id), _pWordGivenClass[l][id]);
                 }
-                Console.WriteLine();
+                //Console.WriteLine();
             }
         }
 
