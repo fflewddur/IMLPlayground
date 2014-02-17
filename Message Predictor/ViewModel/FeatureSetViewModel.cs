@@ -37,6 +37,8 @@ namespace MessagePredictor.ViewModel
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
 
+            HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
+            AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
             AddFeature = new RelayCommand<Label>(PerformAddFeature);
             FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature);
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
@@ -81,6 +83,8 @@ namespace MessagePredictor.ViewModel
 
         #region Commands
 
+        public RelayCommand<string> HighlightFeature { get; private set; }
+        public RelayCommand<Feature> AddFeatureViaSelection { get; private set; }
         public RelayCommand<Label> AddFeature { get; private set; }
         public RelayCommand<Feature> FeatureRemove { get; private set; }
         public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
@@ -198,6 +202,16 @@ namespace MessagePredictor.ViewModel
             }
         }
 
+        private void PerformHighlightFeature(string text)
+        {
+            FeatureTextChanged(text);
+        }
+
+        private void PerformAddFeatureViaSelection(Feature feature)
+        {
+
+        }
+
         private void PerformAddFeature(Label label)
         {
             AddFeatureDialog dialog = new AddFeatureDialog();
@@ -226,12 +240,17 @@ namespace MessagePredictor.ViewModel
         private void AddFeatureVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Word") {
-                _featureTextEditedTimer.Stop();
                 AddFeatureDialogViewModel vm = sender as AddFeatureDialogViewModel;
                 if (vm != null)
-                    _featureText = vm.Word;
-                _featureTextEditedTimer.Start();
+                    FeatureTextChanged(vm.Word);
             }
+        }
+
+        private void FeatureTextChanged(string text)
+        {
+            _featureTextEditedTimer.Stop();
+            _featureText = text;
+            _featureTextEditedTimer.Start();
         }
 
         private void PerformRemoveFeature(Feature feature)

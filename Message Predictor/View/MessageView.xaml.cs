@@ -1,18 +1,7 @@
-﻿using LibIML;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Xml.Linq;
 using Xceed.Wpf.Toolkit;
 
@@ -26,6 +15,13 @@ namespace MessagePredictor.View
         public MessageView()
         {
             InitializeComponent();
+        }
+
+        private void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            Xceed.Wpf.Toolkit.RichTextBox tb = sender as Xceed.Wpf.Toolkit.RichTextBox;
+            MessagePredictorViewModel vm = tb.DataContext as MessagePredictorViewModel;
+            vm.FeatureSetVM.HighlightFeature.Execute(tb.Selection.Text);
         }
     }
 
