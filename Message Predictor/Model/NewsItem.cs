@@ -16,6 +16,7 @@ namespace MessagePredictor.Model
         private readonly double MIN_CONFIDENCE_CHANGE = .01;
 
         private int _id;
+        private int _order;
         private string _originalGroup;
         private string _subject;
         private string _body;
@@ -48,6 +49,12 @@ namespace MessagePredictor.Model
         {
             get { return _id; }
             private set { SetProperty<int>(ref _id, value); }
+        }
+
+        public int Order
+        {
+            get { return _order; }
+            private set { SetProperty<int>(ref _order, value); }
         }
 
         public string OriginalGroup
@@ -327,6 +334,7 @@ namespace MessagePredictor.Model
                 string author = null;
                 bool prevLineBlank = false;
                 int id;
+                int order = 0;
                 string originalGroup;
 
                 if (!GetGroupAndId(filePath, out originalGroup, out id))
@@ -341,12 +349,14 @@ namespace MessagePredictor.Model
                         author = line.Substring("From: ".Length);
                     else if (line.StartsWith("Subject: ", StringComparison.InvariantCultureIgnoreCase))
                         subject = line.Substring("Subject: ".Length);
+                    else if (line.StartsWith("Order: ", StringComparison.InvariantCultureIgnoreCase))
+                        order = int.Parse(line.Substring("Order: ".Length));
                     else if (string.IsNullOrWhiteSpace(line))
                         prevLineBlank = true;
                 }
 
                 if (body.Length > 0) // Ensure we have some content in this item
-                    item = new NewsItem { Id = id, OriginalGroup = originalGroup, Author = author, Subject = subject, Body = body.ToString() };
+                    item = new NewsItem { Id = id, Order = order, OriginalGroup = originalGroup, Author = author, Subject = subject, Body = body.ToString() };
             }
 
             return item;

@@ -19,7 +19,7 @@
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
                   SelectionUnit="FullRow" GridLinesVisibility="Horizontal" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="auto" />
+                <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="auto" SortDirection="Ascending" />
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="6*"/>
                 <DataGridTemplateColumn SortMemberPath="Prediction.Label" Width="1*" Header="{StaticResource ResourceKey=messageListTopicHeader}" 
                                         CellTemplate="{StaticResource ResourceKey=messageListTopicTemplate}" />
