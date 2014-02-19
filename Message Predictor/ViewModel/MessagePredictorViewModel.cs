@@ -480,23 +480,27 @@ namespace MessagePredictor
 
         private void _featureSetVM_FeatureAdded(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
         {
-            Console.WriteLine("added feature {0}", e.Tokens);
+            Console.WriteLine("added feature {0}", e.Feature);
+            Debug.Assert(e.Feature != null);
             // Ensure the vocabulary includes the token for this feature
-            if (_vocab.AddToken(e.Tokens, -1)) // Use -1 for doc frequency for now, we'll fix it below
+            if (_vocab.AddToken(e.Feature.Characters, -1)) // Use -1 for doc frequency for now, we'll fix it below
             {
                 // If we created a new vocab element, include it in our documents' tokenizations
                 //int id = _vocab.GetWordId(e.Tokens, false);
                 int df = 0;
                 foreach (IInstance instance in _messages) {
-                    if (instance.TokenizeForString(e.Tokens))
+                    if (instance.TokenizeForString(e.Feature.Characters))
                         df++;
                 }
                 // Update our vocab with the correct document frequency
-                _vocab.AddToken(e.Tokens, df);
+                _vocab.AddToken(e.Feature.Characters, df);
             }
 
             UpdateVocab();
-            _classifier.UpdateCountsForNewFeature(_vocab.GetWordId(e.Tokens, true));
+            int id = _vocab.GetWordId(e.Feature.Characters, true);
+            _classifier.UpdateCountsForNewFeature(id);
+            _classifier.Train();
+            e.Feature.SystemWeight = _classifier.GetFeatureWeight(id, e.Feature.Label);
             if (AutoUpdatePredictions) {
                 PerformUpdatePredictions();
             }
@@ -511,7 +515,7 @@ namespace MessagePredictor
         }
 
         // Tell the heatmap to show messages containing the feature the user is currently editing
-        private void _featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureAddedEventArgs e)
+        private void _featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureTextEditedEventArgs e)
         {
             HeatMapVM.ToHighlight = e.Tokens;
         }

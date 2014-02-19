@@ -96,9 +96,17 @@ namespace MessagePredictor.ViewModel
 
         public class FeatureAddedEventArgs : EventArgs
         {
-            public readonly string Tokens;
+            public readonly Feature Feature;
+            public FeatureAddedEventArgs(Feature feature)
+            {
+                Feature = feature;
+            }
+        }
 
-            public FeatureAddedEventArgs(string tokens)
+        public class FeatureTextEditedEventArgs : EventArgs
+        {
+            public readonly string Tokens;
+            public FeatureTextEditedEventArgs(string tokens)
             {
                 Tokens = tokens;
             }
@@ -106,7 +114,7 @@ namespace MessagePredictor.ViewModel
 
         public event EventHandler<FeatureAddedEventArgs> FeatureAdded;
         public event EventHandler<EventArgs> FeatureRemoved;
-        public event EventHandler<FeatureAddedEventArgs> FeatureTextEdited;
+        public event EventHandler<FeatureTextEditedEventArgs> FeatureTextEdited;
 
         protected virtual void OnFeatureAdded(FeatureAddedEventArgs e)
         {
@@ -120,7 +128,7 @@ namespace MessagePredictor.ViewModel
                 FeatureRemoved(this, e);
         }
 
-        protected virtual void OnFeatureTextEdited(FeatureAddedEventArgs e)
+        protected virtual void OnFeatureTextEdited(FeatureTextEditedEventArgs e)
         {
             if (FeatureTextEdited != null)
                 FeatureTextEdited(this, e);
@@ -141,7 +149,7 @@ namespace MessagePredictor.ViewModel
             // Update the UI right away, even if we don't retrain
             FeatureSet.Add(feature);
 
-            OnFeatureAdded(new FeatureAddedEventArgs(feature.Characters));
+            OnFeatureAdded(new FeatureAddedEventArgs(feature));
         }
 
         public void RemoveUserFeature(Feature feature)
@@ -165,7 +173,7 @@ namespace MessagePredictor.ViewModel
         private void _featureTextEditedTimer_Tick(object sender, EventArgs e)
         {
             _featureTextEditedTimer.Stop();
-            OnFeatureTextEdited(new FeatureAddedEventArgs(_featureText));
+            OnFeatureTextEdited(new FeatureTextEditedEventArgs(_featureText));
         }
 
         private void classifier_Retrained(object sender, EventArgs e)
@@ -235,7 +243,7 @@ namespace MessagePredictor.ViewModel
 
             // Let anyone watching know that the user has closed the dialog, so _featureText is now empty.
             _featureText = "";
-            OnFeatureTextEdited(new FeatureAddedEventArgs(_featureText));
+            OnFeatureTextEdited(new FeatureTextEditedEventArgs(_featureText));
         }
 
         private void AddFeatureVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
