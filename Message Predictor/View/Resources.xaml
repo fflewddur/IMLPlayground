@@ -55,6 +55,10 @@
         <Setter Property="IsCheckable" Value="True"/>
     </Style>
 
+    <Style x:Key="tabItemStyle" TargetType="TabItem">
+        <Setter Property="Padding" Value="20 5" />
+    </Style>
+    
     <!-- Message list -->
 
     <TextBlock TextAlignment="Center" x:Key="messageListTopicHeader">

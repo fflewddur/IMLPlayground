@@ -23,8 +23,11 @@ namespace LibIML
         private double _systemWeight;
         private double _userWeight;
         private bool _mostImportantLabel;
+        private double _height;
+        private double _userHeight;
 
-        public Feature(string characters, Label label) : base()
+        public Feature(string characters, Label label)
+            : base()
         {
             _characters = characters;
             _label = label;
@@ -57,7 +60,13 @@ namespace LibIML
         public double SystemWeight
         {
             get { return _systemWeight; }
-            set { _systemWeight = value; }
+            set
+            {
+                if (SetProperty<double>(ref _systemWeight, value)) {
+                    Height = SystemWeight * 100;
+                    UserHeight = SystemWeight * 200; // FIXME
+                }
+            }
         }
 
         public double UserWeight
@@ -70,6 +79,25 @@ namespace LibIML
         {
             get { return _mostImportantLabel; }
             set { _mostImportantLabel = value; }
+        }
+
+        public double Height
+        {
+            get { return _height; }
+            private set { SetProperty<double>(ref _height, value); }
+        }
+
+        public double UserHeight
+        {
+            get { return _userHeight; }
+            set
+            {
+                // Minimum height (so the user can drag the bar back up)
+                if (value < 3) {
+                    value = 3;
+                }
+                SetProperty<double>(ref _userHeight, value);
+            }
         }
 
         #endregion

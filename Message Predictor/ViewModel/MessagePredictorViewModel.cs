@@ -527,21 +527,6 @@ namespace MessagePredictor
         {
             FolderListViewModel vm = sender as FolderListViewModel;
             UpdateFilters(_onlyShowRecentChanges);
-            // If this is the Unknown folder, look for items without a user label.
-            //using (_messageListViewSource.View.DeferRefresh()) {
-            //    if (e.Folder.Label == vm.UnknownLabel) {
-            //        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == null);
-            //    } else {
-            //        // Otherwise, look for items with the same label as the selected folder
-            //        _messageListViewSource.View.Filter = (item => (item as NewsItem).UserLabel == e.Folder.Label);
-            //    }
-            //}
-
-            //if (_messageListViewSource.View.CurrentItem == null ||
-            //    _messageListViewSource.View.IsCurrentAfterLast ||
-            //    _messageListViewSource.View.IsCurrentBeforeFirst) {
-            //    _messageListViewSource.View.MoveCurrentToFirst();
-            //}
         }
 
         #endregion

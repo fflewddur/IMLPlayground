@@ -8,11 +8,21 @@
              d:DesignHeight="200" d:DesignWidth="500">
     <Grid>
         <TabControl>
-            <TabItem Header="Overview">
+            <TabItem Header="Overview" Style="{StaticResource ResourceKey=tabItemStyle}">
                 <local:ImportantWordsOverview />
             </TabItem>
-            <TabItem Header="Graph 1"></TabItem>
-            <TabItem Header="Graph 2"></TabItem>
+            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
+                <TabItem.Header>
+                    <TextBlock Text="{Binding Labels[0], StringFormat='{}{0} graph'}"/>
+                </TabItem.Header>
+                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSources[0].View}" />
+            </TabItem>
+            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
+                <TabItem.Header>
+                    <TextBlock Text="{Binding Labels[1], StringFormat='{}{0} graph'}"/>
+                </TabItem.Header>
+                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSources[1].View}" />
+            </TabItem>
         </TabControl>
     </Grid>
 </UserControl>

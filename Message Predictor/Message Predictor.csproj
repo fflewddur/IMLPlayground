@@ -154,6 +154,9 @@
     <Compile Include="View\DirectionArrow.xaml.cs">
       <DependentUpon>DirectionArrow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\FeatureGraph.xaml.cs">
+      <DependentUpon>FeatureGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FolderList.xaml.cs">
       <DependentUpon>FolderList.xaml</DependentUpon>
     </Compile>
@@ -194,6 +197,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\DirectionArrow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\FeatureGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
