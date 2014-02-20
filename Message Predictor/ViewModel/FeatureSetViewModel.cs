@@ -20,7 +20,8 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userAdded;
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
-        private IReadOnlyList<CollectionViewSource> _collectionViewSources;
+        private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
+        private IReadOnlyList<CollectionViewSource> _collectionViewSourcesGraph;
         private string _featureText; // The feature the user is currently typing in
         private DispatcherTimer _featureTextEditedTimer;
 
@@ -33,7 +34,8 @@ namespace MessagePredictor.ViewModel
             _featureSet = new ObservableCollection<Feature>();
             _userAdded = new List<Feature>();
             _userRemoved = new List<Feature>();
-            _collectionViewSources = BuildCollectionViewSources(labels);
+            _collectionViewSourcesOverview = BuildCollectionViewSourcesOverview(labels);
+            _collectionViewSourcesGraph = BuildCollectionViewSourcesGraph(labels);
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
 
@@ -73,10 +75,16 @@ namespace MessagePredictor.ViewModel
             set { SetProperty<ObservableCollection<Feature>>(ref _featureSet, value); }
         }
 
-        public IReadOnlyList<CollectionViewSource> FeatureSetViewSources
+        public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesOverview
         {
-            get { return _collectionViewSources; }
-            private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSources, value); }
+            get { return _collectionViewSourcesOverview; }
+            private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesOverview, value); }
+        }
+
+        public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesGraph
+        {
+            get { return _collectionViewSourcesGraph; }
+            private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesGraph, value); }
         }
 
         #endregion
@@ -277,7 +285,7 @@ namespace MessagePredictor.ViewModel
             Console.WriteLine("PerformFeatureSomewhatImportant on {0}", feature);
         }
 
-        private IReadOnlyList<CollectionViewSource> BuildCollectionViewSources(IReadOnlyList<Label> labels)
+        private IReadOnlyList<CollectionViewSource> BuildCollectionViewSourcesOverview(IReadOnlyList<Label> labels)
         {
             List<CollectionViewSource> collectionViewSources = new List<CollectionViewSource>();
             foreach (Label label in labels) {
@@ -289,6 +297,29 @@ namespace MessagePredictor.ViewModel
                     if (f != null) {
                         // Only display features that are more important for this label than other labels
                         if (f.Label == label && f.MostImportant)
+                            e.Accepted = true;
+                        else
+                            e.Accepted = false;
+                    }
+                };
+                collectionViewSources.Add(cvs);
+            }
+
+            return collectionViewSources;
+        }
+
+        private IReadOnlyList<CollectionViewSource> BuildCollectionViewSourcesGraph(IReadOnlyList<Label> labels)
+        {
+            List<CollectionViewSource> collectionViewSources = new List<CollectionViewSource>();
+            foreach (Label label in labels) {
+                CollectionViewSource cvs = new CollectionViewSource();
+                cvs.Source = FeatureSet;
+                cvs.Filter += (o, e) =>
+                {
+                    Feature f = e.Item as Feature;
+                    if (f != null) {
+                        // Only display features that are more important for this label than other labels
+                        if (f.Label == label)
                             e.Accepted = true;
                         else
                             e.Accepted = false;

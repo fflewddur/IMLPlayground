@@ -15,13 +15,13 @@
                 <TabItem.Header>
                     <TextBlock Text="{Binding Labels[0], StringFormat='{}{0} graph'}"/>
                 </TabItem.Header>
-                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSources[0].View}" />
+                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSourcesGraph[0].View}" />
             </TabItem>
             <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
                 <TabItem.Header>
                     <TextBlock Text="{Binding Labels[1], StringFormat='{}{0} graph'}"/>
                 </TabItem.Header>
-                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSources[1].View}" />
+                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSourcesGraph[1].View}" />
             </TabItem>
         </TabControl>
     </Grid>

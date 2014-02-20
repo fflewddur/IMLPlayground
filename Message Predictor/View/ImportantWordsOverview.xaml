@@ -40,9 +40,9 @@
         <Label Grid.Row="1" Grid.Column="0" Content="{Binding Labels[1]}" Style="{StaticResource headerStyle2}" VerticalContentAlignment="Center" HorizontalContentAlignment="Right"/>
 
         <!-- List of words -->
-        <ItemsControl Name="Topic1Features" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSources[0].View}" VerticalAlignment="Center" 
+        <ItemsControl Name="Topic1Features" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSourcesOverview[0].View}" VerticalAlignment="Center" 
                       ItemsPanel="{StaticResource ResourceKey=importantWordsOverviewPanel}" ItemTemplate="{StaticResource ResourceKey=importantWordsOverviewItem}" />
-        <ItemsControl Name="Topic2Features" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSources[1].View}" VerticalAlignment="Center" 
+        <ItemsControl Name="Topic2Features" Grid.Row="1" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSourcesOverview[1].View}" VerticalAlignment="Center" 
                       ItemsPanel="{StaticResource ResourceKey=importantWordsOverviewPanel}" ItemTemplate="{StaticResource ResourceKey=importantWordsOverviewItem}" />
 
         <!-- Add word buttons -->
