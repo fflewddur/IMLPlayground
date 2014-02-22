@@ -101,6 +101,14 @@ namespace LibIML
             return weight;
         }
 
+        public double GetFeaturePrior(int id, Label label)
+        {
+            double weight;
+            _perClassFeaturePriors[label].TryGetValue(id, out weight);
+
+            return weight;
+        }
+
         public bool IsFeatureMostImportantForLabel(int id, Label label)
         {
             Label mostImportantLabel = null;

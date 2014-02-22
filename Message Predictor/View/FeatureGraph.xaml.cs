@@ -61,7 +61,7 @@ namespace MessagePredictor.View
             if (e.LeftButton == MouseButtonState.Pressed && _currentFeature != null && _mouseOrigY >= 0) {
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
-                _currentFeature.UserHeight += delta;
+                _currentFeature.UserWeight += delta / Feature.PIXELS_TO_WEIGHT;
                 _mouseOrigY = y;
                 
                 Console.WriteLine("Dragging {0}", delta);

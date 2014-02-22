@@ -17,6 +17,11 @@ namespace LibIML
             High
         };
 
+        public const double PIXELS_TO_WEIGHT = 100;
+        public const double WEIGHT_NONE = 3;
+        public const double WEIGHT_MEDIUM = 10;
+        public const double WEIGHT_HIGH = 20;
+
         private string _characters;
         private Label _label;
         private Weight _weightType;
@@ -33,7 +38,7 @@ namespace LibIML
             _label = label;
             _mostImportantLabel = false;
             _weightType = Weight.None;
-            _userWeight = 0;
+            _userWeight = WEIGHT_NONE;
             _systemWeight = 0;
         }
 
@@ -54,7 +59,21 @@ namespace LibIML
         public Weight WeightType
         {
             get { return _weightType; }
-            set { SetProperty<Weight>(ref _weightType, value); }
+            set {
+                if (SetProperty<Weight>(ref _weightType, value)) {
+                    switch (_weightType) {
+                        case Weight.None:
+                            UserWeight = WEIGHT_NONE;
+                            break;
+                        case Weight.Medium:
+                            UserWeight = WEIGHT_MEDIUM;
+                            break;
+                        case Weight.High:
+                            UserWeight = WEIGHT_HIGH;
+                            break;
+                    }
+                }
+            }
         }
 
         public double SystemWeight
@@ -63,8 +82,7 @@ namespace LibIML
             set
             {
                 if (SetProperty<double>(ref _systemWeight, value)) {
-                    Height = SystemWeight * 100;
-                    UserHeight = SystemWeight * 200; // FIXME
+                    Height = SystemWeight * PIXELS_TO_WEIGHT;
                 }
             }
         }
@@ -72,7 +90,11 @@ namespace LibIML
         public double UserWeight
         {
             get { return _userWeight; }
-            set { _userWeight = value; }
+            set
+            {
+                if (SetProperty<double>(ref _userWeight, value))
+                    UserHeight = UserWeight * PIXELS_TO_WEIGHT; // FIXME
+            }
         }
 
         public bool MostImportant
@@ -90,7 +112,7 @@ namespace LibIML
         public double UserHeight
         {
             get { return _userHeight; }
-            set
+            private set
             {
                 // Minimum height (so the user can drag the bar back up)
                 if (value < 3) {

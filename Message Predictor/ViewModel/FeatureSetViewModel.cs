@@ -24,6 +24,7 @@ namespace MessagePredictor.ViewModel
         private IReadOnlyList<CollectionViewSource> _collectionViewSourcesGraph;
         private string _featureText; // The feature the user is currently typing in
         private DispatcherTimer _featureTextEditedTimer;
+        private DispatcherTimer _featureWeightEditedTimer;
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels)
             : base()
@@ -38,6 +39,7 @@ namespace MessagePredictor.ViewModel
             _collectionViewSourcesGraph = BuildCollectionViewSourcesGraph(labels);
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
+            _featureWeightEditedTimer = new DispatcherTimer();
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
             AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
@@ -50,6 +52,10 @@ namespace MessagePredictor.ViewModel
             _vocab.Updated += vocab_Updated;
             _featureTextEditedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
             _featureTextEditedTimer.Tick += _featureTextEditedTimer_Tick;
+            _featureWeightEditedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
+            _featureWeightEditedTimer.Tick += _featureWeightEditedTimer_Tick;
+
+            FeatureSet.CollectionChanged += FeatureSet_CollectionChanged;
         }
 
         #region Properties
@@ -120,9 +126,19 @@ namespace MessagePredictor.ViewModel
             }
         }
 
+        public class FeatureWeightEditedEventArgs : EventArgs
+        {
+            public readonly Feature Feature;
+            public FeatureWeightEditedEventArgs(Feature feature)
+            {
+                Feature = feature;
+            }
+        }
+
         public event EventHandler<FeatureAddedEventArgs> FeatureAdded;
         public event EventHandler<EventArgs> FeatureRemoved;
         public event EventHandler<FeatureTextEditedEventArgs> FeatureTextEdited;
+        public event EventHandler<FeatureWeightEditedEventArgs> FeatureWeightEdited;
 
         protected virtual void OnFeatureAdded(FeatureAddedEventArgs e)
         {
@@ -140,6 +156,12 @@ namespace MessagePredictor.ViewModel
         {
             if (FeatureTextEdited != null)
                 FeatureTextEdited(this, e);
+        }
+
+        protected virtual void OnFeatureWeightEdited(FeatureWeightEditedEventArgs e)
+        {
+            if (FeatureWeightEdited != null)
+                FeatureWeightEdited(this, e);
         }
 
         #endregion
@@ -178,10 +200,28 @@ namespace MessagePredictor.ViewModel
 
         #region Private methods
 
+        private void FeatureSet_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            if (e.NewItems == null)
+                return;
+
+            foreach (Feature f in e.NewItems) {
+                Console.WriteLine("new feature: {0} {1}", f, e.Action);
+            }
+        }
+
         private void _featureTextEditedTimer_Tick(object sender, EventArgs e)
         {
             _featureTextEditedTimer.Stop();
             OnFeatureTextEdited(new FeatureTextEditedEventArgs(_featureText));
+        }
+
+        private void _featureWeightEditedTimer_Tick(object sender, EventArgs e)
+        {
+            _featureWeightEditedTimer.Stop();
+            // FIXME do we need to pass out the specific feature that changed? Might be enough just to let the main VM
+            // know that it needs to update the priors and re-predict.
+            OnFeatureWeightEdited(new FeatureWeightEditedEventArgs(null)); 
         }
 
         private void classifier_Retrained(object sender, EventArgs e)
@@ -211,6 +251,7 @@ namespace MessagePredictor.ViewModel
                     foreach (Label label in _labels) {
                         Feature f = new Feature(word, label);
                         f.SystemWeight = _classifier.GetFeatureWeight(id, label);
+                        f.UserWeight = _classifier.GetFeaturePrior(id, label);
                         f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
                         FeatureSet.Add(f);
                     }
