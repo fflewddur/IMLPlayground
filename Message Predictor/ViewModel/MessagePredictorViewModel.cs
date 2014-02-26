@@ -500,7 +500,7 @@ namespace MessagePredictor
             int id = _vocab.GetWordId(e.Feature.Characters, true);
             _classifier.UpdateCountsForNewFeature(id);
             _classifier.Train();
-            e.Feature.SystemWeight = _classifier.GetFeatureWeight(id, e.Feature.Label);
+            e.Feature.SystemWeight = _classifier.GetFeatureSystemWeight(id, e.Feature.Label);
             if (AutoUpdatePredictions) {
                 PerformUpdatePredictions();
             }

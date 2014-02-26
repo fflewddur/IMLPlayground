@@ -17,6 +17,8 @@ namespace LibIML
         private Vocabulary _vocab;
         private Dictionary<Label, Dictionary<int, int>> _perClassFeatureCounts;
         private Dictionary<Label, Dictionary<int, double>> _perClassFeaturePriors;
+        private Dictionary<Label, int> _perClassFeatureCountSums;
+        private Dictionary<Label, double> _perClassFeaturePriorSums;
         private Dictionary<Label, HashSet<IInstance>> _trainingSet;
         //private Dictionary<Label, HashSet<Feature>> _featuresPerClass; // This gives us a single property to expose with all of the feature data for each class
 
@@ -28,6 +30,8 @@ namespace LibIML
         {
             _perClassFeatureCounts = new Dictionary<Label, Dictionary<int, int>>();
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
+            _perClassFeatureCountSums = new Dictionary<Label, int>();
+            _perClassFeaturePriorSums = new Dictionary<Label, double>();
             //_featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
             _trainingSet = new Dictionary<Label, HashSet<IInstance>>();
             _pClass = new Dictionary<Label, double>();
@@ -55,27 +59,11 @@ namespace LibIML
             get { return _vocab; }
             private set
             {
-                if (SetProperty<Vocabulary>(ref _vocab, value))
-                {
+                if (SetProperty<Vocabulary>(ref _vocab, value)) {
                     ClearInstances(); // If the vocabulary changes, our current instances are invalidated.
                 }
             }
         }
-
-        //public IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass
-        //{
-        //    get { return _featuresPerClass; }
-        //}
-
-        //public Label PositiveLabel
-        //{
-        //    get { return _labels.ToList()[0]; }
-        //}
-
-        //public Label NegativeLabel
-        //{
-        //    get { return _labels.ToList()[1]; }
-        //}
 
         #endregion
 
@@ -93,20 +81,23 @@ namespace LibIML
 
         #region Public methods
 
-        public double GetFeatureWeight(int id, Label label)
+        public double GetFeatureSystemWeight(int id, Label label)
         {
-            double weight;
-            _pWordGivenClass[label].TryGetValue(id, out weight);
-
-            return weight;
+            int count;
+            
+            _perClassFeatureCounts[label].TryGetValue(id, out count);
+            
+            return (double)count / (double)_perClassFeatureCountSums[label];
         }
 
-        public double GetFeaturePrior(int id, Label label)
+        public double GetFeatureUserWeight(int id, Label label)
         {
-            double weight;
-            _perClassFeaturePriors[label].TryGetValue(id, out weight);
+            double prior;
 
-            return weight;
+            if (!_perClassFeaturePriors[label].TryGetValue(id, out prior))
+                prior = _defaultPrior;
+
+            return (double)prior / (double)_perClassFeaturePriorSums[label];
         }
 
         public bool IsFeatureMostImportantForLabel(int id, Label label)
@@ -114,12 +105,10 @@ namespace LibIML
             Label mostImportantLabel = null;
             double mostImportantWeight = 0;
 
-            foreach (Label l in _labels)
-            {
+            foreach (Label l in _labels) {
                 double weight;
                 _pWordGivenClass[l].TryGetValue(id, out weight);
-                if (weight > mostImportantWeight)
-                {
+                if (weight > mostImportantWeight) {
                     mostImportantWeight = weight;
                     mostImportantLabel = l;
                 }
@@ -138,13 +127,10 @@ namespace LibIML
             Debug.Assert(id > 0, "The ID of a feature cannot be < 1");
 
             // Update our feature counts for each item in our training set
-            foreach (Label label in _labels)
-            {
-                foreach (IInstance instance in _trainingSet[label])
-                {
+            foreach (Label label in _labels) {
+                foreach (IInstance instance in _trainingSet[label]) {
                     double count;
-                    if (instance.Features.Data.TryGetValue(id, out count))
-                    {
+                    if (instance.Features.Data.TryGetValue(id, out count)) {
                         int df;
                         _perClassFeatureCounts[instance.GroundTruthLabel].TryGetValue(id, out df);
                         df += (int)count;
@@ -164,7 +150,8 @@ namespace LibIML
         {
             _perClassFeatureCounts.Clear();
             _perClassFeaturePriors.Clear();
-            //_featuresPerClass.Clear();
+            _perClassFeatureCountSums.Clear();
+            _perClassFeaturePriorSums.Clear();
             _pClass.Clear();
             _trainingSet.Clear();
             _pWordGivenClass.Clear();
@@ -188,8 +175,7 @@ namespace LibIML
         /// <param name="instances">The collection of instances to add.</param>
         public void AddInstances(IEnumerable<IInstance> instances)
         {
-            foreach (IInstance instance in instances)
-            {
+            foreach (IInstance instance in instances) {
                 AddInstanceWithoutPrUpdates(instance);
             }
             Train();
@@ -197,8 +183,7 @@ namespace LibIML
 
         public void AddPriors(IEnumerable<Feature> priors)
         {
-            foreach (Feature f in priors)
-            {
+            foreach (Feature f in priors) {
                 double weight;
                 if (f.WeightType == Feature.Weight.High)
                     weight = 50;
@@ -225,16 +210,13 @@ namespace LibIML
 
             // Compute Pr(d|c)
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
-            foreach (Label l in Labels)
-            {
+            foreach (Label l in Labels) {
                 Evidence evidence = new Evidence(Vocab); // Store our evidence in favor of each class
                 evidence.ClassPr = _pClass[l];
                 double prob = 0;
-                foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-                {
+                foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                     double pWord;
-                    if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord))
-                    {
+                    if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord)) {
                         double weight = Math.Exp(pair.Value * Math.Log(pWord));
                         prob += Math.Log(weight);
                         evidence.Weights[pair.Key] = weight;
@@ -246,30 +228,25 @@ namespace LibIML
 
             // Compute Pr(d)
             double pDoc = 0;
-            foreach (Label l in Labels)
-            {
+            foreach (Label l in Labels) {
                 pDoc += _pClass[l] * pDocGivenClass[l];
             }
             //Console.WriteLine("pDoc: {0}", pDoc);
 
             // Compute Pr(c|d)
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
-            foreach (Label l in Labels)
-            {
+            foreach (Label l in Labels) {
                 pClassGivenDoc[l] = (_pClass[l] * pDocGivenClass[l]) / pDoc; // For log likelihood, with normalization
             }
 
             // Find the class with the highest probability for this document
             double maxP = double.MinValue;
-            foreach (Label l in Labels)
-            {
-                if (double.IsNaN(pClassGivenDoc[l]))
-                {
+            foreach (Label l in Labels) {
+                if (double.IsNaN(pClassGivenDoc[l])) {
                     throw new System.ArithmeticException(string.Format("Probability for class {0} is NaN.", l));
                 }
                 //Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
-                if (pClassGivenDoc[l] > maxP)
-                {
+                if (pClassGivenDoc[l] > maxP) {
                     maxP = pClassGivenDoc[l];
                     label = l;
                 }
@@ -288,20 +265,15 @@ namespace LibIML
 
             // Merge our training set into a single collection of instances
             HashSet<IInstance> instances = new HashSet<IInstance>();
-            foreach (Label label in Labels)
-            {
-                foreach (IInstance instance in _trainingSet[label])
-                {
+            foreach (Label label in Labels) {
+                foreach (IInstance instance in _trainingSet[label]) {
                     instances.Add(instance);
                 }
             }
 
-            try
-            {
+            try {
                 await MultinomialNaiveBayesClassifier.SaveArffFile(instances, Vocab, Labels.ToArray(), filePath);
-            }
-            catch (IOException e)
-            {
+            } catch (IOException e) {
                 Console.Error.WriteLine("Error saving ARFF file: {0}.", e.Message);
                 retval = false;
             }
@@ -311,14 +283,12 @@ namespace LibIML
 
         public static async Task<bool> SaveArffFile(IEnumerable<IInstance> instances, Vocabulary vocab, Label[] labels, string filePath)
         {
-            using (TextWriter writer = File.CreateText(filePath))
-            {
+            using (TextWriter writer = File.CreateText(filePath)) {
                 string relation = string.Join("_", labels.Select(l => l.UserLabel));
                 await writer.WriteLineAsync(string.Format("@RELATION {0}\n", relation));
 
                 // Write out each feature and its type (for us, they're all numeric)
-                foreach (int id in vocab.FeatureIds)
-                {
+                foreach (int id in vocab.FeatureIds) {
                     await writer.WriteLineAsync(string.Format("@ATTRIBUTE _{0} NUMERIC", vocab.GetWord(id)));
                 }
 
@@ -332,12 +302,10 @@ namespace LibIML
                 // Write out sparse vectors for each item
                 await writer.WriteLineAsync("@DATA");
                 int classIndex = vocab.Count; // the class attribute is always the last attribute
-                foreach (IInstance instance in instances)
-                {
+                foreach (IInstance instance in instances) {
                     string[] itemFeatures = new string[instance.Features.Data.Count + 1]; // include room for class attribute
                     int index = 0;
-                    foreach (KeyValuePair<int, double> pair in instance.Features.Data.OrderBy(pair => pair.Key))
-                    {
+                    foreach (KeyValuePair<int, double> pair in instance.Features.Data.OrderBy(pair => pair.Key)) {
                         itemFeatures[index] = string.Format("{0} {1}", pair.Key - 1, pair.Value); // Subtract 1 because ARFF features are 0-indexed, but our are 1-indexed
                         index++;
                     }
@@ -357,32 +325,11 @@ namespace LibIML
         {
             ComputePrC();
             ComputePrWGivenC();
-            //UpdateFeaturesPerClass();
 
             TestPrC(_pClass);
             TestPrWGivenC(_pWordGivenClass);
             OnRetrained(new EventArgs());
         }
-
-        //public IEnumerable<Feature> GetFeatures()
-        //{
-        //    List<Feature> features = new List<Feature>();
-
-        //    foreach (int id in Vocab.FeatureIds)
-        //    {
-        //        Feature feature = new Feature();
-        //        feature.Characters = Vocab.GetWord(id);
-
-        //        foreach (Label label in Labels)
-        //        {
-        //            feature.SystemWeight[label] = _pWordGivenClass[label][id];
-        //        }
-
-        //        features.Add(feature);
-        //    }
-
-        //    return features;
-        //}
 
         #endregion
 
@@ -391,13 +338,13 @@ namespace LibIML
         /// </summary>
         private void InitTrainingData()
         {
-            foreach (Label l in Labels)
-            {
+            foreach (Label l in Labels) {
                 _perClassFeatureCounts[l] = new Dictionary<int, int>();
                 _perClassFeaturePriors[l] = new Dictionary<int, double>();
+                _perClassFeatureCountSums[l] = 0;
+                _perClassFeaturePriorSums[l] = 0;
                 _trainingSet[l] = new HashSet<IInstance>();
                 _pWordGivenClass[l] = new Dictionary<int, double>();
-                //_featuresPerClass[l] = new HashSet<Feature>();
             }
         }
 
@@ -408,8 +355,7 @@ namespace LibIML
         private void AddInstanceWithoutPrUpdates(IInstance instance)
         {
             // Update our feature counts
-            foreach (KeyValuePair<int, double> pair in instance.Features.Data)
-            {
+            foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                 int count;
                 _perClassFeatureCounts[instance.GroundTruthLabel].TryGetValue(pair.Key, out count);
                 count += (int)pair.Value;
@@ -428,15 +374,12 @@ namespace LibIML
             _pClass.Clear();
             int trainingSetSize = 0;
 
-            foreach (Label l in Labels)
-            {
+            foreach (Label l in Labels) {
                 trainingSetSize += _trainingSet[l].Count;
                 _pClass[l] = 0;
             }
-            if (trainingSetSize > 0)
-            {
-                foreach (Label l in Labels)
-                {
+            if (trainingSetSize > 0) {
+                foreach (Label l in Labels) {
                     _pClass[l] = _trainingSet[l].Count / (double)trainingSetSize;
                 }
             }
@@ -450,81 +393,44 @@ namespace LibIML
         {
             _pWordGivenClass.Clear();
 
-            foreach (Label l in Labels)
-            {
+            foreach (Label l in Labels) {
                 // Sum up the feature counts
                 _pWordGivenClass[l] = new Dictionary<int, double>();
-                int sumFeatures = 0;
-                foreach (int id in Vocab.FeatureIds)
-                {
+                _perClassFeatureCountSums[l] = 0;
+                foreach (int id in Vocab.FeatureIds) {
                     int count;
                     _perClassFeatureCounts[l].TryGetValue(id, out count);
-                    sumFeatures += count;
+                    _perClassFeatureCountSums[l] += count;
                 }
 
                 // Sum up the priors
-                double sumPriors = 0;
-                foreach (int id in Vocab.FeatureIds)
-                {
+                _perClassFeaturePriorSums[l] = 0;
+                foreach (int id in Vocab.FeatureIds) {
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior; // Use a default value if the user didn't provide one.
-                    sumPriors += prior;
+                    _perClassFeaturePriorSums[l] += prior;
                 }
                 //Console.Write("PrWGivenC for {0}: ", l);
-                foreach (int id in Vocab.FeatureIds)
-                {
+                foreach (int id in Vocab.FeatureIds) {
                     int countFeature;
                     _perClassFeatureCounts[l].TryGetValue(id, out countFeature);
                     double prior;
                     if (!_perClassFeaturePriors[l].TryGetValue(id, out prior))
                         prior = _defaultPrior;
-                    _pWordGivenClass[l][id] = (prior + countFeature) / (sumPriors + (double)sumFeatures);
+                    _pWordGivenClass[l][id] = (prior + countFeature) / (_perClassFeaturePriorSums[l] + (double)_perClassFeatureCountSums[l]);
                     //Console.Write("{0}={1:N4} ", Vocab.GetWord(id), _pWordGivenClass[l][id]);
                 }
                 //Console.WriteLine();
             }
         }
 
-        /// <summary>
-        /// Create collections of Features for each Label, using our current training set as the source data.
-        /// </summary>
-        /*
-        private void UpdateFeaturesPerClass()
-        {
-            _featuresPerClass.Clear();
-
-            foreach (Label label in Labels)
-            {
-                _featuresPerClass[label] = new HashSet<Feature>();
-            }
-
-            foreach (int featureId in Vocab.FeatureIds)
-            {
-
-                foreach (Label label in Labels)
-                {
-                    string characters = _vocab.GetWord(featureId);
-                    int count;
-                    _perClassFeatureCounts[label].TryGetValue(featureId, out count);
-                    double userWeight;
-                    if (!_perClassFeaturePriors[label].TryGetValue(featureId, out userWeight))
-                        userWeight = _defaultPrior;
-                    double systemWeight;
-                    _pWordGivenClass[label].TryGetValue(featureId, out systemWeight);
-
-                    _featuresPerClass[label].Add(new Feature { Characters = characters, CountTraining = count, SystemWeight = systemWeight, UserWeight = userWeight });
-                }
-            }
-        }
-        */
         private bool TestPrC(Dictionary<Label, double> PrC)
         {
             double sum = 0;
             int count = 0;
 
-            foreach (Label l in _labels)
-            {
+            foreach (Label l in _labels) {
                 sum += PrC[l];
                 count++;
             }
@@ -539,19 +445,16 @@ namespace LibIML
         private bool TestPrWGivenC(Dictionary<Label, Dictionary<int, double>> PrWGivenC)
         {
             bool retval = true;
-            foreach (Label l in _labels)
-            {
+            foreach (Label l in _labels) {
                 double sum = 0;
                 int count = 0;
 
-                foreach (double pr in PrWGivenC[l].Values)
-                {
+                foreach (double pr in PrWGivenC[l].Values) {
                     sum += pr;
                     count++;
                 }
 
-                if (count > 0 && Math.Round(sum, 7) != Math.Round(1.0, 7))
-                {
+                if (count > 0 && Math.Round(sum, 7) != Math.Round(1.0, 7)) {
                     retval = false;
                     throw new ArithmeticException(string.Format("Error in PrWGivenC: Sum should be 1, but is {0} for class {1}", sum, l));
                 }
