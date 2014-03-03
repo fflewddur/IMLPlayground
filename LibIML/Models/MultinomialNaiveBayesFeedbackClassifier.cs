@@ -186,9 +186,9 @@ namespace LibIML
             foreach (Feature f in priors) {
                 double weight;
                 if (f.WeightType == Feature.Weight.High)
-                    weight = 50;
+                    weight = 10;
                 else if (f.WeightType == Feature.Weight.Medium)
-                    weight = 25;
+                    weight = 5;
                 else
                     weight = f.UserWeight;
 

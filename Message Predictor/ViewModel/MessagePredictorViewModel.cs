@@ -86,6 +86,7 @@ namespace MessagePredictor
             _featureSetVM.FeatureAdded += _featureSetVM_FeatureAdded;
             _featureSetVM.FeatureRemoved += _featureSetVM_FeatureRemoved;
             _featureSetVM.FeatureTextEdited += _featureSetVM_FeatureTextEdited;
+            _featureSetVM.FeatureWeightEdited += _featureSetVM_FeatureWeightEdited;
 
             _heatMapVM = new HeatMapViewModel(_messages);
             _heatMapVM.HighlightTextChanged += _heatMapVM_HighlightTextChanged;
@@ -298,7 +299,8 @@ namespace MessagePredictor
 
             classifier.ClearInstances();
             classifier.AddInstances(trainingSet);
-            classifier.AddPriors(FeatureSetVM.UserAddedFeatures);
+            //classifier.AddPriors(FeatureSetVM.UserAddedFeatures);
+            classifier.AddPriors(FeatureSetVM.FeatureSet);
 
             timer.Stop();
             Console.WriteLine("Time to train classifier: {0}", timer.Elapsed);
@@ -518,6 +520,14 @@ namespace MessagePredictor
         private void _featureSetVM_FeatureTextEdited(object sender, FeatureSetViewModel.FeatureTextEditedEventArgs e)
         {
             HeatMapVM.ToHighlight = e.Tokens;
+        }
+
+        void _featureSetVM_FeatureWeightEdited(object sender, FeatureSetViewModel.FeatureWeightEditedEventArgs e)
+        {
+            Console.WriteLine("weight edited");
+            if (AutoUpdatePredictions) {
+                PerformUpdatePredictions();
+            }
         }
 
         private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)

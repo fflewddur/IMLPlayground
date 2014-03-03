@@ -196,6 +196,14 @@ namespace MessagePredictor.ViewModel
             OnFeatureRemoved(new EventArgs());
         }
 
+        public void AdjustUserFeature(Feature feature, double weightDelta)
+        {
+            _featureWeightEditedTimer.Stop();
+            feature.UserWeight += weightDelta;
+            feature.WeightType = Feature.Weight.Custom;
+            _featureWeightEditedTimer.Start();
+        }
+
         #endregion
 
         #region Private methods
@@ -205,9 +213,9 @@ namespace MessagePredictor.ViewModel
             if (e.NewItems == null)
                 return;
 
-            foreach (Feature f in e.NewItems) {
-                Console.WriteLine("new feature: {0} {1}", f, e.Action);
-            }
+            //foreach (Feature f in e.NewItems) {
+            //    Console.WriteLine("new feature: {0} {1}", f, e.Action);
+            //}
         }
 
         private void _featureTextEditedTimer_Tick(object sender, EventArgs e)

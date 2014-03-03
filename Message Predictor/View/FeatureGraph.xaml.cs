@@ -1,4 +1,5 @@
 ﻿using LibIML;
+using MessagePredictor.ViewModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -59,9 +60,12 @@ namespace MessagePredictor.View
         private void Rectangle_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && _currentFeature != null && _mouseOrigY >= 0) {
+                FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
-                _currentFeature.UserWeight += delta / Feature.PIXELS_TO_WEIGHT;
+                // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
+                vm.AdjustUserFeature(_currentFeature, delta / Feature.PIXELS_TO_WEIGHT);
+                //_currentFeature.UserWeight += delta / Feature.PIXELS_TO_WEIGHT;
                 _mouseOrigY = y;
                 
                 Console.WriteLine("Dragging {0}", delta);
