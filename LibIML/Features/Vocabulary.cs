@@ -55,8 +55,7 @@ namespace LibIML
             get
             {
                 int result = 0;
-                switch (_restriction)
-                {
+                switch (_restriction) {
                     case Restriction.None:
                         result = _allWordsToIds.Count;
                         break;
@@ -76,8 +75,7 @@ namespace LibIML
             get
             {
                 int[] result = null;
-                switch (_restriction)
-                {
+                switch (_restriction) {
                     case Restriction.None:
                         result = _allWordsToIds.Values.ToArray();
                         break;
@@ -129,10 +127,8 @@ namespace LibIML
         {
             int id = -1;
 
-            if (isRestricted)
-            {
-                switch (_restriction)
-                {
+            if (isRestricted) {
+                switch (_restriction) {
                     case Restriction.None:
                         if (!_allWordsToIds.TryGetValue(word, out id))
                             id = -1;
@@ -144,9 +140,7 @@ namespace LibIML
                             id = -1;
                         break;
                 }
-            }
-            else
-            {
+            } else {
                 if (!_allWordsToIds.TryGetValue(word, out id))
                     id = -1;
             }
@@ -171,8 +165,7 @@ namespace LibIML
         {
             List<string> words = new List<string>();
 
-            foreach (int id in FeatureIds)
-            {
+            foreach (int id in FeatureIds) {
                 words.Add(_allIdsToWords[id]);
             }
 
@@ -190,10 +183,8 @@ namespace LibIML
             int max_df = (int)(max_df_percent * nDocs);
             int oldNextId = _nextId;
 
-            foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs)
-            {
-                if (nDocs < 0 || (tokenDf.Value >= min_df && tokenDf.Value <= max_df))
-                {
+            foreach (KeyValuePair<string, int> tokenDf in tokenDocFreqs) {
+                if (nDocs < 0 || (tokenDf.Value >= min_df && tokenDf.Value <= max_df)) {
                     _allWordsToIds[tokenDf.Key] = _nextId;
                     _allIdsToWords[_nextId] = tokenDf.Key;
                     _allDocumentFreqs[_nextId] = tokenDf.Value;
@@ -201,8 +192,7 @@ namespace LibIML
                 }
             }
 
-            if (oldNextId != _nextId)
-            {
+            if (oldNextId != _nextId) {
                 // We've updated our tokens
                 HasUpdatedTokens = true;
             }
@@ -216,24 +206,19 @@ namespace LibIML
         {
             int oldNextId = _nextId;
 
-            foreach (string token in instance.TokenCounts.Keys)
-            {
+            foreach (string token in instance.TokenCounts.Keys) {
                 int id;
-                if (!_allWordsToIds.TryGetValue(token, out id))
-                {
+                if (!_allWordsToIds.TryGetValue(token, out id)) {
                     _allWordsToIds[token] = _nextId;
                     _allIdsToWords[_nextId] = token;
                     _allDocumentFreqs[_nextId] = 1;
                     _nextId++;
-                }
-                else
-                {
+                } else {
                     _allDocumentFreqs[id]++;
                 }
             }
 
-            if (oldNextId != _nextId)
-            {
+            if (oldNextId != _nextId) {
                 // We've updated our tokens
                 HasUpdatedTokens = true;
             }
@@ -247,18 +232,15 @@ namespace LibIML
         {
             bool updated = false;
 
-            foreach (string token in instance.TokenCounts.Keys)
-            {
+            foreach (string token in instance.TokenCounts.Keys) {
                 int id;
-                if (_allWordsToIds.TryGetValue(token, out id))
-                {
+                if (_allWordsToIds.TryGetValue(token, out id)) {
                     _allDocumentFreqs[id]--;
                     updated = true;
                 }
             }
 
-            if (updated)
-            {
+            if (updated) {
                 // We've updated our tokens
                 HasUpdatedTokens = true;
             }
@@ -281,15 +263,12 @@ namespace LibIML
                 _allIdsToWords[_nextId] = token;
                 _allDocumentFreqs[_nextId] = df;
                 _nextId++;
-            }
-            else
-            {
+            } else {
                 _allDocumentFreqs[id] = df;
             }
 
             bool retval = false;
-            if (oldNextId != _nextId)
-            {
+            if (oldNextId != _nextId) {
                 // We've updated our tokens
                 HasUpdatedTokens = true;
                 retval = true;
@@ -298,13 +277,17 @@ namespace LibIML
             return retval;
         }
 
-        public bool RestrictVocab(IEnumerable<IInstance> instances, IEnumerable<Label> labels, IEnumerable<Feature> forceInclude, IEnumerable<Feature> forceExclude, int size)
+        public bool RestrictVocab(IEnumerable<IInstance> instances, IEnumerable<Label> labels, IEnumerable<Feature> forceInclude, IEnumerable<Feature> forceExclude, 
+            int size, bool onlyUserFeatures)
         {
             bool retval = false;
 
-            if (_restriction == Restriction.HighIG)
-            {
-                RestrictToHighIG(instances, labels, size, forceInclude, forceExclude);
+            if (_restriction == Restriction.HighIG) {
+                if (onlyUserFeatures) {
+                    AddUserFeatures(forceInclude);
+                } else {
+                    RestrictToHighIG(instances, labels, size, forceInclude, forceExclude);
+                }
                 retval = true;
                 HasUpdatedTokens = false;
             }
@@ -315,8 +298,7 @@ namespace LibIML
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            switch (_restriction)
-            {
+            switch (_restriction) {
                 case Restriction.None:
                     foreach (KeyValuePair<string, int> pair in _allWordsToIds)
                         sb.Append(string.Format("{0}:{1} ", pair.Key, pair.Value));
@@ -378,18 +360,15 @@ namespace LibIML
             Dictionary<Label, double> PrC = new Dictionary<Label, double>();
             Dictionary<Label, int> labelCounts = new Dictionary<Label, int>(); // The number of instances in each class
 
-            foreach (Label label in labels)
-            {
+            foreach (Label label in labels) {
                 labelCounts[label] = 0;
             }
 
-            foreach (IInstance instance in instances)
-            {
+            foreach (IInstance instance in instances) {
                 labelCounts[instance.GroundTruthLabel]++;
             }
 
-            foreach (Label label in labels)
-            {
+            foreach (Label label in labels) {
                 PrC[label] = (double)labelCounts[label] / (double)labelCounts.Count;
             }
 
@@ -401,21 +380,17 @@ namespace LibIML
             Dictionary<int, double> PrT = new Dictionary<int, double>();
             Dictionary<int, int> featureCounts = new Dictionary<int, int>(); // The number of documents containing each feature
 
-            foreach (int featureId in _allIdsToWords.Keys)
-            {
+            foreach (int featureId in _allIdsToWords.Keys) {
                 featureCounts[featureId] = 0;
             }
 
-            foreach (IInstance instance in instances)
-            {
-                foreach (int featureId in instance.Features.Data.Keys)
-                {
+            foreach (IInstance instance in instances) {
+                foreach (int featureId in instance.Features.Data.Keys) {
                     featureCounts[featureId]++; // Increment the number of document's we've seen this feature in
                 }
             }
 
-            foreach (int featureId in _allIdsToWords.Keys)
-            {
+            foreach (int featureId in _allIdsToWords.Keys) {
                 PrT[featureId] = (double)featureCounts[featureId] / (double)featureCounts.Count;
             }
 
@@ -428,16 +403,13 @@ namespace LibIML
             Dictionary<int, int> featureCounts = new Dictionary<int, int>();
             Dictionary<Label, Dictionary<int, int>> featureCountsPerClass = new Dictionary<Label, Dictionary<int, int>>();
 
-            foreach (Label label in labels)
-            {
+            foreach (Label label in labels) {
                 featureCountsPerClass[label] = new Dictionary<int, int>();
                 PrCGivenT[label] = new Dictionary<int, double>();
             }
 
-            foreach (IInstance instance in instances)
-            {
-                foreach (int featureId in instance.Features.Data.Keys)
-                {
+            foreach (IInstance instance in instances) {
+                foreach (int featureId in instance.Features.Data.Keys) {
                     int count;
                     featureCountsPerClass[instance.GroundTruthLabel].TryGetValue(featureId, out count);
                     featureCountsPerClass[instance.GroundTruthLabel][featureId] = count + 1; // Increment this feature's count for this class
@@ -447,10 +419,8 @@ namespace LibIML
                 }
             }
 
-            foreach (Label label in labels)
-            {
-                foreach (int featureId in _allIdsToWords.Keys)
-                {
+            foreach (Label label in labels) {
+                foreach (int featureId in _allIdsToWords.Keys) {
                     int countPerClass, countTotal;
                     featureCountsPerClass[label].TryGetValue(featureId, out countPerClass);
                     featureCounts.TryGetValue(featureId, out countTotal);
@@ -468,45 +438,36 @@ namespace LibIML
             Dictionary<int, int> featureAbsences = new Dictionary<int, int>(); // The number of documents *not* containing each feature
             Dictionary<Label, int> instancesPerLabel = new Dictionary<Label, int>();
 
-            foreach (Label label in labels)
-            {
+            foreach (Label label in labels) {
                 featureAbsencesPerClass[label] = new Dictionary<int, int>();
                 PrCGivenNotT[label] = new Dictionary<int, double>();
                 instancesPerLabel[label] = 0;
 
                 // How many instances are there for each label?
-                foreach (IInstance instance in instances)
-                {
-                    if (instance.GroundTruthLabel == label)
-                    {
+                foreach (IInstance instance in instances) {
+                    if (instance.GroundTruthLabel == label) {
                         instancesPerLabel[label]++;
                     }
                 }
             }
 
-            foreach (int featureId in _allIdsToWords.Keys)
-            {
+            foreach (int featureId in _allIdsToWords.Keys) {
                 featureAbsences[featureId] = instances.Count();
-                foreach (Label label in labels)
-                {
+                foreach (Label label in labels) {
                     featureAbsencesPerClass[label][featureId] = instancesPerLabel[label];
                 }
             }
 
-            foreach (IInstance instance in instances)
-            {
-                foreach (int featureId in instance.Features.Data.Keys)
-                {
+            foreach (IInstance instance in instances) {
+                foreach (int featureId in instance.Features.Data.Keys) {
                     // Start off assuming each feature is absent from each document; decrement counter each time we see a given feature.
                     featureAbsencesPerClass[instance.GroundTruthLabel][featureId]--;
                     featureAbsences[featureId]--;
                 }
             }
 
-            foreach (Label label in labels)
-            {
-                foreach (int featureId in _allIdsToWords.Keys)
-                {
+            foreach (Label label in labels) {
+                foreach (int featureId in _allIdsToWords.Keys) {
                     int count;
                     featureAbsencesPerClass[label].TryGetValue(featureId, out count);
                     PrCGivenNotT[label][featureId] = (double)(count + 1) / (double)(featureAbsences[featureId] + labels.Count()); // Add a smoothing term
@@ -546,13 +507,11 @@ namespace LibIML
             timer.Restart();
 
             // Compute information gain for each feature
-            foreach (int featureId in _allIdsToWords.Keys)
-            {
+            foreach (int featureId in _allIdsToWords.Keys) {
                 double PrCSum = 0;
                 double PrTSum = 0;
                 double PrNotTSum = 0;
-                foreach (Label label in labels)
-                {
+                foreach (Label label in labels) {
                     PrCSum += PrC[label] * Math.Log(PrC[label]);
                     PrTSum += PrCGivenT[label][featureId] * Math.Log(PrCGivenT[label][featureId]);
                     PrNotTSum += PrCGivenNotT[label][featureId] * Math.Log(PrCGivenNotT[label][featureId]);
@@ -568,33 +527,32 @@ namespace LibIML
 
             // Add these features to our "restricted" set
             _restrictedIds.Clear();
-            foreach (KeyValuePair<int, double> pair in HighIG)
-            {
+            foreach (KeyValuePair<int, double> pair in HighIG) {
                 string word = _allIdsToWords[pair.Key];
                 Feature feature = new Feature(word, Label.AnyLabel);
                 // Ensure the user didn't remove this feature
-                if (forceExclude == null || !forceExclude.Contains(feature))
-                {
+                if (forceExclude == null || !forceExclude.Contains(feature)) {
                     AddElementToRestricted(pair.Key);
                 }
             }
             // Now add features the user requested
-            if (forceInclude != null)
-            {
-                foreach (Feature f in forceInclude)
-                {
-                    int id;
-                    if (_allWordsToIds.TryGetValue(f.Characters, out id))
-                    {
-                        AddElementToRestricted(id);
-                    }
-                    else
-                        Console.Error.WriteLine("Error: could not find '{0}' in vocabulary", f.Characters);
-                }
-            }
+            AddUserFeatures(forceInclude);
 
             // Fire the Updated event
             this.OnUpdated(new EventArgs());
+        }
+
+        private void AddUserFeatures(IEnumerable<Feature> toInclude)
+        {
+            if (toInclude != null) {
+                foreach (Feature f in toInclude) {
+                    int id;
+                    if (_allWordsToIds.TryGetValue(f.Characters, out id)) {
+                        AddElementToRestricted(id);
+                    } else
+                        Console.Error.WriteLine("Error: could not find '{0}' in vocabulary", f.Characters);
+                }
+            }
         }
 
         #endregion
@@ -617,8 +575,7 @@ namespace LibIML
                     //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
                     Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                     instance.TokenCounts = tokens;
-                    foreach (KeyValuePair<string, int> pair in tokens)
-                    {
+                    foreach (KeyValuePair<string, int> pair in tokens) {
                         // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
                         tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1);
                     }
@@ -634,8 +591,7 @@ namespace LibIML
                 });
 
             // Restrict our vocabulary to terms with high information gain
-            if (restriction == Restriction.HighIG)
-            {
+            if (restriction == Restriction.HighIG) {
                 vocab.RestrictToHighIG(instances, labels, desiredVocabSize);
             }
 

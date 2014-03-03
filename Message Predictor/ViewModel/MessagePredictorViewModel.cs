@@ -32,6 +32,7 @@ namespace MessagePredictor
 
         // Application settings (set at startup)
         int _desiredVocabSize;
+        App.Condition _condition;
 
         // UI preferences (user-modifiable)
         bool _autoUpdatePredictions;
@@ -60,6 +61,9 @@ namespace MessagePredictor
             _vocab = Vocabulary.CreateVocabulary(FilterToTrainingSet(_messages), _labels, Vocabulary.Restriction.HighIG, _desiredVocabSize);
             timer.Stop();
             Console.WriteLine("Time to build vocab: {0}", timer.Elapsed);
+
+            // Convenient accessor for our treatment condition
+            _condition = (App.Condition)App.Current.Properties[App.PropertyKey.Condition];
 
             // Update our test set in light of our new vocabulary
             timer.Restart();
@@ -102,6 +106,7 @@ namespace MessagePredictor
             AutoUpdatePredictions = (bool)App.Current.Properties[MessagePredictor.App.PropertyKey.AutoUpdatePredictions];
 
             // Evaluate the classifier (so we can show predictions to the user)
+            UpdateVocab();
             PerformUpdatePredictions();
             PerformUpdatePredictions(); // Do this twice to avoid showing any change indicators at the start
 
@@ -274,14 +279,27 @@ namespace MessagePredictor
 
         #region Private methods
 
+        private void UpdateVocabForce()
+        {
+            UpdateVocab(true);
+        }
+
         /// <summary>
         /// Update the vocabulary in response to the user adding or removing tokens, or adjusting the training set
         /// </summary>
-        private void UpdateVocab()
+        private void UpdateVocab(bool force = false)
         {
+            bool onlyUserFeatures = false;
+
+            if (!force && _condition == App.Condition.Treatment) {
+                // Unless we're forcing the vocab update, only use user-provided features for our vocab in the
+                // feature-adjustment treatment.
+                onlyUserFeatures = true;
+            }
+
             UpdateInstanceFeatures(false);
             _vocab.RestrictVocab(FilterToTrainingSet(_messages), _labels,
-                _featureSetVM.UserAddedFeatures, _featureSetVM.UserRemovedFeatures, _desiredVocabSize);
+                _featureSetVM.UserAddedFeatures, _featureSetVM.UserRemovedFeatures, _desiredVocabSize, onlyUserFeatures);
             UpdateInstanceFeatures(true);
             TextToHighlight = _vocab.GetFeatureWords();
         }
