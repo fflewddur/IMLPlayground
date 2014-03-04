@@ -32,10 +32,6 @@ namespace MessagePredictor.View
             InitializeComponent();
         }
 
-        protected override void OnMouseDown(MouseButtonEventArgs e)
-        {
-            base.OnMouseDown(e);
-        }
         [BindableAttribute(true)]
         public IEnumerable ItemsSource
         {

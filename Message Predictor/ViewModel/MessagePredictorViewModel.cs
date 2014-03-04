@@ -319,6 +319,7 @@ namespace MessagePredictor
             classifier.AddInstances(trainingSet);
             //classifier.AddPriors(FeatureSetVM.UserAddedFeatures);
             classifier.AddPriors(FeatureSetVM.FeatureSet);
+            classifier.Train();
 
             timer.Stop();
             Console.WriteLine("Time to train classifier: {0}", timer.Elapsed);
@@ -520,7 +521,9 @@ namespace MessagePredictor
             int id = _vocab.GetWordId(e.Feature.Characters, true);
             _classifier.UpdateCountsForNewFeature(id);
             _classifier.Train();
-            e.Feature.SystemWeight = _classifier.GetFeatureSystemWeight(id, e.Feature.Label);
+            double weight;
+            _classifier.TryGetFeatureSystemWeight(id, e.Feature.Label, out weight);
+            e.Feature.SystemWeight = weight;
             if (AutoUpdatePredictions) {
                 PerformUpdatePredictions();
             }

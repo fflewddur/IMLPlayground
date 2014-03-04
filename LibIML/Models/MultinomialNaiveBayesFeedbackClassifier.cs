@@ -81,23 +81,39 @@ namespace LibIML
 
         #region Public methods
 
-        public double GetFeatureSystemWeight(int id, Label label)
+        public bool TryGetFeatureSystemWeight(int id, Label label, out double weight)
         {
             int count;
-            
+            bool retval = false;
+
             _perClassFeatureCounts[label].TryGetValue(id, out count);
+
+            if (_perClassFeatureCountSums[label] > 0) {
+                weight = (double)count / (double)_perClassFeatureCountSums[label];
+                retval = true;
+            } else {
+                weight = 0;
+            }
             
-            return (double)count / (double)_perClassFeatureCountSums[label];
+            return retval;
         }
 
-        public double GetFeatureUserWeight(int id, Label label)
+        public bool TryGetFeatureUserWeight(int id, Label label, out double weight)
         {
             double prior;
+            bool retval = false;
 
             if (!_perClassFeaturePriors[label].TryGetValue(id, out prior))
                 prior = _defaultPrior;
 
-            return (double)prior / (double)_perClassFeaturePriorSums[label];
+            if (_perClassFeaturePriorSums[label] > 0) {
+                weight = (double)prior / (double)_perClassFeaturePriorSums[label];
+                retval = true;
+            } else {
+                weight = 0;
+            }
+
+            return retval;
         }
 
         public bool IsFeatureMostImportantForLabel(int id, Label label)
@@ -160,17 +176,17 @@ namespace LibIML
         }
 
         /// <summary>
-        /// Add a single instance to the classifier's training set. Retrain the classifier after the instance has been added.
+        /// Add a single instance to the classifier's training set. Do not retrain the classifier after the instance has been added.
         /// </summary>
         /// <param name="instance">The instance to add.</param>
         public void AddInstance(IInstance instance)
         {
             AddInstanceWithoutPrUpdates(instance);
-            Train();
+            //Train();
         }
 
         /// <summary>
-        /// Add a collection of instances to the classifier's training set. Retrain the classifier after each instance has been added.
+        /// Add a collection of instances to the classifier's training set. Do not retrain the classifier.
         /// </summary>
         /// <param name="instances">The collection of instances to add.</param>
         public void AddInstances(IEnumerable<IInstance> instances)
@@ -178,9 +194,13 @@ namespace LibIML
             foreach (IInstance instance in instances) {
                 AddInstanceWithoutPrUpdates(instance);
             }
-            Train();
+            //Train();
         }
 
+        /// <summary>
+        /// Add a collection of user-specified feature priors. Do not retrain the classifier.
+        /// </summary>
+        /// <param name="priors"></param>
         public void AddPriors(IEnumerable<Feature> priors)
         {
             foreach (Feature f in priors) {
@@ -195,7 +215,7 @@ namespace LibIML
                 int id = _vocab.GetWordId(f.Characters, true);
                 _perClassFeaturePriors[f.Label][id] = weight;
             }
-            Train();
+            //Train();
         }
 
         /// <summary>

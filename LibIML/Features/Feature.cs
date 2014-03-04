@@ -92,8 +92,9 @@ namespace LibIML
             get { return _userWeight; }
             set
             {
-                if (SetProperty<double>(ref _userWeight, value))
+                if (SetProperty<double>(ref _userWeight, value)) {
                     UserHeight = UserWeight * PIXELS_TO_WEIGHT; // FIXME
+                }
             }
         }
 

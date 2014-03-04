@@ -258,8 +258,11 @@ namespace MessagePredictor.ViewModel
                     // Otherwise, figure out which label this feature is more important for
                     foreach (Label label in _labels) {
                         Feature f = new Feature(word, label);
-                        f.SystemWeight = _classifier.GetFeatureSystemWeight(id, label);
-                        f.UserWeight = _classifier.GetFeatureUserWeight(id, label);
+                        double weight;
+                        if (_classifier.TryGetFeatureSystemWeight(id, label, out weight))
+                            f.SystemWeight = weight;
+                        if (_classifier.TryGetFeatureUserWeight(id, label, out weight))
+                            f.UserWeight = weight;
                         f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
                         FeatureSet.Add(f);
                     }
