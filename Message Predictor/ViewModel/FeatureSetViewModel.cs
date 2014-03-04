@@ -47,6 +47,7 @@ namespace MessagePredictor.ViewModel
             FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature);
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
             FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
+            ApplyFeatureAdjustments = new RelayCommand(PerformApplyFeatureAdjustments);
 
             _classifier.Retrained += classifier_Retrained;
             _vocab.Updated += vocab_Updated;
@@ -103,6 +104,7 @@ namespace MessagePredictor.ViewModel
         public RelayCommand<Feature> FeatureRemove { get; private set; }
         public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
         public RelayCommand<Feature> FeatureSomewhatImportant { get; private set; }
+        public RelayCommand ApplyFeatureAdjustments { get; private set; }
 
         #endregion
 
@@ -196,22 +198,20 @@ namespace MessagePredictor.ViewModel
             OnFeatureRemoved(new EventArgs());
         }
 
-        public double AdjustUserFeature(Feature feature, double weightDelta, bool apply)
+        public double AdjustUserFeatureHeight(Feature feature, double heightDelta, bool apply)
         {
             _featureWeightEditedTimer.Stop();
-            double weightDeltaPerPixels = weightDelta / Feature.PIXELS_TO_WEIGHT;
 
-            if (feature.UserWeight + weightDeltaPerPixels <= 0) {
-                weightDeltaPerPixels = -1 * feature.UserWeight;
-                weightDelta = weightDeltaPerPixels * Feature.PIXELS_TO_WEIGHT;
+            if (feature.UserHeight + heightDelta < Feature.MINIMUM_HEIGHT) {
+                heightDelta = -1 * (feature.UserHeight - Feature.MINIMUM_HEIGHT);
             }
-            feature.UserWeight += weightDeltaPerPixels;
-            feature.WeightType = Feature.Weight.Custom;
-            if (apply) {
-                _featureWeightEditedTimer.Start();
-            }
+            feature.UserHeight += heightDelta;
+            //feature.WeightType = Feature.Weight.Custom;
+            //if (apply) {
+            //    _featureWeightEditedTimer.Start();
+            //}
 
-            return weightDelta;
+            return heightDelta;
         }
 
         #endregion
@@ -345,6 +345,41 @@ namespace MessagePredictor.ViewModel
         private void PerformFeatureSomewhatImportant(Feature feature)
         {
             Console.WriteLine("PerformFeatureSomewhatImportant on {0}", feature);
+        }
+
+        private void PerformApplyFeatureAdjustments()
+        {
+            Console.WriteLine("Apply feature adjustments");
+
+            foreach (Label label in Labels) {
+                UpdateFeaturePriors(label);
+            }
+        }
+
+        private void UpdateFeaturePriors(Label label)
+        {
+            Console.WriteLine("UpdateFeaturePriors for {0}", label);
+
+            IEnumerable<Feature> labelFeatures = _featureSet.Where(f => f.Label == label);
+            // Get the sum of user heights for each feature
+            double userHeightSum = 0;
+            foreach (Feature f in labelFeatures) {
+                userHeightSum += f.UserHeight;
+            }
+
+            // Get the sum of system heights for each feature
+            double systemHeightSum = 0;
+            double systemWeightSum = 0;
+            foreach (Feature f in labelFeatures) {
+                systemHeightSum += f.SystemHeight;
+                systemWeightSum += f.SystemWeight;
+            }
+
+            // Get the ratio of area of user importance vs. area of system importance
+            // (This tells us what the sum of user priors should be)
+            double userToSystemRatio = userHeightSum / systemHeightSum;
+
+            // Get the percentage of total the prior value that should assigned to each feature
         }
 
         private IReadOnlyList<CollectionViewSource> BuildCollectionViewSourcesOverview(IReadOnlyList<Label> labels)

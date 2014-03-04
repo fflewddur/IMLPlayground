@@ -24,8 +24,6 @@ namespace MessagePredictor.View
     /// </summary>
     public partial class FeatureGraph : UserControl
     {
-        private readonly int MINIMUM_WEIGHT = 2;
-
         private double _mouseOrigY;
         private Feature _currentFeature;
         private bool _editingUnusedWeight;
@@ -34,7 +32,7 @@ namespace MessagePredictor.View
         {
             InitializeComponent();
             _editingUnusedWeight = false;
-            UnusedWeight = MINIMUM_WEIGHT;
+            UnusedWeight = Feature.MINIMUM_HEIGHT;
         }
 
         //[BindableAttribute(true)]
@@ -64,11 +62,11 @@ namespace MessagePredictor.View
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
                 // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
-                bool apply = (UnusedWeight == MINIMUM_WEIGHT);
-                if (delta > (UnusedWeight - MINIMUM_WEIGHT)) {
-                    delta = (UnusedWeight - MINIMUM_WEIGHT);
+                bool apply = (UnusedWeight == Feature.MINIMUM_HEIGHT);
+                if (delta > (UnusedWeight - Feature.MINIMUM_HEIGHT)) {
+                    delta = (UnusedWeight - Feature.MINIMUM_HEIGHT);
                 }
-                UnusedWeight -= vm.AdjustUserFeature(_currentFeature, delta, apply);
+                UnusedWeight -= vm.AdjustUserFeatureHeight(_currentFeature, delta, apply);
                 //_currentFeature.UserWeight += delta / Feature.PIXELS_TO_WEIGHT;
                 _mouseOrigY = y;
                 
@@ -99,8 +97,8 @@ namespace MessagePredictor.View
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
                 // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
-                if (UnusedWeight + delta < MINIMUM_WEIGHT) {
-                    UnusedWeight = MINIMUM_WEIGHT;
+                if (UnusedWeight + delta < Feature.MINIMUM_HEIGHT) {
+                    UnusedWeight = Feature.MINIMUM_HEIGHT;
                 } else {
                     UnusedWeight += delta;
                 }

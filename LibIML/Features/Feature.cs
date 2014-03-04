@@ -9,6 +9,8 @@ namespace LibIML
     [Serializable]
     public class Feature : ViewModelBase, IEquatable<Feature>
     {
+        public static readonly int MINIMUM_HEIGHT = 2; // The minimum height in pixels for each bar
+
         public enum Weight
         {
             None,
@@ -28,7 +30,7 @@ namespace LibIML
         private double _systemWeight;
         private double _userWeight;
         private bool _mostImportantLabel;
-        private double _height;
+        private double _systemHeight;
         private double _userHeight;
 
         public Feature(string characters, Label label)
@@ -82,7 +84,7 @@ namespace LibIML
             set
             {
                 if (SetProperty<double>(ref _systemWeight, value)) {
-                    Height = SystemWeight * PIXELS_TO_WEIGHT;
+                    SystemHeight = SystemWeight * PIXELS_TO_WEIGHT;
                 }
             }
         }
@@ -104,20 +106,20 @@ namespace LibIML
             set { _mostImportantLabel = value; }
         }
 
-        public double Height
+        public double SystemHeight
         {
-            get { return _height; }
-            private set { SetProperty<double>(ref _height, value); }
+            get { return _systemHeight; }
+            private set { SetProperty<double>(ref _systemHeight, value); }
         }
 
         public double UserHeight
         {
             get { return _userHeight; }
-            private set
+            set
             {
                 // Minimum height (so the user can drag the bar back up)
-                if (value < 3) {
-                    value = 3;
+                if (value < MINIMUM_HEIGHT) {
+                    value = MINIMUM_HEIGHT;
                 }
                 SetProperty<double>(ref _userHeight, value);
             }

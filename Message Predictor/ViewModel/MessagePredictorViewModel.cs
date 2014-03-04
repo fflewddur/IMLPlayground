@@ -545,10 +545,10 @@ namespace MessagePredictor
 
         void _featureSetVM_FeatureWeightEdited(object sender, FeatureSetViewModel.FeatureWeightEditedEventArgs e)
         {
-            Console.WriteLine("weight edited");
-            if (AutoUpdatePredictions) {
-                PerformUpdatePredictions();
-            }
+            Console.WriteLine("weight edited. Adjust feature weights to correspond to the proportion of user-adjust heights");
+            //if (AutoUpdatePredictions) {
+            //    PerformUpdatePredictions();
+            //}
         }
 
         private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
