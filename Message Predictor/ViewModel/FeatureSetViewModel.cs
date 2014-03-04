@@ -196,12 +196,22 @@ namespace MessagePredictor.ViewModel
             OnFeatureRemoved(new EventArgs());
         }
 
-        public void AdjustUserFeature(Feature feature, double weightDelta)
+        public double AdjustUserFeature(Feature feature, double weightDelta, bool apply)
         {
             _featureWeightEditedTimer.Stop();
-            feature.UserWeight += weightDelta;
+            double weightDeltaPerPixels = weightDelta / Feature.PIXELS_TO_WEIGHT;
+
+            if (feature.UserWeight + weightDeltaPerPixels <= 0) {
+                weightDeltaPerPixels = -1 * feature.UserWeight;
+                weightDelta = weightDeltaPerPixels * Feature.PIXELS_TO_WEIGHT;
+            }
+            feature.UserWeight += weightDeltaPerPixels;
             feature.WeightType = Feature.Weight.Custom;
-            _featureWeightEditedTimer.Start();
+            if (apply) {
+                _featureWeightEditedTimer.Start();
+            }
+
+            return weightDelta;
         }
 
         #endregion

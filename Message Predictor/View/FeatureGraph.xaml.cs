@@ -24,15 +24,20 @@ namespace MessagePredictor.View
     /// </summary>
     public partial class FeatureGraph : UserControl
     {
+        private readonly int MINIMUM_WEIGHT = 2;
+
         private double _mouseOrigY;
         private Feature _currentFeature;
+        private bool _editingUnusedWeight;
 
         public FeatureGraph()
         {
             InitializeComponent();
+            _editingUnusedWeight = false;
+            UnusedWeight = MINIMUM_WEIGHT;
         }
 
-        [BindableAttribute(true)]
+        //[BindableAttribute(true)]
         public IEnumerable ItemsSource
         {
             get { return (IEnumerable)GetValue(ItemsSourceProperty); }
@@ -41,17 +46,16 @@ namespace MessagePredictor.View
 
         // Using a DependencyProperty as the backing store for ItemsSource.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(FeatureGraph), new PropertyMetadata(OnItemsSourceChanged));
+            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(FeatureGraph));
 
-        public static void OnItemsSourceChanged(DependencyObject obj, DependencyPropertyChangedEventArgs args)
+        public double UnusedWeight
         {
-            (obj as FeatureGraph).OnItemsSourceChanged(args);
+            get { return (double)GetValue(UnusedWeightProperty); }
+            set { SetValue(UnusedWeightProperty, value); }
         }
 
-        private void OnItemsSourceChanged(DependencyPropertyChangedEventArgs args)
-        {
-            return;
-        }
+        public static readonly DependencyProperty UnusedWeightProperty =
+            DependencyProperty.Register("UnusedWeight", typeof(double), typeof(FeatureGraph));
 
         private void Rectangle_PreviewMouseMove(object sender, MouseEventArgs e)
         {
@@ -60,7 +64,11 @@ namespace MessagePredictor.View
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
                 // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
-                vm.AdjustUserFeature(_currentFeature, delta / Feature.PIXELS_TO_WEIGHT);
+                bool apply = (UnusedWeight == MINIMUM_WEIGHT);
+                if (delta > (UnusedWeight - MINIMUM_WEIGHT)) {
+                    delta = (UnusedWeight - MINIMUM_WEIGHT);
+                }
+                UnusedWeight -= vm.AdjustUserFeature(_currentFeature, delta, apply);
                 //_currentFeature.UserWeight += delta / Feature.PIXELS_TO_WEIGHT;
                 _mouseOrigY = y;
                 
@@ -81,6 +89,39 @@ namespace MessagePredictor.View
         {
             _mouseOrigY = -1;
             _currentFeature = null;
+            Mouse.OverrideCursor = null;
+        }
+
+        private void UnusedWeight_PreviewMouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed && _editingUnusedWeight && _mouseOrigY >= 0) {
+                FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+                double y = e.GetPosition(this).Y;
+                double delta = _mouseOrigY - y;
+                // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
+                if (UnusedWeight + delta < MINIMUM_WEIGHT) {
+                    UnusedWeight = MINIMUM_WEIGHT;
+                } else {
+                    UnusedWeight += delta;
+                }
+                _mouseOrigY = y;
+                
+                Console.WriteLine("Dragging {0}", delta);
+            }
+        }
+
+        private void UnusedWeight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            _mouseOrigY = e.GetPosition(this).Y;
+            FrameworkElement fe = sender as FrameworkElement;
+            _editingUnusedWeight = true;
+            Mouse.OverrideCursor = Cursors.SizeNS;
+        }
+
+        private void UnusedWeight_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            _mouseOrigY = -1;
+            _editingUnusedWeight = false;
             Mouse.OverrideCursor = null;
         }
     }

@@ -10,6 +10,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         
         <ItemsControl Grid.Column="0" Name="FeatureControl" ItemsSource="{Binding ItemsSource,ElementName=root}">
@@ -37,16 +38,14 @@
         </ItemsControl>
         
         <!-- Unused weight -->
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" PreviewMouseMove="UnusedWeight_PreviewMouseMove" PreviewMouseLeftButtonUp="UnusedWeight_PreviewMouseLeftButtonUp" Background="Transparent">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="LightGreen" VerticalAlignment="Bottom" Cursor="SizeNS" 
-                                   PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" />
-            <Rectangle Grid.Row="1" Width="20" Height="{Binding Height}" Fill="DarkGreen" />
-            <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 20 0 0"/>
+            <Rectangle Grid.Row="0" Width="20" Height="{Binding UnusedWeight,ElementName=root}" Fill="LightGreen" VerticalAlignment="Bottom" Cursor="SizeNS" 
+                                   PreviewMouseLeftButtonDown="UnusedWeight_PreviewMouseLeftButtonDown" />
+            <TextBlock Grid.Row="2" Text="Unused" Margin="0 20 0 0"/>
         </Grid>
         
         <Button Grid.Column="2" VerticalAlignment="Center">Add importance</Button>
