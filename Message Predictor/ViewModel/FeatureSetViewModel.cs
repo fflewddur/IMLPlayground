@@ -248,30 +248,78 @@ namespace MessagePredictor.ViewModel
             UpdateFeatures();
         }
 
+
         private void UpdateFeatures()
         {
             Console.WriteLine("UpdateFeatures()");
-            FeatureSet.Clear();
+            List<Feature> toRemove = new List<Feature>();
+
+            // Add the features we don't already have in our set
             foreach (int id in _vocab.FeatureIds) {
                 string word = _vocab.GetWord(id);
-                Feature userFeature = _userAdded.Find(p => p.Characters == word);
-                // First, see if the user added this feature manually; if so, keep associating it with the label the user requested
-                if (userFeature != null) {
-                    FeatureSet.Add(userFeature);
-                } else {
-                    // Otherwise, figure out which label this feature is more important for
+                Feature toFind = new Feature(word, Label.AnyLabel);
+                if (!FeatureSet.Contains(toFind)) {
+                    // These will be system-determined features, so be sure to add them to both labels.
+                    // Also include the default user weight and prior.
                     foreach (Label label in _labels) {
                         Feature f = new Feature(word, label);
-                        double weight;
-                        if (_classifier.TryGetFeatureSystemWeight(id, label, out weight))
-                            f.SystemWeight = weight;
-                        if (_classifier.TryGetFeatureUserWeight(id, label, out weight))
-                            f.UserWeight = weight;
-                        f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
                         FeatureSet.Add(f);
+                        double prior, weight;
+                        _classifier.TryGetFeatureUserPrior(id, label, out prior);
+                        f.UserPrior = prior;
+                        _classifier.TryGetFeatureUserWeight(id, label, out weight);
+                        f.UserWeight = weight;
                     }
                 }
             }
+
+            // Go through each feature and update it with the system's current weight, or mark it for removal
+            foreach (Feature f in FeatureSet) {
+                int id = _vocab.GetWordId(f.Characters, true);
+
+                // Figure out if we need to remove this feature
+                if (id < 0) {
+                    toRemove.Add(f);
+                }
+
+                // Update this feature's system-determined weight
+                double weight;
+                if (_classifier.TryGetFeatureSystemWeight(id, f.Label, out weight)) {
+                    f.SystemWeight = weight;
+                }
+
+                // Figure out which label this feature is most important for
+                f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, f.Label);
+            }
+
+            // Remove anything marked for removal
+            foreach (Feature f in toRemove) {
+                FeatureSet.Remove(f);
+            }
+
+            //FeatureSet.Clear();
+            //foreach (int id in _vocab.FeatureIds) {
+            //    string word = _vocab.GetWord(id);
+            //    Feature userFeature = _userAdded.Find(p => p.Characters == word);
+            //    // First, see if the user added this feature manually; if so, keep associating it with the label the user requested
+            //    if (userFeature != null) {
+            //        FeatureSet.Add(userFeature);
+            //    } else {
+            //        // Otherwise, figure out which label this feature is more important for
+            //        foreach (Label label in _labels) {
+            //            Feature f = new Feature(word, label);
+            //            double weight;
+            //            if (_classifier.TryGetFeatureSystemWeight(id, label, out weight))
+            //                f.SystemWeight = weight;
+            //            if (_classifier.TryGetFeatureUserWeight(id, label, out weight))
+            //                f.UserWeight = weight;
+            //            if (_classifier.TryGetFeatureUserPrior(id, label, out weight))
+            //                f.UserPrior = weight;
+            //            f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
+            //            FeatureSet.Add(f);
+            //        }
+            //    }
+            //}
         }
 
         private void PerformHighlightFeature(string text)
@@ -380,9 +428,11 @@ namespace MessagePredictor.ViewModel
             double userToSystemRatio = userHeightSum / systemHeightSum;
             double desiredPriorSum = userToSystemRatio * systemFeatureCountSum;
 
-            // Get the percentage of total the prior value that should assigned to each feature
+            // Get the percentage of the total prior value that should assigned to each feature
             foreach (Feature f in labelFeatures) {
+                Console.Write("Old prior for {0} = {1}, ", f.Characters, f.UserPrior);
                 f.UserPrior = (f.UserHeight / userHeightSum) * desiredPriorSum;
+                Console.WriteLine("new prior = {0}", f.UserPrior);
             }
 
             _featurePriorsEditedTimer.Start();

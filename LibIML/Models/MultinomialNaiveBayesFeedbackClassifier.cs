@@ -131,6 +131,27 @@ namespace LibIML
         }
 
         /// <summary>
+        /// Get the user-set prior of a given feature for a given label.
+        /// </summary>
+        /// <param name="id">The ID of the feature to lookup.</param>
+        /// <param name="label">The label of the feature to lookup.</param>
+        /// <param name="prior">Stores the feature's prior for 'label'.</param>
+        /// <returns>True on success, false otherwise.</returns>
+        public bool TryGetFeatureUserPrior(int id, Label label, out double prior)
+        {
+            bool retval = false;
+
+            if (_perClassFeaturePriors[label].TryGetValue(id, out prior)) {
+                retval = true;
+            } else {
+                prior = _defaultPrior;
+                retval = false;
+            }
+
+            return retval;
+        }
+
+        /// <summary>
         /// Get the summation of all system feature counts for a given label (if available).
         /// </summary>
         /// <param name="label">The label to get the feature count summation for.</param>

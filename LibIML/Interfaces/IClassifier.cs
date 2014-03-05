@@ -28,6 +28,7 @@ namespace LibIML
         void ClearInstances(); // Remove all existing training instances
         bool TryGetFeatureSystemWeight(int id, Label label, out double weight);
         bool TryGetFeatureUserWeight(int id, Label label, out double weight);
+        bool TryGetFeatureUserPrior(int id, Label label, out double prior);
         bool TryGetSystemFeatureSum(Label label, out double sum);
         bool IsFeatureMostImportantForLabel(int id, Label label);
 

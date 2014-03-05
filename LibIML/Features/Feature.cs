@@ -9,7 +9,7 @@ namespace LibIML
     [Serializable]
     public class Feature : ViewModelBase, IEquatable<Feature>
     {
-        public static readonly int MINIMUM_HEIGHT = 2; // The minimum height in pixels for each bar
+        public static readonly int MINIMUM_HEIGHT = 4; // The minimum height in pixels for each bar
 
         public enum Weight
         {
