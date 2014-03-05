@@ -244,7 +244,7 @@ namespace LibIML
                 else if (f.WeightType == Feature.Weight.Medium)
                     weight = 5;
                 else
-                    weight = f.UserWeight;
+                    weight = f.UserPrior;
 
                 int id = _vocab.GetWordId(f.Characters, true);
                 _perClassFeaturePriors[f.Label][id] = weight;

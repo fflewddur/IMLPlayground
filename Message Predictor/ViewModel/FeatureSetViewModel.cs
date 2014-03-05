@@ -24,7 +24,7 @@ namespace MessagePredictor.ViewModel
         private IReadOnlyList<CollectionViewSource> _collectionViewSourcesGraph;
         private string _featureText; // The feature the user is currently typing in
         private DispatcherTimer _featureTextEditedTimer;
-        private DispatcherTimer _featureWeightEditedTimer;
+        private DispatcherTimer _featurePriorsEditedTimer;
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels)
             : base()
@@ -39,7 +39,7 @@ namespace MessagePredictor.ViewModel
             _collectionViewSourcesGraph = BuildCollectionViewSourcesGraph(labels);
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
-            _featureWeightEditedTimer = new DispatcherTimer();
+            _featurePriorsEditedTimer = new DispatcherTimer();
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
             AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
@@ -53,8 +53,8 @@ namespace MessagePredictor.ViewModel
             _vocab.Updated += vocab_Updated;
             _featureTextEditedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
             _featureTextEditedTimer.Tick += _featureTextEditedTimer_Tick;
-            _featureWeightEditedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
-            _featureWeightEditedTimer.Tick += _featureWeightEditedTimer_Tick;
+            _featurePriorsEditedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
+            _featurePriorsEditedTimer.Tick += _featurePriorsEditedTimer_Tick;
 
             FeatureSet.CollectionChanged += FeatureSet_CollectionChanged;
         }
@@ -128,10 +128,10 @@ namespace MessagePredictor.ViewModel
             }
         }
 
-        public class FeatureWeightEditedEventArgs : EventArgs
+        public class FeaturePriorEditedEventArgs : EventArgs
         {
             public readonly Feature Feature;
-            public FeatureWeightEditedEventArgs(Feature feature)
+            public FeaturePriorEditedEventArgs(Feature feature)
             {
                 Feature = feature;
             }
@@ -140,7 +140,7 @@ namespace MessagePredictor.ViewModel
         public event EventHandler<FeatureAddedEventArgs> FeatureAdded;
         public event EventHandler<EventArgs> FeatureRemoved;
         public event EventHandler<FeatureTextEditedEventArgs> FeatureTextEdited;
-        public event EventHandler<FeatureWeightEditedEventArgs> FeatureWeightEdited;
+        public event EventHandler<FeaturePriorEditedEventArgs> FeaturePriorEdited;
 
         protected virtual void OnFeatureAdded(FeatureAddedEventArgs e)
         {
@@ -160,10 +160,10 @@ namespace MessagePredictor.ViewModel
                 FeatureTextEdited(this, e);
         }
 
-        protected virtual void OnFeatureWeightEdited(FeatureWeightEditedEventArgs e)
+        protected virtual void OnFeaturePriorEdited(FeaturePriorEditedEventArgs e)
         {
-            if (FeatureWeightEdited != null)
-                FeatureWeightEdited(this, e);
+            if (FeaturePriorEdited != null)
+                FeaturePriorEdited(this, e);
         }
 
         #endregion
@@ -200,16 +200,10 @@ namespace MessagePredictor.ViewModel
 
         public double AdjustUserFeatureHeight(Feature feature, double heightDelta, bool apply)
         {
-            _featureWeightEditedTimer.Stop();
-
             if (feature.UserHeight + heightDelta < Feature.MINIMUM_HEIGHT) {
                 heightDelta = -1 * (feature.UserHeight - Feature.MINIMUM_HEIGHT);
             }
             feature.UserHeight += heightDelta;
-            //feature.WeightType = Feature.Weight.Custom;
-            //if (apply) {
-            //    _featureWeightEditedTimer.Start();
-            //}
 
             return heightDelta;
         }
@@ -234,12 +228,12 @@ namespace MessagePredictor.ViewModel
             OnFeatureTextEdited(new FeatureTextEditedEventArgs(_featureText));
         }
 
-        private void _featureWeightEditedTimer_Tick(object sender, EventArgs e)
+        private void _featurePriorsEditedTimer_Tick(object sender, EventArgs e)
         {
-            _featureWeightEditedTimer.Stop();
+            _featurePriorsEditedTimer.Stop();
             // FIXME do we need to pass out the specific feature that changed? Might be enough just to let the main VM
             // know that it needs to update the priors and re-predict.
-            OnFeatureWeightEdited(new FeatureWeightEditedEventArgs(null)); 
+            OnFeaturePriorEdited(new FeaturePriorEditedEventArgs(null)); 
         }
 
         private void classifier_Retrained(object sender, EventArgs e)
@@ -358,9 +352,13 @@ namespace MessagePredictor.ViewModel
 
         private void UpdateFeaturePriors(Label label)
         {
+            // Don't fire a featureWeightEdited event while we're updating these values
+            _featurePriorsEditedTimer.Stop();
+
             Console.WriteLine("UpdateFeaturePriors for {0}", label);
 
             IEnumerable<Feature> labelFeatures = _featureSet.Where(f => f.Label == label);
+            
             // Get the sum of user heights for each feature
             double userHeightSum = 0;
             foreach (Feature f in labelFeatures) {
@@ -369,17 +367,25 @@ namespace MessagePredictor.ViewModel
 
             // Get the sum of system heights for each feature
             double systemHeightSum = 0;
-            double systemWeightSum = 0;
             foreach (Feature f in labelFeatures) {
                 systemHeightSum += f.SystemHeight;
-                systemWeightSum += f.SystemWeight;
             }
 
+            // Get the sum of counts for each feature
+            double systemFeatureCountSum = 0;
+            _classifier.TryGetSystemFeatureSum(label, out systemFeatureCountSum);
+
             // Get the ratio of area of user importance vs. area of system importance
-            // (This tells us what the sum of user priors should be)
+            // (This tells us what the sum of user priors should be, relative to the sum of feature counts)
             double userToSystemRatio = userHeightSum / systemHeightSum;
+            double desiredPriorSum = userToSystemRatio * systemFeatureCountSum;
 
             // Get the percentage of total the prior value that should assigned to each feature
+            foreach (Feature f in labelFeatures) {
+                f.UserPrior = (f.UserHeight / userHeightSum) * desiredPriorSum;
+            }
+
+            _featurePriorsEditedTimer.Start();
         }
 
         private IReadOnlyList<CollectionViewSource> BuildCollectionViewSourcesOverview(IReadOnlyList<Label> labels)

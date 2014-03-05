@@ -67,10 +67,9 @@ namespace MessagePredictor.View
                     delta = (UnusedWeight - Feature.MINIMUM_HEIGHT);
                 }
                 UnusedWeight -= vm.AdjustUserFeatureHeight(_currentFeature, delta, apply);
-                //_currentFeature.UserWeight += delta / Feature.PIXELS_TO_WEIGHT;
                 _mouseOrigY = y;
                 
-                Console.WriteLine("Dragging {0}", delta);
+                //Console.WriteLine("Dragging {0}", delta);
             }
         }
 
@@ -104,7 +103,7 @@ namespace MessagePredictor.View
                 }
                 _mouseOrigY = y;
                 
-                Console.WriteLine("Dragging {0}", delta);
+                //Console.WriteLine("Dragging {0}", delta);
             }
         }
 

@@ -20,7 +20,8 @@ namespace LibIML
         };
 
         public const double PIXELS_TO_WEIGHT = 100;
-        public const double WEIGHT_NONE = 3;
+        public const double WEIGHT_NONE = 0;
+        public const double WEIGHT_DEFAULT = 1;
         public const double WEIGHT_MEDIUM = 10;
         public const double WEIGHT_HIGH = 20;
 
@@ -29,6 +30,7 @@ namespace LibIML
         private Weight _weightType;
         private double _systemWeight;
         private double _userWeight;
+        private double _userPrior;
         private bool _mostImportantLabel;
         private double _systemHeight;
         private double _userHeight;
@@ -39,8 +41,9 @@ namespace LibIML
             _characters = characters;
             _label = label;
             _mostImportantLabel = false;
-            _weightType = Weight.None;
-            _userWeight = WEIGHT_NONE;
+            _weightType = Weight.Custom;
+            _userWeight = WEIGHT_DEFAULT;
+            _userPrior = WEIGHT_DEFAULT;
             _systemWeight = 0;
         }
 
@@ -61,7 +64,8 @@ namespace LibIML
         public Weight WeightType
         {
             get { return _weightType; }
-            set {
+            set
+            {
                 if (SetProperty<Weight>(ref _weightType, value)) {
                     switch (_weightType) {
                         case Weight.None:
@@ -78,6 +82,10 @@ namespace LibIML
             }
         }
 
+        /// <summary>
+        /// The system-determined weight, relative to all other feature weights.
+        /// This is used for explaining the relative importance of each feature.
+        /// </summary>
         public double SystemWeight
         {
             get { return _systemWeight; }
@@ -89,6 +97,10 @@ namespace LibIML
             }
         }
 
+        /// <summary>
+        /// The user-specified prior, relative to all other priors.
+        /// This is used for explaining the relative importance of each feature.
+        /// </summary>
         public double UserWeight
         {
             get { return _userWeight; }
@@ -98,6 +110,12 @@ namespace LibIML
                     UserHeight = UserWeight * PIXELS_TO_WEIGHT; // FIXME
                 }
             }
+        }
+
+        public double UserPrior
+        {
+            get { return _userPrior; }
+            set { SetProperty<double>(ref _userPrior, value); }
         }
 
         public bool MostImportant

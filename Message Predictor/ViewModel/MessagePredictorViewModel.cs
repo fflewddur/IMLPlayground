@@ -90,7 +90,7 @@ namespace MessagePredictor
             _featureSetVM.FeatureAdded += _featureSetVM_FeatureAdded;
             _featureSetVM.FeatureRemoved += _featureSetVM_FeatureRemoved;
             _featureSetVM.FeatureTextEdited += _featureSetVM_FeatureTextEdited;
-            _featureSetVM.FeatureWeightEdited += _featureSetVM_FeatureWeightEdited;
+            _featureSetVM.FeaturePriorEdited += _featureSetVM_FeaturePriorsEdited;
 
             _heatMapVM = new HeatMapViewModel(_messages);
             _heatMapVM.HighlightTextChanged += _heatMapVM_HighlightTextChanged;
@@ -543,9 +543,10 @@ namespace MessagePredictor
             HeatMapVM.ToHighlight = e.Tokens;
         }
 
-        void _featureSetVM_FeatureWeightEdited(object sender, FeatureSetViewModel.FeatureWeightEditedEventArgs e)
+        void _featureSetVM_FeaturePriorsEdited(object sender, FeatureSetViewModel.FeaturePriorEditedEventArgs e)
         {
             Console.WriteLine("weight edited. Adjust feature weights to correspond to the proportion of user-adjust heights");
+            PerformUpdatePredictions();
             //if (AutoUpdatePredictions) {
             //    PerformUpdatePredictions();
             //}
