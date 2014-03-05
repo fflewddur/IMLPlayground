@@ -81,6 +81,13 @@ namespace LibIML
 
         #region Public methods
 
+        /// <summary>
+        /// Get the relative system-determined importance of a given feature for a given label.
+        /// </summary>
+        /// <param name="id">The ID of the feature to lookup.</param>
+        /// <param name="label">The label of the feature to lookup.</param>
+        /// <param name="weight">Stores the feature's relative importance for 'label'.</param>
+        /// <returns>True on success, false otherwise.</returns>
         public bool TryGetFeatureSystemWeight(int id, Label label, out double weight)
         {
             int count;
@@ -98,6 +105,13 @@ namespace LibIML
             return retval;
         }
 
+        /// <summary>
+        /// Get the relative user-set importance of a given feature for a given label.
+        /// </summary>
+        /// <param name="id">The ID of the feature to lookup.</param>
+        /// <param name="label">The label of the feature to lookup.</param>
+        /// <param name="weight">Stores the feature's relative importance for 'label'.</param>
+        /// <returns>True on success, false otherwise.</returns>
         public bool TryGetFeatureUserWeight(int id, Label label, out double weight)
         {
             double prior;
@@ -111,6 +125,26 @@ namespace LibIML
                 retval = true;
             } else {
                 weight = 0;
+            }
+
+            return retval;
+        }
+
+        /// <summary>
+        /// Get the summation of all system feature counts for a given label (if available).
+        /// </summary>
+        /// <param name="label">The label to get the feature count summation for.</param>
+        /// <param name="sum">Stores the feature count summation.</param>
+        /// <returns>True on success, false otherwise.</returns>
+        public bool TryGetSystemFeatureSum(Label label, out double sum)
+        {
+            bool retval = false;
+
+            if (_perClassFeatureCountSums[label] > 0) {
+                sum = _perClassFeatureCountSums[label];
+                retval = true;
+            } else {
+                sum = 0;
             }
 
             return retval;
