@@ -14,6 +14,8 @@ namespace MessagePredictor.ViewModel
 {
     class FeatureSetViewModel : ViewModelBase
     {
+        public static readonly double PERCENT_HEIGHT_OF_MAX_BAR = 0.5;
+
         private IClassifier _classifier;
         private Vocabulary _vocab;
         private IReadOnlyList<Label> _labels;
@@ -25,6 +27,9 @@ namespace MessagePredictor.ViewModel
         private string _featureText; // The feature the user is currently typing in
         private DispatcherTimer _featureTextEditedTimer;
         private DispatcherTimer _featurePriorsEditedTimer;
+        private DispatcherTimer _featureGraphHeightChangedTimer;
+        private double _featureGraphHeight;
+        private double _pixelsToWeight; // How many pixels to use to display each unit of feature weight (changes based on display size)
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels)
             : base()
@@ -40,6 +45,7 @@ namespace MessagePredictor.ViewModel
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
             _featurePriorsEditedTimer = new DispatcherTimer();
+            _featureGraphHeightChangedTimer = new DispatcherTimer();
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
             AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
@@ -55,7 +61,8 @@ namespace MessagePredictor.ViewModel
             _featureTextEditedTimer.Tick += _featureTextEditedTimer_Tick;
             _featurePriorsEditedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
             _featurePriorsEditedTimer.Tick += _featurePriorsEditedTimer_Tick;
-
+            _featureGraphHeightChangedTimer.Interval = new TimeSpan(2000000); // 200 milliseconds
+            _featureGraphHeightChangedTimer.Tick += _featureGraphHeightChangedTimer_Tick;
             FeatureSet.CollectionChanged += FeatureSet_CollectionChanged;
         }
 
@@ -92,6 +99,19 @@ namespace MessagePredictor.ViewModel
         {
             get { return _collectionViewSourcesGraph; }
             private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesGraph, value); }
+        }
+
+        public double FeatureGraphHeight
+        {
+            get { return _featureGraphHeight; }
+            set
+            {
+                if (SetProperty<double>(ref _featureGraphHeight, value)) {
+                    // Wait until this stops changing before updating the layout
+                    _featureGraphHeightChangedTimer.Stop();
+                    _featureGraphHeightChangedTimer.Start();
+                }
+            }
         }
 
         #endregion
@@ -233,7 +253,13 @@ namespace MessagePredictor.ViewModel
             _featurePriorsEditedTimer.Stop();
             // FIXME do we need to pass out the specific feature that changed? Might be enough just to let the main VM
             // know that it needs to update the priors and re-predict.
-            OnFeaturePriorEdited(new FeaturePriorEditedEventArgs(null)); 
+            OnFeaturePriorEdited(new FeaturePriorEditedEventArgs(null));
+        }
+
+        private void _featureGraphHeightChangedTimer_Tick(object sender, EventArgs e)
+        {
+            _featureGraphHeightChangedTimer.Stop();
+            UpdateFeatureHeights();
         }
 
         private void classifier_Retrained(object sender, EventArgs e)
@@ -248,6 +274,23 @@ namespace MessagePredictor.ViewModel
             UpdateFeatures();
         }
 
+        private void UpdateFeatureHeights()
+        {
+            // Computer our new pixelsToWeight ratio
+            double maxWeight = 0;
+            foreach (Feature f in FeatureSet) {
+                double weight = f.SystemWeight + f.UserWeight;
+                if (maxWeight < weight) {
+                    maxWeight = weight;
+                }
+            }
+            _pixelsToWeight = (maxWeight * PERCENT_HEIGHT_OF_MAX_BAR * _featureGraphHeight) / maxWeight;
+
+            // Update the PixelsToWeight value for each Feature
+            foreach (Feature f in FeatureSet) {
+                f.PixelsToWeight = _pixelsToWeight;
+            }
+        }
 
         private void UpdateFeatures()
         {
@@ -263,12 +306,14 @@ namespace MessagePredictor.ViewModel
                     // Also include the default user weight and prior.
                     foreach (Label label in _labels) {
                         Feature f = new Feature(word, label);
-                        FeatureSet.Add(f);
+                        f.PixelsToWeight = _pixelsToWeight;
                         double prior, weight;
                         _classifier.TryGetFeatureUserPrior(id, label, out prior);
                         f.UserPrior = prior;
                         _classifier.TryGetFeatureUserWeight(id, label, out weight);
                         f.UserWeight = weight;
+
+                        FeatureSet.Add(f);
                     }
                 }
             }
@@ -286,9 +331,15 @@ namespace MessagePredictor.ViewModel
                 double weight;
                 if (_classifier.TryGetFeatureSystemWeight(id, f.Label, out weight)) {
                     f.SystemWeight = weight;
+                } else {
+                    Console.WriteLine("NO SYSTEM WEIGHT FOR {0}", f);
+                }
+                if (_classifier.TryGetFeatureUserWeight(id, f.Label, out weight)) {
+                    f.UserWeight = weight;
                 }
 
                 // Figure out which label this feature is most important for
+                // FIXME This doesn't seem to be working
                 f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, f.Label);
             }
 
@@ -297,29 +348,9 @@ namespace MessagePredictor.ViewModel
                 FeatureSet.Remove(f);
             }
 
-            //FeatureSet.Clear();
-            //foreach (int id in _vocab.FeatureIds) {
-            //    string word = _vocab.GetWord(id);
-            //    Feature userFeature = _userAdded.Find(p => p.Characters == word);
-            //    // First, see if the user added this feature manually; if so, keep associating it with the label the user requested
-            //    if (userFeature != null) {
-            //        FeatureSet.Add(userFeature);
-            //    } else {
-            //        // Otherwise, figure out which label this feature is more important for
-            //        foreach (Label label in _labels) {
-            //            Feature f = new Feature(word, label);
-            //            double weight;
-            //            if (_classifier.TryGetFeatureSystemWeight(id, label, out weight))
-            //                f.SystemWeight = weight;
-            //            if (_classifier.TryGetFeatureUserWeight(id, label, out weight))
-            //                f.UserWeight = weight;
-            //            if (_classifier.TryGetFeatureUserPrior(id, label, out weight))
-            //                f.UserPrior = weight;
-            //            f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, label);
-            //            FeatureSet.Add(f);
-            //        }
-            //    }
-            //}
+            UpdateFeatureHeights();
+            _collectionViewSourcesOverview[0].View.Refresh();
+            _collectionViewSourcesOverview[1].View.Refresh();
         }
 
         private void PerformHighlightFeature(string text)
@@ -344,6 +375,7 @@ namespace MessagePredictor.ViewModel
             if (result == true) {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
                 Feature f = new Feature(vm.Word.ToLower(), label);
+                f.PixelsToWeight = _pixelsToWeight;
                 if (vm.SelectedWeight == vm.Weights[0])
                     f.WeightType = Feature.Weight.High;
                 else if (vm.SelectedWeight == vm.Weights[1])
@@ -406,7 +438,7 @@ namespace MessagePredictor.ViewModel
             Console.WriteLine("UpdateFeaturePriors for {0}", label);
 
             IEnumerable<Feature> labelFeatures = _featureSet.Where(f => f.Label == label);
-            
+
             // Get the sum of user heights for each feature
             double userHeightSum = 0;
             foreach (Feature f in labelFeatures) {

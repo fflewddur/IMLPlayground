@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePredictor.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +24,24 @@ namespace MessagePredictor.View
         public ImportantWordsContainer()
         {
             InitializeComponent();
+        }
+
+        private void Grid_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            // We'll use this new height to update the height of our feature graphs' bars
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            if (vm != null) {
+                vm.FeatureGraphHeight = e.NewSize.Height;
+            }
+        }
+
+        private void Grid_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            // We'll use this new height to update the height of our feature graphs' bars
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            if (vm != null) {
+                vm.FeatureGraphHeight = this.ActualHeight;
+            }
         }
     }
 }

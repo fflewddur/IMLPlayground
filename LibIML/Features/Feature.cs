@@ -19,11 +19,11 @@ namespace LibIML
             High
         };
 
-        public const double PIXELS_TO_WEIGHT = 100;
+        //public const double PIXELS_TO_WEIGHT = 100;
         public const double WEIGHT_NONE = 0;
         public const double WEIGHT_DEFAULT = 1;
-        public const double WEIGHT_MEDIUM = 10;
-        public const double WEIGHT_HIGH = 20;
+        public const double WEIGHT_MEDIUM = 2;
+        public const double WEIGHT_HIGH = 4;
 
         private string _characters;
         private Label _label;
@@ -34,6 +34,7 @@ namespace LibIML
         private bool _mostImportantLabel;
         private double _systemHeight;
         private double _userHeight;
+        private double _pixelsToWeight;
 
         public Feature(string characters, Label label)
             : base()
@@ -69,13 +70,13 @@ namespace LibIML
                 if (SetProperty<Weight>(ref _weightType, value)) {
                     switch (_weightType) {
                         case Weight.None:
-                            UserWeight = WEIGHT_NONE;
+                            UserPrior = WEIGHT_NONE;
                             break;
                         case Weight.Medium:
-                            UserWeight = WEIGHT_MEDIUM;
+                            UserPrior = WEIGHT_MEDIUM;
                             break;
                         case Weight.High:
-                            UserWeight = WEIGHT_HIGH;
+                            UserPrior = WEIGHT_HIGH;
                             break;
                     }
                 }
@@ -92,7 +93,7 @@ namespace LibIML
             set
             {
                 if (SetProperty<double>(ref _systemWeight, value)) {
-                    SystemHeight = SystemWeight * PIXELS_TO_WEIGHT;
+                    SystemHeight = SystemWeight * PixelsToWeight;
                 }
             }
         }
@@ -107,7 +108,7 @@ namespace LibIML
             set
             {
                 if (SetProperty<double>(ref _userWeight, value)) {
-                    UserHeight = UserWeight * PIXELS_TO_WEIGHT; // FIXME
+                    UserHeight = UserWeight * PixelsToWeight;
                 }
             }
         }
@@ -143,6 +144,18 @@ namespace LibIML
             }
         }
 
+        public double PixelsToWeight
+        {
+            get { return _pixelsToWeight; }
+            set
+            {
+                if (SetProperty<double>(ref _pixelsToWeight, value)) {
+                    SystemHeight = SystemWeight * PixelsToWeight;
+                    UserHeight = UserWeight * PixelsToWeight;
+                }
+            }
+        }
+
         #endregion
 
         #region Override methods
@@ -151,7 +164,7 @@ namespace LibIML
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("{0} (label={1}, weight type={2}, user weight={3}, system weight={4})", Characters, Label, this.WeightType, UserWeight, SystemWeight);
+            sb.AppendFormat("{0} (label={1}, weight type={2}, user weight={3}, prior={5}, system weight={4})", Characters, Label, this.WeightType, UserWeight, SystemWeight, UserPrior);
 
             return sb.ToString();
         }

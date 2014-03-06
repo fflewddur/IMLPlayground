@@ -55,6 +55,7 @@ namespace MessagePredictor.View
         public static readonly DependencyProperty UnusedWeightProperty =
             DependencyProperty.Register("UnusedWeight", typeof(double), typeof(FeatureGraph));
 
+        
         private void Rectangle_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && _currentFeature != null && _mouseOrigY >= 0) {

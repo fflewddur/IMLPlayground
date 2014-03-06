@@ -101,7 +101,7 @@ namespace LibIML
             } else {
                 weight = 0;
             }
-            
+
             return retval;
         }
 
@@ -260,12 +260,12 @@ namespace LibIML
         {
             foreach (Feature f in priors) {
                 double weight;
-                if (f.WeightType == Feature.Weight.High)
-                    weight = 10;
-                else if (f.WeightType == Feature.Weight.Medium)
-                    weight = 5;
-                else
-                    weight = f.UserPrior;
+                //if (f.WeightType == Feature.Weight.High)
+                //    weight = 10;
+                //else if (f.WeightType == Feature.Weight.Medium)
+                //    weight = 5;
+                //else
+                weight = f.UserPrior;
 
                 int id = _vocab.GetWordId(f.Characters, true);
                 _perClassFeaturePriors[f.Label][id] = weight;
