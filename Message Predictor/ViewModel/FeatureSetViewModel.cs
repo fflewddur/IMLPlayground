@@ -206,14 +206,18 @@ namespace MessagePredictor.ViewModel
 
         public void RemoveUserFeature(Feature feature)
         {
+            // Create a feature with the same word, but that will match any label
+            Feature anyLabel = new Feature(feature.Characters, Label.AnyLabel);
+
             // If the user previously added this feature manually, remove it from our list
-            _userAdded.Remove(feature);
+            while (_userAdded.Remove(anyLabel)) ;
+
             // Ensure we don't add this feature to the list multiple times
-            if (!_userRemoved.Contains(feature))
-                _userRemoved.Add(feature);
+            if (!_userRemoved.Contains(anyLabel))
+                _userRemoved.Add(anyLabel);
 
             // Update the UI right away, even if we don't retrain
-            FeatureSet.Remove(feature);
+            while (FeatureSet.Remove(anyLabel)) ;
 
             OnFeatureRemoved(new EventArgs());
         }
@@ -460,6 +464,7 @@ namespace MessagePredictor.ViewModel
             double desiredPriorSum = userToSystemRatio * systemFeatureCountSum;
 
             // Get the percentage of the total prior value that should assigned to each feature
+            Console.WriteLine("userHeightSum: {0} systemHeightSum: {1} userToSystemRatio: {2} systemFeatureCountSum: {3}", userHeightSum, systemHeightSum, userToSystemRatio, systemFeatureCountSum);
             foreach (Feature f in labelFeatures) {
                 Console.Write("Old prior for {0} = {1}, ", f.Characters, f.UserPrior);
                 f.UserPrior = (f.UserHeight / userHeightSum) * desiredPriorSum;

@@ -285,6 +285,7 @@ namespace LibIML
             if (_restriction == Restriction.HighIG) {
                 if (onlyUserFeatures) {
                     AddUserFeatures(forceInclude);
+                    RemoveUserFeatures(forceExclude);
                 } else {
                     RestrictToHighIG(instances, labels, size, forceInclude, forceExclude);
                 }
@@ -341,6 +342,12 @@ namespace LibIML
         {
             if (!_restrictedIds.Contains(id))
                 _restrictedIds.Add(id);
+        }
+
+        private void RemoveElementFromRestricted(int id)
+        {
+            if (_restrictedIds.Contains(id))
+                _restrictedIds.Remove(id);
         }
 
         //private void AddElementsToRestricted(IEnumerable<int> ids)
@@ -549,6 +556,19 @@ namespace LibIML
                     int id;
                     if (_allWordsToIds.TryGetValue(f.Characters, out id)) {
                         AddElementToRestricted(id);
+                    } else
+                        Console.Error.WriteLine("Error: could not find '{0}' in vocabulary", f.Characters);
+                }
+            }
+        }
+
+        private void RemoveUserFeatures(IEnumerable<Feature> toExclude)
+        {
+            if (toExclude != null) {
+                foreach (Feature f in toExclude) {
+                    int id;
+                    if (_allWordsToIds.TryGetValue(f.Characters, out id)) {
+                        RemoveElementFromRestricted(id);
                     } else
                         Console.Error.WriteLine("Error: could not find '{0}' in vocabulary", f.Characters);
                 }
