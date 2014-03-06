@@ -62,7 +62,7 @@ namespace MessagePredictor
         {
             string conditionString = element.Value.ToString();
             Condition condition = Condition.Control;
-            if (conditionString.Equals("treatment"))
+            if (conditionString.Equals("Treatment", StringComparison.InvariantCultureIgnoreCase))
                 condition = Condition.Treatment;
 
             this.Properties[PropertyKey.Condition] = condition;

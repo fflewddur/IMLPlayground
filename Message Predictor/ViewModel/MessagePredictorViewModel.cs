@@ -106,7 +106,7 @@ namespace MessagePredictor
             AutoUpdatePredictions = (bool)App.Current.Properties[MessagePredictor.App.PropertyKey.AutoUpdatePredictions];
 
             // Evaluate the classifier (so we can show predictions to the user)
-            UpdateVocab();
+            UpdateVocabForce();
             PerformUpdatePredictions();
             PerformUpdatePredictions(); // Do this twice to avoid showing any change indicators at the start
 
