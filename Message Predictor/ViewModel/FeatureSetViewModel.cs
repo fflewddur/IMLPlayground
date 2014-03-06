@@ -331,15 +331,12 @@ namespace MessagePredictor.ViewModel
                 double weight;
                 if (_classifier.TryGetFeatureSystemWeight(id, f.Label, out weight)) {
                     f.SystemWeight = weight;
-                } else {
-                    Console.WriteLine("NO SYSTEM WEIGHT FOR {0}", f);
                 }
                 if (_classifier.TryGetFeatureUserWeight(id, f.Label, out weight)) {
                     f.UserWeight = weight;
                 }
 
                 // Figure out which label this feature is most important for
-                // FIXME This doesn't seem to be working
                 f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, f.Label);
             }
 
@@ -349,8 +346,10 @@ namespace MessagePredictor.ViewModel
             }
 
             UpdateFeatureHeights();
-            _collectionViewSourcesOverview[0].View.Refresh();
-            _collectionViewSourcesOverview[1].View.Refresh();
+            // Refresh our source views
+            foreach (CollectionViewSource cvs in _collectionViewSourcesOverview) {
+                cvs.View.Refresh();
+            }
         }
 
         private void PerformHighlightFeature(string text)

@@ -566,20 +566,37 @@ namespace LibIML
         /// <returns>A new Vocabulary object.</returns>
         public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances, IEnumerable<Label> labels, Restriction restriction, int desiredVocabSize)
         {
-            ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
+            //ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
+
+            // We need to do this sequentially because if different IDs are assigned on each startup, different participants will see different vocabularies.
+            // (When we restrict our vocab to high IG items, ties are broken by item ID)
+            Dictionary<string, int> tokenDocCounts = new Dictionary<string, int>();
+            PorterStemmer stemmer = new PorterStemmer(); 
+
+            foreach (IInstance instance in instances) {
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                foreach (KeyValuePair<string, int> pair in tokens) {
+                        // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
+                        int count;
+                        tokenDocCounts.TryGetValue(pair.Key, out count);
+                        count++;
+                        tokenDocCounts[pair.Key] = count;
+                }
+            }
 
             // Tokenize and stem each document, returning a collection of tokens and corresponding counts.
-            Parallel.ForEach(instances, (instance, state, index) =>
-                {
-                    PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
-                    //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
-                    Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
-                    instance.TokenCounts = tokens;
-                    foreach (KeyValuePair<string, int> pair in tokens) {
-                        // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
-                        tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1);
-                    }
-                });
+            //Parallel.ForEach(instances, (instance, state, index) =>
+            //    {
+            //        PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            //        //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+            //        Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+            //        instance.TokenCounts = tokens;
+            //        foreach (KeyValuePair<string, int> pair in tokens) {
+            //            // If this key doesn't exist yet, add it with a value of 1. Otherwise, increment its value by 1.
+            //            tokenDocCounts.AddOrUpdate(pair.Key, 1, (key, value) => value + 1);
+            //        }
+            //    });
 
             Vocabulary vocab = new Vocabulary(restriction);
             vocab.AddTokens(tokenDocCounts, instances.Count());
