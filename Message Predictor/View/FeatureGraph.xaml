@@ -28,9 +28,9 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="LightGreen" VerticalAlignment="Bottom" Cursor="SizeNS" 
+                        <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
                                    PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" />
-                        <Rectangle Grid.Row="1" Width="20" Height="{Binding SystemHeight}" Fill="DarkGreen" />
+                        <Rectangle Grid.Row="1" Width="20" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" />
                         <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
@@ -61,7 +61,7 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Rectangle Grid.Row="0" Width="20" Height="{Binding UnusedWeight,ElementName=root}" Fill="LightGreen" VerticalAlignment="Bottom" Cursor="SizeNS" 
+            <Rectangle Grid.Row="0" Width="20" Height="{Binding UnusedWeight,ElementName=root}" Fill="{Binding GraphColorUser,ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
                                    PreviewMouseLeftButtonDown="UnusedWeight_PreviewMouseLeftButtonDown" />
             <TextBlock Grid.Row="2" Text="Unused" Margin="0 20 0 0"/>
         </Grid>

@@ -33,6 +33,8 @@ namespace MessagePredictor.View
             InitializeComponent();
             _editingUnusedWeight = false;
             UnusedWeight = Feature.MINIMUM_HEIGHT;
+            GraphColorSystem = Brushes.Red;
+            GraphColorUser = Brushes.Pink;
         }
 
         //[BindableAttribute(true)]
@@ -55,7 +57,26 @@ namespace MessagePredictor.View
         public static readonly DependencyProperty UnusedWeightProperty =
             DependencyProperty.Register("UnusedWeight", typeof(double), typeof(FeatureGraph));
 
+        public Brush GraphColorUser
+        {
+            get { return (Brush)GetValue(GraphColorUserProperty); }
+            set { SetValue(GraphColorUserProperty, value); }
+        }
 
+        // Using a DependencyProperty as the backing store for GraphColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty GraphColorUserProperty =
+            DependencyProperty.Register("GraphColorUser", typeof(Brush), typeof(FeatureGraph));
+
+        public Brush GraphColorSystem
+        {
+            get { return (Brush)GetValue(GraphColorSystemProperty); }
+            set { SetValue(GraphColorSystemProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for GraphColor.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty GraphColorSystemProperty =
+            DependencyProperty.Register("GraphColorSystem", typeof(Brush), typeof(FeatureGraph));
+        
         private void Rectangle_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && _currentFeature != null && _mouseOrigY >= 0) {
