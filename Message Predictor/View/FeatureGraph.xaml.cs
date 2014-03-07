@@ -122,5 +122,16 @@ namespace MessagePredictor.View
             _editingUnusedWeight = false;
             Mouse.OverrideCursor = null;
         }
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            FrameworkElement fe = sender as FrameworkElement;
+
+            if (vm != null && fe != null) {
+                Feature f = fe.DataContext as Feature;
+                vm.FeatureRemove.Execute(f);
+            }
+        }
     }
 }
