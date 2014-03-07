@@ -36,8 +36,8 @@
         </Grid.ColumnDefinitions>
 
         <!-- Topic labels-->
-        <TextBlock Grid.Row="0" Grid.Column="0" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/><Run>to </Run><Run Text="{Binding Labels[0], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/></TextBlock>
-        <TextBlock Grid.Row="1" Grid.Column="0" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/><Run>to </Run><Run Text="{Binding Labels[1], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/></TextBlock>
+        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/><Run>to </Run><Run Text="{Binding Labels[0], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/></TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/><Run>to </Run><Run Text="{Binding Labels[1], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/></TextBlock>
 
         <!-- List of words -->
         <ItemsControl Name="Topic1Features" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSourcesOverview[0].View}" VerticalAlignment="Center" 
@@ -46,7 +46,7 @@
                       ItemsPanel="{StaticResource ResourceKey=importantWordsOverviewPanel}" ItemTemplate="{StaticResource ResourceKey=importantWordsOverviewItem}" />
 
         <!-- Add word buttons -->
-        <Button Grid.Row="0" Grid.Column="2" Content="{Binding Labels[0]}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeature}" CommandParameter="{Binding Labels[0]}" Style="{StaticResource buttonStyle}"/>
-        <Button Grid.Row="1" Grid.Column="2" Content="{Binding Labels[1]}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeature}" CommandParameter="{Binding Labels[1]}" Style="{StaticResource buttonStyle}"/>
+        <Button Grid.Row="0" Grid.Column="2" Margin="5" Content="{Binding Labels[0]}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeature}" CommandParameter="{Binding Labels[0]}" Style="{StaticResource buttonStyle}"/>
+        <Button Grid.Row="1" Grid.Column="2" Margin="5" Content="{Binding Labels[1]}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeature}" CommandParameter="{Binding Labels[1]}" Style="{StaticResource buttonStyle}"/>
     </Grid>
 </UserControl>
