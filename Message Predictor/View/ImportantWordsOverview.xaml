@@ -16,6 +16,8 @@
                         <MenuItem Header="Very important" IsCheckable="True" Click="FeatureVeryImportant_Click" Style="{StaticResource ResourceKey=featureMenuCheckable}"/>
                         <MenuItem Header="Somewhat important" IsCheckable="True" Click="FeatureSomewhatImportant_Click" Style="{StaticResource ResourceKey=featureMenuCheckable}"/>
                         <Separator />
+                        <MenuItem Header="Find" Click="FeatureFind_Click"/>
+                        <Separator />
                         <MenuItem Header="Remove" Click="FeatureRemove_Click" />
                     </StackPanel>
                 </xctk:DropDownButton.DropDownContent>

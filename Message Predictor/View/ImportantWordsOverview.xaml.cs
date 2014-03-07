@@ -114,5 +114,19 @@ namespace MessagePredictor.View
                 }
             }
         }
+
+        private void FeatureFind_Click(object sender, RoutedEventArgs e)
+        {
+            MenuItem item = sender as MenuItem;
+            if (item != null)
+            {
+                FeatureSetViewModel fsvm = this.DataContext as FeatureSetViewModel;
+                Feature f = item.DataContext as Feature;
+                if (fsvm != null && f != null)
+                {
+                    fsvm.HighlightFeature.Execute(f.Characters);
+                }
+            }
+        }
     }
 }

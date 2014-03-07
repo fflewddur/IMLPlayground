@@ -34,7 +34,9 @@
                         <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem HeaderStringFormat="Remove {0}" Header="{Binding Characters, Mode=OneWay}" Click="MenuItem_Click"/>
+                                    <MenuItem HeaderStringFormat="Find '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Find_Click"/>
+                                    <Separator />
+                                    <MenuItem HeaderStringFormat="Remove '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Remove_Click"/>
                                 </ContextMenu>
                             </TextBlock.ContextMenu>
                             <TextBlock.Style>
@@ -64,6 +66,15 @@
             <TextBlock Grid.Row="2" Text="Unused" Margin="0 20 0 0"/>
         </Grid>
 
-        <Button Grid.Column="2" VerticalAlignment="Center" Command="{Binding ApplyFeatureAdjustments}" Style="{StaticResource ResourceKey=buttonStyle}">Apply</Button>
+        <Grid Grid.Column="2" VerticalAlignment="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" VerticalAlignment="Center" Margin="5" Content="{Binding Labels[0]}" ContentStringFormat="Add a word about {0}" Command="{Binding AddFeature}" CommandParameter="{Binding Labels[1]}" Style="{StaticResource ResourceKey=buttonStyle}"/>
+            <Button Grid.Row="1" VerticalAlignment="Center" Margin="5" Command="{Binding ApplyFeatureAdjustments}" Style="{StaticResource ResourceKey=buttonStyle}">Apply changes</Button>
+
+        </Grid>
+        
     </Grid>
 </UserControl>

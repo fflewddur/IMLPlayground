@@ -55,7 +55,7 @@ namespace MessagePredictor.View
         public static readonly DependencyProperty UnusedWeightProperty =
             DependencyProperty.Register("UnusedWeight", typeof(double), typeof(FeatureGraph));
 
-        
+
         private void Rectangle_PreviewMouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed && _currentFeature != null && _mouseOrigY >= 0) {
@@ -69,7 +69,7 @@ namespace MessagePredictor.View
                 }
                 UnusedWeight -= vm.AdjustUserFeatureHeight(_currentFeature, delta, apply);
                 _mouseOrigY = y;
-                
+
                 //Console.WriteLine("Dragging {0}", delta);
             }
         }
@@ -99,11 +99,12 @@ namespace MessagePredictor.View
                 // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
                 if (UnusedWeight + delta < Feature.MINIMUM_HEIGHT) {
                     UnusedWeight = Feature.MINIMUM_HEIGHT;
-                } else {
+                }
+                else {
                     UnusedWeight += delta;
                 }
                 _mouseOrigY = y;
-                
+
                 //Console.WriteLine("Dragging {0}", delta);
             }
         }
@@ -123,7 +124,7 @@ namespace MessagePredictor.View
             Mouse.OverrideCursor = null;
         }
 
-        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        private void Remove_Click(object sender, RoutedEventArgs e)
         {
             FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
             FrameworkElement fe = sender as FrameworkElement;
@@ -131,6 +132,17 @@ namespace MessagePredictor.View
             if (vm != null && fe != null) {
                 Feature f = fe.DataContext as Feature;
                 vm.FeatureRemove.Execute(f);
+            }
+        }
+
+        private void Find_Click(object sender, RoutedEventArgs e)
+        {
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            FrameworkElement fe = sender as FrameworkElement;
+
+            if (vm != null && fe != null) {
+                Feature f = fe.DataContext as Feature;
+                vm.HighlightFeature.Execute(f.Characters);
             }
         }
     }
