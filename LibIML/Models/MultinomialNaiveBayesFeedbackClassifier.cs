@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibIML.Instances;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -293,7 +294,13 @@ namespace LibIML
                     double pWord;
                     if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord)) {
                         double weight = Math.Exp(pair.Value * Math.Log(pWord));
-                        //Console.WriteLine("Weight={0}, userWeight={1}, sysWeight={2}", weight, )
+                        double userWeight, sysWeight;
+                        string word = _vocab.GetWord(pair.Key);
+                        TryGetFeatureUserWeight(pair.Key, l, out userWeight);
+                        TryGetFeatureSystemWeight(pair.Key, l, out sysWeight);
+                        EvidenceItem ei = new EvidenceItem(word, pair.Key, (int)pair.Value, sysWeight, userWeight);
+                        evidence.Items.Add(ei);
+                        //Console.WriteLine("Feature={3}, weight={0}, userWeight={1}, sysWeight={2}", weight, userWeight, sysWeight, word);
                         prob += Math.Log(weight);
                         //evidence.Weights[pair.Key] = weight;
                     }

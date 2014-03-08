@@ -20,6 +20,7 @@ namespace LibIML
         {
             Confidence = -1;
             ClassPr = -1;
+            Items = new List<EvidenceItem>();
             //Weights = new Dictionary<int, double>();
             //Vocab = vocab;
         }

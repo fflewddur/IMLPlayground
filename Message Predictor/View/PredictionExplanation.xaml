@@ -6,6 +6,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-            
+        <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction}" />
     </Grid>
 </UserControl>
