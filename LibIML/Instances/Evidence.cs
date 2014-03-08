@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibIML.Instances;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,17 +9,19 @@ namespace LibIML
 {
     public class Evidence
     {
-        public Dictionary<int, double> Weights;
+        public List<EvidenceItem> Items;
+        //public Dictionary<int, int> Counts;
+        //public Dictionary<int, double> Weights;
         public double ClassPr;
         public double Confidence;
-        private Vocabulary Vocab;
+        //private Vocabulary Vocab;
 
-        public Evidence(Vocabulary vocab)
+        public Evidence()
         {
             Confidence = -1;
             ClassPr = -1;
-            Weights = new Dictionary<int, double>();
-            Vocab = vocab;
+            //Weights = new Dictionary<int, double>();
+            //Vocab = vocab;
         }
 
         #region Override methods
@@ -29,10 +32,13 @@ namespace LibIML
 
             sb.AppendFormat("Confidence={0:N2} ", Confidence);
             sb.AppendFormat("ClassPr={0:N2} ", ClassPr);
-            foreach (KeyValuePair<int, double> pair in Weights)
-            {
-                sb.AppendFormat("{0}={1:N4} ", Vocab.GetWord(pair.Key), pair.Value);
+            foreach (EvidenceItem item in Items) {
+                sb.AppendFormat("{0}={1}*({2:N4}+{3:N4} ", item.Word, item.Count, item.SystemWeight, item.UserWeight);
             }
+            //foreach (KeyValuePair<int, double> pair in Weights)
+            //{
+            //    sb.AppendFormat("{0}={1:N4} ", Vocab.GetWord(pair.Key), pair.Value);
+            //}
 
             return sb.ToString();
         }

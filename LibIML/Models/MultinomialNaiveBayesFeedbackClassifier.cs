@@ -96,7 +96,7 @@ namespace LibIML
             _perClassFeatureCounts[label].TryGetValue(id, out count);
 
             if (_perClassFeatureCountSums[label] > 0) {
-                weight = (double)count / (double)_perClassFeatureCountSums[label];
+                weight = (double)count / (double)(_perClassFeatureCountSums[label] + _perClassFeaturePriorSums[label]);
                 retval = true;
             } else {
                 weight = 0;
@@ -121,7 +121,7 @@ namespace LibIML
                 prior = _defaultPrior;
 
             if (_perClassFeaturePriorSums[label] > 0) {
-                weight = (double)prior / (double)_perClassFeaturePriorSums[label];
+                weight = (double)prior / (double)(_perClassFeatureCountSums[label] + _perClassFeaturePriorSums[label]);
                 retval = true;
             } else {
                 weight = 0;
@@ -286,15 +286,16 @@ namespace LibIML
             // Compute Pr(d|c)
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
             foreach (Label l in Labels) {
-                Evidence evidence = new Evidence(Vocab); // Store our evidence in favor of each class
+                Evidence evidence = new Evidence(); // Store our evidence in favor of each class
                 evidence.ClassPr = _pClass[l];
                 double prob = 0;
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                     double pWord;
                     if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord)) {
                         double weight = Math.Exp(pair.Value * Math.Log(pWord));
+                        //Console.WriteLine("Weight={0}, userWeight={1}, sysWeight={2}", weight, )
                         prob += Math.Log(weight);
-                        evidence.Weights[pair.Key] = weight;
+                        //evidence.Weights[pair.Key] = weight;
                     }
                 }
                 pDocGivenClass[l] = Math.Exp(prob);

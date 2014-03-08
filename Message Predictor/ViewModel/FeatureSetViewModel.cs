@@ -288,7 +288,8 @@ namespace MessagePredictor.ViewModel
                     maxWeight = weight;
                 }
             }
-            _pixelsToWeight = (maxWeight * PERCENT_HEIGHT_OF_MAX_BAR * _featureGraphHeight) / maxWeight;
+            // Subtract ~50px because of the tabbed item headers
+            _pixelsToWeight = (PERCENT_HEIGHT_OF_MAX_BAR * (_featureGraphHeight - 50)) / maxWeight;
 
             // Update the PixelsToWeight value for each Feature
             foreach (Feature f in FeatureSet) {

@@ -19,7 +19,8 @@
                 </xctk:RichTextBox>
             </TabItem>
             <TabItem Header="Explanation">
-                <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction}" />
+                <local:PredictionExplanation/>
+                <!--<Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction}" />-->
             </TabItem>
         </TabControl>
     </Grid>

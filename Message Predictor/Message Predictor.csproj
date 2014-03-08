@@ -192,6 +192,9 @@
     <Compile Include="View\MessageWindow.xaml.cs">
       <DependentUpon>MessageWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\PredictionExplanation.xaml.cs">
+      <DependentUpon>PredictionExplanation.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\PredictionOverview.xaml.cs">
       <DependentUpon>PredictionOverview.xaml</DependentUpon>
     </Compile>
@@ -224,6 +227,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\MessageWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\PredictionExplanation.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

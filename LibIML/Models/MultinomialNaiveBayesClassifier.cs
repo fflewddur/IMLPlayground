@@ -144,7 +144,7 @@ namespace LibIML
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
-                Evidence evidence = new Evidence(Vocab); // Store our evidence in favor of each class
+                Evidence evidence = new Evidence(); // Store our evidence in favor of each class
                 double prob = 0;
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data)
                 {
@@ -153,7 +153,7 @@ namespace LibIML
                     {
                         double weight = pair.Value * Math.Log(pWord);
                         prob += weight;
-                        evidence.Weights[pair.Key] = weight;
+                        //evidence.Weights[pair.Key] = weight;
                     }
                 }
                 pDocGivenClass[l] = prob;
