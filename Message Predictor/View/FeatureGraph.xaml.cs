@@ -76,6 +76,19 @@ namespace MessagePredictor.View
         // Using a DependencyProperty as the backing store for GraphColor.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty GraphColorSystemProperty =
             DependencyProperty.Register("GraphColorSystem", typeof(Brush), typeof(FeatureGraph));
+
+
+
+        public LibIML.Label Label
+        {
+            get { return (LibIML.Label)GetValue(LabelProperty); }
+            set { SetValue(LabelProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for Label.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty LabelProperty =
+            DependencyProperty.Register("Label", typeof(LibIML.Label), typeof(FeatureGraph));
+
         
         private void Rectangle_PreviewMouseMove(object sender, MouseEventArgs e)
         {
