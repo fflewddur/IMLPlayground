@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:conv="clr-namespace:MessagePredictor.Converters" 
+             xmlns:local="clr-namespace:MessagePredictor.View" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -12,35 +13,38 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0">
-            <Label.Content>
+        <Label Grid.Row="0" Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc}" />
+
+
+
+        <local:EvidenceGraph Grid.Row="1">
+            <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
                         <conv:DictionaryItemFromLabelConverter/>
                     </MultiBinding.Converter>
-
                     <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
                     <Binding Path="Labels[0]"/>
                 </MultiBinding>
-            </Label.Content>
-        </Label>
+            </local:EvidenceGraph.Evidence>
+        </local:EvidenceGraph>
 
-        <Label Grid.Row="1">
-            <Label.Content>
+        <local:EvidenceGraph Grid.Row="2">
+            <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
                         <conv:DictionaryItemFromLabelConverter/>
                     </MultiBinding.Converter>
-
                     <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
                     <Binding Path="Labels[1]"/>
                 </MultiBinding>
-            </Label.Content>
-        </Label>
-
-        <Label Grid.Row="2" Content="{Binding Labels[0]}"/>
-        <Label Grid.Row="3" Content="{Binding Labels[1]}"/>
+            </local:EvidenceGraph.Evidence>
+        </local:EvidenceGraph>
+        
+        <Label Grid.Row="3" Content="Class imbalance explanation will go here."/>
+        <Label Grid.Row="4" Content="Pie chart will go here."/>
     </Grid>
 </UserControl>

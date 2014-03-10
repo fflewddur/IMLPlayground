@@ -286,6 +286,8 @@ namespace LibIML
 
             // Compute Pr(d|c)
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
+            int importantWordsUnique = 0; // how many of the features show up in the message?
+            int importantWordsTotal = 0; // how many instances of features show up in the message?
             foreach (Label l in Labels) {
                 Evidence evidence = new Evidence(); // Store our evidence in favor of each class
                 evidence.ClassPr = _pClass[l];
@@ -293,6 +295,8 @@ namespace LibIML
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                     double pWord;
                     if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord)) {
+                        importantWordsTotal += (int)pair.Value;
+                        importantWordsUnique++;
                         double weight = Math.Exp(pair.Value * Math.Log(pWord));
                         double userWeight, sysWeight;
                         string word = _vocab.GetWord(pair.Key);
@@ -308,6 +312,9 @@ namespace LibIML
                 pDocGivenClass[l] = Math.Exp(prob);
                 prediction.EvidencePerClass[l] = evidence;
             }
+            // We increment these for each label, so normalize them by the number of labels.
+            prediction.ImportantWordTotal = importantWordsTotal / Labels.Count();
+            prediction.ImportantWordUniques = importantWordsUnique / Labels.Count();
 
             // Compute Pr(d)
             double pDoc = 0;

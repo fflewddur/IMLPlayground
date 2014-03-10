@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace LibIML
 {
-    public class Evidence
+    public class Evidence : ViewModelBase
     {
-        public List<EvidenceItem> Items;
-        public double ClassPr;
-        public double Confidence;
+        public List<EvidenceItem> _items;
+        public double _classPr;
+        public double _confidence;
 
         public Evidence()
         {
@@ -19,6 +19,28 @@ namespace LibIML
             ClassPr = -1;
             Items = new List<EvidenceItem>();
         }
+
+        #region Properties
+
+        public List<EvidenceItem> Items
+        {
+            get { return _items; }
+            set { SetProperty<List<EvidenceItem>>(ref _items, value); }
+        }
+
+        public double ClassPr
+        {
+            get { return _classPr; }
+            set { SetProperty<double>(ref _classPr, value); }
+        }
+
+        public double Confidence
+        {
+            get { return _confidence; }
+            set { SetProperty<double>(ref _confidence, value); }
+        }
+
+        #endregion
 
         #region Override methods
 
