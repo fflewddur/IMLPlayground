@@ -34,7 +34,7 @@ namespace LibIML
             sb.AppendFormat("Confidence={0:N2} ", Confidence);
             sb.AppendFormat("ClassPr={0:N2} ", ClassPr);
             foreach (EvidenceItem item in Items) {
-                sb.AppendFormat("{0}={1}*({2:N4}+{3:N4} ", item.Word, item.Count, item.SystemWeight, item.UserWeight);
+                sb.AppendFormat("{0}={1}*({2:N4}+{3:N4}) ", item.Word, item.Count, item.SystemWeight, item.UserWeight);
             }
             //foreach (KeyValuePair<int, double> pair in Weights)
             //{

@@ -1,5 +1,6 @@
 ﻿using LibIML;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -56,6 +57,27 @@ namespace MessagePredictor.Converters
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culter)
         {
             return DependencyProperty.UnsetValue;
+        }
+    }
+
+    public class DictionaryItemFromLabelConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (values != null && values.Length >= 2) {
+                var myDict = values[0] as IDictionary;
+                var myKey = values[1] as Label;
+                if (myDict != null && myKey != null) {
+                    //return myDict[myKey].ToString();
+                    return myDict[myKey];
+                }
+            }
+            return Binding.DoNothing;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
         }
     }
 }
