@@ -9,18 +9,16 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
-            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc}" />
+        <TextBlock Grid.Row="0" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" TextWrapping="Wrap" />
 
-
-
-        <local:EvidenceGraph Grid.Row="1">
+        <local:EvidenceGraph Grid.Row="1" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400">
             <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
@@ -32,7 +30,7 @@
             </local:EvidenceGraph.Evidence>
         </local:EvidenceGraph>
 
-        <local:EvidenceGraph Grid.Row="2">
+        <local:EvidenceGraph Grid.Row="2" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812">
             <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>

@@ -77,8 +77,6 @@ namespace MessagePredictor.View
         public static readonly DependencyProperty GraphColorSystemProperty =
             DependencyProperty.Register("GraphColorSystem", typeof(Brush), typeof(FeatureGraph));
 
-
-
         public LibIML.Label Label
         {
             get { return (LibIML.Label)GetValue(LabelProperty); }
@@ -96,7 +94,6 @@ namespace MessagePredictor.View
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
-                // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
                 bool apply = (UnusedWeight == Feature.MINIMUM_HEIGHT);
                 if (delta > (UnusedWeight - Feature.MINIMUM_HEIGHT)) {
                     delta = (UnusedWeight - Feature.MINIMUM_HEIGHT);

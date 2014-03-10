@@ -10,6 +10,7 @@ namespace LibIML
     public class Feature : ViewModelBase, IEquatable<Feature>
     {
         public static readonly int MINIMUM_HEIGHT = 4; // The minimum height in pixels for each bar
+        public static readonly int BAR_WIDTH = 20; // The default width (in pixels) for each bar
 
         public enum Weight
         {
@@ -31,21 +32,36 @@ namespace LibIML
         private double _systemWeight;
         private double _userWeight;
         private double _userPrior;
+        private int _count;
+        private double _width;
         private bool _mostImportantLabel;
         private double _systemHeight;
         private double _userHeight;
         private double _pixelsToWeight;
 
+        // We use this constructor for the FeatureGraphs
         public Feature(string characters, Label label)
             : base()
         {
             _characters = characters;
             _label = label;
+            _count = 0;
             _mostImportantLabel = false;
             _weightType = Weight.Custom;
             _userWeight = WEIGHT_DEFAULT;
             _userPrior = WEIGHT_DEFAULT;
             _systemWeight = 0;
+        }
+
+        // We use this constructor for the EvidenceGraphs
+        public Feature(string characters, Label label, int count, double sysWeight, double userWeight) : base()
+        {
+            _characters = characters;
+            _label = label;
+            _count = count;
+            _userWeight = userWeight;
+            _systemWeight = sysWeight;
+            PixelsToWeight = 100;
         }
 
         #region Properties
@@ -119,6 +135,12 @@ namespace LibIML
             set { SetProperty<double>(ref _userPrior, value); }
         }
 
+        public int Count
+        {
+            get { return _count; }
+            set { SetProperty<int>(ref _count, value); }
+        }
+
         public bool MostImportant
         {
             get { return _mostImportantLabel; }
@@ -144,6 +166,12 @@ namespace LibIML
             }
         }
 
+        public double Width
+        {
+            get { return _width; }
+            private set { SetProperty<double>(ref _width, value); }
+        }
+
         public double PixelsToWeight
         {
             get { return _pixelsToWeight; }
@@ -152,6 +180,7 @@ namespace LibIML
                 if (SetProperty<double>(ref _pixelsToWeight, value)) {
                     SystemHeight = SystemWeight * PixelsToWeight;
                     UserHeight = UserWeight * PixelsToWeight;
+                    Width = Count * BAR_WIDTH;
                 }
             }
         }

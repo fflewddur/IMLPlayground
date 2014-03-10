@@ -7,6 +7,28 @@
              Name="root"
              d:DesignHeight="200" d:DesignWidth="300">
     <Grid>
-        <Label Content="{Binding ElementName=root,Path=Evidence}"/> 
+        <!--<Label Content="{Binding ElementName=root,Path=Evidence}"/>-->
+        <ItemsControl Grid.Column="0" Name="FeatureControl" ItemsSource="{Binding ElementName=root,Path=Evidence.Items}">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5" MinHeight="50">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Rectangle Grid.Row="0" Width="{Binding Width}" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}"  VerticalAlignment="Bottom" />
+                        <Rectangle Grid.Row="1" Width="{Binding Width}" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" />
+                        <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2" TextAlignment="Center"/>
+                    </Grid>
+
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

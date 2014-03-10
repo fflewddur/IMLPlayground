@@ -9,7 +9,7 @@ namespace LibIML
 {
     public class Evidence : ViewModelBase
     {
-        public List<EvidenceItem> _items;
+        public List<Feature> _items;
         public double _classPr;
         public double _confidence;
 
@@ -17,15 +17,15 @@ namespace LibIML
         {
             Confidence = -1;
             ClassPr = -1;
-            Items = new List<EvidenceItem>();
+            Items = new List<Feature>();
         }
 
         #region Properties
 
-        public List<EvidenceItem> Items
+        public List<Feature> Items
         {
             get { return _items; }
-            set { SetProperty<List<EvidenceItem>>(ref _items, value); }
+            set { SetProperty<List<Feature>>(ref _items, value); }
         }
 
         public double ClassPr
@@ -50,8 +50,8 @@ namespace LibIML
 
             sb.AppendFormat("Confidence={0:N2} ", Confidence);
             sb.AppendFormat("ClassPr={0:N2} ", ClassPr);
-            foreach (EvidenceItem item in Items) {
-                sb.AppendFormat("{0}={1}*({2:N4}+{3:N4}) ", item.Word, item.Count, item.SystemWeight, item.UserWeight);
+            foreach (Feature item in Items) {
+                sb.AppendFormat("{0}={1}*({2:N4}+{3:N4}) ", item.Characters, item.Count, item.SystemWeight, item.UserWeight);
             }
 
             return sb.ToString();
