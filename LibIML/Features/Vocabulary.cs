@@ -530,7 +530,7 @@ namespace LibIML
             Console.WriteLine("Vocab computing IG took {0}", timer.Elapsed);
 
             // Find the features with the highest information gain
-            List<KeyValuePair<int, double>> HighIG = IG.OrderBy(entry => entry.Value).Take(vocabSize).ToList();
+            List<KeyValuePair<int, double>> HighIG = IG.OrderByDescending(entry => entry.Value).Take(vocabSize).ToList();
 
             // Add these features to our "restricted" set
             _restrictedIds.Clear();
