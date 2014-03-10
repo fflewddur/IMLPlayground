@@ -159,9 +159,9 @@ namespace LibIML
             set
             {
                 // Minimum height (so the user can drag the bar back up)
-                if (value < MINIMUM_HEIGHT) {
-                    value = MINIMUM_HEIGHT;
-                }
+                //if (value < MINIMUM_HEIGHT) {
+                //    value = MINIMUM_HEIGHT;
+                //}
                 SetProperty<double>(ref _userHeight, value);
             }
         }

@@ -7,8 +7,14 @@
              Name="root"
              d:DesignHeight="200" d:DesignWidth="300">
     <Grid>
-        <!--<Label Content="{Binding ElementName=root,Path=Evidence}"/>-->
-        <ItemsControl Grid.Column="0" Name="FeatureControl" ItemsSource="{Binding ElementName=root,Path=Evidence.Items}">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*"/>
+            <ColumnDefinition Width="4*"/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Column="0" Content="{Binding ElementName=root,Path=Label}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="5"/>
+        
+        <ItemsControl Grid.Column="1" Name="FeatureControl" ItemsSource="{Binding ElementName=root,Path=Evidence.Items}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"/>

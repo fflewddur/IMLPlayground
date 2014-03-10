@@ -15,10 +15,14 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5*"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" TextWrapping="Wrap" />
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" TextWrapping="Wrap" Margin="5" />
 
-        <local:EvidenceGraph Grid.Row="1" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400">
+        <local:EvidenceGraph Grid.Row="1" Label="{Binding Labels[0]}" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400">
             <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
@@ -30,7 +34,7 @@
             </local:EvidenceGraph.Evidence>
         </local:EvidenceGraph>
 
-        <local:EvidenceGraph Grid.Row="2" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812">
+        <local:EvidenceGraph Grid.Row="2" Label="{Binding Labels[1]}" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812">
             <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
