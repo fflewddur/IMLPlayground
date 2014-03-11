@@ -1,6 +1,7 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LibIML;
 using MessagePredictor.Model;
+using MessagePredictor.View;
 using MessagePredictor.ViewModel;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -229,8 +231,19 @@ namespace MessagePredictor
             Mouse.OverrideCursor = Cursors.Wait;
 
             // Don't do anything if the message already has the desired label
-            if (item.UserLabel == label ||
-                (item.UserLabel == null && label == FolderListVM.UnknownLabel)) {
+            if (item.UserLabel == label || (item.UserLabel == null && label == FolderListVM.UnknownLabel)) {
+                Mouse.OverrideCursor = null;
+                return;
+            }
+
+            // Make sure the user is moving the item to the correct folder
+            if (label != FolderListVM.UnknownLabel && label != item.GroundTruthLabel) {
+                Mouse.OverrideCursor = null;
+                Dialog d = new Dialog();
+                d.DialogTitle = string.Format("Not about {0}", label);
+                d.DialogMessage = string.Format("Sorry, we can't move this message to '{0}' because it's actually about '{1}'.", label, item.GroundTruthLabel);
+                d.Owner = App.Current.MainWindow;
+                d.ShowDialog();
                 return;
             }
 

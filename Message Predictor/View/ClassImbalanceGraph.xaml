@@ -27,6 +27,8 @@
                 </MultiBinding>
             </Rectangle.Width>
         </Rectangle>
+        
+        <Label Grid.Column="1" Content="{Binding ElementName=root,Path=Evidence.ClassCount}"></Label>
         <!--<Label Grid.Column="1" Content="{Binding ElementName=root,Path=Evidence.ClassCount}"/>-->
     </Grid>
 </UserControl>

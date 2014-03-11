@@ -161,6 +161,9 @@
       <DependentUpon>CommandBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\Converters.cs" />
+    <Compile Include="View\Dialog.xaml.cs">
+      <DependentUpon>Dialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\DirectionArrow.xaml.cs">
       <DependentUpon>DirectionArrow.xaml</DependentUpon>
     </Compile>
@@ -213,6 +216,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\CommandBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\Dialog.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
