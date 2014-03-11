@@ -12,7 +12,7 @@
             <TabItem Header="Message">
                 <xctk:RichTextBox Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.DocumentReadOnly}" IsReadOnly="True" 
                                   ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                  SelectionChanged="RichTextBox_SelectionChanged">
+                                  SelectionChanged="RichTextBox_SelectionChanged" UseLayoutRounding="True">
                     <xctk:RichTextBox.TextFormatter>
                         <local:MyFormatter />
                     </xctk:RichTextBox.TextFormatter>

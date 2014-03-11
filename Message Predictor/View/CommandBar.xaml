@@ -20,25 +20,14 @@
             </ToggleSwitch:HorizontalToggleSwitch>
             <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center" Name="FileToMenu">
                 <xctk:DropDownButton.DropDownContent>
-                    <Menu ItemsSource="{Binding FolderListVM.Folders}" IsMainMenu="False">
-                        <Menu.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <VirtualizingStackPanel Orientation="Vertical"/>
-                            </ItemsPanelTemplate>
-                        </Menu.ItemsPanel>
-                        <Menu.ItemTemplate>
-                            <ItemContainerTemplate>
-                                <MenuItem Header="{Binding Label}" Click="LabelMessage_Click" 
-                                          Command="{Binding Path=DataContext.LabelMessage, ElementName=FileToMenu}" CommandParameter="{Binding Label}">
-                                </MenuItem>
-                            </ItemContainerTemplate>
-                        </Menu.ItemTemplate>
-                    </Menu>
-                    <!--<StackPanel Orientation="Vertical">
-                        <MenuItem Header="{Binding Folders[0].Label}" Command="{Binding FileToUnknown}" Click="FileToFolder_Click"/>
-                        <MenuItem Header="{Binding Topic1UserLabel}" Command="{Binding FileToTopic1}" Click="FileToFolder_Click"/>
-                        <MenuItem Header="{Binding Topic2UserLabel}" Command="{Binding FileToTopic2}" Click="FileToFolder_Click"/>
-                    </StackPanel>-->
+                    <StackPanel Orientation="Vertical">
+                        <MenuItem Header="{Binding FolderListVM.Folders[0].Label}" Click="LabelMessage_Click" 
+                                  Command="{Binding LabelMessage}" CommandParameter="{Binding FolderListVM.Folders[0].Label}" />
+                        <MenuItem Header="{Binding FolderListVM.Folders[1].Label}" Click="LabelMessage_Click"
+                                  Command="{Binding LabelMessage}" CommandParameter="{Binding FolderListVM.Folders[1].Label}"/>
+                        <MenuItem Header="{Binding FolderListVM.Folders[2].Label}" Click="LabelMessage_Click"
+                                  Command="{Binding LabelMessage}" CommandParameter="{Binding FolderListVM.Folders[2].Label}"/>
+                    </StackPanel>
                 </xctk:DropDownButton.DropDownContent>
                 <TextBlock TextAlignment="Center">Move message<LineBreak />to folder&#x2026;</TextBlock>
             </xctk:DropDownButton>
