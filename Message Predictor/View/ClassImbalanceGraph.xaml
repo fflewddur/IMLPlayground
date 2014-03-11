@@ -8,15 +8,9 @@
              Name="root"
              d:DesignHeight="150" d:DesignWidth="300">
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
-        
-        <Label Grid.Column="0" Content="{Binding ElementName=root,Path=Label}" ContentStringFormat="{}{0}:" MinWidth="70" HorizontalAlignment="Right"/>
-        
-        <Rectangle Grid.Column="1" HorizontalAlignment="Left" Fill="{Binding ElementName=root,Path=GraphColor}" Height="15">
-            <Rectangle.Width>
+        <Label Content="{Binding ElementName=root,Path=Evidence.ClassCount}" Background="{Binding ElementName=root,Path=GraphColor}" 
+               HorizontalAlignment="Left" HorizontalContentAlignment="Center" Foreground="White">
+            <Label.Width>
                 <MultiBinding>
                     <MultiBinding.Converter>
                         <conv:GraphWidthFromCountConverter/>
@@ -25,10 +19,7 @@
                     <Binding Path="Evidence.TotalClassCount" ElementName="root"/>
                     <Binding Path="Width" />
                 </MultiBinding>
-            </Rectangle.Width>
-        </Rectangle>
-        
-        <Label Grid.Column="1" Content="{Binding ElementName=root,Path=Evidence.ClassCount}"></Label>
-        <!--<Label Grid.Column="1" Content="{Binding ElementName=root,Path=Evidence.ClassCount}"/>-->
+            </Label.Width>
+        </Label>
     </Grid>
 </UserControl>

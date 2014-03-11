@@ -29,8 +29,9 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
-                                   PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" />
-                        <Rectangle Grid.Row="1" Width="20" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" />
+                                   PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" />
+                        <Rectangle Grid.Row="1" Width="20" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" 
+                                   SnapsToDevicePixels="True"/>
                         <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>

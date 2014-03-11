@@ -15,15 +15,23 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="5*"/>
-            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" TextWrapping="Wrap" Margin="5" />
+        <Label Grid.Row="0" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step one:</Label>
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" 
+                   TextWrapping="Wrap" Margin="15 0 5 5" />
 
-        <local:EvidenceGraph Grid.Row="1" Label="{Binding Labels[0]}" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400">
+        <Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+               Margin="15 0 5 5"/>
+        <local:EvidenceGraph Grid.Row="2" Grid.Column="1" Label="{Binding Labels[0]}" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400"
+                             Margin="5 0 5 5">
             <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
@@ -35,7 +43,10 @@
             </local:EvidenceGraph.Evidence>
         </local:EvidenceGraph>
 
-        <local:EvidenceGraph Grid.Row="2" Label="{Binding Labels[1]}" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812">
+        <Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+               Margin="15 0 5 5"/>
+        <local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812"
+                             Margin="5 0 5 5">
             <local:EvidenceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
@@ -47,31 +58,38 @@
             </local:EvidenceGraph.Evidence>
         </local:EvidenceGraph>
 
-        <local:ClassImbalanceGraph Grid.Row="3" Label="{Binding Labels[0]}" GraphColor="#FFB66400">
-            <local:ClassImbalanceGraph.Evidence>
-                <MultiBinding>
-                    <MultiBinding.Converter>
-                        <conv:DictionaryItemFromLabelConverter/>
-                    </MultiBinding.Converter>
-                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
-                    <Binding Path="Labels[0]"/>
-                </MultiBinding>
-            </local:ClassImbalanceGraph.Evidence>
-        </local:ClassImbalanceGraph>
-
-        <local:ClassImbalanceGraph Grid.Row="4" Label="{Binding Labels[1]}" GraphColor="#FF127812">
-            <local:ClassImbalanceGraph.Evidence>
-                <MultiBinding>
-                    <MultiBinding.Converter>
-                        <conv:DictionaryItemFromLabelConverter/>
-                    </MultiBinding.Converter>
-                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
-                    <Binding Path="Labels[1]"/>
-                </MultiBinding>
-            </local:ClassImbalanceGraph.Evidence>
-        </local:ClassImbalanceGraph>
-
+        <Label Grid.Row="4" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step two:</Label>
         
-        <Label Grid.Row="5" Content="Pie chart will go here."/>
+        <Label Grid.Row="5" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+               HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+        <local:ClassImbalanceGraph Grid.Row="5" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0 5 5 0">
+            <local:ClassImbalanceGraph.Evidence>
+                <MultiBinding>
+                    <MultiBinding.Converter>
+                        <conv:DictionaryItemFromLabelConverter/>
+                    </MultiBinding.Converter>
+                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                    <Binding Path="Labels[0]"/>
+                </MultiBinding>
+            </local:ClassImbalanceGraph.Evidence>
+        </local:ClassImbalanceGraph>
+
+        <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+               HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
+        <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0 5 5 0">
+            <local:ClassImbalanceGraph.Evidence>
+                <MultiBinding>
+                    <MultiBinding.Converter>
+                        <conv:DictionaryItemFromLabelConverter/>
+                    </MultiBinding.Converter>
+                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                    <Binding Path="Labels[1]"/>
+                </MultiBinding>
+            </local:ClassImbalanceGraph.Evidence>
+        </local:ClassImbalanceGraph>
+
+        <Label Grid.Row="7" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step three:</Label>
+        
+        <Label Grid.Row="8" Grid.Column="1" Content="Pie chart will go here."/>
     </Grid>
 </UserControl>
