@@ -26,14 +26,14 @@ namespace MessagePredictor.View
     {
         private double _mouseOrigY;
         private Feature _currentFeature;
-        private bool _editingUnusedWeight;
+        //private bool _editingUnusedWeight;
 
         public FeatureGraph()
         {
             InitializeComponent();
-            _editingUnusedWeight = false;
-            UnusedWeight = Feature.MINIMUM_HEIGHT;
-            GraphColorSystem = Brushes.Red;
+            //_editingUnusedWeight = false;
+            //UnusedWeight = Feature.MINIMUM_HEIGHT;
+            GraphColorSystem = Brushes.Red; // Be obvious that we're using default values
             GraphColorUser = Brushes.Pink;
         }
 
@@ -48,14 +48,14 @@ namespace MessagePredictor.View
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(FeatureGraph));
 
-        public double UnusedWeight
-        {
-            get { return (double)GetValue(UnusedWeightProperty); }
-            set { SetValue(UnusedWeightProperty, value); }
-        }
+        //public double UnusedWeight
+        //{
+        //    get { return (double)GetValue(UnusedWeightProperty); }
+        //    set { SetValue(UnusedWeightProperty, value); }
+        //}
 
-        public static readonly DependencyProperty UnusedWeightProperty =
-            DependencyProperty.Register("UnusedWeight", typeof(double), typeof(FeatureGraph));
+        //public static readonly DependencyProperty UnusedWeightProperty =
+        //    DependencyProperty.Register("UnusedWeight", typeof(double), typeof(FeatureGraph));
 
         public Brush GraphColorUser
         {
@@ -94,11 +94,12 @@ namespace MessagePredictor.View
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
-                bool apply = (UnusedWeight == Feature.MINIMUM_HEIGHT);
-                if (delta > (UnusedWeight - Feature.MINIMUM_HEIGHT)) {
-                    delta = (UnusedWeight - Feature.MINIMUM_HEIGHT);
-                }
-                UnusedWeight -= vm.AdjustUserFeatureHeight(_currentFeature, delta, apply);
+                //bool apply = (UnusedWeight == Feature.MINIMUM_HEIGHT);
+                //if (delta > (UnusedWeight - Feature.MINIMUM_HEIGHT)) {
+                //    delta = (UnusedWeight - Feature.MINIMUM_HEIGHT);
+                //}
+                //UnusedWeight -= vm.AdjustUserFeatureHeight(_currentFeature, delta, apply);
+                vm.AdjustUserFeatureHeight(_currentFeature, delta);
                 _mouseOrigY = y;
 
                 //Console.WriteLine("Dragging {0}", delta);
@@ -116,44 +117,54 @@ namespace MessagePredictor.View
 
         private void Rectangle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
+            StopAdjustingFeature();
+        }
+
+        private void Grid_MouseLeave(object sender, MouseEventArgs e)
+        {
+            StopAdjustingFeature();
+        }
+
+        private void StopAdjustingFeature()
+        {
             _mouseOrigY = -1;
             _currentFeature = null;
             Mouse.OverrideCursor = null;
         }
 
-        private void UnusedWeight_PreviewMouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed && _editingUnusedWeight && _mouseOrigY >= 0) {
-                FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
-                double y = e.GetPosition(this).Y;
-                double delta = _mouseOrigY - y;
-                // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
-                if (UnusedWeight + delta < Feature.MINIMUM_HEIGHT) {
-                    UnusedWeight = Feature.MINIMUM_HEIGHT;
-                }
-                else {
-                    UnusedWeight += delta;
-                }
-                _mouseOrigY = y;
+        //private void UnusedWeight_PreviewMouseMove(object sender, MouseEventArgs e)
+        //{
+        //    if (e.LeftButton == MouseButtonState.Pressed && _editingUnusedWeight && _mouseOrigY >= 0) {
+        //        FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+        //        double y = e.GetPosition(this).Y;
+        //        double delta = _mouseOrigY - y;
+        //        // FIXME We should probably base our PIXELS_TO_WEIGHT value on the height of the graph
+        //        if (UnusedWeight + delta < Feature.MINIMUM_HEIGHT) {
+        //            UnusedWeight = Feature.MINIMUM_HEIGHT;
+        //        }
+        //        else {
+        //            UnusedWeight += delta;
+        //        }
+        //        _mouseOrigY = y;
 
-                //Console.WriteLine("Dragging {0}", delta);
-            }
-        }
+        //        //Console.WriteLine("Dragging {0}", delta);
+        //    }
+        //}
 
-        private void UnusedWeight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            _mouseOrigY = e.GetPosition(this).Y;
-            FrameworkElement fe = sender as FrameworkElement;
-            _editingUnusedWeight = true;
-            Mouse.OverrideCursor = Cursors.SizeNS;
-        }
+        //private void UnusedWeight_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    _mouseOrigY = e.GetPosition(this).Y;
+        //    FrameworkElement fe = sender as FrameworkElement;
+        //    _editingUnusedWeight = true;
+        //    Mouse.OverrideCursor = Cursors.SizeNS;
+        //}
 
-        private void UnusedWeight_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            _mouseOrigY = -1;
-            _editingUnusedWeight = false;
-            Mouse.OverrideCursor = null;
-        }
+        //private void UnusedWeight_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    _mouseOrigY = -1;
+        //    _editingUnusedWeight = false;
+        //    Mouse.OverrideCursor = null;
+        //}
 
         private void Remove_Click(object sender, RoutedEventArgs e)
         {

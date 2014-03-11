@@ -222,7 +222,7 @@ namespace MessagePredictor.ViewModel
             OnFeatureRemoved(new EventArgs());
         }
 
-        public double AdjustUserFeatureHeight(Feature feature, double heightDelta, bool apply)
+        public double AdjustUserFeatureHeight(Feature feature, double heightDelta)
         {
             if (feature.UserHeight + heightDelta < Feature.MINIMUM_HEIGHT) {
                 heightDelta = -1 * (feature.UserHeight - Feature.MINIMUM_HEIGHT);

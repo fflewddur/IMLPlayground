@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              Name="root"
              d:DesignHeight="300" d:DesignWidth="300">
-    <Grid Margin="10">
+    <Grid Margin="10" MouseLeave="Grid_MouseLeave" Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto"/>
@@ -57,7 +57,7 @@
         </ItemsControl>
 
         <!-- Unused weight -->
-        <Grid Grid.Column="1" PreviewMouseMove="UnusedWeight_PreviewMouseMove" PreviewMouseLeftButtonUp="UnusedWeight_PreviewMouseLeftButtonUp" Background="Transparent">
+        <!--<Grid Grid.Column="1" PreviewMouseMove="UnusedWeight_PreviewMouseMove" PreviewMouseLeftButtonUp="UnusedWeight_PreviewMouseLeftButtonUp" Background="Transparent">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
@@ -65,7 +65,7 @@
             <Rectangle Grid.Row="0" Width="20" Height="{Binding UnusedWeight,ElementName=root}" Fill="{Binding GraphColorUser,ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
                                    PreviewMouseLeftButtonDown="UnusedWeight_PreviewMouseLeftButtonDown" />
             <TextBlock Grid.Row="2" Text="Unused" Margin="0 20 0 0"/>
-        </Grid>
+        </Grid>-->
 
         <Grid Grid.Column="2" VerticalAlignment="Center">
             <Grid.RowDefinitions>
