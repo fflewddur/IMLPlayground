@@ -288,9 +288,16 @@ namespace LibIML
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
             int importantWordsUnique = 0; // how many of the features show up in the message?
             int importantWordsTotal = 0; // how many instances of features show up in the message?
+            int trainingSetSize = 0;
+            foreach (Label l in Labels) {
+                trainingSetSize += _trainingSet[l].Count;
+            }
+
             foreach (Label l in Labels) {
                 Evidence evidence = new Evidence(); // Store our evidence in favor of each class
                 evidence.ClassPr = _pClass[l];
+                evidence.ClassCount = _trainingSet[l].Count;
+                evidence.TotalClassCount = trainingSetSize;
                 double prob = 0;
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                     double pWord;

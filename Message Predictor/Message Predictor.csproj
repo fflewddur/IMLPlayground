@@ -154,6 +154,9 @@
     <Compile Include="View\AddFeatureDialog.xaml.cs">
       <DependentUpon>AddFeatureDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\ClassImbalanceGraph.xaml.cs">
+      <DependentUpon>ClassImbalanceGraph.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\CommandBar.xaml.cs">
       <DependentUpon>CommandBar.xaml</DependentUpon>
     </Compile>
@@ -202,6 +205,10 @@
       <DependentUpon>PredictionOverview.xaml</DependentUpon>
     </Compile>
     <Page Include="View\AddFeatureDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ClassImbalanceGraph.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

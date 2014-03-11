@@ -80,5 +80,28 @@ namespace MessagePredictor.Converters
             throw new NotSupportedException();
         }
     }
+
+    public class GraphWidthFromCountConverter : IMultiValueConverter
+    {
+        public object Convert(object[] values, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            if (values != null && values.Length >= 3) {
+                var count = values[0] as int?;
+                var totalCount = values[1] as int?;
+                var maxWidth = values[2] as int?;
+                //Console.WriteLine("count={0} totalCount={1} maxWidth={2}", count, totalCount, maxWidth);
+                maxWidth = 300; // FIXME hardcode this for now
+                if (count != null && totalCount != null) {
+                    return (count / (double)totalCount) * maxWidth;
+                }
+            }
+            return Binding.DoNothing;
+        }
+
+        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, System.Globalization.CultureInfo culture)
+        {
+            throw new NotSupportedException();
+        }
+    }
 }
 

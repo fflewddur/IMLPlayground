@@ -9,14 +9,18 @@ namespace LibIML
 {
     public class Evidence : ViewModelBase
     {
-        public List<Feature> _items;
-        public double _classPr;
-        public double _confidence;
+        private List<Feature> _items;
+        private int _classCount;
+        private int _totalClassCount;
+        private double _classPr;
+        private double _confidence;
 
         public Evidence()
         {
             Confidence = -1;
             ClassPr = -1;
+            ClassCount = -1;
+            TotalClassCount = -1;
             Items = new List<Feature>();
         }
 
@@ -32,6 +36,18 @@ namespace LibIML
         {
             get { return _classPr; }
             set { SetProperty<double>(ref _classPr, value); }
+        }
+
+        public int ClassCount
+        {
+            get { return _classCount; }
+            set { SetProperty<int>(ref _classCount, value); }
+        }
+
+        public int TotalClassCount
+        {
+            get { return _totalClassCount; }
+            set { SetProperty<int>(ref _totalClassCount, value); }
         }
 
         public double Confidence
