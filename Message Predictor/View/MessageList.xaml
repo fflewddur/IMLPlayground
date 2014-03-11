@@ -18,6 +18,11 @@
                   SelectedItem="{Binding FolderListVM.SelectedFolder.SelectedMessage}" 
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
                   SelectionUnit="FullRow" GridLinesVisibility="Horizontal" ScrollViewer.VerticalScrollBarVisibility="Visible">
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderThickness" Value="0"/>
+                </Style>
+            </DataGrid.CellStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="auto" SortDirection="Ascending" />
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="6*"/>
