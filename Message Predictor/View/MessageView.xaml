@@ -9,7 +9,7 @@
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <TabControl>
-            <TabItem Header="Message">
+            <TabItem Header="Message" Style="{StaticResource ResourceKey=tabItemStyle}">
                 <xctk:RichTextBox Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.DocumentReadOnly}" IsReadOnly="True" 
                                   ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                   SelectionChanged="RichTextBox_SelectionChanged" UseLayoutRounding="True">
@@ -18,7 +18,10 @@
                     </xctk:RichTextBox.TextFormatter>
                 </xctk:RichTextBox>
             </TabItem>
-            <TabItem Header="Explanation">
+            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
+                <TabItem.Header>
+                    <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.Label}" ContentStringFormat="Why '{0}'?"></Label>
+                </TabItem.Header>
                 <local:PredictionExplanation/>
                 <!--<Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction}" />-->
             </TabItem>
