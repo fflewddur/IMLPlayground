@@ -10,10 +10,12 @@ namespace LibIML
     public class Evidence : ViewModelBase
     {
         private List<Feature> _items;
-        private int _classCount;
-        private int _totalClassCount;
-        private double _classPr;
-        private double _confidence;
+        private int _classCount; // Number of training set instances with this label
+        private int _totalClassCount; // Total number of training set instances
+        private double _classPr; // Probability of a given item belonging to this class
+        private double _confidence; // Classifier's confidence in this label being correct
+        private double _featureWeight; // Sum of feature weights * feature count for this label
+        private double _pDoc; // Probability of this document
 
         public Evidence()
         {
@@ -56,6 +58,18 @@ namespace LibIML
             set { SetProperty<double>(ref _confidence, value); }
         }
 
+        public double FeatureWeight
+        {
+            get { return _featureWeight; }
+            set { SetProperty<double>(ref _featureWeight, value); }
+        }
+
+        public double PrDoc
+        {
+            get { return _pDoc; }
+            set { SetProperty<double>(ref _pDoc, value); }
+        }
+
         #endregion
 
         #region Override methods
@@ -66,8 +80,10 @@ namespace LibIML
 
             sb.AppendFormat("Confidence={0:N2} ", Confidence);
             sb.AppendFormat("ClassPr={0:N2} ", ClassPr);
+            sb.AppendFormat("PrDoc={0} ", PrDoc);
             foreach (Feature item in Items) {
-                sb.AppendFormat("{0}={1}*({2:N4}+{3:N4}) ", item.Characters, item.Count, item.SystemWeight, item.UserWeight);
+                sb.AppendFormat("{0}={4:N4} ({1}*({2:N4}+{3:N4})) ", item.Characters, item.Count, item.SystemWeight, item.UserWeight, 
+                    item.Count * (item.SystemWeight + item.UserWeight));
             }
 
             return sb.ToString();

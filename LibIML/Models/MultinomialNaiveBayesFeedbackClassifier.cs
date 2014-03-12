@@ -309,18 +309,17 @@ namespace LibIML
                         string word = _vocab.GetWord(pair.Key);
                         TryGetFeatureUserWeight(pair.Key, l, out userWeight);
                         TryGetFeatureSystemWeight(pair.Key, l, out sysWeight);
-                        //EvidenceItem ei = new EvidenceItem(word, pair.Key, (int)pair.Value, sysWeight, userWeight);
                         Feature f = new Feature(word, l, (int)pair.Value, sysWeight, userWeight);
                         evidence.Items.Add(f);
                         //Console.WriteLine("Feature={3}, weight={0}, userWeight={1}, sysWeight={2}", weight, userWeight, sysWeight, word);
                         prob += Math.Log(weight);
-                        //evidence.Weights[pair.Key] = weight;
                     }
                 }
                 pDocGivenClass[l] = Math.Exp(prob);
+                //evidence.FeatureWeight = pDocGivenClass[l];
                 prediction.EvidencePerClass[l] = evidence;
             }
-            prediction.UpdatePrDescriptions();
+            
             // We increment these for each label, so normalize them by the number of labels.
             prediction.ImportantWordTotal = importantWordsTotal / Labels.Count();
             prediction.ImportantWordUniques = importantWordsUnique / Labels.Count();
@@ -336,6 +335,8 @@ namespace LibIML
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
             foreach (Label l in Labels) {
                 pClassGivenDoc[l] = (_pClass[l] * pDocGivenClass[l]) / pDoc; // For log likelihood, with normalization
+                prediction.EvidencePerClass[l].PrDoc = pDoc;
+                prediction.EvidencePerClass[l].FeatureWeight = pDocGivenClass[l];
             }
 
             // Find the class with the highest probability for this document
@@ -354,7 +355,7 @@ namespace LibIML
 
             prediction.Label = label;
             prediction.Confidence = prediction.EvidencePerClass[label].Confidence;
-
+            prediction.UpdatePrDescriptions();
             return prediction;
         }
 

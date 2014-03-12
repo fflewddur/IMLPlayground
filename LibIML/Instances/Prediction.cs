@@ -90,32 +90,51 @@ namespace LibIML
         /// </summary>
         public void UpdatePrDescriptions()
         {
-            int smallest = int.MaxValue, largest = int.MinValue;
-            Label smallestLabel = null;
-            Label largestLabel = null;
+            // Figure out values for ClassPrDesc and FeaturePrDesc
+            int smallestCount = int.MaxValue, largestCount = int.MinValue;
+            double smallestWeight = double.MaxValue, largestWeight = double.MinValue;
+            Label smallestCountLabel = null, smallestWeightLabel = null, largestCountLabel = null, largestWeightLabel = null;
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
-                if (pair.Value.ClassCount <= smallest) {
-                    smallest = pair.Value.ClassCount;
-                    smallestLabel = pair.Key;
+                if (pair.Value.ClassCount <= smallestCount) {
+                    smallestCount = pair.Value.ClassCount;
+                    smallestCountLabel = pair.Key;
                 }
-                if (pair.Value.ClassCount > largest) {
-                    largest = pair.Value.ClassCount;
-                    largestLabel = pair.Key;
+                if (pair.Value.ClassCount > largestCount) {
+                    largestCount = pair.Value.ClassCount;
+                    largestCountLabel = pair.Key;
+                }
+                if (pair.Value.FeatureWeight <= smallestWeight) {
+                    smallestWeight = pair.Value.FeatureWeight;
+                    smallestWeightLabel = pair.Key;
+                }
+                if (pair.Value.FeatureWeight > largestWeight) {
+                    largestWeight = pair.Value.FeatureWeight;
+                    largestWeightLabel = pair.Key;
                 }
             }
 
             // Build ClassPrDesc
             StringBuilder sb = new StringBuilder();
-            string comparison = "more likely than";
-            if (smallest == largest) {
-                comparison = "equally likely as";
+            if (smallestCount == largestCount) {
+                sb.AppendFormat("There are an equal number of messages in each folder, so the computer thinks each Unknown message is equally likely to be about {0} or {1}.",
+                    largestCountLabel, smallestCountLabel);
+            } else {
+                double ratio = Math.Round(largestCount / (double)smallestCount, 1);
+                sb.AppendFormat("There are {0:N1} times more messages in the {1} folder than the {2} folder, so the computer thinks each Unknonw message is {0:N1} times more likely to be about {1} than {2}.",
+                    ratio, largestCountLabel.ToString(), smallestCountLabel.ToString());
             }
-            sb.AppendFormat("There are {0} messages in the {1} folder vs. {2} messages in the {3} folder, so the computer thinks {1} messages are {4} {3} messages.",
-                largest, largestLabel.ToString(), smallest, smallestLabel.ToString(), comparison);
             ClassPrDesc = sb.ToString();
 
             // Build FeaturePrDesc
             sb.Clear();
+            if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
+                sb.AppendFormat("The area of the {0} bars equals the area of the {1} bars, so the computer thinks this message is equally likely to be either. ({2} vs {3})",
+                    largestWeightLabel, smallestWeightLabel, largestWeight, smallestWeight);
+            } else {
+                double ratio = Math.Round(largestWeight / smallestWeight, 1);
+                sb.AppendFormat("The area of the {0} bars is {1:N1} times larger than the {2} bars, so the computer thinks this message is {1:N1} times more likely to be about {0} than {2}. ({3} vs {4})",
+                    largestWeightLabel, ratio, smallestWeightLabel, largestWeight, smallestWeight);
+            }
             FeaturePrDesc = sb.ToString();
         }
 
@@ -151,7 +170,7 @@ namespace LibIML
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-
+            
             sb.AppendFormat("Predicted label is {0}\n", Label);
             foreach (KeyValuePair<Label, Evidence> pair in EvidencePerClass)
             {

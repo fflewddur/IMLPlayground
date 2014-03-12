@@ -7,8 +7,10 @@
              xmlns:local="clr-namespace:MessagePredictor.View" 
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
+    <ScrollViewer>
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -59,9 +61,8 @@
                 </MultiBinding>
             </local:EvidenceGraph.Evidence>
         </local:EvidenceGraph>
-        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 0 15 5" TextWrapping="Wrap">
-            The area of the ___ bars is ___ larger than the ___ bars, so the computer starts off thinking this message is ___ more likely to be about ___ than ___.
-        </TextBlock>
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 0 15 5" TextWrapping="Wrap" 
+                   Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.FeaturePrDesc, Mode=OneWay}" />
 
         <Label Grid.Row="5" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step two:</Label>
 
@@ -100,5 +101,7 @@
         <Label Grid.Row="9" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step three:</Label>
 
         <Label Grid.Row="10" Grid.Column="1" Content="Pie chart will go here."/>
+        <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction, Mode=OneWay}" TextWrapping="Wrap"></TextBlock>
     </Grid>
+    </ScrollViewer>
 </UserControl>
