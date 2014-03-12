@@ -8,6 +8,7 @@
         ResizeMode="CanResizeWithGrip" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow"
+        Style="{StaticResource ResourceKey=windowStyle}"
         FocusManager.FocusedElement="{Binding ElementName=PhraseTextBox}">
     <Grid Margin="10">
         <Grid.RowDefinitions>

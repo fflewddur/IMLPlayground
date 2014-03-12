@@ -5,6 +5,7 @@
         xmlns:local="clr-namespace:MessagePredictor.View" 
         WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow"
+        Style="{StaticResource ResourceKey=windowStyle}"
         Title="MessageWindow"
         Height="700" Width="700">
     <Grid>

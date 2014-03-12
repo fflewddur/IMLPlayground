@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="{Binding DialogTitle,ElementName=root}" Height="150" Width="350"
         WindowStartupLocation="CenterOwner"
+        Style="{StaticResource ResourceKey=windowStyle}"
         SizeToContent="Height"
         Name="root">
     <Grid Margin="10">

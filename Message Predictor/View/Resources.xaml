@@ -9,25 +9,30 @@
     <conv:StringFormatConverter x:Key="convStringFormat" />
     <conv:LabelToBoolConverter x:Key="convLabelToBool" />
     
+    <Style x:Key="windowStyle" TargetType="Window">
+        <Setter Property="FontFamily" Value="Sego UI" />
+        <Setter Property="FontSize" Value="14" />
+    </Style>
+    
     <Style x:Key="headerStyle1">
-        <Setter Property="Control.FontSize" Value="16" />
+        <Setter Property="Control.FontSize" Value="18" />
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
         <Setter Property="Control.Margin" Value="0 10 0 0" />
     </Style>
     <Style x:Key="headerStyle2">
-        <Setter Property="Control.FontSize" Value="13" />
+        <Setter Property="Control.FontSize" Value="15" />
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
         <Setter Property="TextBlock.TextAlignment" Value="Center"/>
     </Style>
     <Style x:Key="headerStyle3">
-        <Setter Property="Control.FontSize" Value="13" />
+        <Setter Property="Control.FontSize" Value="15" />
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
         <Setter Property="TextBlock.TextAlignment" Value="Center"/>
         <Setter Property="TextBlock.Margin" Value="0"/>
     </Style>
     <Style x:Key="contentStyle">
-        <Setter Property="Control.FontSize" Value="12" />
-        <Setter Property="Control.FontFamily" Value="Segoe UI" />
+        <!--<Setter Property="Control.FontSize" Value="12" />-->
+        <!--<Setter Property="Control.FontFamily" Value="Segoe UI" />-->
     </Style>
     <Style x:Key="buttonStyle">
         <Setter Property="Control.Padding" Value="10 5" />
@@ -35,7 +40,7 @@
         <Setter Property="Control.MinWidth" Value="40" />
     </Style>
     <Style x:Key="headerStyleDialog">
-        <Setter Property="Control.FontSize" Value="14"/>
+        <Setter Property="Control.FontSize" Value="15"/>
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
         <Setter Property="Control.Margin" Value="0 0 0 10"/>
     </Style>
