@@ -38,8 +38,14 @@
         </Grid.ColumnDefinitions>
 
         <!-- Topic labels-->
-        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/><Run>to </Run><Run Text="{Binding Labels[0], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/></TextBlock>
-        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/><Run>to </Run><Run Text="{Binding Labels[1], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/></TextBlock>
+        <TextBlock Grid.Row="0" Grid.Column="0" Margin="5" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/>
+            <Run>to </Run><Run Text="{Binding Labels[0], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/><LineBreak/>
+            <Run>than </Run><Run Text="{Binding Labels[1], Mode=OneTime}"/>
+        </TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="0" Margin="5" TextAlignment="Right" VerticalAlignment="Center" xml:space="preserve"><Run>More important</Run><LineBreak/>
+            <Run>to </Run><Run Text="{Binding Labels[1], Mode=OneWay}" Style="{StaticResource ResourceKey=headerStyle2}"/><LineBreak/>
+            <Run>than </Run><Run Text="{Binding Labels[0], Mode=OneTime}"/>
+        </TextBlock>
 
         <!-- List of words -->
         <ItemsControl Name="Topic1Features" Grid.Row="0" Grid.Column="1" ItemsSource="{Binding FeatureSetViewSourcesOverview[0].View}" VerticalAlignment="Center" 

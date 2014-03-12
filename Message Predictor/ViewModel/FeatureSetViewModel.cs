@@ -241,9 +241,9 @@ namespace MessagePredictor.ViewModel
             if (e.NewItems == null)
                 return;
 
-            //foreach (Feature f in e.NewItems) {
-            //    Console.WriteLine("new feature: {0} {1}", f, e.Action);
-            //}
+            foreach (Feature f in e.NewItems) {
+                Console.WriteLine("new feature: {0} {1}", f, e.Action);
+            }
         }
 
         private void _featureTextEditedTimer_Tick(object sender, EventArgs e)
@@ -378,7 +378,7 @@ namespace MessagePredictor.ViewModel
             bool? result = dialog.ShowDialog();
             if (result == true) {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
-                Feature f = new Feature(vm.Word.ToLower(), label);
+                Feature f = new Feature(vm.Word.ToLower(), label, true);
                 f.PixelsToWeight = _pixelsToWeight;
                 if (vm.SelectedWeight == vm.Weights[0])
                     f.WeightType = Feature.Weight.High;
@@ -492,6 +492,8 @@ namespace MessagePredictor.ViewModel
                             e.Accepted = false;
                     }
                 };
+                cvs.SortDescriptions.Clear();
+                cvs.SortDescriptions.Add(new System.ComponentModel.SortDescription("Characters", System.ComponentModel.ListSortDirection.Ascending));
                 collectionViewSources.Add(cvs);
             }
 
@@ -515,6 +517,8 @@ namespace MessagePredictor.ViewModel
                             e.Accepted = false;
                     }
                 };
+                cvs.SortDescriptions.Clear();
+                cvs.SortDescriptions.Add(new System.ComponentModel.SortDescription("Characters", System.ComponentModel.ListSortDirection.Ascending));
                 collectionViewSources.Add(cvs);
             }
 

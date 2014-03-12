@@ -28,6 +28,7 @@ namespace LibIML
 
         private string _characters;
         private Label _label;
+        private bool _userAdded;
         private Weight _weightType;
         private double _systemWeight;
         private double _userWeight;
@@ -53,11 +54,14 @@ namespace LibIML
             _systemWeight = 0;
         }
 
-        // We use this constructor for the EvidenceGraphs
-        public Feature(string characters, Label label, int count, double sysWeight, double userWeight) : base()
+        public Feature(string characters, Label label, bool userAdded) : this(characters, label)
         {
-            _characters = characters;
-            _label = label;
+            _userAdded = userAdded;
+        }
+
+        // We use this constructor for the EvidenceGraphs
+        public Feature(string characters, Label label, int count, double sysWeight, double userWeight) : this(characters, label, false)
+        {
             _count = count;
             _userWeight = userWeight;
             _systemWeight = sysWeight;
@@ -76,6 +80,12 @@ namespace LibIML
         {
             get { return _label; }
             private set { _label = Label; }
+        }
+
+        public bool UserAdded
+        {
+            get { return _userAdded; }
+            private set { _userAdded = value; }
         }
 
         public Weight WeightType
