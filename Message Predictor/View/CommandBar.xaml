@@ -21,11 +21,11 @@
             <xctk:DropDownButton Padding="10 5" VerticalContentAlignment="Center" Name="FileToMenu">
                 <xctk:DropDownButton.DropDownContent>
                     <StackPanel Orientation="Vertical">
-                        <MenuItem Header="{Binding FolderListVM.Folders[0].Label}" Click="LabelMessage_Click" 
+                        <MenuItem Header="{Binding FolderListVM.Folders[0].Label}" Click="LabelMessage_Click" Style="{StaticResource ResourceKey=labelMenuItem}"
                                   Command="{Binding LabelMessage}" CommandParameter="{Binding FolderListVM.Folders[0].Label}" />
-                        <MenuItem Header="{Binding FolderListVM.Folders[1].Label}" Click="LabelMessage_Click"
+                        <MenuItem Header="{Binding FolderListVM.Folders[1].Label}" Click="LabelMessage_Click" Style="{StaticResource ResourceKey=labelMenuItem}"
                                   Command="{Binding LabelMessage}" CommandParameter="{Binding FolderListVM.Folders[1].Label}"/>
-                        <MenuItem Header="{Binding FolderListVM.Folders[2].Label}" Click="LabelMessage_Click"
+                        <MenuItem Header="{Binding FolderListVM.Folders[2].Label}" Click="LabelMessage_Click" Style="{StaticResource ResourceKey=labelMenuItem}"
                                   Command="{Binding LabelMessage}" CommandParameter="{Binding FolderListVM.Folders[2].Label}"/>
                     </StackPanel>
                 </xctk:DropDownButton.DropDownContent>

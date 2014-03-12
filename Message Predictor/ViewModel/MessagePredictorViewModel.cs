@@ -233,6 +233,11 @@ namespace MessagePredictor
             // Don't do anything if the message already has the desired label
             if (item.UserLabel == label || (item.UserLabel == null && label == FolderListVM.UnknownLabel)) {
                 Mouse.OverrideCursor = null;
+                Dialog d = new Dialog();
+                d.DialogTitle = string.Format("Already in {0}", label);
+                d.DialogMessage = string.Format("Sorry, we can't move this message to '{0}' because it's already there!", label);
+                d.Owner = App.Current.MainWindow;
+                d.ShowDialog();
                 return;
             }
 

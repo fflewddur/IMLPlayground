@@ -18,6 +18,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -57,12 +59,15 @@
                 </MultiBinding>
             </local:EvidenceGraph.Evidence>
         </local:EvidenceGraph>
+        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 0 15 5" TextWrapping="Wrap">
+            The area of the ___ bars is ___ larger than the ___ bars, so the computer starts off thinking this message is ___ more likely to be about ___ than ___.
+        </TextBlock>
 
-        <Label Grid.Row="4" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step two:</Label>
-        
-        <Label Grid.Row="5" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+        <Label Grid.Row="5" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step two:</Label>
+
+        <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-        <local:ClassImbalanceGraph Grid.Row="5" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0 5 5 0">
+        <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0 5 5 0">
             <local:ClassImbalanceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
@@ -74,9 +79,9 @@
             </local:ClassImbalanceGraph.Evidence>
         </local:ClassImbalanceGraph>
 
-        <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+        <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-        <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0 5 5 0">
+        <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0 5 5 0">
             <local:ClassImbalanceGraph.Evidence>
                 <MultiBinding>
                     <MultiBinding.Converter>
@@ -88,8 +93,12 @@
             </local:ClassImbalanceGraph.Evidence>
         </local:ClassImbalanceGraph>
 
-        <Label Grid.Row="7" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step three:</Label>
-        
-        <Label Grid.Row="8" Grid.Column="1" Content="Pie chart will go here."/>
+        <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 10 15 5" TextWrapping="Wrap" 
+                   Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ClassPrDesc, Mode=OneWay}">
+        </TextBlock>
+
+        <Label Grid.Row="9" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step three:</Label>
+
+        <Label Grid.Row="10" Grid.Column="1" Content="Pie chart will go here."/>
     </Grid>
 </UserControl>

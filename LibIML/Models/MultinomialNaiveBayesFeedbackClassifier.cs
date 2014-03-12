@@ -320,6 +320,7 @@ namespace LibIML
                 pDocGivenClass[l] = Math.Exp(prob);
                 prediction.EvidencePerClass[l] = evidence;
             }
+            prediction.UpdatePrDescriptions();
             // We increment these for each label, so normalize them by the number of labels.
             prediction.ImportantWordTotal = importantWordsTotal / Labels.Count();
             prediction.ImportantWordUniques = importantWordsUnique / Labels.Count();
