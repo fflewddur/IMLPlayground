@@ -298,6 +298,8 @@ namespace LibIML
             sb.Append("There ");
             if (ImportantWordUniques == 1) {
                 sb.Append("is 1 important word");
+            } else if (_importantWordUniques == 0) {
+                sb.Append("are no important words");
             } else {
                 sb.AppendFormat("are {0} important words", ImportantWordUniques);
             }

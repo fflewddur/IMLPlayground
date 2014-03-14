@@ -127,6 +127,17 @@
     
     <!-- End message list -->
     
+    <!-- Prediction explanation -->
+    <Style x:Key="hideIfNoFeatures">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordUniques}" Value="0">
+                <Setter Property="Control.Visibility" Value="Collapsed" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+    
+    <!-- End Prediction explanation -->
+    
     <!-- Heat map -->
 
     <Style x:Key="heatMapHeaderStyle" TargetType="TextBlock">
