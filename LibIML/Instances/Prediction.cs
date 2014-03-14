@@ -131,12 +131,12 @@ namespace LibIML
             // Build FeaturePrDesc
             sb.Clear();
             if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
-                sb.AppendFormat("The area of the {0} bars equals the area of the {1} bars, so the computer thinks this message is equally likely to be either. ({2} vs {3})",
-                    largestWeightLabel, smallestWeightLabel, largestWeight, smallestWeight);
+                sb.AppendFormat("The area of the {0} bars equals the area of the {1} bars, so the computer thinks this message is equally likely to be either",
+                    largestWeightLabel, smallestWeightLabel);
             } else {
                 double ratio = Math.Round(largestWeight / smallestWeight, 1);
-                sb.AppendFormat("The area of the {0} bars is {1:N1} times larger than the {2} bars, so the computer thinks this message is {1:N1} times more likely to be about {0} than {2}. ({3} vs {4})",
-                    largestWeightLabel, ratio, smallestWeightLabel, largestWeight, smallestWeight);
+                sb.AppendFormat("The area of the {0} bars is {1:N1} times larger than the {2} bars, so the computer thinks this message is {1:N1} times more likely to be about {0} than {2}.",
+                    largestWeightLabel, ratio, smallestWeightLabel);
             }
             FeaturePrDesc = sb.ToString();
         }
@@ -193,11 +193,12 @@ namespace LibIML
                 heightAdjustmentRatio = MIN_HEIGHT / highestHeight;
             }
 
+            // Make sure each bar is at least 2px tall
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
                 foreach (Feature f in pair.Value.EvidenceItems) {
                     f.SystemWeight = f.SystemWeight * heightAdjustmentRatio;
-                    if ((f.SystemWeight * f.PixelsToWeight) < 1) {
-                        f.SystemWeight = 1 / f.PixelsToWeight;
+                    if ((f.SystemWeight * f.PixelsToWeight) < 2) {
+                        f.SystemWeight = 2 / f.PixelsToWeight;
                     }
                 }
             }
