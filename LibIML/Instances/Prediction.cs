@@ -23,6 +23,7 @@ namespace LibIML
         private string _featurePrDesc; // Describe how feature probability influenced this prediction
         private System.Windows.Point _confidencePiePoint; // Where should the smaller confidence arc end?
         private bool _confidencePieLarge; // Is the pie slice more or less than 50%?
+        private string _confidenceDesc;
 
         public Prediction()
         {
@@ -102,6 +103,12 @@ namespace LibIML
             private set { SetProperty<bool>(ref _confidencePieLarge, value); }
         }
 
+        public string ConfidenceDesc
+        {
+            get { return _confidenceDesc; }
+            private set { SetProperty<string>(ref _confidenceDesc, value); }
+        }
+
         #endregion
 
         /// <summary>
@@ -111,8 +118,10 @@ namespace LibIML
         {
             // Figure out values for ClassPrDesc and FeaturePrDesc
             int smallestCount = int.MaxValue, largestCount = int.MinValue;
-            double smallestWeight = double.MaxValue, largestWeight = double.MinValue;
-            Label smallestCountLabel = null, smallestWeightLabel = null, largestCountLabel = null, largestWeightLabel = null;
+            double smallestWeight = double.MaxValue, largestWeight = double.MinValue, 
+                smallestConf = double.MaxValue, largestConf = double.MinValue;
+            Label smallestCountLabel = null, smallestWeightLabel = null, smallestConfLabel = null, 
+                largestCountLabel = null, largestWeightLabel = null, largestConfLabel = null;
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
                 if (pair.Value.InstanceCount <= smallestCount) {
                     smallestCount = pair.Value.InstanceCount;
@@ -129,6 +138,14 @@ namespace LibIML
                 if (pair.Value.PrDocGivenClass > largestWeight) {
                     largestWeight = pair.Value.PrDocGivenClass;
                     largestWeightLabel = pair.Key;
+                }
+                if (pair.Value.Confidence <= smallestConf) {
+                    smallestConf = pair.Value.Confidence;
+                    smallestConfLabel = pair.Key;
+                }
+                if (pair.Value.Confidence > largestConf) {
+                    largestConf = pair.Value.Confidence;
+                    largestConfLabel = pair.Key;
                 }
             }
 
@@ -147,7 +164,7 @@ namespace LibIML
             // Build FeaturePrDesc
             sb.Clear();
             if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
-                sb.AppendFormat("Because the area of the {0} bars equals the area of the {1} bars, the computer thinks this message is equally likely to be either",
+                sb.AppendFormat("Because the area of the {0} bars equals the area of the {1} bars, the computer thinks this message is equally likely to be about either.",
                     largestWeightLabel, smallestWeightLabel);
             } else {
                 double ratio = Math.Round(largestWeight / smallestWeight, 1);
@@ -169,6 +186,44 @@ namespace LibIML
                     largestWeightLabel, ratioDesc, smallestWeightLabel);
             }
             FeaturePrDesc = sb.ToString();
+
+            // Also update data for our confidence pie chart
+            foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
+                // FIXME Yeah, this is a hack and won't work with different labels.
+                if (pair.Key.UserLabel == "Baseball") {
+                    // Subtract 90 to rotate the graph so that it starts at (0, 1) instead of (1, 0)
+                    double angle = (360 * pair.Value.Confidence) - 90;
+                    if (angle < 0) {
+                        angle += 360; // Wrap around if we fell into negative territory
+                    }
+                    ConfidencePieLarge = (angle > 90);
+                    angle *= Math.PI / 180; // convert to radians
+                    ConfidencePiePoint = new Point(50 + Math.Cos(angle) * 50, 50 + Math.Sin(angle) * 50);
+                }
+            }
+
+            sb.Clear();
+            sb.Append("Combining parts one and two, the computer thinks this message is ");
+            if (Math.Round(smallestConf, 7) == Math.Round(largestConf, 7)) {
+                sb.AppendFormat("equally likely to be about {0} or {1} (ties are broken in favor of {2}).", largestConfLabel, smallestConfLabel, this.Label);
+            } else {
+                double oddsRatio = Math.Round((1 / smallestConf) - 1, 1);
+                string ratioDesc;
+                if (oddsRatio > 1000) {
+                    ratioDesc = "over 1,000";
+                } else {
+                    if (oddsRatio > 100) {
+                        int ratioInt = (int)(oddsRatio / 10);
+                        ratioDesc = string.Format("{0:N0}", ratioInt * 10);
+                    } else if (oddsRatio > 10) {
+                        ratioDesc = string.Format("{0:N0}", oddsRatio);
+                    } else {
+                        ratioDesc = string.Format("{0:N1}", oddsRatio);
+                    }
+                }
+                sb.AppendFormat("{0} times more likely to be about {1} than about {2}.", ratioDesc, largestConfLabel, smallestConfLabel);
+            }
+            ConfidenceDesc = sb.ToString();
         }
 
         public void UpdateEvidenceGraphData()
@@ -234,21 +289,6 @@ namespace LibIML
 
                 pair.Value.EvidenceItems.Sort();
             }
-
-            // Also update data for our confidence pie chart
-            foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
-                if (pair.Key.UserLabel == "Baseball") {
-                    double angle = (360 * pair.Value.Confidence) - 90;
-                    if (angle < 0) {
-                        angle += 360;
-                    }
-                    ConfidencePieLarge = (angle > 90);
-                    angle *= Math.PI / 180; // convert to radians
-                    ConfidencePiePoint = new Point(50 + Math.Cos(angle) * 50, 50 + Math.Sin(angle) * 50);
-                    //ConfidencePiePoint = new Point(98, 60);
-                }
-            }
-            
         }
 
         private void UpdateImportantWordDesc()

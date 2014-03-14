@@ -17,6 +17,7 @@
     <Style x:Key="windowStyle" TargetType="Window">
         <Setter Property="FontFamily" Value="Sego UI" />
         <Setter Property="FontSize" Value="14" />
+        <Setter Property="UseLayoutRounding" Value="True"/>
     </Style>
     
     <Style x:Key="headerStyle1">

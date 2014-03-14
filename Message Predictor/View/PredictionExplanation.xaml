@@ -99,26 +99,31 @@
             </TextBlock>
 
             <Label Grid.Row="9" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part three:</Label>
-
-            <Label Grid.Row="10" Grid.Column="1" Content="Pie chart will go here."/>
-            <Canvas Grid.Row="10" Grid.Column="1" Height="100">
-                <Ellipse Width="100" Height="100" Fill="{StaticResource ResourceKey=hockeyBrushSystem}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0"/>
-                <Path Stroke="Black" StrokeThickness="1" Fill="{StaticResource ResourceKey=baseballBrushSystem}">
-                    <Path.Data>
-                        <PathGeometry>
-                            <PathFigure StartPoint="50,0" IsClosed="True">
-                                <ArcSegment
+            <Grid Grid.Row="10" Grid.Column="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidenceDesc,Mode=OneWay}"></TextBlock>
+                <Canvas Grid.Column="1" Height="100">
+                    <Ellipse Width="100" Height="100" Fill="{StaticResource ResourceKey=hockeyBrushSystem}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0"/>
+                    <Path Stroke="Black" StrokeThickness="1" Fill="{StaticResource ResourceKey=baseballBrushSystem}">
+                        <Path.Data>
+                            <PathGeometry>
+                                <PathFigure StartPoint="50,0" IsClosed="True">
+                                    <ArcSegment
                                     Size="50,50"
                                     Point="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePiePoint}"
                                     IsLargeArc="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePieLarge}"
                                     SweepDirection="Clockwise"/>
-                                <LineSegment Point="50,50"/>
-                            </PathFigure>
-                        </PathGeometry>
-                    </Path.Data>
-                </Path>
-            </Canvas>
-            <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction, Mode=OneWay}" TextWrapping="Wrap"></TextBlock>
+                                    <LineSegment Point="50,50"/>
+                                </PathFigure>
+                            </PathGeometry>
+                        </Path.Data>
+                    </Path>
+                </Canvas>
+            </Grid>
+            
         </Grid>
     </ScrollViewer>
 </UserControl>
