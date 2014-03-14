@@ -66,9 +66,9 @@
 
             <Label Grid.Row="5" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part two:</Label>
 
-            <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+            <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-            <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0 5 5 0">
+            <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0">
                 <local:ClassImbalanceGraph.Evidence>
                     <MultiBinding>
                         <MultiBinding.Converter>
@@ -80,9 +80,9 @@
                 </local:ClassImbalanceGraph.Evidence>
             </local:ClassImbalanceGraph>
 
-            <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+            <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-            <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0 5 5 0">
+            <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0">
                 <local:ClassImbalanceGraph.Evidence>
                     <MultiBinding>
                         <MultiBinding.Converter>
