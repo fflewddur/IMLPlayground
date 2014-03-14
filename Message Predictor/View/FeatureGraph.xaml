@@ -22,17 +22,19 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="10" PreviewMouseMove="Rectangle_PreviewMouseMove" PreviewMouseLeftButtonUp="Rectangle_PreviewMouseLeftButtonUp" Background="Transparent">
+                    <Grid PreviewMouseMove="Rectangle_PreviewMouseMove" PreviewMouseLeftButtonUp="Rectangle_PreviewMouseLeftButtonUp" Background="Transparent">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
-                                   PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" />
+                                   PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" Margin="3 0 3 0"/>
                         <Rectangle Grid.Row="1" Width="20" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" 
-                                   SnapsToDevicePixels="True"/>
-                        <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2">
+                                   SnapsToDevicePixels="True" Margin="3 0 3 0"/>
+                        <Separator Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Margin="0 0 0 2"/>
+                        <TextBlock Grid.Row="3" Text="{Binding Characters, Mode=OneWay}" Padding="5 2">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem HeaderStringFormat="Find '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Find_Click"/>
