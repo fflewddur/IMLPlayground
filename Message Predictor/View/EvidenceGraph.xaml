@@ -15,17 +15,20 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="5" MinHeight="50">
+                    <Grid MinHeight="50">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Rectangle Grid.Row="0" Width="{Binding Width}" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" 
-                                   VerticalAlignment="Bottom" SnapsToDevicePixels="True"/>
-                        <Rectangle Grid.Row="1" Width="{Binding Width}" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" 
-                                   SnapsToDevicePixels="True"/>
-                        <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2" TextAlignment="Center"/>
+                        <!-- We're just using one color for these bars now -->
+                        <!--<Rectangle Grid.Row="0" Width="{Binding Width}" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" 
+                                   VerticalAlignment="Bottom" SnapsToDevicePixels="True"/>-->
+                        <Label Grid.Row="0" Width="{Binding Width}" Height="{Binding SystemHeight}" Background="{Binding GraphColorSystem, ElementName=root}" 
+                                   SnapsToDevicePixels="True" VerticalAlignment="Bottom" Content="{Binding Count}" ContentStringFormat="{}{0}x" Foreground="White" 
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" Padding="0 0 0 3" Margin="3 0 3 0"/>
+                        <Separator Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Margin="0 0 0 2"/>
+                        <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2" TextAlignment="Center" VerticalAlignment="Top"/>
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
