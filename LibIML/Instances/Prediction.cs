@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Media;
 
 namespace LibIML
 {
@@ -19,6 +21,8 @@ namespace LibIML
         private string _importantWordDesc; // Describe how many important words were used for this prediction
         private string _classPrDesc; // Describe how class probability influenced this prediction
         private string _featurePrDesc; // Describe how feature probability influenced this prediction
+        private System.Windows.Point _confidencePiePoint; // Where should the smaller confidence arc end?
+        private bool _confidencePieLarge; // Is the pie slice more or less than 50%?
 
         public Prediction()
         {
@@ -84,6 +88,18 @@ namespace LibIML
         {
             get { return _featurePrDesc; }
             private set { SetProperty<string>(ref _featurePrDesc, value);}
+        }
+
+        public Point ConfidencePiePoint
+        {
+            get { return _confidencePiePoint; }
+            private set { SetProperty<Point>(ref _confidencePiePoint, value); }
+        }
+
+        public bool ConfidencePieLarge
+        {
+            get { return _confidencePieLarge; }
+            private set { SetProperty<bool>(ref _confidencePieLarge, value); }
         }
 
         #endregion
@@ -218,6 +234,21 @@ namespace LibIML
 
                 pair.Value.EvidenceItems.Sort();
             }
+
+            // Also update data for our confidence pie chart
+            foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
+                if (pair.Key.UserLabel == "Baseball") {
+                    double angle = (360 * pair.Value.Confidence) - 90;
+                    if (angle < 0) {
+                        angle += 360;
+                    }
+                    ConfidencePieLarge = (angle > 90);
+                    angle *= Math.PI / 180; // convert to radians
+                    ConfidencePiePoint = new Point(50 + Math.Cos(angle) * 50, 50 + Math.Sin(angle) * 50);
+                    //ConfidencePiePoint = new Point(98, 60);
+                }
+            }
+            
         }
 
         private void UpdateImportantWordDesc()
