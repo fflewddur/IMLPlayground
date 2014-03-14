@@ -93,18 +93,18 @@ namespace LibIML
 
         #endregion
 
-        public void UpdateHeightsForEvidenceExplanation()
-        {
-            EvidenceItems.Clear();
-            foreach (Feature item in SourceItems) {
-                //double weight = Math.Pow(item.UserWeight + item.SystemWeight, item.Count);
-                //double contribution = (1 / ((double)NumClasses * SourceItems.Count)) * (weight) / PrDoc;
-                //Console.WriteLine("Contribution for '{1}' = {0:N4} (weight={2:N4}, PrD={3:N4}, PrD|C={4:N4})", contribution, item.Characters, weight, PrDoc, PrDocGivenClass);
-                //Feature evidenceItem = new Feature(item.Characters, item.Label, item.Count, contribution, 0);
-                Feature evidenceItem = new Feature(item.Characters, item.Label, item.Count, item.SystemWeight, item.UserWeight);
-                EvidenceItems.Add(evidenceItem);
-            }
-        }
+        //public void UpdateHeightsForEvidenceExplanation()
+        //{
+        //    EvidenceItems.Clear();
+        //    foreach (Feature item in SourceItems) {
+        //        //double weight = Math.Pow(item.UserWeight + item.SystemWeight, item.Count);
+        //        //double contribution = (1 / ((double)NumClasses * SourceItems.Count)) * (weight) / PrDoc;
+        //        //Console.WriteLine("Contribution for '{1}' = {0:N4} (weight={2:N4}, PrD={3:N4}, PrD|C={4:N4})", contribution, item.Characters, weight, PrDoc, PrDocGivenClass);
+        //        //Feature evidenceItem = new Feature(item.Characters, item.Label, item.Count, contribution, 0);
+        //        Feature evidenceItem = new Feature(item.Characters, item.Label, item.Count, item.SystemWeight, item.UserWeight);
+        //        EvidenceItems.Add(evidenceItem);
+        //    }
+        //}
 
         public string GetExplanationString()
         {

@@ -339,12 +339,11 @@ namespace LibIML
                 prediction.EvidencePerClass[l].NumClasses = Labels.Count();
                 prediction.EvidencePerClass[l].PrDoc = pDoc;
                 prediction.EvidencePerClass[l].PrDocGivenClass = pDocGivenClass[l];
-                prediction.EvidencePerClass[l].UpdateHeightsForEvidenceExplanation();
+                //prediction.EvidencePerClass[l].UpdateHeightsForEvidenceExplanation();
                 //Console.WriteLine("label={3}, pDocGivenClass={0:N3}, log(pDocGivenClass)={1:N3}, pDoc={2:N3}, pClass={4:N2}, conf={5:N3}, eFeatureWeight={6:N3}", pDocGivenClass[l], Math.Log(pDocGivenClass[l]), pDoc, l, _pClass[l],
                 //    pClassGivenDoc[l], prediction.EvidencePerClass[l].PrDocGivenClass);
                 //Console.WriteLine("Explanation: {0}", prediction.EvidencePerClass[l].GetExplanationString()); 
             }
-            // TODO Tell the prediction to update it's Evidence items now that it has Evidence for each label
 
             // Find the class with the highest probability for this document
             double maxP = double.MinValue;
@@ -362,7 +361,9 @@ namespace LibIML
 
             prediction.Label = label;
             prediction.Confidence = prediction.EvidencePerClass[label].Confidence;
+            prediction.UpdateEvidenceGraphData();
             prediction.UpdatePrDescriptions();
+
             return prediction;
         }
 

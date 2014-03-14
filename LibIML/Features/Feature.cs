@@ -66,7 +66,7 @@ namespace LibIML
             _userWeight = userWeight;
             _systemWeight = sysWeight;
             //Console.WriteLine("weight={0}", _systemWeight);
-            PixelsToWeight = 500;
+            PixelsToWeight = 10;
         }
 
         #region Properties

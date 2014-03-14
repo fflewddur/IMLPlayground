@@ -8,6 +8,9 @@ namespace LibIML
 {
     public class Prediction : ViewModelBase
     {
+        public static readonly double MIN_HEIGHT = 2.0;
+        public static readonly double MAX_HEIGHT = 10.0; 
+
         private Label _label;
         private double _confidence;
         private Dictionary<Label, Evidence> _evidencePerClass;
@@ -136,6 +139,68 @@ namespace LibIML
                     largestWeightLabel, ratio, smallestWeightLabel, largestWeight, smallestWeight);
             }
             FeaturePrDesc = sb.ToString();
+        }
+
+        public void UpdateEvidenceGraphData()
+        {
+            // Get the sum of weights for all labels.
+            double weightSum = 0;
+            Dictionary<Label, double> perLabelWeightSum = new Dictionary<Label, double>();
+            Dictionary<Label, double> perLabelHeight = new Dictionary<Label, double>();
+            foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
+                double labelWeight = 0;
+                foreach (Feature f in pair.Value.SourceItems) {
+                    // Multiply by -1 to reverse the sign; log(<1) will always be negative.
+                    double featureWeight = -1 * (Math.Log(f.UserWeight + f.SystemWeight) * f.Count);
+                    f.UserHeight = featureWeight; // Store this here because we need it later in this method.
+                    labelWeight += featureWeight;
+                }
+                perLabelWeightSum[pair.Key] = labelWeight;
+                weightSum += labelWeight;
+            }
+            //Console.WriteLine("weightSum={0}", weightSum);
+            // Use Confidence to determine the height ratio between different labels
+            foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
+                //Console.WriteLine("Confidence for {0} = {1:N6}", pair.Key, pair.Value.Confidence);
+                perLabelHeight[pair.Key] = weightSum * pair.Value.Confidence;
+            }
+
+            // Now figure out the height ratio for different bars; store the results in EvidenceItems.
+            double highestHeight = double.MinValue;
+            foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
+                pair.Value.EvidenceItems.Clear();
+                foreach (Feature f in pair.Value.SourceItems) {
+                    // 1 - % because the smaller the ln(weight), the more important the feature
+                    double featurePercent = 1 - (f.UserHeight / perLabelWeightSum[pair.Key]);
+                    if (featurePercent <= 0) {
+                        featurePercent = 1; // If there's only one feature, it was solely responsible.
+                    }
+                    double featureHeight = perLabelHeight[pair.Key] * featurePercent;
+                    if (featureHeight > highestHeight) {
+                        highestHeight = featureHeight;
+                    }
+                    //Console.WriteLine("featureHeight ({0}, height={3:N3}): '{1}' = {2:N6} ({4:P})", f.Label, f.Characters, featureHeight, perLabelHeight[pair.Key], featurePercent);
+                    Feature evidenceFeature = new Feature(f.Characters, f.Label, f.Count, featureHeight, 0);
+                    pair.Value.EvidenceItems.Add(evidenceFeature);
+                }
+            }
+
+            // Keep our bars within a reasonable pixel height range;
+            double heightAdjustmentRatio = 1.0;
+            if (highestHeight > MAX_HEIGHT) {
+                heightAdjustmentRatio = MAX_HEIGHT / highestHeight;
+            } else if (highestHeight < MIN_HEIGHT) {
+                heightAdjustmentRatio = MIN_HEIGHT / highestHeight;
+            }
+
+            foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
+                foreach (Feature f in pair.Value.EvidenceItems) {
+                    f.SystemWeight = f.SystemWeight * heightAdjustmentRatio;
+                    if ((f.SystemWeight * f.PixelsToWeight) < 1) {
+                        f.SystemWeight = 1 / f.PixelsToWeight;
+                    }
+                }
+            }
         }
 
         private void UpdateImportantWordDesc()

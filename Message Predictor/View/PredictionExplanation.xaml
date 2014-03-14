@@ -8,100 +8,100 @@
              mc:Ignorable="d" 
              d:DesignHeight="300" d:DesignWidth="300">
     <ScrollViewer>
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step one:</Label>
-        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" 
+            <Label Grid.Row="0" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part one:</Label>
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" 
                    TextWrapping="Wrap" Margin="15 0 5 5" />
 
-        <Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+            <Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                Margin="15 0 5 5"/>
-        <local:EvidenceGraph Grid.Row="2" Grid.Column="1" Label="{Binding Labels[0]}" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400"
+            <local:EvidenceGraph Grid.Row="2" Grid.Column="1" Label="{Binding Labels[0]}" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400"
                              Margin="5 0 5 5">
-            <local:EvidenceGraph.Evidence>
-                <MultiBinding>
-                    <MultiBinding.Converter>
-                        <conv:DictionaryItemFromLabelConverter/>
-                    </MultiBinding.Converter>
-                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
-                    <Binding Path="Labels[0]"/>
-                </MultiBinding>
-            </local:EvidenceGraph.Evidence>
-        </local:EvidenceGraph>
+                <local:EvidenceGraph.Evidence>
+                    <MultiBinding>
+                        <MultiBinding.Converter>
+                            <conv:DictionaryItemFromLabelConverter/>
+                        </MultiBinding.Converter>
+                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="Labels[0]"/>
+                    </MultiBinding>
+                </local:EvidenceGraph.Evidence>
+            </local:EvidenceGraph>
 
-        <Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+            <Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                Margin="15 0 5 5"/>
-        <local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812"
+            <local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812"
                              Margin="5 0 5 5">
-            <local:EvidenceGraph.Evidence>
-                <MultiBinding>
-                    <MultiBinding.Converter>
-                        <conv:DictionaryItemFromLabelConverter/>
-                    </MultiBinding.Converter>
-                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
-                    <Binding Path="Labels[1]"/>
-                </MultiBinding>
-            </local:EvidenceGraph.Evidence>
-        </local:EvidenceGraph>
-        <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 0 15 5" TextWrapping="Wrap" 
+                <local:EvidenceGraph.Evidence>
+                    <MultiBinding>
+                        <MultiBinding.Converter>
+                            <conv:DictionaryItemFromLabelConverter/>
+                        </MultiBinding.Converter>
+                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="Labels[1]"/>
+                    </MultiBinding>
+                </local:EvidenceGraph.Evidence>
+            </local:EvidenceGraph>
+            <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 0 15 5" TextWrapping="Wrap" 
                    Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.FeaturePrDesc, Mode=OneWay}" />
 
-        <Label Grid.Row="5" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step two:</Label>
+            <Label Grid.Row="5" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part two:</Label>
 
-        <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+            <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-        <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0 5 5 0">
-            <local:ClassImbalanceGraph.Evidence>
-                <MultiBinding>
-                    <MultiBinding.Converter>
-                        <conv:DictionaryItemFromLabelConverter/>
-                    </MultiBinding.Converter>
-                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
-                    <Binding Path="Labels[0]"/>
-                </MultiBinding>
-            </local:ClassImbalanceGraph.Evidence>
-        </local:ClassImbalanceGraph>
+            <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0 5 5 0">
+                <local:ClassImbalanceGraph.Evidence>
+                    <MultiBinding>
+                        <MultiBinding.Converter>
+                            <conv:DictionaryItemFromLabelConverter/>
+                        </MultiBinding.Converter>
+                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="Labels[0]"/>
+                    </MultiBinding>
+                </local:ClassImbalanceGraph.Evidence>
+            </local:ClassImbalanceGraph>
 
-        <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
+            <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0 5 5 0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-        <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0 5 5 0">
-            <local:ClassImbalanceGraph.Evidence>
-                <MultiBinding>
-                    <MultiBinding.Converter>
-                        <conv:DictionaryItemFromLabelConverter/>
-                    </MultiBinding.Converter>
-                    <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
-                    <Binding Path="Labels[1]"/>
-                </MultiBinding>
-            </local:ClassImbalanceGraph.Evidence>
-        </local:ClassImbalanceGraph>
+            <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0 5 5 0">
+                <local:ClassImbalanceGraph.Evidence>
+                    <MultiBinding>
+                        <MultiBinding.Converter>
+                            <conv:DictionaryItemFromLabelConverter/>
+                        </MultiBinding.Converter>
+                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="Labels[1]"/>
+                    </MultiBinding>
+                </local:ClassImbalanceGraph.Evidence>
+            </local:ClassImbalanceGraph>
 
-        <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 10 15 5" TextWrapping="Wrap" 
+            <TextBlock Grid.Row="8" Grid.Column="0" Grid.ColumnSpan="2" Margin="15 10 15 5" TextWrapping="Wrap" 
                    Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ClassPrDesc, Mode=OneWay}">
-        </TextBlock>
+            </TextBlock>
 
-        <Label Grid.Row="9" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Step three:</Label>
+            <Label Grid.Row="9" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part three:</Label>
 
-        <Label Grid.Row="10" Grid.Column="1" Content="Pie chart will go here."/>
-        <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction, Mode=OneWay}" TextWrapping="Wrap"></TextBlock>
-    </Grid>
+            <Label Grid.Row="10" Grid.Column="1" Content="Pie chart will go here."/>
+            <TextBlock Grid.Row="11" Grid.Column="1" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction, Mode=OneWay}" TextWrapping="Wrap"></TextBlock>
+        </Grid>
     </ScrollViewer>
 </UserControl>
