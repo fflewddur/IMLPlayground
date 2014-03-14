@@ -65,7 +65,8 @@ namespace LibIML
             _count = count;
             _userWeight = userWeight;
             _systemWeight = sysWeight;
-            PixelsToWeight = 100;
+            //Console.WriteLine("weight={0}", _systemWeight);
+            PixelsToWeight = 500;
         }
 
         #region Properties
@@ -145,6 +146,10 @@ namespace LibIML
             set { SetProperty<double>(ref _userPrior, value); }
         }
 
+        /// <summary>
+        /// Number of times this feature occurs in the given document.
+        /// Used by Evidence class.
+        /// </summary>
         public int Count
         {
             get { return _count; }

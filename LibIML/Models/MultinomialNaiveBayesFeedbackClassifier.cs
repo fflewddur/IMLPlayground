@@ -295,9 +295,9 @@ namespace LibIML
 
             foreach (Label l in Labels) {
                 Evidence evidence = new Evidence(); // Store our evidence in favor of each class
-                evidence.ClassPr = _pClass[l];
-                evidence.ClassCount = _trainingSet[l].Count;
-                evidence.TotalClassCount = trainingSetSize;
+                evidence.PrClass = _pClass[l];
+                evidence.InstanceCount = _trainingSet[l].Count;
+                evidence.TotalInstanceCount = trainingSetSize;
                 double prob = 0;
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                     double pWord;
@@ -310,11 +310,12 @@ namespace LibIML
                         TryGetFeatureUserWeight(pair.Key, l, out userWeight);
                         TryGetFeatureSystemWeight(pair.Key, l, out sysWeight);
                         Feature f = new Feature(word, l, (int)pair.Value, sysWeight, userWeight);
-                        evidence.Items.Add(f);
-                        //Console.WriteLine("Feature={3}, weight={0}, userWeight={1}, sysWeight={2}", weight, userWeight, sysWeight, word);
+                        evidence.SourceItems.Add(f);
+                        //Console.WriteLine("Feature={3}, weight={0}, userWeight={1}, sysWeight={2}, count={4}", weight, userWeight, sysWeight, word, (int)pair.Value);
                         prob += Math.Log(weight);
                     }
                 }
+                
                 pDocGivenClass[l] = Math.Exp(prob);
                 //evidence.FeatureWeight = pDocGivenClass[l];
                 prediction.EvidencePerClass[l] = evidence;
@@ -335,9 +336,15 @@ namespace LibIML
             Dictionary<Label, double> pClassGivenDoc = new Dictionary<Label, double>();
             foreach (Label l in Labels) {
                 pClassGivenDoc[l] = (_pClass[l] * pDocGivenClass[l]) / pDoc; // For log likelihood, with normalization
+                prediction.EvidencePerClass[l].NumClasses = Labels.Count();
                 prediction.EvidencePerClass[l].PrDoc = pDoc;
-                prediction.EvidencePerClass[l].FeatureWeight = pDocGivenClass[l];
+                prediction.EvidencePerClass[l].PrDocGivenClass = pDocGivenClass[l];
+                prediction.EvidencePerClass[l].UpdateHeightsForEvidenceExplanation();
+                //Console.WriteLine("label={3}, pDocGivenClass={0:N3}, log(pDocGivenClass)={1:N3}, pDoc={2:N3}, pClass={4:N2}, conf={5:N3}, eFeatureWeight={6:N3}", pDocGivenClass[l], Math.Log(pDocGivenClass[l]), pDoc, l, _pClass[l],
+                //    pClassGivenDoc[l], prediction.EvidencePerClass[l].PrDocGivenClass);
+                //Console.WriteLine("Explanation: {0}", prediction.EvidencePerClass[l].GetExplanationString()); 
             }
+            // TODO Tell the prediction to update it's Evidence items now that it has Evidence for each label
 
             // Find the class with the highest probability for this document
             double maxP = double.MinValue;

@@ -9,47 +9,62 @@ namespace LibIML
 {
     public class Evidence : ViewModelBase
     {
-        private List<Feature> _items;
-        private int _classCount; // Number of training set instances with this label
-        private int _totalClassCount; // Total number of training set instances
-        private double _classPr; // Probability of a given item belonging to this class
+        private List<Feature> _sourceItems;
+        private List<Feature> _evidenceItems;
+        private int _nClasses; // Number of classes (needed to normalize feature importance; we assume uniform class distribution)
+        private int _instanceCount; // Number of training set instances with this label
+        private int _totalInstanceCount; // Total number of training set instances
+        private double _prClass; // Probability of a given item belonging to this class
         private double _confidence; // Classifier's confidence in this label being correct
-        private double _featureWeight; // Sum of feature weights * feature count for this label
+        private double _prDocGivenClass; // Sum of feature weights * feature count for this label
         private double _pDoc; // Probability of this document
 
         public Evidence()
         {
             Confidence = -1;
-            ClassPr = -1;
-            ClassCount = -1;
-            TotalClassCount = -1;
-            Items = new List<Feature>();
+            PrClass = -1;
+            InstanceCount = -1;
+            TotalInstanceCount = -1;
+            SourceItems = new List<Feature>();
+            EvidenceItems = new List<Feature>();
         }
 
         #region Properties
 
-        public List<Feature> Items
+        /// <summary>
+        /// Holds the original item weights from the classifier.
+        /// </summary>
+        public List<Feature> SourceItems
         {
-            get { return _items; }
-            set { SetProperty<List<Feature>>(ref _items, value); }
+            get { return _sourceItems; }
+            set { SetProperty<List<Feature>>(ref _sourceItems, value); }
         }
 
-        public double ClassPr
+        /// <summary>
+        /// Holds Features with updated weights to show their relative contribution to the prediction.
+        /// </summary>
+        public List<Feature> EvidenceItems
         {
-            get { return _classPr; }
-            set { SetProperty<double>(ref _classPr, value); }
+            get { return _evidenceItems; }
+            set { SetProperty<List<Feature>>(ref _evidenceItems, value); }
         }
 
-        public int ClassCount
+        public int NumClasses
         {
-            get { return _classCount; }
-            set { SetProperty<int>(ref _classCount, value); }
+            get { return _nClasses; }
+            set { SetProperty<int>(ref _nClasses, value); }
         }
 
-        public int TotalClassCount
+        public int InstanceCount
         {
-            get { return _totalClassCount; }
-            set { SetProperty<int>(ref _totalClassCount, value); }
+            get { return _instanceCount; }
+            set { SetProperty<int>(ref _instanceCount, value); }
+        }
+
+        public int TotalInstanceCount
+        {
+            get { return _totalInstanceCount; }
+            set { SetProperty<int>(ref _totalInstanceCount, value); }
         }
 
         public double Confidence
@@ -58,10 +73,16 @@ namespace LibIML
             set { SetProperty<double>(ref _confidence, value); }
         }
 
-        public double FeatureWeight
+        public double PrClass
         {
-            get { return _featureWeight; }
-            set { SetProperty<double>(ref _featureWeight, value); }
+            get { return _prClass; }
+            set { SetProperty<double>(ref _prClass, value); }
+        }
+
+        public double PrDocGivenClass
+        {
+            get { return _prDocGivenClass; }
+            set { SetProperty<double>(ref _prDocGivenClass, value); }
         }
 
         public double PrDoc
@@ -72,6 +93,32 @@ namespace LibIML
 
         #endregion
 
+        public void UpdateHeightsForEvidenceExplanation()
+        {
+            EvidenceItems.Clear();
+            foreach (Feature item in SourceItems) {
+                //double weight = Math.Pow(item.UserWeight + item.SystemWeight, item.Count);
+                //double contribution = (1 / ((double)NumClasses * SourceItems.Count)) * (weight) / PrDoc;
+                //Console.WriteLine("Contribution for '{1}' = {0:N4} (weight={2:N4}, PrD={3:N4}, PrD|C={4:N4})", contribution, item.Characters, weight, PrDoc, PrDocGivenClass);
+                //Feature evidenceItem = new Feature(item.Characters, item.Label, item.Count, contribution, 0);
+                Feature evidenceItem = new Feature(item.Characters, item.Label, item.Count, item.SystemWeight, item.UserWeight);
+                EvidenceItems.Add(evidenceItem);
+            }
+        }
+
+        public string GetExplanationString()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            sb.AppendFormat("PrDocGivenClass = {0} | ", PrDocGivenClass);
+            foreach (Feature item in SourceItems) {
+                double contribution = 0.5 * (Math.Pow(item.UserWeight + item.SystemWeight, item.Count)) / PrDoc;
+                sb.AppendFormat("{0} ({1}) = {2} ({3} + {4})^{5} ", item.Characters, item.Label, contribution, item.UserWeight, item.SystemWeight, item.Count);
+            }
+
+            return sb.ToString();
+        }
+
         #region Override methods
 
         public override string ToString()
@@ -79,9 +126,9 @@ namespace LibIML
             StringBuilder sb = new StringBuilder();
 
             sb.AppendFormat("Confidence={0:N2} ", Confidence);
-            sb.AppendFormat("ClassPr={0:N2} ", ClassPr);
+            sb.AppendFormat("ClassPr={0:N2} ", PrClass);
             sb.AppendFormat("PrDoc={0} ", PrDoc);
-            foreach (Feature item in Items) {
+            foreach (Feature item in SourceItems) {
                 sb.AppendFormat("{0}={4:N4} ({1}*({2:N4}+{3:N4})) ", item.Characters, item.Count, item.SystemWeight, item.UserWeight, 
                     item.Count * (item.SystemWeight + item.UserWeight));
             }

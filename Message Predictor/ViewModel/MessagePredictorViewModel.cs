@@ -25,6 +25,7 @@ namespace MessagePredictor
 
         // Viewmodels (and data for this viewmodel)
         private FolderListViewModel _folderListVM;
+        private MessageViewModel _messageVM;
         private FeatureSetViewModel _featureSetVM;
         private HeatMapViewModel _heatMapVM;
         private EvaluatorViewModel _evaluatorVM;
@@ -87,6 +88,8 @@ namespace MessagePredictor
 
             _folderListVM = new FolderListViewModel(_evaluatorVM.Evaluators);
             _folderListVM.SelectedFolderChanged += _folderListVM_SelectedFolderChanged;
+
+            _messageVM = new MessageViewModel();
 
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
             _featureSetVM.FeatureAdded += _featureSetVM_FeatureAdded;

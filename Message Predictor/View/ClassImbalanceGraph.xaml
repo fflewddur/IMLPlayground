@@ -8,15 +8,15 @@
              Name="root"
              d:DesignHeight="150" d:DesignWidth="300">
     <Grid>
-        <Label Content="{Binding ElementName=root,Path=Evidence.ClassCount}" Background="{Binding ElementName=root,Path=GraphColor}" 
+        <Label Content="{Binding ElementName=root,Path=Evidence.InstanceCount}" Background="{Binding ElementName=root,Path=GraphColor}" 
                HorizontalAlignment="Left" HorizontalContentAlignment="Center" Foreground="White">
             <Label.Width>
                 <MultiBinding>
                     <MultiBinding.Converter>
                         <conv:GraphWidthFromCountConverter/>
                     </MultiBinding.Converter>
-                    <Binding Path="Evidence.ClassCount" ElementName="root"/>
-                    <Binding Path="Evidence.TotalClassCount" ElementName="root"/>
+                    <Binding Path="Evidence.InstanceCount" ElementName="root"/>
+                    <Binding Path="Evidence.TotalInstanceCount" ElementName="root"/>
                     <Binding Path="Width" />
                 </MultiBinding>
             </Label.Width>

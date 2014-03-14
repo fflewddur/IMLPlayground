@@ -7,7 +7,7 @@
              Name="root"
              d:DesignHeight="200" d:DesignWidth="300">
     <Grid>
-        <ItemsControl Grid.Column="1" Name="FeatureControl" ItemsSource="{Binding ElementName=root,Path=Evidence.Items}">
+        <ItemsControl Grid.Column="1" Name="FeatureControl" ItemsSource="{Binding ElementName=root,Path=Evidence.EvidenceItems}">
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Horizontal"/>

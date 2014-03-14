@@ -95,20 +95,20 @@ namespace LibIML
             double smallestWeight = double.MaxValue, largestWeight = double.MinValue;
             Label smallestCountLabel = null, smallestWeightLabel = null, largestCountLabel = null, largestWeightLabel = null;
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
-                if (pair.Value.ClassCount <= smallestCount) {
-                    smallestCount = pair.Value.ClassCount;
+                if (pair.Value.InstanceCount <= smallestCount) {
+                    smallestCount = pair.Value.InstanceCount;
                     smallestCountLabel = pair.Key;
                 }
-                if (pair.Value.ClassCount > largestCount) {
-                    largestCount = pair.Value.ClassCount;
+                if (pair.Value.InstanceCount > largestCount) {
+                    largestCount = pair.Value.InstanceCount;
                     largestCountLabel = pair.Key;
                 }
-                if (pair.Value.FeatureWeight <= smallestWeight) {
-                    smallestWeight = pair.Value.FeatureWeight;
+                if (pair.Value.PrDocGivenClass <= smallestWeight) {
+                    smallestWeight = pair.Value.PrDocGivenClass;
                     smallestWeightLabel = pair.Key;
                 }
-                if (pair.Value.FeatureWeight > largestWeight) {
-                    largestWeight = pair.Value.FeatureWeight;
+                if (pair.Value.PrDocGivenClass > largestWeight) {
+                    largestWeight = pair.Value.PrDocGivenClass;
                     largestWeightLabel = pair.Key;
                 }
             }

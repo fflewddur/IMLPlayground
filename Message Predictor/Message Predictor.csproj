@@ -150,6 +150,7 @@
     <Compile Include="ViewModel\HeatMapViewModel.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\MessagePredictorViewModel.cs" />
+    <Compile Include="ViewModel\MessageViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Compile Include="View\AddFeatureDialog.xaml.cs">
       <DependentUpon>AddFeatureDialog.xaml</DependentUpon>
