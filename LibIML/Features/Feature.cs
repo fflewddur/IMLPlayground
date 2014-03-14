@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace LibIML
 {
     [Serializable]
-    public class Feature : ViewModelBase, IEquatable<Feature>
+    public class Feature : ViewModelBase, IEquatable<Feature>, IComparable<Feature>
     {
         public static readonly int MINIMUM_HEIGHT = 4; // The minimum height in pixels for each bar
         public static readonly int BAR_WIDTH = 20; // The default width (in pixels) for each bar
@@ -236,6 +236,19 @@ namespace LibIML
             //if (Label != Label.AnyLabel)
             hash += hash * 31 + Label.GetHashCode();
             return hash;
+        }
+
+        public int CompareTo(Feature other)
+        {
+            if (other == null) {
+                return 1;
+            } else {
+                int retval = this.Characters.CompareTo(other.Characters);
+                if (retval == 0) {
+                    return this.Label.CompareTo(other.Label);
+                } else
+                    return retval;
+            }
         }
 
         #endregion

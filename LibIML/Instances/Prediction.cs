@@ -131,12 +131,26 @@ namespace LibIML
             // Build FeaturePrDesc
             sb.Clear();
             if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
-                sb.AppendFormat("The area of the {0} bars equals the area of the {1} bars, so the computer thinks this message is equally likely to be either",
+                sb.AppendFormat("Because the area of the {0} bars equals the area of the {1} bars, the computer thinks this message is equally likely to be either",
                     largestWeightLabel, smallestWeightLabel);
             } else {
                 double ratio = Math.Round(largestWeight / smallestWeight, 1);
-                sb.AppendFormat("The area of the {0} bars is {1:N1} times larger than the {2} bars, so the computer thinks this message is {1:N1} times more likely to be about {0} than {2}.",
-                    largestWeightLabel, ratio, smallestWeightLabel);
+                string ratioDesc;
+                if (ratio > 1000) {
+                    ratioDesc = "over 1,000";
+                } else {
+                    if (ratio > 100) {
+                        int ratioInt = (int)(ratio / 10);
+                        ratioDesc = string.Format("{0:N0}", ratioInt * 10);
+                    } else if (ratio > 10) {
+                        ratioDesc = string.Format("{0:N0}", ratio);
+                    } else {
+                        ratioDesc = string.Format("{0:N1}", ratio);
+                    }
+                }
+
+                sb.AppendFormat("Because the area of the {0} bars is {1} times larger than the {2} bars, the computer thinks this message is {1} times more likely to be about {0} than {2}.",
+                    largestWeightLabel, ratioDesc, smallestWeightLabel);
             }
             FeaturePrDesc = sb.ToString();
         }
@@ -171,7 +185,7 @@ namespace LibIML
                 pair.Value.EvidenceItems.Clear();
                 foreach (Feature f in pair.Value.SourceItems) {
                     // 1 - % because the smaller the ln(weight), the more important the feature
-                    double featurePercent = 1 - (f.UserHeight / perLabelWeightSum[pair.Key]);
+                    double featurePercent = 1 - ((f.UserHeight) / perLabelWeightSum[pair.Key]);
                     if (featurePercent <= 0) {
                         featurePercent = 1; // If there's only one feature, it was solely responsible.
                     }
@@ -201,6 +215,8 @@ namespace LibIML
                         f.SystemWeight = 2 / f.PixelsToWeight;
                     }
                 }
+
+                pair.Value.EvidenceItems.Sort();
             }
         }
 
