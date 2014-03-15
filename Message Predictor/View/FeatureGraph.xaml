@@ -29,9 +29,9 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
+                        <Rectangle Grid.Row="0" Width="{Binding Width}" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
                                    PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" Margin="3 0 3 0"/>
-                        <Rectangle Grid.Row="1" Width="20" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" 
+                        <Rectangle Grid.Row="1" Width="{Binding Width}" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" 
                                    SnapsToDevicePixels="True" Margin="3 0 3 0"/>
                         <Separator Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Margin="0 0 0 2"/>
                         <TextBlock Grid.Row="3" Text="{Binding Characters, Mode=OneWay}" Padding="5 2">

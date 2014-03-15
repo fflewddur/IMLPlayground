@@ -10,7 +10,7 @@ namespace LibIML
     public class Feature : ViewModelBase, IEquatable<Feature>, IComparable<Feature>
     {
         public static readonly int MINIMUM_HEIGHT = 4; // The minimum height in pixels for each bar
-        public static readonly int BAR_WIDTH = 20; // The default width (in pixels) for each bar
+        public static readonly int BAR_WIDTH = 25; // The default width (in pixels) for each bar
 
         public enum Weight
         {
@@ -46,7 +46,7 @@ namespace LibIML
         {
             _characters = characters;
             _label = label;
-            _count = 0;
+            _count = 1;
             _mostImportantLabel = false;
             _weightType = Weight.Custom;
             _userWeight = WEIGHT_DEFAULT;
