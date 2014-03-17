@@ -5,7 +5,7 @@
                     xmlns:local="clr-namespace:MessagePredictor.View"
                     xmlns:conv="clr-namespace:MessagePredictor.Converters"
                     xmlns:libiml="clr-namespace:LibIML;assembly=LibIML">
-    
+
     <conv:StringFormatConverter x:Key="convStringFormat" />
     <conv:LabelToBoolConverter x:Key="convLabelToBool" />
 
@@ -13,13 +13,13 @@
     <SolidColorBrush x:Key="hockeyBrushSystem" Color="#FFB66400" />
     <SolidColorBrush x:Key="baseballBrushUser" Color="#FF2EBB2E" />
     <SolidColorBrush x:Key="baseballBrushSystem" Color="#FF127812" />
-    
+
     <Style x:Key="windowStyle" TargetType="Window">
         <Setter Property="FontFamily" Value="Sego UI" />
         <Setter Property="FontSize" Value="14" />
         <Setter Property="UseLayoutRounding" Value="True"/>
     </Style>
-    
+
     <Style x:Key="headerStyle1">
         <Setter Property="Control.FontSize" Value="18" />
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
@@ -68,11 +68,35 @@
     <Style x:Key="labelMenuItem" TargetType="MenuItem">
         <Setter Property="Padding" Value="5"/>
     </Style>
-    
     <Style x:Key="tabItemStyle" TargetType="TabItem">
         <Setter Property="Padding" Value="20 5" />
     </Style>
-    
+    <Style x:Key="rotated90" TargetType="FrameworkElement">
+        <Setter Property="LayoutTransform">
+            <Setter.Value>
+                <TransformGroup>
+                    <TransformGroup.Children>
+                        <TransformCollection>
+                            <RotateTransform Angle="90"/>
+                        </TransformCollection>
+                    </TransformGroup.Children>
+                </TransformGroup>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="rotated270" TargetType="FrameworkElement">
+        <Setter Property="LayoutTransform">
+            <Setter.Value>
+                <TransformGroup>
+                    <TransformGroup.Children>
+                        <TransformCollection>
+                            <RotateTransform Angle="270"/>
+                        </TransformCollection>
+                    </TransformGroup.Children>
+                </TransformGroup>
+            </Setter.Value>
+        </Setter>
+    </Style>
     <!-- Message list -->
 
     <TextBlock TextAlignment="Center" x:Key="messageListTopicHeader">
@@ -105,7 +129,7 @@
             </MultiDataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <DataTemplate x:Key="messageListTopicTemplate" DataType="model:NewsItem">
         <TextBlock TextAlignment="Center" Text="{Binding Prediction.Label}" Style="{StaticResource ResourceKey=messageListTopicStyle}" />
     </DataTemplate>
@@ -124,9 +148,9 @@
             <local:DirectionArrow Grid.Column="1" Direction="{Binding PredictionConfidenceDirection}" Difference="{Binding PredictionConfidenceDifference, StringFormat='{}{0:P0}'}" HorizontalAlignment="Left"/>
         </Grid>
     </DataTemplate>
-    
+
     <!-- End message list -->
-    
+
     <!-- Prediction explanation -->
     <Style x:Key="hideIfNoFeatures">
         <Style.Triggers>
@@ -135,9 +159,9 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <!-- End Prediction explanation -->
-    
+
     <!-- Heat map -->
 
     <Style x:Key="heatMapHeaderStyle" TargetType="TextBlock">
@@ -151,7 +175,7 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <Style x:Key="heatMapListViewStyle" TargetType="ListView">
         <Style.Triggers>
             <DataTrigger Binding="{Binding ToHighlight}" Value="{x:Static sys:String.Empty}">
@@ -172,7 +196,7 @@
             </DataTrigger>
         </Style.Triggers>-->
     </Style>
-    
+
     <ItemsPanelTemplate x:Key="heatMapPanel">
         <WrapPanel Orientation="Horizontal" VirtualizingPanel.VirtualizationMode="Recycling" 
                    VirtualizingPanel.IsVirtualizing="True" VirtualizingPanel.IsVirtualizingWhenGrouping="True" />

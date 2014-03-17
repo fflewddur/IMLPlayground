@@ -13,13 +13,13 @@
             </TabItem>
             <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
                 <TabItem.Header>
-                    <TextBlock Text="{Binding Labels[0], StringFormat='{}{0} graph'}"/>
+                    <TextBlock Text="{Binding Labels[0], StringFormat='Adjust {0} words'}"/>
                 </TabItem.Header>
                 <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSourcesGraph[0].View}" Label="{Binding Labels[0]}" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400"/>
             </TabItem>
             <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
                 <TabItem.Header>
-                    <TextBlock Text="{Binding Labels[1], StringFormat='{}{0} graph'}"/>
+                    <TextBlock Text="{Binding Labels[1], StringFormat='Adjust {0} words'}"/>
                 </TabItem.Header>
                 <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSourcesGraph[1].View}" Label="{Binding Labels[1]}" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812" />
             </TabItem>
