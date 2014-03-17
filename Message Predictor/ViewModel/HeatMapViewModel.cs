@@ -1,4 +1,5 @@
-﻿using MessagePredictor.Converters;
+﻿using LibIML;
+using MessagePredictor.Converters;
 using MessagePredictor.Model;
 using MessagePredictor.View;
 using System;
@@ -21,13 +22,16 @@ namespace MessagePredictor.ViewModel
         private string _toHighlight;
         private NewsItem _currentMessage;
         private MessageWindow _messageWindow;
+        private string _tooltipContent;
+        private Label _unknownLabel;
 
-        public HeatMapViewModel(NewsCollection messages)
+        public HeatMapViewModel(NewsCollection messages, Label unknownLabel)
             : base()
         {
             _messages = messages;
             _heatMapView = BuildCollectionViewSourceForCollection(_messages);
             _currentMessage = null;
+            _unknownLabel = unknownLabel;
         }
 
         #region Properties
@@ -46,6 +50,7 @@ namespace MessagePredictor.ViewModel
                 if (SetProperty<string>(ref _toHighlight, value)) {
                     OnHighlightTextChanged(new HighlightTextChangedEventArgs(_toHighlight));
                     MarkMessagesContainingWord(ToHighlight);
+                    UpdateTooltipContent(ToHighlight);
                     if (CurrentMessage != null)
                         CurrentMessage.HighlightWithWord(ToHighlight);
                 }
@@ -72,6 +77,12 @@ namespace MessagePredictor.ViewModel
                     }
                 }
             }
+        }
+
+        public string TooltipContent
+        {
+            get { return _tooltipContent; }
+            private set { SetProperty<string>(ref _tooltipContent, value); }
         }
 
         #endregion
@@ -134,6 +145,31 @@ namespace MessagePredictor.ViewModel
             Console.WriteLine("Time to highlight word: {0}", timer.Elapsed);
         }
 
+        private void UpdateTooltipContent(string word)
+        {
+            Dictionary<Label, int> countPerLabel = new Dictionary<Label, int>();
+
+            foreach (NewsItem item in _messages) {
+                int count;
+                Label label = item.UserLabel;
+                if (label == null) {
+                    label = _unknownLabel;
+                }
+                countPerLabel.TryGetValue(label, out count);
+                if (item.IsHighlighted) {
+                    count++;
+                }
+                countPerLabel[label] = count;
+            }
+
+            StringBuilder sb = new StringBuilder();
+            foreach (KeyValuePair<Label, int> pair in countPerLabel) {
+                sb.AppendFormat("{0} messages in '{1}' contain '{2}'.\n\n", pair.Value, pair.Key, word);
+            }
+
+            TooltipContent = sb.ToString();
+        }
+
         private CollectionViewSource BuildCollectionViewSourceForCollection(NewsCollection collection)
         {
             CollectionViewSource cvs = new CollectionViewSource();
@@ -144,7 +180,7 @@ namespace MessagePredictor.ViewModel
             view.GroupDescriptions.Add(new PropertyGroupDescription("UserLabel", new LabelToStringConverter()));
             //view.IsLiveGrouping = true;
             //cvs.IsLiveGroupingRequested = true;
-            
+
             view.SortDescriptions.Clear();
             view.SortDescriptions.Add(new SortDescription("UserLabel", ListSortDirection.Descending));
             view.SortDescriptions.Add(new SortDescription("IsHighlighted", ListSortDirection.Descending));
