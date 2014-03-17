@@ -26,7 +26,21 @@
                                    VerticalAlignment="Bottom" SnapsToDevicePixels="True"/>-->
                         <Label Grid.Row="0" Width="{Binding Width}" Height="{Binding SystemHeight}" Background="{Binding GraphColorSystem, ElementName=root}" 
                                    SnapsToDevicePixels="True" VerticalAlignment="Bottom" Content="{Binding Count}" ContentStringFormat="{}{0}x" Foreground="White" 
-                               HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" Padding="0 0 0 3" Margin="3 0 3 0"/>
+                               HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" Padding="0 0 0 3" Margin="3 0 3 0">
+                            <Label.ToolTip>
+                                <TextBlock>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="Count={0} SysWeight={1:N3} UserWeight={2:N3} Word='{3}' Percent={4:P2}">
+                                            <Binding Path="Count"/>
+                                            <Binding Path="SystemWeight"/>
+                                            <Binding Path="UserWeight"/>
+                                            <Binding Path="Characters"/>
+                                            <Binding Path="PercentOfReason"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                            </Label.ToolTip>
+                        </Label>
                         <Separator Grid.Row="1" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Margin="0 0 0 2"/>
                         <TextBlock Grid.Row="2" Text="{Binding Characters, Mode=OneWay}" Margin="0 3 0 5" Padding="5 2" TextAlignment="Center" VerticalAlignment="Top"/>
                     </Grid>

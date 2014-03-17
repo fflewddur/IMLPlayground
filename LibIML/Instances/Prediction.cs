@@ -10,8 +10,8 @@ namespace LibIML
 {
     public class Prediction : ViewModelBase
     {
-        public static readonly double MIN_HEIGHT = 2.0;
-        public static readonly double MAX_HEIGHT = 10.0; 
+        public static readonly double MIN_HEIGHT = 4.0;
+        public static readonly double MAX_HEIGHT = 12.0; 
 
         private Label _label;
         private double _confidence;
@@ -256,16 +256,18 @@ namespace LibIML
                 pair.Value.EvidenceItems.Clear();
                 foreach (Feature f in pair.Value.SourceItems) {
                     // 1 - % because the smaller the ln(weight), the more important the feature
-                    double featurePercent = 1 - ((f.UserHeight) / perLabelWeightSum[pair.Key]);
+                    //double featurePercent = 1 - ((f.UserHeight) / perLabelWeightSum[pair.Key]);
+                    double featurePercent = ((f.UserHeight) / perLabelWeightSum[pair.Key]);
                     if (featurePercent <= 0) {
                         featurePercent = 1; // If there's only one feature, it was solely responsible.
                     }
-                    double featureHeight = perLabelHeight[pair.Key] * featurePercent;
+                    double featureHeight = (perLabelHeight[pair.Key] * featurePercent) / f.Count;
                     if (featureHeight > highestHeight) {
                         highestHeight = featureHeight;
                     }
                     //Console.WriteLine("featureHeight ({0}, height={3:N3}): '{1}' = {2:N6} ({4:P})", f.Label, f.Characters, featureHeight, perLabelHeight[pair.Key], featurePercent);
                     Feature evidenceFeature = new Feature(f.Characters, f.Label, f.Count, featureHeight, 0);
+                    evidenceFeature.PercentOfReason = featurePercent;
                     pair.Value.EvidenceItems.Add(evidenceFeature);
                 }
             }

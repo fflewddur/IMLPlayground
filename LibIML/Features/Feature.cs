@@ -39,6 +39,7 @@ namespace LibIML
         private double _systemHeight;
         private double _userHeight;
         private double _pixelsToWeight;
+        private double _percentOfReason; // Percentage of total evidence 
 
         // We use this constructor for the FeatureGraphs
         public Feature(string characters, Label label)
@@ -198,6 +199,12 @@ namespace LibIML
                     Width = Count * BAR_WIDTH;
                 }
             }
+        }
+
+        public double PercentOfReason
+        {
+            get { return _percentOfReason; }
+            set { SetProperty<double>(ref _percentOfReason, value); }
         }
 
         #endregion
