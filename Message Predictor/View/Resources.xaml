@@ -192,9 +192,10 @@
             <DataTrigger Binding="{Binding ToHighlight}" Value="{x:Static sys:String.Empty}">
                 <Setter Property="Visibility" Value="Collapsed"/>
             </DataTrigger>
+            
         </Style.Triggers>
     </Style>
-
+    
     <Style x:Key="heatMapNoContentStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="Gray"/>
         <Setter Property="FontStyle" Value="Italic"/>

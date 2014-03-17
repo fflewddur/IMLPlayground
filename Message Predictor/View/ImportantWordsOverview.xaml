@@ -9,7 +9,7 @@
              d:DesignHeight="250" d:DesignWidth="600">
     <UserControl.Resources>
         <DataTemplate x:Key="importantWordsOverviewItem">
-            <xctk:DropDownButton Margin="5" Style="{StaticResource ResourceKey=importantWordsDropDownStyle}">
+            <xctk:DropDownButton Margin="5" Style="{StaticResource ResourceKey=importantWordsDropDownStyle}" Name="dropDownButton">
                 <xctk:DropDownButton.DropDownContent>
                     <StackPanel Orientation="Vertical">
                         <!--<MenuItem Header="Very important" IsCheckable="True" Click="FeatureVeryImportant_Click" Style="{StaticResource ResourceKey=featureMenuCheckable}"/>-->

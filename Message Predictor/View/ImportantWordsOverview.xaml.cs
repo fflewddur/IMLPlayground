@@ -55,13 +55,10 @@ namespace MessagePredictor.View
         private void CheckMenuItem(MenuItem item)
         {
             StackPanel panel = item.Parent as StackPanel;
-            if (panel != null)
-            {
-                foreach (UIElement element in panel.Children)
-                {
+            if (panel != null) {
+                foreach (UIElement element in panel.Children) {
                     MenuItem otherItem = element as MenuItem;
-                    if (otherItem != null)
-                    {
+                    if (otherItem != null) {
                         if (otherItem != item)
                             otherItem.IsChecked = false;
                         else
@@ -74,12 +71,10 @@ namespace MessagePredictor.View
         private void FeatureVeryImportant_Click(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
-            if (item != null)
-            {
+            if (item != null) {
                 FeatureSetViewModel fsvm = this.DataContext as FeatureSetViewModel;
                 Feature f = item.DataContext as Feature;
-                if (fsvm != null && f != null)
-                {
+                if (fsvm != null && f != null) {
                     fsvm.FeatureVeryImportant.Execute(f);
                     CheckMenuItem(item);
                 }
@@ -89,12 +84,10 @@ namespace MessagePredictor.View
         private void FeatureSomewhatImportant_Click(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
-            if (item != null)
-            {
+            if (item != null) {
                 FeatureSetViewModel fsvm = this.DataContext as FeatureSetViewModel;
                 Feature f = item.DataContext as Feature;
-                if (fsvm != null && f != null)
-                {
+                if (fsvm != null && f != null) {
                     fsvm.FeatureSomewhatImportant.Execute(f);
                     CheckMenuItem(item);
                 }
@@ -104,12 +97,10 @@ namespace MessagePredictor.View
         private void FeatureRemove_Click(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
-            if (item != null)
-            {
+            if (item != null) {
                 FeatureSetViewModel fsvm = this.DataContext as FeatureSetViewModel;
                 Feature f = item.DataContext as Feature;
-                if (fsvm != null && f != null)
-                {
+                if (fsvm != null && f != null) {
                     fsvm.FeatureRemove.Execute(f);
                 }
             }
@@ -118,14 +109,19 @@ namespace MessagePredictor.View
         private void FeatureFind_Click(object sender, RoutedEventArgs e)
         {
             MenuItem item = sender as MenuItem;
-            if (item != null)
-            {
+            if (item != null) {
                 FeatureSetViewModel fsvm = this.DataContext as FeatureSetViewModel;
                 Feature f = item.DataContext as Feature;
-                if (fsvm != null && f != null)
-                {
+                if (fsvm != null && f != null) {
                     fsvm.HighlightFeature.Execute(f.Characters);
                 }
+
+                for (int i = 0; i < Topic1Features.Items.Count; i++) {
+                    ContentPresenter c = (ContentPresenter)Topic1Features.ItemContainerGenerator.ContainerFromIndex(i);
+                    DropDownButton b = c.ContentTemplate.FindName("dropDownButton", c) as DropDownButton;
+                    b.IsOpen = false;
+                }
+
             }
         }
 
@@ -134,7 +130,7 @@ namespace MessagePredictor.View
             Dialog d = new Dialog();
             d.Owner = App.Current.MainWindow;
             d.DialogTitle = "Important words";
-            d.DialogMessage = "The computer only looks for a small number of words in each message; all of them are listed under 'Important words'.\n\n" + 
+            d.DialogMessage = "The computer only looks for a small number of words in each message; all of them are listed under 'Important words'.\n\n" +
                 "You can tell the computer about new words it should look for using the 'Add a word about...' buttons, or tell the computer not to look for certain words by removing them from this list.\n\n" +
                 "If a message doesn't contain any of these important words, the computer will have difficulty predicting its topic.";
             d.ShowDialog();

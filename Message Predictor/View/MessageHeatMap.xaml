@@ -15,8 +15,9 @@
         </Grid.RowDefinitions>
 
         <TextBlock Grid.Row="0" Text="{Binding ToHighlight, StringFormat='Messages containing &quot;{0}&quot;'}" Style="{StaticResource ResourceKey=heatMapHeaderStyle}"/>
-        
-        <TextBlock Grid.Row="1" Name="NoContentMessage" Style="{StaticResource ResourceKey=heatMapNoContentStyle}">Search for a word to see which messages it is in.</TextBlock>
+
+        <!--Search for a word to see which messages it is in.-->
+        <TextBlock Grid.Row="1" Name="NoContentMessage" Style="{StaticResource ResourceKey=heatMapNoContentStyle}"></TextBlock>
 
         <ListView Grid.Row="1" Name="HeatMap" Style="{StaticResource ResourceKey=heatMapListViewStyle}"
                   SelectionMode="Single" ItemsSource="{Binding HeatMapView.View}" SelectedItem="{Binding CurrentMessage}"
