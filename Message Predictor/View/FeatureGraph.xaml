@@ -51,7 +51,6 @@
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem HeaderStringFormat="Find '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Find_Click"/>
-                                    <Separator />
                                     <MenuItem HeaderStringFormat="Remove '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Remove_Click"/>
                                 </ContextMenu>
                             </TextBlock.ContextMenu>
