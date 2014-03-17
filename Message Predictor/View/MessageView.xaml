@@ -20,7 +20,7 @@
             </TabItem>
             <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
                 <TabItem.Header>
-                    <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.Label}" ContentStringFormat="Why '{0}'?"></Label>
+                    <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.Label}" ContentStringFormat="Why '{0}'?" Margin="0" Padding="0"></Label>
                 </TabItem.Header>
                 <local:PredictionExplanation/>
             </TabItem>

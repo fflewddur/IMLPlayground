@@ -69,7 +69,7 @@
         <Setter Property="Padding" Value="5"/>
     </Style>
     <Style x:Key="tabItemStyle" TargetType="TabItem">
-        <Setter Property="Padding" Value="20 5" />
+        <Setter Property="Padding" Value="25 7" />
     </Style>
     <Style x:Key="rotated90" TargetType="FrameworkElement">
         <Setter Property="LayoutTransform">
@@ -97,6 +97,7 @@
             </Setter.Value>
         </Setter>
     </Style>
+    
     <!-- Message list -->
 
     <TextBlock TextAlignment="Center" x:Key="messageListTopicHeader">
@@ -152,6 +153,7 @@
     <!-- End message list -->
 
     <!-- Prediction explanation -->
+    
     <Style x:Key="hideIfNoFeatures">
         <Style.Triggers>
             <DataTrigger Binding="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordUniques}" Value="0">
@@ -162,11 +164,20 @@
 
     <!-- End Prediction explanation -->
 
+    <!-- Important words -->
+
+    <Style x:Key="importantWordsDropDownStyle" TargetType="xctk:DropDownButton">
+        <Setter Property="Padding" Value="5 2"/>
+    </Style>
+    
+    <!-- End important words -->
+    
     <!-- Heat map -->
 
     <Style x:Key="heatMapHeaderStyle" TargetType="TextBlock">
-        <Setter Property="Control.FontSize" Value="16" />
+        <Setter Property="Control.FontSize" Value="18" />
         <Setter Property="Control.FontFamily" Value="Segoe UI Semibold" />
+        <Setter Property="TextAlignment" Value="Center"/>
         <Setter Property="TextWrapping" Value="Wrap"/>
         <Setter Property="Margin" Value="0 10 0 5"/>
         <Style.Triggers>
