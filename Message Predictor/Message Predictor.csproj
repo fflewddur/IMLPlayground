@@ -136,6 +136,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Libs\ArrowEnds.cs" />
+    <Compile Include="Libs\ArrowLine.cs" />
+    <Compile Include="Libs\ArrowLineBase.cs" />
+    <Compile Include="Libs\ArrowPolyline.cs" />
     <Compile Include="Model\Enums.cs" />
     <Compile Include="Model\Evaluator.cs" />
     <Compile Include="Model\NewsCollection.cs" />
