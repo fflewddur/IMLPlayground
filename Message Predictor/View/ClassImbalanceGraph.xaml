@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:MessagePredictor.View"
              xmlns:conv="clr-namespace:MessagePredictor.Converters"
              mc:Ignorable="d" 
              Name="root"
@@ -16,7 +17,7 @@
         <Separator Grid.Column="0" Height="1" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Margin="2 0 0 0" Style="{StaticResource ResourceKey=rotated90}"/>
         
         <Label Grid.Column="1" Content="{Binding ElementName=root,Path=Evidence.InstanceCount}" Background="{Binding ElementName=root,Path=GraphColor}" 
-               HorizontalAlignment="Left" HorizontalContentAlignment="Center" Foreground="White" Margin="0 5 0 5">
+               HorizontalAlignment="Left" HorizontalContentAlignment="Center" Foreground="White" Margin="0 5 0 5" ToolTip="{Binding ElementName=root,Path=Evidence.ClassImbalanceTooltip}">
             <Label.Width>
                 <MultiBinding>
                     <MultiBinding.Converter>
@@ -27,6 +28,7 @@
                     <Binding Path="Width" />
                 </MultiBinding>
             </Label.Width>
+            
         </Label>
     </Grid>
 </UserControl>

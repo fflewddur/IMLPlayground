@@ -18,8 +18,10 @@ namespace LibIML
         private double _confidence; // Classifier's confidence in this label being correct
         private double _prDocGivenClass; // Sum of feature weights * feature count for this label
         private double _pDoc; // Probability of this document
+        private string _classImbalanceTooltip;
+        private Label _label;
 
-        public Evidence()
+        public Evidence(Label label)
         {
             Confidence = -1;
             PrClass = -1;
@@ -27,6 +29,7 @@ namespace LibIML
             TotalInstanceCount = -1;
             SourceItems = new List<Feature>();
             EvidenceItems = new List<Feature>();
+            Label = label;
         }
 
         #region Properties
@@ -58,7 +61,12 @@ namespace LibIML
         public int InstanceCount
         {
             get { return _instanceCount; }
-            set { SetProperty<int>(ref _instanceCount, value); }
+            set
+            {
+                if (SetProperty<int>(ref _instanceCount, value)) {
+                    ClassImbalanceTooltip = string.Format("There are {0:N0} messages in the '{1}' folder.", InstanceCount, Label);
+                }
+            }
         }
 
         public int TotalInstanceCount
@@ -89,6 +97,18 @@ namespace LibIML
         {
             get { return _pDoc; }
             set { SetProperty<double>(ref _pDoc, value); }
+        }
+
+        public Label Label
+        {
+            get { return _label; }
+            private set { SetProperty<Label>(ref _label, value); }
+        }
+
+        public string ClassImbalanceTooltip
+        {
+            get { return _classImbalanceTooltip; }
+            private set { SetProperty<string>(ref _classImbalanceTooltip, value); }
         }
 
         #endregion

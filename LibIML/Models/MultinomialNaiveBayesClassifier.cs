@@ -144,7 +144,7 @@ namespace LibIML
             Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
             foreach (Label l in Labels)
             {
-                Evidence evidence = new Evidence(); // Store our evidence in favor of each class
+                Evidence evidence = new Evidence(l); // Store our evidence in favor of each class
                 double prob = 0;
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data)
                 {
