@@ -48,15 +48,6 @@ namespace MessagePredictor.View
         public static readonly DependencyProperty ItemsSourceProperty =
             DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(FeatureGraph));
 
-        //public double UnusedWeight
-        //{
-        //    get { return (double)GetValue(UnusedWeightProperty); }
-        //    set { SetValue(UnusedWeightProperty, value); }
-        //}
-
-        //public static readonly DependencyProperty UnusedWeightProperty =
-        //    DependencyProperty.Register("UnusedWeight", typeof(double), typeof(FeatureGraph));
-
         public Brush GraphColorUser
         {
             get { return (Brush)GetValue(GraphColorUserProperty); }
@@ -94,11 +85,6 @@ namespace MessagePredictor.View
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
-                //bool apply = (UnusedWeight == Feature.MINIMUM_HEIGHT);
-                //if (delta > (UnusedWeight - Feature.MINIMUM_HEIGHT)) {
-                //    delta = (UnusedWeight - Feature.MINIMUM_HEIGHT);
-                //}
-                //UnusedWeight -= vm.AdjustUserFeatureHeight(_currentFeature, delta, apply);
                 vm.AdjustUserFeatureHeight(_currentFeature, delta);
                 _mouseOrigY = y;
 

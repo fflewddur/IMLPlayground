@@ -30,6 +30,7 @@ namespace MessagePredictor.ViewModel
         private DispatcherTimer _featureGraphHeightChangedTimer;
         private double _featureGraphHeight;
         private double _pixelsToWeight; // How many pixels to use to display each unit of feature weight (changes based on display size)
+        private bool _featureImportanceAdjusted;
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels)
             : base()
@@ -46,6 +47,7 @@ namespace MessagePredictor.ViewModel
             _featureTextEditedTimer = new DispatcherTimer();
             _featurePriorsEditedTimer = new DispatcherTimer();
             _featureGraphHeightChangedTimer = new DispatcherTimer();
+            _featureImportanceAdjusted = false;
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
             AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
@@ -53,7 +55,7 @@ namespace MessagePredictor.ViewModel
             FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature);
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
             FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
-            ApplyFeatureAdjustments = new RelayCommand(PerformApplyFeatureAdjustments);
+            ApplyFeatureAdjustments = new RelayCommand(PerformApplyFeatureAdjustments, CanPerformApplyFeatureAdjustments);
 
             _classifier.Retrained += classifier_Retrained;
             _vocab.Updated += vocab_Updated;
@@ -228,6 +230,7 @@ namespace MessagePredictor.ViewModel
                 heightDelta = -1 * (feature.UserHeight - Feature.MINIMUM_HEIGHT);
             }
             feature.UserHeight += heightDelta;
+            _featureImportanceAdjusted = true;
 
             return heightDelta;
         }
@@ -355,6 +358,8 @@ namespace MessagePredictor.ViewModel
             foreach (CollectionViewSource cvs in _collectionViewSourcesOverview) {
                 cvs.View.Refresh();
             }
+
+            _featureImportanceAdjusted = false;
         }
 
         private void PerformHighlightFeature(string text)
@@ -425,6 +430,11 @@ namespace MessagePredictor.ViewModel
             Console.WriteLine("PerformFeatureSomewhatImportant on {0}", feature);
         }
 
+        private bool CanPerformApplyFeatureAdjustments()
+        {
+            return _featureImportanceAdjusted;
+        }
+
         private void PerformApplyFeatureAdjustments()
         {
             Console.WriteLine("Apply feature adjustments");
@@ -432,6 +442,8 @@ namespace MessagePredictor.ViewModel
             foreach (Label label in Labels) {
                 UpdateFeaturePriors(label);
             }
+
+            _featureImportanceAdjusted = false;
         }
 
         private void UpdateFeaturePriors(Label label)
