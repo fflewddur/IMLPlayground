@@ -159,8 +159,17 @@ namespace MessagePredictor.ViewModel
             }
         }
 
+        public class FeatureRemovedEventArgs : EventArgs
+        {
+            public readonly string Tokens;
+            public FeatureRemovedEventArgs(string tokens)
+            {
+                Tokens = tokens;
+            }
+        }
+
         public event EventHandler<FeatureAddedEventArgs> FeatureAdded;
-        public event EventHandler<EventArgs> FeatureRemoved;
+        public event EventHandler<FeatureRemovedEventArgs> FeatureRemoved;
         public event EventHandler<FeatureTextEditedEventArgs> FeatureTextEdited;
         public event EventHandler<FeaturePriorEditedEventArgs> FeaturePriorEdited;
 
@@ -170,7 +179,7 @@ namespace MessagePredictor.ViewModel
                 FeatureAdded(this, e);
         }
 
-        protected virtual void OnFeatureRemoved(EventArgs e)
+        protected virtual void OnFeatureRemoved(FeatureRemovedEventArgs e)
         {
             if (FeatureRemoved != null)
                 FeatureRemoved(this, e);
@@ -221,7 +230,7 @@ namespace MessagePredictor.ViewModel
             // Update the UI right away, even if we don't retrain
             while (FeatureSet.Remove(anyLabel)) ;
 
-            OnFeatureRemoved(new EventArgs());
+            OnFeatureRemoved(new FeatureRemovedEventArgs(feature.Characters));
         }
 
         public double AdjustUserFeatureHeight(Feature feature, double heightDelta)

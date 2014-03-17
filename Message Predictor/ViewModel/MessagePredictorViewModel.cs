@@ -550,11 +550,16 @@ namespace MessagePredictor
             }
         }
 
-        private void _featureSetVM_FeatureRemoved(object sender, EventArgs e)
+        private void _featureSetVM_FeatureRemoved(object sender, FeatureSetViewModel.FeatureRemovedEventArgs e)
         {
             UpdateVocab();
             if (AutoUpdatePredictions) {
                 PerformUpdatePredictions();
+            }
+
+            // If the removed feature was highlighted, reset the highlight.
+            if (HeatMapVM.ToHighlight == e.Tokens) {
+                HeatMapVM.ToHighlight = "";
             }
         }
 
