@@ -119,9 +119,16 @@ namespace MessagePredictor.View
                 for (int i = 0; i < Topic1Features.Items.Count; i++) {
                     ContentPresenter c = (ContentPresenter)Topic1Features.ItemContainerGenerator.ContainerFromIndex(i);
                     DropDownButton b = c.ContentTemplate.FindName("dropDownButton", c) as DropDownButton;
-                    b.IsOpen = false;
+                    if (b != null)
+                        b.IsOpen = false;
                 }
 
+                for (int i = 0; i < Topic2Features.Items.Count; i++) {
+                    ContentPresenter c = (ContentPresenter)Topic2Features.ItemContainerGenerator.ContainerFromIndex(i);
+                    DropDownButton b = c.ContentTemplate.FindName("dropDownButton", c) as DropDownButton;
+                    if (b != null)
+                        b.IsOpen = false;
+                }
             }
         }
 
