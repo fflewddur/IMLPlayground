@@ -1,5 +1,6 @@
 ﻿using LibIML;
 using MessagePredictor.Model;
+using System;
 
 namespace MessagePredictor.ViewModel
 {
@@ -40,7 +41,34 @@ namespace MessagePredictor.ViewModel
         public NewsItem SelectedMessage
         {
             get { return _selectedMessage; }
-            set { SetProperty<NewsItem>(ref _selectedMessage, value); }
+            set
+            {
+                if (SetProperty<NewsItem>(ref _selectedMessage, value)) {
+                    OnSelectedFolderChanged(new SelectedMessageChangedEventArgs(_selectedMessage));
+                }
+            }
+        }
+
+        #endregion
+
+        #region Events
+
+        public class SelectedMessageChangedEventArgs : EventArgs
+        {
+            public readonly NewsItem Message;
+
+            public SelectedMessageChangedEventArgs(NewsItem message)
+            {
+                Message = message;
+            }
+        }
+
+        public event EventHandler<SelectedMessageChangedEventArgs> SelectedMessageChanged;
+
+        protected virtual void OnSelectedFolderChanged(SelectedMessageChangedEventArgs e)
+        {
+            if (SelectedMessageChanged != null)
+                SelectedMessageChanged(this, e);
         }
 
         #endregion

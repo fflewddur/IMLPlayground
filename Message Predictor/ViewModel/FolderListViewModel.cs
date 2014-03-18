@@ -18,13 +18,21 @@ namespace MessagePredictor.ViewModel
 
             // First add an "Unlabeled" folder
             _unknownLabel = new Label("Unknown", "Unknown");
-            _folders.Add(new FolderViewModel(_unknownLabel, null));
+            FolderViewModel vm = new FolderViewModel(_unknownLabel, null);
+            vm.SelectedMessageChanged += vm_SelectedMessageChanged;
+            _folders.Add(vm);
 
             // Now add all of the classification labels
             foreach (Evaluator evaluator in evaluators) {
-                FolderViewModel vm = new FolderViewModel(evaluator.Label, evaluator);
+                vm = new FolderViewModel(evaluator.Label, evaluator);
+                vm.SelectedMessageChanged += vm_SelectedMessageChanged;
                 _folders.Add(vm);
             }
+        }
+
+        void vm_SelectedMessageChanged(object sender, FolderViewModel.SelectedMessageChangedEventArgs e)
+        {
+            OnSelectedMessageChanged(e);
         }
 
         #region Properties
@@ -71,6 +79,14 @@ namespace MessagePredictor.ViewModel
         {
             if (SelectedFolderChanged != null)
                 SelectedFolderChanged(this, e);
+        }
+
+        public event EventHandler<FolderViewModel.SelectedMessageChangedEventArgs> SelectedMessageChanged;
+
+        protected virtual void OnSelectedMessageChanged(FolderViewModel.SelectedMessageChangedEventArgs e)
+        {
+            if (SelectedMessageChanged != null)
+                SelectedMessageChanged(this, e);
         }
 
         #endregion

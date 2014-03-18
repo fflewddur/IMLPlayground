@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePredictor.Model;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,12 @@ namespace MessagePredictor.ViewModel
     /// </summary>
     class MessageViewModel : ViewModelBase
     {
+        private NewsItem _message;
 
+        public NewsItem Message
+        {
+            get { return _message; }
+            set { SetProperty<NewsItem>(ref _message, value); }
+        }
     }
 }

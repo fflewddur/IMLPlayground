@@ -25,6 +25,11 @@ namespace MessagePredictor.View
             InitializeComponent();
         }
 
+        private void DataGrid_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
         /// <summary>
         /// Start a drag event for moving items to different folders.
         /// </summary>

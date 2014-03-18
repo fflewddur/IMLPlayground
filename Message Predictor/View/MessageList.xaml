@@ -22,7 +22,7 @@
         
         <!-- Summary list -->
         <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding MessageListViewSource.View}" AutoGenerateColumns="False" 
-                  SelectedItem="{Binding FolderListVM.SelectedFolder.SelectedMessage}" 
+                  SelectedItem="{Binding FolderListVM.SelectedFolder.SelectedMessage}"
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
                   SelectionUnit="FullRow" GridLinesVisibility="Horizontal" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <DataGrid.CellStyle>

@@ -89,6 +89,7 @@ namespace MessagePredictor
 
             _folderListVM = new FolderListViewModel(_evaluatorVM.Evaluators);
             _folderListVM.SelectedFolderChanged += _folderListVM_SelectedFolderChanged;
+            _folderListVM.SelectedMessageChanged += _folderListVM_SelectedMessageChanged;
 
             _messageVM = new MessageViewModel();
 
@@ -103,6 +104,7 @@ namespace MessagePredictor
 
             _messageListViewSource = new CollectionViewSource();
             _messageListViewSource.Source = _messages;
+
 
             // Setup our Commands
             UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
@@ -163,6 +165,12 @@ namespace MessagePredictor
         {
             get { return _textToHighlight; }
             private set { SetProperty<List<string>>(ref _textToHighlight, value); }
+        }
+
+        public MessageViewModel MessageVM
+        {
+            get { return _messageVM; }
+            private set { SetProperty<MessageViewModel>(ref _messageVM, value); }
         }
 
         public FolderListViewModel FolderListVM
@@ -590,8 +598,15 @@ namespace MessagePredictor
 
         private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
         {
-            FolderListViewModel vm = sender as FolderListViewModel;
+            //FolderListViewModel vm = sender as FolderListViewModel;
             UpdateFilters(_onlyShowRecentChanges);
+            //MessageVM.Message = vm.SelectedFolder.SelectedMessage;
+            MessageVM.Message = e.Folder.SelectedMessage;
+        }
+
+        private void _folderListVM_SelectedMessageChanged(object sender, FolderViewModel.SelectedMessageChangedEventArgs e)
+        {
+            MessageVM.Message = e.Message;
         }
 
         #endregion

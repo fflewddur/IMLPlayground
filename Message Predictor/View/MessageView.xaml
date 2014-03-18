@@ -10,7 +10,10 @@
     <Grid>
         <TabControl>
             <TabItem Header="Message" Style="{StaticResource ResourceKey=tabItemStyle}">
-                <xctk:RichTextBox Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.DocumentReadOnly}" IsReadOnly="True" 
+                <!--<xctk:RichTextBox Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.DocumentReadOnly}" IsReadOnly="True" 
+                                  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                                  SelectionChanged="RichTextBox_SelectionChanged" BorderThickness="0" Padding="5 10 5 0">-->
+                <xctk:RichTextBox Text="{Binding MessageVM.Message.DocumentReadOnly}" IsReadOnly="True" 
                                   ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"
                                   SelectionChanged="RichTextBox_SelectionChanged" BorderThickness="0" Padding="5 10 5 0">
                     <xctk:RichTextBox.TextFormatter>
