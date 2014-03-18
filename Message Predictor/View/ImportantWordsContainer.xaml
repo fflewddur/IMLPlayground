@@ -7,7 +7,14 @@
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="500">
     <Grid SizeChanged="Grid_SizeChanged" DataContextChanged="Grid_DataContextChanged">
-        <TabControl>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <Label Grid.Row="0" Style="{StaticResource headerStyle1}">Important words</Label>
+        
+        <TabControl Grid.Row="1">
             <TabItem Header="Overview" Style="{StaticResource ResourceKey=tabItemStyle}">
                 <local:ImportantWordsOverview />
             </TabItem>

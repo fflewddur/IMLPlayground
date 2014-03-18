@@ -18,6 +18,7 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="7*" />
                 </Grid.ColumnDefinitions>
                 
@@ -44,23 +45,26 @@
                     <!--<Label Grid.Row="4" Style="{StaticResource headerStyle1}">Words</Label>-->
                     <local:MessageHeatMap Grid.Row="5" Style="{StaticResource contentStyle}"  DataContext="{Binding HeatMapVM}"/>
                 </Grid>
-                
+
+                <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="true" Width="4" Background="White"/>
+
                 <!-- Right column -->
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="2">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="2*" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="1*" />
                     </Grid.RowDefinitions>
                     
                     <!-- Messages -->
-                    <Label Grid.Row="0" Style="{StaticResource headerStyle1}">Messages</Label>
-                    <local:MessageList Grid.Row="1" Style="{StaticResource contentStyle}"/>
+                    
+                    <local:MessageList Grid.Row="0" Style="{StaticResource contentStyle}"/>
+
+                    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="true" Height="4" Background="White"/>
                     
                     <!-- Important words -->
-                    <Label Grid.Row="2" Style="{StaticResource headerStyle1}">Important words</Label>
-                    <local:ImportantWordsContainer Grid.Row="3" Style="{StaticResource contentStyle}" DataContext="{Binding FeatureSetVM}"/>
+                    
+                    <local:ImportantWordsContainer Grid.Row="2" Style="{StaticResource contentStyle}" DataContext="{Binding FeatureSetVM}"/>
                 </Grid>
             </Grid>
         </Grid>
