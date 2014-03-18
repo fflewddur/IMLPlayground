@@ -14,7 +14,7 @@ namespace MessagePredictor.ViewModel
 {
     class FeatureSetViewModel : ViewModelBase
     {
-        public static readonly double PERCENT_HEIGHT_OF_MAX_BAR = 0.5;
+        public static readonly double PERCENT_HEIGHT_OF_MAX_BAR = 0.55;
 
         private IClassifier _classifier;
         private Vocabulary _vocab;
