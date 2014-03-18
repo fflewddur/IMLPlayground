@@ -108,7 +108,11 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidenceDesc,Mode=OneWay}"></TextBlock>
                 <Canvas Grid.Column="1" Height="100" Margin="10 0 0 10">
-                    <Ellipse Width="100" Height="100" Fill="{StaticResource ResourceKey=hockeyBrushSystem}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0"/>
+                    <Ellipse Width="100" Height="100" Fill="{StaticResource ResourceKey=hockeyBrushSystem}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0">
+                        <Ellipse.ToolTip>
+                            <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePieCircle}" ContentStringFormat="{}{0:P0} chance this message is about Hockey"/>
+                        </Ellipse.ToolTip>
+                    </Ellipse>
                     <Path Stroke="Black" StrokeThickness="1" Fill="{StaticResource ResourceKey=baseballBrushSystem}">
                         <Path.Data>
                             <PathGeometry>
@@ -122,6 +126,9 @@
                                 </PathFigure>
                             </PathGeometry>
                         </Path.Data>
+                        <Path.ToolTip>
+                            <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePieSlice}" ContentStringFormat="{}{0:P0} chance this message is about Baseball"/>
+                        </Path.ToolTip>
                     </Path>
                 </Canvas>
             </Grid>

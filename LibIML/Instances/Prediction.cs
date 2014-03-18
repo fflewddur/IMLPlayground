@@ -23,6 +23,8 @@ namespace LibIML
         private string _featurePrDesc; // Describe how feature probability influenced this prediction
         private System.Windows.Point _confidencePiePoint; // Where should the smaller confidence arc end?
         private bool _confidencePieLarge; // Is the pie slice more or less than 50%?
+        private double _confidencePieCircle; // The confidence value of the pie background
+        private double _confidencePieSlice; // The confidence value of the pie slice
         private string _confidenceDesc;
 
         public Prediction()
@@ -107,6 +109,18 @@ namespace LibIML
         {
             get { return _confidenceDesc; }
             private set { SetProperty<string>(ref _confidenceDesc, value); }
+        }
+
+        public double ConfidencePieSlice
+        {
+            get { return _confidencePieSlice; }
+            private set { SetProperty<double>(ref _confidencePieSlice, value); }
+        }
+
+        public double ConfidencePieCircle
+        {
+            get { return _confidencePieCircle; }
+            private set { SetProperty<double>(ref _confidencePieCircle, value); }
         }
 
         #endregion
@@ -196,9 +210,12 @@ namespace LibIML
                     if (angle < 0) {
                         angle += 360; // Wrap around if we fell into negative territory
                     }
-                    ConfidencePieLarge = (angle > 90);
+                    ConfidencePieLarge = (angle > 90) && (angle < 270);
                     angle *= Math.PI / 180; // convert to radians
                     ConfidencePiePoint = new Point(50 + Math.Cos(angle) * 50, 50 + Math.Sin(angle) * 50);
+                    ConfidencePieSlice = pair.Value.Confidence;
+                } else if (pair.Key.UserLabel == "Hockey") {
+                    ConfidencePieCircle = pair.Value.Confidence;
                 }
             }
 
