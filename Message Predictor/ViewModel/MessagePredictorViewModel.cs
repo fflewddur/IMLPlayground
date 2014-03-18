@@ -247,7 +247,7 @@ namespace MessagePredictor
                 Mouse.OverrideCursor = null;
                 Dialog d = new Dialog();
                 d.DialogTitle = string.Format("Already in {0}", label);
-                d.DialogMessage = string.Format("Sorry, we can't move this message to '{0}' because it's already there!", label);
+                d.DialogMessage = string.Format("This message is already in the {0} folder.", label);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
                 return;
@@ -258,7 +258,7 @@ namespace MessagePredictor
                 Mouse.OverrideCursor = null;
                 Dialog d = new Dialog();
                 d.DialogTitle = string.Format("Not about {0}", label);
-                d.DialogMessage = string.Format("Sorry, we can't move this message to '{0}' because it's actually about '{1}'.", label, item.GroundTruthLabel);
+                d.DialogMessage = string.Format("For this experiment, we can't let you move this message to the {0} folder.\n\nThe person who wrote this message says it's about {1}.", label, item.GroundTruthLabel);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
                 return;
