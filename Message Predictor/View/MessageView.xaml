@@ -18,7 +18,7 @@
                     </xctk:RichTextBox.TextFormatter>
                 </xctk:RichTextBox>
             </TabItem>
-            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}">
+            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.Label.Color}">
                 <TabItem.Header>
                     <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.Label}" ContentStringFormat="Why '{0}'?" Margin="0" Padding="0"></Label>
                 </TabItem.Header>

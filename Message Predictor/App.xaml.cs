@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Media;
 using System.Xml.Linq;
 
 namespace MessagePredictor
@@ -31,11 +32,13 @@ namespace MessagePredictor
             Topic1VocabSize,
             Topic1SystemLabel,
             Topic1UserLabel,
+            Topic1Color,
             Topic2TrainSize,
             Topic2TestSize,
             Topic2VocabSize,
             Topic2SystemLabel,
             Topic2UserLabel,
+            Topic2Color,
             AutoUpdatePredictions
         }
 
@@ -96,6 +99,7 @@ namespace MessagePredictor
             int vocabSize = 0;
             string systemLabel = null;
             string userLabel = null;
+            Brush color = null;
             if (element.Attribute("trainSize") != null)
                 trainSize = Int32.Parse(element.Attribute("trainSize").Value.ToString());
             if (element.Attribute("testSize") != null)
@@ -106,12 +110,15 @@ namespace MessagePredictor
                 systemLabel = element.Attribute("systemLabel").Value.ToString();
             if (element.Attribute("userLabel") != null)
                 userLabel = element.Attribute("userLabel").Value.ToString();
+            if (element.Attribute("color") != null)
+                color = new SolidColorBrush((Color)ColorConverter.ConvertFromString(element.Attribute("color").Value.ToString()));
 
             PropertyKey keyTrainSize = PropertyKey.Unknown;
             PropertyKey keyTestSize = PropertyKey.Unknown;
             PropertyKey keyVocabSize = PropertyKey.Unknown;
             PropertyKey keySystemLabel = PropertyKey.Unknown;
             PropertyKey keyUserLabel = PropertyKey.Unknown;
+            PropertyKey keyColor = PropertyKey.Unknown;
             switch (topic) {
                 case 1:
                     keyTrainSize = PropertyKey.Topic1TrainSize;
@@ -119,6 +126,7 @@ namespace MessagePredictor
                     keyVocabSize = PropertyKey.Topic1VocabSize;
                     keySystemLabel = PropertyKey.Topic1SystemLabel;
                     keyUserLabel = PropertyKey.Topic1UserLabel;
+                    keyColor = PropertyKey.Topic1Color;
                     break;
                 case 2:
                     keyTrainSize = PropertyKey.Topic2TrainSize;
@@ -126,6 +134,7 @@ namespace MessagePredictor
                     keyVocabSize = PropertyKey.Topic2VocabSize;
                     keySystemLabel = PropertyKey.Topic2SystemLabel;
                     keyUserLabel = PropertyKey.Topic2UserLabel;
+                    keyColor = PropertyKey.Topic2Color;
                     break;
                 default:
                     Console.Error.WriteLine("Unknown topic: {0}", topic);
@@ -137,6 +146,7 @@ namespace MessagePredictor
             this.Properties[keyVocabSize] = vocabSize;
             this.Properties[keySystemLabel] = systemLabel;
             this.Properties[keyUserLabel] = userLabel;
+            this.Properties[keyColor] = color;
         }
 
         private void LoadAutoUpdatePredictionsProperty(XElement element)

@@ -33,9 +33,9 @@
                    TextWrapping="Wrap" Margin="15 0 5 5" />
 
             <Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
-               Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}" />              
-            
-            <local:EvidenceGraph Grid.Row="2" Grid.Column="1" Label="{Binding Labels[0]}" GraphColorUser="#FFDC9717" GraphColorSystem="#FFB66400"
+               Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}" />
+
+            <local:EvidenceGraph Grid.Row="2" Grid.Column="1" Label="{Binding Labels[0]}" GraphColorUser="{Binding Labels[0].Color}" GraphColorSystem="{Binding Labels[0].Color}"
                              Margin="5 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}">
                 <local:EvidenceGraph.Evidence>
                     <MultiBinding>
@@ -50,7 +50,7 @@
 
             <Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>
-            <local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="#FF2EBB2E" GraphColorSystem="#FF127812"
+            <local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="{Binding Labels[1].Color}" GraphColorSystem="{Binding Labels[1].Color}"
                              Margin="5 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}">
                 <local:EvidenceGraph.Evidence>
                     <MultiBinding>
@@ -70,7 +70,7 @@
 
             <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-            <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="#FFB66400" Margin="0">
+            <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="{Binding Labels[0].Color}" Margin="0">
                 <local:ClassImbalanceGraph.Evidence>
                     <MultiBinding>
                         <MultiBinding.Converter>
@@ -84,7 +84,7 @@
 
             <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-            <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="#FF127812" Margin="0">
+            <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="{Binding Labels[1].Color}" Margin="0">
                 <local:ClassImbalanceGraph.Evidence>
                     <MultiBinding>
                         <MultiBinding.Converter>
@@ -108,12 +108,12 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidenceDesc,Mode=OneWay}"></TextBlock>
                 <Canvas Grid.Column="1" Height="100" Margin="10 0 0 10">
-                    <Ellipse Width="100" Height="100" Fill="{StaticResource ResourceKey=hockeyBrushSystem}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0">
+                    <Ellipse Width="100" Height="100" Fill="{Binding Labels[0].Color}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0">
                         <Ellipse.ToolTip>
                             <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePieCircle}" ContentStringFormat="{}{0:P0} chance this message is about Hockey"/>
                         </Ellipse.ToolTip>
                     </Ellipse>
-                    <Path Stroke="Black" StrokeThickness="1" Fill="{StaticResource ResourceKey=baseballBrushSystem}">
+                    <Path Stroke="Black" StrokeThickness="1" Fill="{Binding Labels[1].Color}">
                         <Path.Data>
                             <PathGeometry>
                                 <PathFigure StartPoint="50,0" IsClosed="True">

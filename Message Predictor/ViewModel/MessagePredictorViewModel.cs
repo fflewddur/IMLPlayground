@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
 
 namespace MessagePredictor
 {
@@ -47,7 +48,7 @@ namespace MessagePredictor
             Stopwatch timer = new Stopwatch();
 
             timer.Start();
-            List<NewsCollection> folders = new List<NewsCollection>();
+            //List<NewsCollection> folders = new List<NewsCollection>();
             _messages = LoadDataset();
             timer.Stop();
             Console.WriteLine("Time to load data set: {0}", timer.Elapsed);
@@ -444,8 +445,10 @@ namespace MessagePredictor
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.DataDir, App.Current.Properties[App.PropertyKey.DatasetFile].ToString());
 
             _labels = new List<Label>();
-            _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic1UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic1SystemLabel].ToString()));
-            _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic2UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic2SystemLabel].ToString()));
+            _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic1UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic1SystemLabel].ToString(), 
+                (Brush)App.Current.Properties[App.PropertyKey.Topic1Color]));
+            _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic2UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic2SystemLabel].ToString(),
+                (Brush)App.Current.Properties[App.PropertyKey.Topic2Color]));
 
             NewsCollection dataset = NewsCollection.CreateFromZip(path, _labels);
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace LibIML
 {
@@ -11,12 +12,18 @@ namespace LibIML
     {
         private string _userLabel;
         private string _systemLabel;
+        private Brush _color;
         private static readonly Label _anyLabel;
 
         public Label(string userLabel, string systemLabel)
         {
             UserLabel = userLabel;
             SystemLabel = systemLabel;
+        }
+
+        public Label(string userLabel, string systemLabel, Brush color) : this(userLabel, systemLabel)
+        {
+            Color = color;
         }
 
         static Label()
@@ -42,6 +49,12 @@ namespace LibIML
         {
             get { return _systemLabel; }
             private set { SetProperty<string>(ref _systemLabel, value); }
+        }
+
+        public Brush Color
+        {
+            get { return _color; }
+            private set { SetProperty<Brush>(ref _color, value); }
         }
 
         public static Label AnyLabel
