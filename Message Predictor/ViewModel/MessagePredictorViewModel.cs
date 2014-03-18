@@ -239,7 +239,7 @@ namespace MessagePredictor
 
         private void PerformLabelMessage(Label label)
         {
-            NewsItem item = FolderListVM.SelectedFolder.SelectedMessage;
+            NewsItem item = MessageVM.Message;
             Mouse.OverrideCursor = Cursors.Wait;
 
             // Don't do anything if the message already has the desired label
@@ -591,16 +591,14 @@ namespace MessagePredictor
 
         private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
         {
-            if (FolderListVM.SelectedFolder != null && FolderListVM.SelectedFolder.SelectedMessage != null) {
-                FolderListVM.SelectedFolder.SelectedMessage.HighlightWithWord(e.Text);
+            if (MessageVM.Message != null) {
+                MessageVM.Message.HighlightWithWord(e.Text);
             }
         }
 
         private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
         {
-            //FolderListViewModel vm = sender as FolderListViewModel;
             UpdateFilters(_onlyShowRecentChanges);
-            //MessageVM.Message = vm.SelectedFolder.SelectedMessage;
             MessageVM.Message = e.Folder.SelectedMessage;
         }
 

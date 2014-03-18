@@ -29,7 +29,7 @@
             </Grid.ColumnDefinitions>
 
             <Label Grid.Row="0" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part one:</Label>
-            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ImportantWordDesc, Mode=OneWay}" 
+            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MessageVM.Message.Prediction.ImportantWordDesc, Mode=OneWay}" 
                    TextWrapping="Wrap" Margin="15 0 5 5" />
 
             <Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
@@ -42,7 +42,7 @@
                         <MultiBinding.Converter>
                             <conv:DictionaryItemFromLabelConverter/>
                         </MultiBinding.Converter>
-                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
                         <Binding Path="Labels[0]"/>
                     </MultiBinding>
                 </local:EvidenceGraph.Evidence>
@@ -57,13 +57,13 @@
                         <MultiBinding.Converter>
                             <conv:DictionaryItemFromLabelConverter/>
                         </MultiBinding.Converter>
-                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
                         <Binding Path="Labels[1]"/>
                     </MultiBinding>
                 </local:EvidenceGraph.Evidence>
             </local:EvidenceGraph>
             <TextBlock Grid.Row="4" Grid.Column="1" Margin="15 0 15 5" TextWrapping="Wrap" MaxWidth="400" TextAlignment="Left"
-                   Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.FeaturePrDesc, Mode=OneWay}" 
+                   Text="{Binding MessageVM.Message.Prediction.FeaturePrDesc, Mode=OneWay}" 
                    HorizontalAlignment="Left" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>
 
             <Label Grid.Row="5" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part two:</Label>
@@ -76,7 +76,7 @@
                         <MultiBinding.Converter>
                             <conv:DictionaryItemFromLabelConverter/>
                         </MultiBinding.Converter>
-                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
                         <Binding Path="Labels[0]"/>
                     </MultiBinding>
                 </local:ClassImbalanceGraph.Evidence>
@@ -90,14 +90,14 @@
                         <MultiBinding.Converter>
                             <conv:DictionaryItemFromLabelConverter/>
                         </MultiBinding.Converter>
-                        <Binding Path="FolderListVM.SelectedFolder.SelectedMessage.Prediction.EvidencePerClass"/>
+                        <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
                         <Binding Path="Labels[1]"/>
                     </MultiBinding>
                 </local:ClassImbalanceGraph.Evidence>
             </local:ClassImbalanceGraph>
 
             <TextBlock Grid.Row="8" Grid.Column="1" Margin="15 10 15 5" TextWrapping="Wrap" MaxWidth="400"
-                   Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ClassPrDesc, Mode=OneWay}">
+                   Text="{Binding MessageVM.Message.Prediction.ClassPrDesc, Mode=OneWay}">
             </TextBlock>
 
             <Label Grid.Row="9" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part three:</Label>
@@ -106,11 +106,11 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidenceDesc,Mode=OneWay}"></TextBlock>
+                <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding MessageVM.Message.Prediction.ConfidenceDesc,Mode=OneWay}"></TextBlock>
                 <Canvas Grid.Column="1" Height="100" Margin="10 0 0 10">
                     <Ellipse Width="100" Height="100" Fill="{Binding Labels[0].Color}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0">
                         <Ellipse.ToolTip>
-                            <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePieCircle}" ContentStringFormat="{}{0:P0} chance this message is about Hockey"/>
+                            <Label Content="{Binding MessageVM.Message.Prediction.ConfidencePieCircle}" ContentStringFormat="{}{0:P0} chance this message is about Hockey"/>
                         </Ellipse.ToolTip>
                     </Ellipse>
                     <Path Stroke="Black" StrokeThickness="1" Fill="{Binding Labels[1].Color}">
@@ -119,15 +119,15 @@
                                 <PathFigure StartPoint="50,0" IsClosed="True">
                                     <ArcSegment
                                     Size="50,50"
-                                    Point="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePiePoint}"
-                                    IsLargeArc="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePieLarge}"
+                                    Point="{Binding MessageVM.Message.Prediction.ConfidencePiePoint}"
+                                    IsLargeArc="{Binding MessageVM.Message.Prediction.ConfidencePieLarge}"
                                     SweepDirection="Clockwise"/>
                                     <LineSegment Point="50,50"/>
                                 </PathFigure>
                             </PathGeometry>
                         </Path.Data>
                         <Path.ToolTip>
-                            <Label Content="{Binding FolderListVM.SelectedFolder.SelectedMessage.Prediction.ConfidencePieSlice}" ContentStringFormat="{}{0:P0} chance this message is about Baseball"/>
+                            <Label Content="{Binding MessageVM.Message.Prediction.ConfidencePieSlice}" ContentStringFormat="{}{0:P0} chance this message is about Baseball"/>
                         </Path.ToolTip>
                     </Path>
                 </Canvas>
