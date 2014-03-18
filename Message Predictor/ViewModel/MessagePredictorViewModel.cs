@@ -605,6 +605,7 @@ namespace MessagePredictor
         private void _folderListVM_SelectedMessageChanged(object sender, FolderViewModel.SelectedMessageChangedEventArgs e)
         {
             MessageVM.Message = e.Message;
+            MessageVM.Message.HighlightWithWord(HeatMapVM.ToHighlight);
         }
 
         #endregion

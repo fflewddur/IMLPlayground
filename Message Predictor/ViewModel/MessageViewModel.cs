@@ -17,7 +17,17 @@ namespace MessagePredictor.ViewModel
         public NewsItem Message
         {
             get { return _message; }
-            set { SetProperty<NewsItem>(ref _message, value); }
+            set
+            {
+                if (SetProperty<NewsItem>(ref _message, value)) {
+
+                }
+            }
+        }
+
+        private void UpdateMessageForViewing(NewsItem message)
+        {
+            
         }
     }
 }
