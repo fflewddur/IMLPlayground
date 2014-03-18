@@ -15,8 +15,12 @@ namespace MessagePredictor.Model
         private int _trainingSetCount;
         private Direction _correctPredictionDirection;
         private Direction _totalPredictionDirection;
+        private Direction _averageConfidenceDirection;
         private int _totalPredictionDifference;
         private int _correctPredictionDifference;
+        private double _averageConfidence;
+        private double _priorAverageConfidence;
+        private double _averageConfidenceDifference;
 
         public Evaluator(Label label)
             : base()
@@ -114,6 +118,42 @@ namespace MessagePredictor.Model
             private set { SetProperty<int>(ref _correctPredictionDifference, value); }
         }
 
+        public double AverageConfidence
+        {
+            get { return _averageConfidence; }
+            private set {
+                double prior = _averageConfidence;
+                SetProperty<double>(ref _averageConfidence, value);
+                PriorAverageConfidence = prior;
+                AverageConfidenceDifference = Math.Abs(AverageConfidence - PriorAverageConfidence);
+                if (prior < value) {
+                    AverageConfidenceDirection = Direction.Up;
+                } else if (prior > value) {
+                    AverageConfidenceDirection = Direction.Down;
+                } else {
+                    AverageConfidenceDirection = Direction.None;
+                }
+            }
+        }
+
+        public double PriorAverageConfidence
+        {
+            get { return _priorAverageConfidence; }
+            private set { SetProperty<double>(ref _priorAverageConfidence, value); }
+        }
+
+        public double AverageConfidenceDifference
+        {
+            get { return _averageConfidenceDifference; }
+            private set { SetProperty<double>(ref _averageConfidenceDifference, value); }
+        }
+
+        public Direction AverageConfidenceDirection
+        {
+            get { return _averageConfidenceDirection; }
+            private set { SetProperty<Direction>(ref _averageConfidenceDirection, value); }
+        }
+
         #endregion
 
         #region Public methods
@@ -128,10 +168,12 @@ namespace MessagePredictor.Model
             int correctPredictionCount = 0;
             int totalPredictionCount = 0;
             int trainingSetCount = 0;
+            double confidenceSum = 0;
 
             foreach (IInstance instance in instances) {
                 if (instance.Prediction.Label == _label) {
                     totalPredictionCount++;
+                    confidenceSum += instance.Prediction.Confidence;
                     if (instance.UserLabel == _label) {
                         correctPredictionCount++;
                     }
@@ -145,6 +187,7 @@ namespace MessagePredictor.Model
             CorrectPredictionCount = correctPredictionCount;
             TotalPredictionCount = totalPredictionCount;
             TrainingSetCount = trainingSetCount;
+            AverageConfidence = confidenceSum / (double)totalPredictionCount;
         }
 
         #endregion

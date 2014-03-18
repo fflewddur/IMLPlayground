@@ -145,10 +145,10 @@
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" TextAlignment="Center" Text="{Binding Prediction.Confidence, StringFormat='{}{0:P0}'}" />
+            <TextBlock Grid.Column="0" TextAlignment="Center" Text="{Binding Prediction.Confidence, StringFormat='{}{0:0%}'}" />
             <local:DirectionArrow Grid.Column="1" Direction="{Binding PredictionConfidenceDirection}" 
                                   UnitOfMeasure="Confidence"
-                                  Difference="{Binding PredictionConfidenceDifference, StringFormat='{}{0:P0}'}" HorizontalAlignment="Left"/>
+                                  Difference="{Binding PredictionConfidenceDifference, StringFormat='{}{0:0%}'}" HorizontalAlignment="Left"/>
         </Grid>
     </DataTemplate>
 
