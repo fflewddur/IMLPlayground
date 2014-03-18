@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Media;
+using System.Xml;
 using System.Xml.Linq;
 
 namespace MessagePredictor
@@ -13,6 +14,7 @@ namespace MessagePredictor
     public partial class App : Application
     {
         public const string DataDir = "Data";
+        public const string LogDir = "Logs";
 
         public enum Condition
         {
@@ -42,19 +44,48 @@ namespace MessagePredictor
             AutoUpdatePredictions
         }
 
+        private XmlWriter _logger;
+
         // Called on Application startup. Handle any command line arguments, load our configuration properties, 
         // and then build the ViewModel and View.
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 
-            LoadPropertiesFile();
+            _logger = BuildLogger();
+            _logger.WriteStartDocument();
+            _logger.WriteStartElement("MessagePredictorLog");
 
-            MessagePredictorViewModel vm = new MessagePredictorViewModel();
+            LoadPropertiesFile();
+            _logger.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
+            _logger.WriteAttributeString("dataset", this.Properties[PropertyKey.DatasetFile].ToString());
+            _logger.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
+            _logger.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
+            _logger.WriteAttributeString("system", Environment.OSVersion.ToString());
+            _logger.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
+            _logger.WriteAttributeString("runtime", Environment.Version.ToString());
+
+            MessagePredictorViewModel vm = new MessagePredictorViewModel(_logger);
             var window = new MessagePredictorWindow();
             window.DataContext = vm;
             window.Loaded += window_Loaded;
             window.Show();
+            _logger.WriteStartElement("WindowOpen");
+            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.WriteEndElement();
+        }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+
+            _logger.WriteStartElement("WindowClose");
+            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.WriteEndElement();
+
+            _logger.WriteEndElement(); // End root element
+            _logger.WriteEndDocument();
+            _logger.Close();
         }
 
         /// <summary>
@@ -192,6 +223,24 @@ namespace MessagePredictor
             } catch (FileNotFoundException e) {
                 Console.Error.WriteLine("Could not load properties file: {0}", e.Message);
             }
+        }
+
+        private XmlWriter BuildLogger()
+        {
+            // If our log directory doesn't exist, create it.
+            string logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LogDir);
+            if (!Directory.Exists(logDir)) {
+                Directory.CreateDirectory(logDir);
+            }
+
+            // Create a new log file
+            string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.LogDir, "log.xml");
+            XmlWriterSettings settings = new XmlWriterSettings();
+            settings.Indent = true;
+            settings.IndentChars = "\t";
+            XmlWriter logger = XmlWriter.Create(logFile, settings);
+
+            return logger;
         }
 
         #region Event handlers

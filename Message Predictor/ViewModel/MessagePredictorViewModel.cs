@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Xml;
 
 namespace MessagePredictor
 {
@@ -23,6 +24,7 @@ namespace MessagePredictor
         List<Label> _labels;
         Vocabulary _vocab;
         MultinomialNaiveBayesFeedbackClassifier _classifier;
+        XmlWriter _logger;
 
         // Viewmodels (and data for this viewmodel)
         private FolderListViewModel _folderListVM;
@@ -42,10 +44,12 @@ namespace MessagePredictor
         bool _autoUpdatePredictions;
         bool _onlyShowRecentChanges;
 
-        public MessagePredictorViewModel()
+        public MessagePredictorViewModel(XmlWriter logger)
         {
             Console.WriteLine("MessagePredictorViewModel() start");
             Stopwatch timer = new Stopwatch();
+
+            _logger = logger;
 
             timer.Start();
             //List<NewsCollection> folders = new List<NewsCollection>();
