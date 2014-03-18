@@ -26,6 +26,15 @@ namespace MessagePredictor.View
             InitializeComponent();
         }
 
+        public string UnitOfMeasure
+        {
+            get { return (string)GetValue(UnitOfMeasureProperty); }
+            set { SetValue(UnitOfMeasureProperty, value); }
+        }
+
+        public static readonly DependencyProperty UnitOfMeasureProperty =
+            DependencyProperty.Register("UnitOfMeasure", typeof(string), typeof(DirectionArrow));
+
         public string Difference
         {
             get { return (string)GetValue(DifferenceProperty); }
@@ -39,7 +48,7 @@ namespace MessagePredictor.View
 
         private void OnDifferenceChanged(DependencyPropertyChangedEventArgs args)
         {
-            UpdateTooltip(Direction, Difference);
+            UpdateTooltip(Direction, Difference, UnitOfMeasure);
         }
 
         public static readonly DependencyProperty DifferenceProperty =
@@ -58,7 +67,7 @@ namespace MessagePredictor.View
 
         private void OnDirectionChanged(DependencyPropertyChangedEventArgs args)
         {
-            UpdateTooltip(Direction, Difference);
+            UpdateTooltip(Direction, Difference, UnitOfMeasure);
         }
 
         public static readonly DependencyProperty DirectionProperty =
@@ -68,13 +77,13 @@ namespace MessagePredictor.View
         /// When the direction or difference changes, update our tooltip appropriately.
         /// </summary>
         /// <param name="direction"></param>
-        /// <param name="Difference"></param>
-        private void UpdateTooltip(Direction direction, string Difference)
+        /// <param name="difference"></param>
+        private void UpdateTooltip(Direction direction, string difference, string unitOfMeasure)
         {
             if (direction == Direction.Down) {
-                Arrow.ToolTip = string.Format("Decreased by {0}", Difference);
+                Arrow.ToolTip = string.Format("{0} decreased by {1}", unitOfMeasure, difference);
             } else if (direction == Direction.Up) {
-                Arrow.ToolTip = string.Format("Increased by {0}", Difference);
+                Arrow.ToolTip = string.Format("{0} increased by {1}", unitOfMeasure, difference);
             } else {
                 Arrow.ToolTip = null;
             }

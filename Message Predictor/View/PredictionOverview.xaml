@@ -85,9 +85,10 @@
 
         <!-- Direction arrows -->
         <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" 
+                              UnitOfMeasure="{Binding EvaluatorVM.Evaluators[0].Label, StringFormat='Total predictions of {0}'}"
                               Difference="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDifference}" HorizontalContentAlignment="Left"/>
         <local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDirection}" 
+                              UnitOfMeasure="{Binding EvaluatorVM.Evaluators[1].Label, StringFormat='Total predictions of {0}'}"
                               Difference="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDifference}" HorizontalContentAlignment="Left"/>
-        <!--<local:DirectionArrow Grid.Row="2" Grid.Column="2" />-->
     </Grid>
 </UserControl>

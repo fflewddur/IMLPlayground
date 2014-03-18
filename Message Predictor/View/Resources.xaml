@@ -146,7 +146,9 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" TextAlignment="Center" Text="{Binding Prediction.Confidence, StringFormat='{}{0:P0}'}" />
-            <local:DirectionArrow Grid.Column="1" Direction="{Binding PredictionConfidenceDirection}" Difference="{Binding PredictionConfidenceDifference, StringFormat='{}{0:P0}'}" HorizontalAlignment="Left"/>
+            <local:DirectionArrow Grid.Column="1" Direction="{Binding PredictionConfidenceDirection}" 
+                                  UnitOfMeasure="Confidence"
+                                  Difference="{Binding PredictionConfidenceDifference, StringFormat='{}{0:P0}'}" HorizontalAlignment="Left"/>
         </Grid>
     </DataTemplate>
 
@@ -292,7 +294,8 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
-                        <local:DirectionArrow Grid.Column="1" Direction="{Binding Evaluator.CorrectPredictionDirection}" Difference="{Binding Evaluator.CorrectPredictionDifference}"/>
+                        <local:DirectionArrow Grid.Column="1" Direction="{Binding Evaluator.CorrectPredictionDirection}" 
+                                              UnitOfMeasure="Correct predictions" Difference="{Binding Evaluator.CorrectPredictionDifference}"/>
                     </Grid>
                     <TextBlock Grid.Row="2" Text="correct predictions" 
                            Style="{StaticResource folderDetails}"/>
