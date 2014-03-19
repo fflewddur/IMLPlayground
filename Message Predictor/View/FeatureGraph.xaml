@@ -41,13 +41,15 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Rectangle Grid.Row="0" Width="{Binding Width}" Height="{Binding UserHeight}" Fill="{Binding GraphColorUser, ElementName=root}" VerticalAlignment="Bottom" Cursor="SizeNS" 
                                    PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" Margin="3 0 3 0"/>
-                        <Rectangle Grid.Row="1" Width="{Binding Width}" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" 
+                        <Separator Grid.Row="1" Width="{Binding Width}" Height="1" Background="Black" Margin="0" />
+                        <Rectangle Grid.Row="2" Width="{Binding Width}" Height="{Binding SystemHeight}" Fill="{Binding GraphColorSystem, ElementName=root}" 
                                    SnapsToDevicePixels="True" Margin="3 0 3 0"/>
-                        <Separator Grid.Row="2" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Margin="0 0 0 2"/>
-                        <TextBlock Grid.Row="3" Text="{Binding Characters, Mode=OneWay}" Padding="5 2">
+                        <Separator Grid.Row="3" Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" Margin="0 0 0 2"/>
+                        <TextBlock Grid.Row="4" Text="{Binding Characters, Mode=OneWay}" Padding="5 2">
                             <TextBlock.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem HeaderStringFormat="Find '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Find_Click"/>
