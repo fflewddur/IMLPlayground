@@ -11,6 +11,7 @@ namespace LibIML
     {
         private List<Feature> _sourceItems;
         private List<Feature> _evidenceItems;
+        //private List<EvidenceItem> _items;
         private int _nClasses; // Number of classes (needed to normalize feature importance; we assume uniform class distribution)
         private int _instanceCount; // Number of training set instances with this label
         private int _totalInstanceCount; // Total number of training set instances

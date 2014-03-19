@@ -281,7 +281,8 @@ namespace LibIML
         /// <returns>A prediction for this instance.</returns>
         public Prediction PredictInstance(IInstance instance)
         {
-            Label label = null;
+            Label labelWinner = null;
+            Label labelLoser = null;
             Prediction prediction = new Prediction();
 
             // Compute Pr(d|c)
@@ -291,6 +292,22 @@ namespace LibIML
             int trainingSetSize = 0;
             foreach (Label l in Labels) {
                 trainingSetSize += _trainingSet[l].Count;
+            }
+
+            //List<EvidenceItem> evidenceItems = new List<EvidenceItem>();
+            Dictionary<int, EvidenceItem> evidenceItems = new Dictionary<int, EvidenceItem>();
+            foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
+                string word = _vocab.GetWord(pair.Key);
+                EvidenceItem ei = new EvidenceItem(word, pair.Key, (int)pair.Value);
+                evidenceItems[pair.Key] = ei;
+            }
+
+            // FIXME this only works for binary classification
+            Label topic1 = null;
+            Label topic2 = null;
+            if (Labels.Count() >= 1) {
+                topic1 = Labels.ElementAt(0);
+                topic2 = Labels.ElementAt(1);
             }
 
             foreach (Label l in Labels) {
@@ -311,6 +328,11 @@ namespace LibIML
                         TryGetFeatureSystemWeight(pair.Key, l, out sysWeight);
                         Feature f = new Feature(word, l, (int)pair.Value, sysWeight, userWeight);
                         evidence.SourceItems.Add(f);
+                        if (l == topic1) {
+                            evidenceItems[pair.Key].Label1Pr = weight;
+                        } else if (l == topic2) {
+                            evidenceItems[pair.Key].Label2Pr = weight;
+                        }
                         //Console.WriteLine("Feature={3}, weight={0}, userWeight={1}, sysWeight={2}, count={4}", weight, userWeight, sysWeight, word, (int)pair.Value);
                         prob += Math.Log(weight);
                     }
@@ -354,15 +376,35 @@ namespace LibIML
                 //Console.WriteLine("Label: {0} Probability: {1:0.00000}", l, pClassGivenDoc[l]);
                 if (pClassGivenDoc[l] > maxP) {
                     maxP = pClassGivenDoc[l];
-                    label = l;
+                    if (labelLoser == null) {
+                        labelLoser = labelWinner;
+                    }
+                    labelWinner = l;
+                } else {
+                    labelLoser = l;
                 }
                 prediction.EvidencePerClass[l].Confidence = pClassGivenDoc[l];
             }
 
-            prediction.Label = label;
-            prediction.Confidence = prediction.EvidencePerClass[label].Confidence;
+            prediction.Label = labelWinner;
+            prediction.Confidence = prediction.EvidencePerClass[labelWinner].Confidence;
             prediction.UpdateEvidenceGraphData();
             prediction.UpdatePrDescriptions();
+            prediction.EvidenceItems = evidenceItems.Values.OrderBy(i => i.FeatureText).ToList();
+            //Console.WriteLine("Prediction: {0} ({1:0%})", labelWinner, prediction.Confidence);
+            foreach (EvidenceItem ei in prediction.EvidenceItems) {
+                if (labelWinner == topic2) {
+                    ei.InvertRatio();
+                }
+
+                if (ei.Ratio > 1) {
+                    ei.Label = labelWinner;
+                } else if (ei.Ratio < 1) {
+                    ei.Label = labelLoser;
+                }
+
+                //Console.WriteLine("  EvidenceItem = {0}", ei);
+            }
 
             return prediction;
         }

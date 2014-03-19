@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibIML.Instances;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,7 @@ namespace LibIML
         private Label _label;
         private double _confidence;
         private Dictionary<Label, Evidence> _evidencePerClass;
+        private List<EvidenceItem> _evidenceItems;
         private int _importantWordUniques;
         private int _importantWordTotal;
         private string _importantWordDesc; // Describe how many important words were used for this prediction
@@ -121,6 +123,12 @@ namespace LibIML
         {
             get { return _confidencePieCircle; }
             private set { SetProperty<double>(ref _confidencePieCircle, value); }
+        }
+
+        public List<EvidenceItem> EvidenceItems
+        {
+            get { return _evidenceItems; }
+            set { SetProperty<List<EvidenceItem>>(ref _evidenceItems, value); }
         }
 
         #endregion
