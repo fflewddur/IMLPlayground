@@ -246,6 +246,16 @@ namespace MessagePredictor
             NewsItem item = MessageVM.Message;
             Mouse.OverrideCursor = Cursors.Wait;
 
+            _logger.WriteStartElement("LabelMessage");
+            _logger.WriteAttributeString("id", item.Id.ToString());
+            _logger.WriteAttributeString("label", label.ToString());
+            if (item.UserLabel != null) {
+                _logger.WriteAttributeString("priorLabel", item.UserLabel.ToString());
+            } else {
+                _logger.WriteAttributeString("priorLabel", "Unknown");
+            }
+            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
             // Don't do anything if the message already has the desired label
             if (item.UserLabel == label || (item.UserLabel == null && label == FolderListVM.UnknownLabel)) {
                 Mouse.OverrideCursor = null;
@@ -254,6 +264,7 @@ namespace MessagePredictor
                 d.DialogMessage = string.Format("This message is already in the {0} folder.", label);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
+                logEndElement(_logger);
                 return;
             }
 
@@ -265,6 +276,7 @@ namespace MessagePredictor
                 d.DialogMessage = string.Format("For this experiment, we can't let you move this message to the {0} folder.\n\nThe person who wrote this message says it's about {1}.", label, item.GroundTruthLabel);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
+                logEndElement(_logger);
                 return;
             }
 
@@ -295,6 +307,7 @@ namespace MessagePredictor
             }
 
             Mouse.OverrideCursor = null;
+            logEndElement(_logger);
         }
 
         #endregion
@@ -602,14 +615,45 @@ namespace MessagePredictor
 
         private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
         {
+            _logger.WriteStartElement("SelectedFolder");
+            _logger.WriteAttributeString("label", e.Folder.Label.ToString());
+            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
             UpdateFilters(_onlyShowRecentChanges);
             MessageVM.Message = e.Folder.SelectedMessage;
+
+            logEndElement(_logger);
         }
 
         private void _folderListVM_SelectedMessageChanged(object sender, FolderViewModel.SelectedMessageChangedEventArgs e)
         {
+            _logger.WriteStartElement("SelectedMessage");
+            _logger.WriteAttributeString("id", e.Message.Id.ToString());
+            if (e.Message.UserLabel != null) {
+                _logger.WriteAttributeString("userLabel", e.Message.UserLabel.ToString());
+            } else {
+                _logger.WriteAttributeString("userLabel", "none");
+            }
+            _logger.WriteAttributeString("groundTruthLabel", e.Message.GroundTruthLabel.ToString());
+            _logger.WriteAttributeString("isHighlighted", e.Message.IsHighlighted.ToString());
+            _logger.WriteAttributeString("isPredictionCorrect", e.Message.IsPredictionCorrect.ToString());
+            _logger.WriteAttributeString("predictionLabel", e.Message.Prediction.Label.ToString());
+            _logger.WriteAttributeString("predictionConfidence", e.Message.Prediction.Confidence.ToString());
+            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
             MessageVM.Message = e.Message;
             MessageVM.Message.HighlightWithWord(HeatMapVM.ToHighlight);
+
+            logEndElement(_logger);
+        }
+
+        /// <summary>
+        /// Close the current XML element and flush the stream to disk. 
+        /// </summary>
+        /// <param name="logger"></param>
+        private void logEndElement(XmlWriter logger) {
+            _logger.WriteEndElement();
+            _logger.Flush();
         }
 
         #endregion

@@ -73,12 +73,14 @@ namespace MessagePredictor
             _logger.WriteStartElement("WindowOpen");
             _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             _logger.WriteEndElement();
+            _logger.WriteStartElement("Actions");
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
 
+            _logger.WriteEndElement(); // End <actions/> element
             _logger.WriteStartElement("WindowClose");
             _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             _logger.WriteEndElement();
