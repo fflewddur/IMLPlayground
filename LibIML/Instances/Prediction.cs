@@ -21,8 +21,11 @@ namespace LibIML
         private int _importantWordUniques;
         private int _importantWordTotal;
         private string _importantWordDesc; // Describe how many important words were used for this prediction
+        private string _classPrHeader;
         private string _classPrDesc; // Describe how class probability influenced this prediction
+        private string _featurePrHeader;
         private string _featurePrDesc; // Describe how feature probability influenced this prediction
+        private string _confidenceHeader;
         private System.Windows.Point _confidencePiePoint; // Where should the smaller confidence arc end?
         private bool _confidencePieLarge; // Is the pie slice more or less than 50%?
         private double _confidencePieCircle; // The confidence value of the pie background
@@ -83,16 +86,40 @@ namespace LibIML
             private set { SetProperty<string>(ref _importantWordDesc, value); }
         }
 
+        public string ClassPrHeader
+        {
+            get { return _classPrHeader; }
+            private set { SetProperty<string>(ref _classPrHeader, value); }
+        }
+
         public string ClassPrDesc
         {
             get { return _classPrDesc; }
             private set { SetProperty<string>(ref _classPrDesc, value); }
         }
 
+        public string FeaturePrHeader
+        {
+            get { return _featurePrHeader; }
+            private set { SetProperty<string>(ref _featurePrHeader, value); }
+        }
+
         public string FeaturePrDesc
         {
             get { return _featurePrDesc; }
             private set { SetProperty<string>(ref _featurePrDesc, value);}
+        }
+
+        public string ConfidenceHeader
+        {
+            get { return _confidenceHeader; }
+            private set { SetProperty<string>(ref _confidenceHeader, value); }
+        }
+
+        public string ConfidenceDesc
+        {
+            get { return _confidenceDesc; }
+            private set { SetProperty<string>(ref _confidenceDesc, value); }
         }
 
         public Point ConfidencePiePoint
@@ -107,11 +134,7 @@ namespace LibIML
             private set { SetProperty<bool>(ref _confidencePieLarge, value); }
         }
 
-        public string ConfidenceDesc
-        {
-            get { return _confidenceDesc; }
-            private set { SetProperty<string>(ref _confidenceDesc, value); }
-        }
+        
 
         public double ConfidencePieSlice
         {
@@ -171,22 +194,45 @@ namespace LibIML
                 }
             }
 
-            // Build ClassPrDesc
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sbHeader = new StringBuilder();
+            StringBuilder sbDesc = new StringBuilder();
+
+            // Build ClassPrHeader and ClassPrDesc
+            sbHeader.Clear();
             if (smallestCount == largestCount) {
-                sb.AppendFormat("There are an equal number of messages in each folder, so the computer thinks each Unknown message is equally likely to be about {0} or {1}.",
-                    largestCountLabel, smallestCountLabel);
+                sbHeader.AppendFormat("The {0} folder has as many messages as the {1} folder", largestCountLabel, smallestCountLabel);
+                sbDesc.AppendFormat("This makes the computer think each Unknown message is equally likely to be about {0} or {1}.",
+                   largestCountLabel, smallestCountLabel);
             } else {
+                sbHeader.AppendFormat("The {0} folder has more messages than the {1} folder", largestCountLabel, smallestCountLabel);
                 double ratio = Math.Round(largestCount / (double)smallestCount, 1);
-                sb.AppendFormat("There are {0:N1} times more messages in the {1} folder than the {2} folder, so the computer thinks each Unknonw message is {0:N1} times more likely to be about {1} than {2}.",
+                sbDesc.AppendFormat("There are {0:N1} times more messages in the {1} folder than the {2} folder, so the computer thinks each Unknonw message is {0:N1} times more likely to be about {1} than {2}.",
                     ratio, largestCountLabel.ToString(), smallestCountLabel.ToString());
             }
-            ClassPrDesc = sb.ToString();
+            ClassPrHeader = sbHeader.ToString();
+            ClassPrDesc = sbDesc.ToString();
+
+            // Build ClassPrDesc
+            //sbDesc.Clear();
+            //if (smallestCount == largestCount) {
+            //    sbDesc.AppendFormat("There are an equal number of messages in each folder, so the computer thinks each Unknown message is equally likely to be about {0} or {1}.",
+            //        largestCountLabel, smallestCountLabel);
+            //} else {
+            //    double ratio = Math.Round(largestCount / (double)smallestCount, 1);
+            //    sbDesc.AppendFormat("There are {0:N1} times more messages in the {1} folder than the {2} folder, so the computer thinks each Unknonw message is {0:N1} times more likely to be about {1} than {2}.",
+            //        ratio, largestCountLabel.ToString(), smallestCountLabel.ToString());
+            //}
+            //ClassPrDesc = sbDesc.ToString();
+
+            // Build FeaturePrHeader
+            sbHeader.Clear();
+            sbHeader.AppendFormat("More important words are associated with {0} than {1}", largestWeightLabel, smallestWeightLabel);
+            FeaturePrHeader = sbHeader.ToString();
 
             // Build FeaturePrDesc
-            sb.Clear();
+            sbDesc.Clear();
             if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
-                sb.AppendFormat("Because the size of the {0} words equals the size of the {1} words, the computer thinks this message is equally likely to be about either.",
+                sbDesc.AppendFormat("Because the size of the {0} words equals the size of the {1} words, the computer thinks this message is equally likely to be about either.",
                     largestWeightLabel, smallestWeightLabel);
             } else {
                 double ratio = Math.Round(largestWeight / smallestWeight, 1);
@@ -204,10 +250,10 @@ namespace LibIML
                     }
                 }
 
-                sb.AppendFormat("Because the {0} words ({3}) are larger than the {2} words ({4}), the computer thinks this message is more likely to be about {0} than {2}.",
-                    largestWeightLabel, ratioDesc, smallestWeightLabel, largestWeightLabel.ColorDesc, smallestWeightLabel.ColorDesc);
+                sbDesc.AppendFormat("This makes the computer think this message is {1} times more likely to be about {0} than {2}.",
+                    largestWeightLabel, ratioDesc, smallestWeightLabel);
             }
-            FeaturePrDesc = sb.ToString();
+            FeaturePrDesc = sbDesc.ToString();
 
             // Also update data for our confidence pie chart
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
@@ -227,10 +273,14 @@ namespace LibIML
                 }
             }
 
-            sb.Clear();
-            sb.Append("Combining parts one and two, the computer thinks this message is ");
+            sbHeader.Clear();
+            sbHeader.AppendFormat("{0:0%} probability this message is about {1}", _confidence, _label);
+            ConfidenceHeader = sbHeader.ToString();
+
+            sbDesc.Clear();
+            sbDesc.Append("Combining parts one and two, the computer thinks this message is ");
             if (Math.Round(smallestConf, 7) == Math.Round(largestConf, 7)) {
-                sb.AppendFormat("equally likely to be about {0} or {1} (ties are broken in favor of {2}).", largestConfLabel, smallestConfLabel, this.Label);
+                sbDesc.AppendFormat("equally likely to be about {0} or {1} (ties are broken in favor of {2}).", largestConfLabel, smallestConfLabel, this.Label);
             } else {
                 double oddsRatio = Math.Round((1 / smallestConf) - 1, 1);
                 string ratioDesc;
@@ -246,9 +296,9 @@ namespace LibIML
                         ratioDesc = string.Format("{0:N1}", oddsRatio);
                     }
                 }
-                sb.AppendFormat("{0} times more likely to be about {1} than about {2}.", ratioDesc, largestConfLabel, smallestConfLabel);
+                sbDesc.AppendFormat("{0} times more likely to be about {1} than about {2}.", ratioDesc, largestConfLabel, smallestConfLabel);
             }
-            ConfidenceDesc = sb.ToString();
+            ConfidenceDesc = sbDesc.ToString();
         }
 
         public void UpdateEvidenceGraphData()
