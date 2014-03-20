@@ -471,9 +471,9 @@ namespace MessagePredictor
 
             _labels = new List<Label>();
             _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic1UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic1SystemLabel].ToString(), 
-                (Brush)App.Current.Properties[App.PropertyKey.Topic1Color]));
+                (Brush)App.Current.Properties[App.PropertyKey.Topic1Color], App.Current.Properties[App.PropertyKey.Topic1ColorDesc].ToString()));
             _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic2UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic2SystemLabel].ToString(),
-                (Brush)App.Current.Properties[App.PropertyKey.Topic2Color]));
+                (Brush)App.Current.Properties[App.PropertyKey.Topic2Color], App.Current.Properties[App.PropertyKey.Topic2ColorDesc].ToString()));
 
             NewsCollection dataset = NewsCollection.CreateFromZip(path, _labels);
 

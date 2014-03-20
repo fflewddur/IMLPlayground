@@ -388,7 +388,7 @@ namespace LibIML
 
             prediction.Label = labelWinner;
             prediction.Confidence = prediction.EvidencePerClass[labelWinner].Confidence;
-            prediction.UpdateEvidenceGraphData();
+            //prediction.UpdateEvidenceGraphData();
             prediction.UpdatePrDescriptions();
             prediction.EvidenceItems = evidenceItems.Values.OrderBy(i => i.FeatureText).ToList();
             //Console.WriteLine("Prediction: {0} ({1:0%})", labelWinner, prediction.Confidence);
@@ -400,6 +400,7 @@ namespace LibIML
                 if (ei.Ratio > 1) {
                     ei.Label = labelWinner;
                 } else if (ei.Ratio < 1) {
+                    ei.InvertRatio();
                     ei.Label = labelLoser;
                 }
 

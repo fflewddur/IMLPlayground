@@ -28,7 +28,7 @@
                             </xctk:RichTextBox.TextFormatter>
                         </xctk:RichTextBox>
                         <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="4"/>
-                        <local:PredictionExplanation Grid.Column="2"/>
+                        <local:PredictionExplanation Grid.Column="2" Margin="0 0 10 0"/>
                     </Grid>
                 </ScrollViewer>
             <!--</TabItem>-->

@@ -13,6 +13,7 @@ namespace LibIML
         private string _userLabel;
         private string _systemLabel;
         private Brush _color;
+        private string _colorDesc;
         private static readonly Label _anyLabel;
 
         public Label(string userLabel, string systemLabel)
@@ -21,9 +22,10 @@ namespace LibIML
             SystemLabel = systemLabel;
         }
 
-        public Label(string userLabel, string systemLabel, Brush color) : this(userLabel, systemLabel)
+        public Label(string userLabel, string systemLabel, Brush color, string colorDesc) : this(userLabel, systemLabel)
         {
             Color = color;
+            ColorDesc = colorDesc;
         }
 
         static Label()
@@ -55,6 +57,12 @@ namespace LibIML
         {
             get { return _color; }
             private set { SetProperty<Brush>(ref _color, value); }
+        }
+
+        public string ColorDesc
+        {
+            get { return _colorDesc; }
+            private set { SetProperty<string>(ref _colorDesc, value); }
         }
 
         public static Label AnyLabel

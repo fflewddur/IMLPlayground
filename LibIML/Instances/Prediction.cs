@@ -204,8 +204,8 @@ namespace LibIML
                     }
                 }
 
-                sb.AppendFormat("Because the {0} words are larger than the {2} words, the computer thinks this message is more likely to be about {0} than {2}.",
-                    largestWeightLabel, ratioDesc, smallestWeightLabel);
+                sb.AppendFormat("Because the {0} words ({3}) are larger than the {2} words ({4}), the computer thinks this message is more likely to be about {0} than {2}.",
+                    largestWeightLabel, ratioDesc, smallestWeightLabel, largestWeightLabel.ColorDesc, smallestWeightLabel.ColorDesc);
             }
             FeaturePrDesc = sb.ToString();
 
