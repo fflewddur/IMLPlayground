@@ -7,7 +7,7 @@
              xmlns:local="clr-namespace:MessagePredictor.View" 
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="500">
-    <ScrollViewer>
+    <!--<ScrollViewer>-->
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
@@ -28,7 +28,12 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">1) Important words</Label>
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical">
+            <Label Background="{Binding MessageVM.Message.Prediction.Label.Color}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                   Foreground="White" FontWeight="Bold" Content="{Binding MessageVM.Message.Prediction.Label}" ContentStringFormat="Why {0}?"></Label>
+            <Label FontWeight="Bold" Margin="5 15 5 5">1) Important words</Label>
+
+        </StackPanel>
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MessageVM.Message.Prediction.ImportantWordDesc, Mode=OneWay}" 
                    TextWrapping="Wrap" Margin="15 0 5 5" />
 
@@ -150,5 +155,5 @@
             </Grid>
 
         </Grid>
-    </ScrollViewer>
+    <!--</ScrollViewer>-->
 </UserControl>

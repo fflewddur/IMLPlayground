@@ -6,24 +6,38 @@
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:local="clr-namespace:MessagePredictor.View" 
              mc:Ignorable="d" 
-             d:DesignHeight="300" d:DesignWidth="300">
+             d:DesignHeight="600" d:DesignWidth="500">
     <Grid>
-        <TabControl>
-            <TabItem Header="Message" Style="{StaticResource ResourceKey=tabItemStyle}">
-                <xctk:RichTextBox Text="{Binding MessageVM.Message.DocumentReadOnly}" IsReadOnly="True" 
-                                  ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                                  SelectionChanged="RichTextBox_SelectionChanged" BorderThickness="0" Padding="5 10 5 0">
-                    <xctk:RichTextBox.TextFormatter>
-                        <local:MyFormatter />
-                    </xctk:RichTextBox.TextFormatter>
-                </xctk:RichTextBox>
-            </TabItem>
-            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding MessageVM.Message.Prediction.Label.Color}">
-                <TabItem.Header>
+        <!--<TabControl>-->
+            <!--<TabItem Header="Message" Style="{StaticResource ResourceKey=tabItemStyle}">-->
+                <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="3*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
+                        <!--<Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>-->
+                        <xctk:RichTextBox Grid.Column="0" Text="{Binding MessageVM.Message.DocumentReadOnly}" IsReadOnly="True" 
+                                          SelectionChanged="RichTextBox_SelectionChanged" BorderThickness="0" Padding="5 10 5 0">
+                            <xctk:RichTextBox.TextFormatter>
+                                <local:MyFormatter />
+                            </xctk:RichTextBox.TextFormatter>
+                        </xctk:RichTextBox>
+                        <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="4"/>
+                        <local:PredictionExplanation Grid.Column="2"/>
+                    </Grid>
+                </ScrollViewer>
+            <!--</TabItem>-->
+            <!--<TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding MessageVM.Message.Prediction.Label.Color}">-->
+                <!--<TabItem.Header>
                     <Label Content="{Binding MessageVM.Message.Prediction.Label}" ContentStringFormat="Why '{0}'?" Margin="0" Padding="0"></Label>
-                </TabItem.Header>
-                <local:PredictionExplanation/>
-            </TabItem>
-        </TabControl>
+                </TabItem.Header>-->
+                <!--<local:PredictionExplanation/>-->
+            <!--</TabItem>
+        </TabControl>-->
     </Grid>
 </UserControl>
