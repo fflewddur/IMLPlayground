@@ -28,7 +28,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">1) Count the important words</Label>
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">1) Important words</Label>
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MessageVM.Message.Prediction.ImportantWordDesc, Mode=OneWay}" 
                    TextWrapping="Wrap" Margin="15 0 5 5" />
 
@@ -82,7 +82,7 @@
                    Text="{Binding MessageVM.Message.Prediction.FeaturePrDesc, Mode=OneWay}" 
                    HorizontalAlignment="Left" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>
 
-            <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">2) Count the messages in each folder</Label>
+            <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">2) # of messages in each folder</Label>
 
             <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
@@ -116,7 +116,7 @@
                    Text="{Binding MessageVM.Message.Prediction.ClassPrDesc, Mode=OneWay}">
             </TextBlock>
 
-            <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">3) Average steps 1 and 2</Label>
+            <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">3) Combine parts 1 and 2</Label>
             <Grid Grid.Row="10" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

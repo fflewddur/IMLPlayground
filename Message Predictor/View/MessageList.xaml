@@ -6,16 +6,16 @@
              mc:Ignorable="d" 
              xmlns:local="clr-namespace:MessagePredictor.View" 
              xmlns:model="clr-namespace:MessagePredictor.Model" 
-             d:DesignHeight="300" d:DesignWidth="600">
+             d:DesignHeight="400" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="1*" />
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.ColumnSpan="3" Style="{StaticResource headerStyle1}">Messages</Label>

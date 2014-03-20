@@ -17,7 +17,7 @@
             <!-- Two-column split -->
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="200" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="7*" />
                 </Grid.ColumnDefinitions>
