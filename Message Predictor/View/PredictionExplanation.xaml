@@ -136,13 +136,14 @@
                        TextWrapping="Wrap" TextAlignment="Center"></TextBlock>
         </StackPanel>
         
-        <Grid Grid.Row="10" Grid.Column="1">
+        <Grid Grid.Row="10" Grid.Column="0" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="120"/>
             </Grid.ColumnDefinitions>
-            <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding MessageVM.Message.Prediction.ConfidenceDesc,Mode=OneWay}" Foreground="Gray"/>
-            <Canvas Grid.Column="1" Height="100" Margin="10 0 0 10">
+            <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding MessageVM.Message.Prediction.ConfidenceDesc,Mode=OneWay}" Foreground="Gray"
+                       Margin="25 10 0 0"/>
+            <Canvas Grid.Column="1" Height="100" Margin="10 5 0 10">
                 <Ellipse Width="100" Height="100" Fill="{Binding Labels[0].Color}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0">
                     <Ellipse.ToolTip>
                         <Label Content="{Binding MessageVM.Message.Prediction.ConfidencePieCircle}" ContentStringFormat="{}{0:P0} chance this message is about Hockey"/>

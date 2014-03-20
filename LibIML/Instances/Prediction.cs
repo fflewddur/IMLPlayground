@@ -278,7 +278,7 @@ namespace LibIML
             ConfidenceHeader = sbHeader.ToString();
 
             sbDesc.Clear();
-            sbDesc.Append("Combining parts one and two, the computer thinks this message is ");
+            sbDesc.Append("Combining both parts makes the computer think this message is ");
             if (Math.Round(smallestConf, 7) == Math.Round(largestConf, 7)) {
                 sbDesc.AppendFormat("equally likely to be about {0} or {1} (ties are broken in favor of {2}).", largestConfLabel, smallestConfLabel, this.Label);
             } else {
