@@ -8,40 +8,41 @@
              mc:Ignorable="d" 
              d:DesignHeight="500" d:DesignWidth="500">
     <!--<ScrollViewer>-->
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical">
             <Label Background="{Binding MessageVM.Message.Prediction.Label.Color}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                    Foreground="White" FontWeight="Bold" Content="{Binding MessageVM.Message.Prediction.Label}" ContentStringFormat="Why {0}?"></Label>
-            <Label FontWeight="Bold" Margin="5 15 5 5">1) Important words</Label>
+            <Label FontWeight="Bold" Margin="5 15 5 5">Important words</Label>
 
         </StackPanel>
-            <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MessageVM.Message.Prediction.ImportantWordDesc, Mode=OneWay}" 
+        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MessageVM.Message.Prediction.ImportantWordDesc, Mode=OneWay}" 
                    TextWrapping="Wrap" Margin="15 0 5 5" />
 
-            <!--<Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+        <!--<Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}" />-->
 
         <Border Margin="10 0 0 10" CornerRadius="20" BorderBrush="Gray" BorderThickness="1" Background="Beige"
-                Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Padding="5">
+                Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Center" Padding="5"
+                Style="{StaticResource ResourceKey=hideIfNoFeatures}">
             <ItemsControl  ItemsSource="{Binding MessageVM.Message.Prediction.EvidenceItems}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -72,9 +73,9 @@
                 </local:EvidenceGraph.Evidence>
             </local:EvidenceGraph>-->
 
-            <!--<Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+        <!--<Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
                Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>-->
-            <!--<local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="{Binding Labels[1].Color}" GraphColorSystem="{Binding Labels[1].Color}"
+        <!--<local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="{Binding Labels[1].Color}" GraphColorSystem="{Binding Labels[1].Color}"
                              Margin="5 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}">
                 <local:EvidenceGraph.Evidence>
                     <MultiBinding>
@@ -86,77 +87,84 @@
                     </MultiBinding>
                 </local:EvidenceGraph.Evidence>
             </local:EvidenceGraph>-->
-            <TextBlock Grid.Row="4" Grid.Column="1" Margin="15 0 15 5" TextWrapping="Wrap" MaxWidth="400" TextAlignment="Left"
+        <TextBlock Grid.Row="4" Grid.Column="1" Margin="15 0 15 5" TextWrapping="Wrap" MaxWidth="400" TextAlignment="Left"
                    Text="{Binding MessageVM.Message.Prediction.FeaturePrDesc, Mode=OneWay}" 
                    HorizontalAlignment="Left" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>
 
-            <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">2) # of messages in each folder</Label>
+        <StackPanel  Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+            <Label FontSize="50" FontWeight="Bold" Foreground="Gray" HorizontalContentAlignment="Center">+</Label>
+            <Label FontWeight="Bold" Margin="5 15 5 5"># of messages in each folder</Label>
+        </StackPanel>
 
-            <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0"
+        <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-            <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="{Binding Labels[0].Color}" Margin="0">
-                <local:ClassImbalanceGraph.Evidence>
-                    <MultiBinding>
-                        <MultiBinding.Converter>
-                            <conv:DictionaryItemFromLabelConverter/>
-                        </MultiBinding.Converter>
-                        <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
-                        <Binding Path="Labels[0]"/>
-                    </MultiBinding>
-                </local:ClassImbalanceGraph.Evidence>
-            </local:ClassImbalanceGraph>
+        <local:ClassImbalanceGraph Grid.Row="6" Grid.Column="1" Label="{Binding Labels[0]}" GraphColor="{Binding Labels[0].Color}" Margin="0">
+            <local:ClassImbalanceGraph.Evidence>
+                <MultiBinding>
+                    <MultiBinding.Converter>
+                        <conv:DictionaryItemFromLabelConverter/>
+                    </MultiBinding.Converter>
+                    <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
+                    <Binding Path="Labels[0]"/>
+                </MultiBinding>
+            </local:ClassImbalanceGraph.Evidence>
+        </local:ClassImbalanceGraph>
 
-            <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0"
+        <Label Grid.Row="7" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
-            <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="{Binding Labels[1].Color}" Margin="0">
-                <local:ClassImbalanceGraph.Evidence>
-                    <MultiBinding>
-                        <MultiBinding.Converter>
-                            <conv:DictionaryItemFromLabelConverter/>
-                        </MultiBinding.Converter>
-                        <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
-                        <Binding Path="Labels[1]"/>
-                    </MultiBinding>
-                </local:ClassImbalanceGraph.Evidence>
-            </local:ClassImbalanceGraph>
+        <local:ClassImbalanceGraph Grid.Row="7" Grid.Column="1" Label="{Binding Labels[1]}" GraphColor="{Binding Labels[1].Color}" Margin="0">
+            <local:ClassImbalanceGraph.Evidence>
+                <MultiBinding>
+                    <MultiBinding.Converter>
+                        <conv:DictionaryItemFromLabelConverter/>
+                    </MultiBinding.Converter>
+                    <Binding Path="MessageVM.Message.Prediction.EvidencePerClass"/>
+                    <Binding Path="Labels[1]"/>
+                </MultiBinding>
+            </local:ClassImbalanceGraph.Evidence>
+        </local:ClassImbalanceGraph>
 
-            <TextBlock Grid.Row="8" Grid.Column="1" Margin="15 10 15 5" TextWrapping="Wrap" MaxWidth="400"
+        <TextBlock Grid.Row="8" Grid.Column="1" Margin="15 10 15 5" TextWrapping="Wrap" MaxWidth="400"
                    Text="{Binding MessageVM.Message.Prediction.ClassPrDesc, Mode=OneWay}">
-            </TextBlock>
+        </TextBlock>
 
-            <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">3) Combine parts 1 and 2</Label>
-            <Grid Grid.Row="10" Grid.Column="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding MessageVM.Message.Prediction.ConfidenceDesc,Mode=OneWay}"></TextBlock>
-                <Canvas Grid.Column="1" Height="100" Margin="10 0 0 10">
-                    <Ellipse Width="100" Height="100" Fill="{Binding Labels[0].Color}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0">
-                        <Ellipse.ToolTip>
-                            <Label Content="{Binding MessageVM.Message.Prediction.ConfidencePieCircle}" ContentStringFormat="{}{0:P0} chance this message is about Hockey"/>
-                        </Ellipse.ToolTip>
-                    </Ellipse>
-                    <Path Stroke="Black" StrokeThickness="1" Fill="{Binding Labels[1].Color}">
-                        <Path.Data>
-                            <PathGeometry>
-                                <PathFigure StartPoint="50,0" IsClosed="True">
-                                    <ArcSegment
+        <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical">
+            <Label FontSize="50" FontWeight="Bold" Foreground="Gray" HorizontalContentAlignment="Center">=</Label>
+            <Label  FontWeight="Bold" Margin="5 15 5 5">Combine parts 1 and 2</Label>
+        </StackPanel>
+        
+        <Grid Grid.Row="10" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding MessageVM.Message.Prediction.ConfidenceDesc,Mode=OneWay}"></TextBlock>
+            <Canvas Grid.Column="1" Height="100" Margin="10 0 0 10">
+                <Ellipse Width="100" Height="100" Fill="{Binding Labels[0].Color}" Stroke="Black" StrokeThickness="1" Canvas.Left="0" Canvas.Top="0">
+                    <Ellipse.ToolTip>
+                        <Label Content="{Binding MessageVM.Message.Prediction.ConfidencePieCircle}" ContentStringFormat="{}{0:P0} chance this message is about Hockey"/>
+                    </Ellipse.ToolTip>
+                </Ellipse>
+                <Path Stroke="Black" StrokeThickness="1" Fill="{Binding Labels[1].Color}">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure StartPoint="50,0" IsClosed="True">
+                                <ArcSegment
                                     Size="50,50"
                                     Point="{Binding MessageVM.Message.Prediction.ConfidencePiePoint}"
                                     IsLargeArc="{Binding MessageVM.Message.Prediction.ConfidencePieLarge}"
                                     SweepDirection="Clockwise"/>
-                                    <LineSegment Point="50,50"/>
-                                </PathFigure>
-                            </PathGeometry>
-                        </Path.Data>
-                        <Path.ToolTip>
-                            <Label Content="{Binding MessageVM.Message.Prediction.ConfidencePieSlice}" ContentStringFormat="{}{0:P0} chance this message is about Baseball"/>
-                        </Path.ToolTip>
-                    </Path>
-                </Canvas>
-            </Grid>
-
+                                <LineSegment Point="50,50"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </Path.Data>
+                    <Path.ToolTip>
+                        <Label Content="{Binding MessageVM.Message.Prediction.ConfidencePieSlice}" ContentStringFormat="{}{0:P0} chance this message is about Baseball"/>
+                    </Path.ToolTip>
+                </Path>
+            </Canvas>
         </Grid>
+
+    </Grid>
     <!--</ScrollViewer>-->
 </UserControl>
