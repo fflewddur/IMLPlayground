@@ -28,14 +28,30 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <Label Grid.Row="0" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part one:</Label>
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">1) Count the important words</Label>
             <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding MessageVM.Message.Prediction.ImportantWordDesc, Mode=OneWay}" 
                    TextWrapping="Wrap" Margin="15 0 5 5" />
 
-            <Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
-               Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}" />
+            <!--<Label Grid.Row="2" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+               Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}" />-->
 
-            <local:EvidenceGraph Grid.Row="2" Grid.Column="1" Label="{Binding Labels[0]}" GraphColorUser="{Binding Labels[0].Color}" GraphColorSystem="{Binding Labels[0].Color}"
+            <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding MessageVM.Message.Prediction.EvidenceItems}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Label Foreground="{Binding Label.Color}" FontWeight="Bold" FontSize="{Binding FontSize}" Content="{Binding FeatureText}">
+                            <Label.ToolTip>
+                                <Label Content="{Binding}"/>
+                            </Label.ToolTip>
+                        </Label>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <!--<local:EvidenceGraph Grid.Row="2" Grid.Column="1" Label="{Binding Labels[0]}" GraphColorUser="{Binding Labels[0].Color}" GraphColorSystem="{Binding Labels[0].Color}"
                              Margin="5 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}">
                 <local:EvidenceGraph.Evidence>
                     <MultiBinding>
@@ -46,11 +62,11 @@
                         <Binding Path="Labels[0]"/>
                     </MultiBinding>
                 </local:EvidenceGraph.Evidence>
-            </local:EvidenceGraph>
+            </local:EvidenceGraph>-->
 
-            <Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
-               Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>
-            <local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="{Binding Labels[1].Color}" GraphColorSystem="{Binding Labels[1].Color}"
+            <!--<Label Grid.Row="3" Grid.Column="0" Content="{Binding Labels[1]}" ContentStringFormat="{}{0}:" HorizontalContentAlignment="Right" VerticalContentAlignment="Center"
+               Margin="15 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>-->
+            <!--<local:EvidenceGraph Grid.Row="3" Grid.Column="1" Label="{Binding Labels[1]}" GraphColorUser="{Binding Labels[1].Color}" GraphColorSystem="{Binding Labels[1].Color}"
                              Margin="5 0 5 5" Style="{StaticResource ResourceKey=hideIfNoFeatures}">
                 <local:EvidenceGraph.Evidence>
                     <MultiBinding>
@@ -61,12 +77,12 @@
                         <Binding Path="Labels[1]"/>
                     </MultiBinding>
                 </local:EvidenceGraph.Evidence>
-            </local:EvidenceGraph>
+            </local:EvidenceGraph>-->
             <TextBlock Grid.Row="4" Grid.Column="1" Margin="15 0 15 5" TextWrapping="Wrap" MaxWidth="400" TextAlignment="Left"
                    Text="{Binding MessageVM.Message.Prediction.FeaturePrDesc, Mode=OneWay}" 
                    HorizontalAlignment="Left" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>
 
-            <Label Grid.Row="5" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part two:</Label>
+            <Label Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">2) Count the messages in each folder</Label>
 
             <Label Grid.Row="6" Grid.Column="0" Content="{Binding Labels[0]}" ContentStringFormat="{}{0}:" Margin="0"
                HorizontalContentAlignment="Right" VerticalContentAlignment="Center"/>
@@ -100,7 +116,7 @@
                    Text="{Binding MessageVM.Message.Prediction.ClassPrDesc, Mode=OneWay}">
             </TextBlock>
 
-            <Label Grid.Row="9" Grid.Column="0" FontWeight="Bold" Margin="5 15 5 5">Part three:</Label>
+            <Label Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" FontWeight="Bold" Margin="5 15 5 5">3) Average steps 1 and 2</Label>
             <Grid Grid.Row="10" Grid.Column="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>

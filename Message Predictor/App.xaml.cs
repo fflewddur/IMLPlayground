@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
@@ -64,6 +65,10 @@ namespace MessagePredictor
             _logger.WriteAttributeString("system", Environment.OSVersion.ToString());
             _logger.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
             _logger.WriteAttributeString("runtime", Environment.Version.ToString());
+
+            // Use a longer tooltip timeout (20 seconds)
+            ToolTipService.ShowDurationProperty.OverrideMetadata(
+                typeof(DependencyObject), new FrameworkPropertyMetadata(20000));
 
             MessagePredictorViewModel vm = new MessagePredictorViewModel(_logger);
             var window = new MessagePredictorWindow();

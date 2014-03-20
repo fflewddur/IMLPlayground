@@ -15,6 +15,7 @@ namespace LibIML.Instances
         private double _label2Pr;
         private int _count;
         private double _ratio;
+        private double _fontSize;
         //private string _word;
         //private int _id;
         //private int _count;
@@ -60,7 +61,8 @@ namespace LibIML.Instances
         public double Label1Pr
         {
             get { return _label1Pr; }
-            set { 
+            set
+            {
                 _label1Pr = value;
                 UpdateRatio();
             }
@@ -69,7 +71,7 @@ namespace LibIML.Instances
         public double Label2Pr
         {
             get { return _label2Pr; }
-            set 
+            set
             {
                 _label2Pr = value;
                 UpdateRatio();
@@ -85,7 +87,17 @@ namespace LibIML.Instances
         public double Ratio
         {
             get { return _ratio; }
-            private set { _ratio = value; }
+            private set
+            {
+                _ratio = value;
+                FontSize = Math.Log(_ratio + Math.E) * 10;
+            }
+        }
+
+        public double FontSize
+        {
+            get { return _fontSize; }
+            private set { _fontSize = value; }
         }
 
         //public string Word
@@ -127,7 +139,7 @@ namespace LibIML.Instances
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("{0} label={5} topic1Pr={1:N4} topic2Pr={2:N4} count={3} ratio={4:N4}", FeatureText, Label1Pr, Label2Pr, Count, Ratio, Label);
+            sb.AppendFormat("{0} label={5} topic1Pr={1:N6} topic2Pr={2:N6} count={3} ratio={4:N3} fontSize={6:N1}", FeatureText, Label1Pr, Label2Pr, Count, Ratio, Label, FontSize);
 
             return sb.ToString();
         }
