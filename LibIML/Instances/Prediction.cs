@@ -186,7 +186,7 @@ namespace LibIML
             // Build FeaturePrDesc
             sb.Clear();
             if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
-                sb.AppendFormat("Because the area of the {0} bars equals the area of the {1} bars, the computer thinks this message is equally likely to be about either.",
+                sb.AppendFormat("Because the size of the {0} words equals the size of the {1} words, the computer thinks this message is equally likely to be about either.",
                     largestWeightLabel, smallestWeightLabel);
             } else {
                 double ratio = Math.Round(largestWeight / smallestWeight, 1);
@@ -204,7 +204,7 @@ namespace LibIML
                     }
                 }
 
-                sb.AppendFormat("Because the area of the {0} bars is {1} times larger than the {2} bars, the computer thinks this message is {1} times more likely to be about {0} than {2}.",
+                sb.AppendFormat("Because the {0} words are larger than the {2} words, the computer thinks this message is more likely to be about {0} than {2}.",
                     largestWeightLabel, ratioDesc, smallestWeightLabel);
             }
             FeaturePrDesc = sb.ToString();
@@ -332,8 +332,8 @@ namespace LibIML
             }
             sb.Append(" in this message");
             if (ImportantWordTotal > 0) {
-                sb.Append(". ");
-                if (ImportantWordTotal == 1) {
+                sb.Append(": ");
+/*                if (ImportantWordTotal == 1) {
                     sb.Append(" It appears a total of 1 time.");
                 } else {
                     if (ImportantWordUniques == 1) {
@@ -342,6 +342,7 @@ namespace LibIML
                         sb.AppendFormat(" They appear a total of {0} times.", ImportantWordTotal);
                     }
                 }
+ */
             } else {
                 sb.Append(", so they have no impact on the predicted topic.");
             }
