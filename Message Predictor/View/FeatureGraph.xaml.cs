@@ -99,6 +99,8 @@ namespace MessagePredictor.View
             Feature feature = fe.DataContext as Feature;
             _currentFeature = feature;
             Mouse.OverrideCursor = Cursors.SizeNS;
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            vm.LogFeatureAdjustBegin(feature);
         }
 
         private void Rectangle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -113,9 +115,13 @@ namespace MessagePredictor.View
 
         private void StopAdjustingFeature()
         {
-            _mouseOrigY = -1;
-            _currentFeature = null;
-            Mouse.OverrideCursor = null;
+            if (_currentFeature != null) {
+                FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+                vm.LogFeatureAdjustEnd(_currentFeature);
+                _mouseOrigY = -1;
+                _currentFeature = null;
+                Mouse.OverrideCursor = null;
+            }
         }
 
         //private void UnusedWeight_PreviewMouseMove(object sender, MouseEventArgs e)
@@ -171,6 +177,14 @@ namespace MessagePredictor.View
             if (vm != null && fe != null) {
                 Feature f = fe.DataContext as Feature;
                 vm.HighlightFeature.Execute(f.Characters);
+            }
+        }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            if (vm != null && e.HorizontalChange != 0) {
+                vm.LogFeatureGraphScrolled(Label.ToString(), e.HorizontalChange, e.HorizontalOffset);
             }
         }
     }

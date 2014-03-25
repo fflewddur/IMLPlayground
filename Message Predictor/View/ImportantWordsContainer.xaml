@@ -14,7 +14,7 @@
         
         <Label Grid.Row="0" Style="{StaticResource headerStyle1}">Important words</Label>
         
-        <TabControl Grid.Row="1">
+        <TabControl Grid.Row="1" SelectionChanged="TabControl_SelectionChanged">
             <TabItem Header="Overview" Style="{StaticResource ResourceKey=tabItemStyle}">
                 <local:ImportantWordsOverview />
             </TabItem>

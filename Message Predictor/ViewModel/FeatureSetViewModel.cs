@@ -205,11 +205,69 @@ namespace MessagePredictor.ViewModel
 
         #region Public methods
 
+        public void LogFeatureTabChanged(string tabName)
+        {
+            _logger.Writer.WriteStartElement("FeatureTabChanged");
+            _logger.Writer.WriteAttributeString("tabName", tabName);
+            _logger.logTime();
+            _logger.logEndElement();
+        }
+
+        public void LogFeatureAdjustBegin(Feature feature)
+        {
+            _logger.Writer.WriteStartElement("FeatureAdjustmentBegin");
+            _logger.Writer.WriteAttributeString("feature", feature.Characters);
+            _logger.Writer.WriteAttributeString("userHeight", feature.UserHeight.ToString());
+            _logger.Writer.WriteAttributeString("systemHeight", feature.SystemHeight.ToString());
+            _logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
+            _logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
+            _logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
+            _logger.Writer.WriteAttributeString("label", feature.Label.ToString());
+            _logger.logTime();
+        }
+
+        public void LogFeatureAdjustEnd(Feature feature)
+        {
+            _logger.Writer.WriteStartElement("FeatureAdjustmentEnd");
+            _logger.Writer.WriteAttributeString("feature", feature.Characters);
+            _logger.Writer.WriteAttributeString("userHeight", feature.UserHeight.ToString());
+            _logger.Writer.WriteAttributeString("systemHeight", feature.SystemHeight.ToString());
+            _logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
+            _logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
+            _logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
+            _logger.Writer.WriteAttributeString("label", feature.Label.ToString());
+            _logger.logTime();
+            _logger.logEndElement();
+            _logger.logEndElement(); // Also end the FeatureAdjustBegin element
+        }
+
+        public void LogOverviewScrolled(double change, double offset)
+        {
+            _logger.Writer.WriteStartElement("FeatureOverviewScrolled");
+            _logger.Writer.WriteAttributeString("change", change.ToString());
+            _logger.Writer.WriteAttributeString("offset", offset.ToString());
+            _logger.logTime();
+            _logger.logEndElement();
+        }
+
+        public void LogFeatureGraphScrolled(string topic, double change, double offset)
+        {
+            _logger.Writer.WriteStartElement("FeatureGraphScrolled");
+            _logger.Writer.WriteAttributeString("label", topic);
+            _logger.Writer.WriteAttributeString("change", change.ToString());
+            _logger.Writer.WriteAttributeString("offset", offset.ToString());
+            _logger.logTime();
+            _logger.logEndElement();
+        }
+
         public void AddUserFeature(Feature feature)
         {
             _logger.Writer.WriteStartElement("AddFeature");
             _logger.Writer.WriteAttributeString("feature", feature.Characters);
             _logger.Writer.WriteAttributeString("weightType", feature.WeightType.ToString());
+            _logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
+            _logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
+            _logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
             _logger.Writer.WriteAttributeString("label", feature.Label.ToString());
             _logger.logTime();
             _logger.logEndElement();
@@ -228,6 +286,15 @@ namespace MessagePredictor.ViewModel
 
         public void RemoveUserFeature(Feature feature)
         {
+            _logger.Writer.WriteStartElement("RemoveFeature");
+            _logger.Writer.WriteAttributeString("feature", feature.Characters);
+            _logger.Writer.WriteAttributeString("weightType", feature.WeightType.ToString());
+            _logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
+            _logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
+            _logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
+            _logger.logTime();
+            _logger.logEndElement();
+
             // Create a feature with the same word, but that will match any label
             Feature anyLabel = new Feature(feature.Characters, Label.AnyLabel);
 
@@ -463,12 +530,16 @@ namespace MessagePredictor.ViewModel
         private void PerformApplyFeatureAdjustments()
         {
             Console.WriteLine("Apply feature adjustments");
+            _logger.Writer.WriteStartElement("ApplyFeatureAdjustments");
+            _logger.logTime();
 
             foreach (Label label in Labels) {
                 UpdateFeaturePriors(label);
             }
 
             _featureImportanceAdjusted = false;
+
+            _logger.logEndElement();
         }
 
         private void UpdateFeaturePriors(Label label)

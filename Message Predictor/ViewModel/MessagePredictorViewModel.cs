@@ -322,6 +322,15 @@ namespace MessagePredictor
             _folderListVM.SelectFolderByIndex(0);
         }
 
+        public void LogMessageScrolled(double change, double offset)
+        {
+            _logger.Writer.WriteStartElement("FeatureGraphScrolled");
+            _logger.Writer.WriteAttributeString("change", change.ToString());
+            _logger.Writer.WriteAttributeString("offset", offset.ToString());
+            _logger.logTime();
+            _logger.logEndElement();
+        }
+
         #endregion
 
         #region Private methods

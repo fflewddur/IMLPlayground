@@ -7,6 +7,7 @@
              mc:Ignorable="d" 
              Name="root"
              d:DesignHeight="300" d:DesignWidth="300">
+    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollChanged="ScrollViewer_ScrollChanged">
     <Grid Margin="10" MouseLeave="Grid_MouseLeave" Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -83,4 +84,5 @@
         </Grid>
 
     </Grid>
+    </ScrollViewer>
 </UserControl>

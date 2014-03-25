@@ -142,5 +142,13 @@ namespace MessagePredictor.View
                 "If a message doesn't contain any of these important words, the computer will have difficulty predicting its topic.";
             d.ShowDialog();
         }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            if (vm != null && e.HorizontalChange != 0) {
+                vm.LogOverviewScrolled(e.HorizontalChange, e.HorizontalOffset);
+            }
+        }
     }
 }

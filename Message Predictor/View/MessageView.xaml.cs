@@ -23,6 +23,14 @@ namespace MessagePredictor.View
             MessagePredictorViewModel vm = tb.DataContext as MessagePredictorViewModel;
             vm.FeatureSetVM.HighlightFeature.Execute(tb.Selection.Text.Trim());
         }
+
+        private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            if (vm != null && e.VerticalChange != 0) {
+                vm.LogMessageScrolled(e.VerticalChange, e.VerticalOffset);
+            }
+        }
     }
 
     public class MyFormatter : ITextFormatter

@@ -10,7 +10,7 @@
     <Grid>
         <!--<TabControl>-->
             <!--<TabItem Header="Message" Style="{StaticResource ResourceKey=tabItemStyle}">-->
-                <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollChanged="ScrollViewer_ScrollChanged">
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="3*"/>
