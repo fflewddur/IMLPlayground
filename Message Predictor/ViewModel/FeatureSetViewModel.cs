@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LibIML;
+using MessagePredictor.Model;
 using MessagePredictor.View;
 using System;
 using System.Collections.Generic;
@@ -9,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Threading;
+using System.Xml;
 
 namespace MessagePredictor.ViewModel
 {
@@ -31,10 +33,12 @@ namespace MessagePredictor.ViewModel
         private double _featureGraphHeight;
         private double _pixelsToWeight; // How many pixels to use to display each unit of feature weight (changes based on display size)
         private bool _featureImportanceAdjusted;
+        private Logger _logger;
 
-        public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels)
+        public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels, Logger logger)
             : base()
         {
+            _logger = logger;
             _classifier = classifier;
             _vocab = vocab;
             _labels = labels;
@@ -203,6 +207,13 @@ namespace MessagePredictor.ViewModel
 
         public void AddUserFeature(Feature feature)
         {
+            _logger.Writer.WriteStartElement("AddFeature");
+            _logger.Writer.WriteAttributeString("feature", feature.Characters);
+            _logger.Writer.WriteAttributeString("weightType", feature.WeightType.ToString());
+            _logger.Writer.WriteAttributeString("label", feature.Label.ToString());
+            _logger.logTime();
+            _logger.logEndElement();
+
             // If the user previously removed this feature, clear it from the list of removed features
             _userRemoved.Remove(feature);
             // If the user already added this feature, overwrite the previous version
@@ -383,6 +394,9 @@ namespace MessagePredictor.ViewModel
 
         private void PerformAddFeature(Label label)
         {
+            _logger.Writer.WriteStartElement("ShowAddFeatureDialog");
+            _logger.logTime();
+
             AddFeatureDialog dialog = new AddFeatureDialog();
             dialog.Owner = App.Current.MainWindow;
             AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(label);
@@ -406,6 +420,8 @@ namespace MessagePredictor.ViewModel
             // Let anyone watching know that the user has closed the dialog, so _featureText is now empty.
             _featureText = "";
             OnFeatureTextEdited(new FeatureTextEditedEventArgs(_featureText));
+
+            _logger.logEndElement();
         }
 
         private void AddFeatureVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

@@ -24,7 +24,7 @@ namespace MessagePredictor
         List<Label> _labels;
         Vocabulary _vocab;
         MultinomialNaiveBayesFeedbackClassifier _classifier;
-        XmlWriter _logger;
+        Logger _logger;
 
         // Viewmodels (and data for this viewmodel)
         private FolderListViewModel _folderListVM;
@@ -44,7 +44,7 @@ namespace MessagePredictor
         bool _autoUpdatePredictions;
         bool _onlyShowRecentChanges;
 
-        public MessagePredictorViewModel(XmlWriter logger)
+        public MessagePredictorViewModel(Logger logger)
         {
             Console.WriteLine("MessagePredictorViewModel() start");
             Stopwatch timer = new Stopwatch();
@@ -97,7 +97,7 @@ namespace MessagePredictor
 
             _messageVM = new MessageViewModel();
 
-            _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels);
+            _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels, _logger);
             _featureSetVM.FeatureAdded += _featureSetVM_FeatureAdded;
             _featureSetVM.FeatureRemoved += _featureSetVM_FeatureRemoved;
             _featureSetVM.FeatureTextEdited += _featureSetVM_FeatureTextEdited;
@@ -246,15 +246,15 @@ namespace MessagePredictor
             NewsItem item = MessageVM.Message;
             Mouse.OverrideCursor = Cursors.Wait;
 
-            _logger.WriteStartElement("LabelMessage");
-            _logger.WriteAttributeString("id", item.Id.ToString());
-            _logger.WriteAttributeString("label", label.ToString());
+            _logger.Writer.WriteStartElement("LabelMessage");
+            _logger.Writer.WriteAttributeString("id", item.Id.ToString());
+            _logger.Writer.WriteAttributeString("label", label.ToString());
             if (item.UserLabel != null) {
-                _logger.WriteAttributeString("priorLabel", item.UserLabel.ToString());
+                _logger.Writer.WriteAttributeString("priorLabel", item.UserLabel.ToString());
             } else {
-                _logger.WriteAttributeString("priorLabel", "Unknown");
+                _logger.Writer.WriteAttributeString("priorLabel", "Unknown");
             }
-            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
             // Don't do anything if the message already has the desired label
             if (item.UserLabel == label || (item.UserLabel == null && label == FolderListVM.UnknownLabel)) {
@@ -264,7 +264,7 @@ namespace MessagePredictor
                 d.DialogMessage = string.Format("This message is already in the {0} folder.", label);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
-                logEndElement(_logger);
+                _logger.logEndElement();
                 return;
             }
 
@@ -276,7 +276,7 @@ namespace MessagePredictor
                 d.DialogMessage = string.Format("For this experiment, we can't let you move this message to the {0} folder.\n\nThe person who wrote this message says it's about {1}.", label, item.GroundTruthLabel);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
-                logEndElement(_logger);
+                _logger.logEndElement();
                 return;
             }
 
@@ -307,7 +307,7 @@ namespace MessagePredictor
             }
 
             Mouse.OverrideCursor = null;
-            logEndElement(_logger);
+            _logger.logEndElement();
         }
 
         #endregion
@@ -470,7 +470,7 @@ namespace MessagePredictor
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.DataDir, App.Current.Properties[App.PropertyKey.DatasetFile].ToString());
 
             _labels = new List<Label>();
-            _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic1UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic1SystemLabel].ToString(), 
+            _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic1UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic1SystemLabel].ToString(),
                 (Brush)App.Current.Properties[App.PropertyKey.Topic1Color], App.Current.Properties[App.PropertyKey.Topic1ColorDesc].ToString()));
             _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic2UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic2SystemLabel].ToString(),
                 (Brush)App.Current.Properties[App.PropertyKey.Topic2Color], App.Current.Properties[App.PropertyKey.Topic2ColorDesc].ToString()));
@@ -608,52 +608,50 @@ namespace MessagePredictor
 
         private void _heatMapVM_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
         {
+            _logger.Writer.WriteStartElement("HighlightTextChanged");
+            _logger.Writer.WriteAttributeString("text", e.Text);
+            _logger.logTime();
+
             if (MessageVM.Message != null) {
                 MessageVM.Message.HighlightWithWord(e.Text);
             }
+
+            _logger.logEndElement();
         }
 
         private void _folderListVM_SelectedFolderChanged(object sender, FolderListViewModel.SelectedFolderChangedEventArgs e)
         {
-            _logger.WriteStartElement("SelectedFolder");
-            _logger.WriteAttributeString("label", e.Folder.Label.ToString());
-            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.Writer.WriteStartElement("SelectedFolder");
+            _logger.Writer.WriteAttributeString("label", e.Folder.Label.ToString());
+            _logger.logTime();
 
             UpdateFilters(_onlyShowRecentChanges);
             MessageVM.Message = e.Folder.SelectedMessage;
 
-            logEndElement(_logger);
+            _logger.logEndElement();
         }
 
         private void _folderListVM_SelectedMessageChanged(object sender, FolderViewModel.SelectedMessageChangedEventArgs e)
         {
-            _logger.WriteStartElement("SelectedMessage");
-            _logger.WriteAttributeString("id", e.Message.Id.ToString());
+            _logger.Writer.WriteStartElement("SelectedMessage");
+            _logger.Writer.WriteAttributeString("id", e.Message.Id.ToString());
             if (e.Message.UserLabel != null) {
-                _logger.WriteAttributeString("userLabel", e.Message.UserLabel.ToString());
+                _logger.Writer.WriteAttributeString("userLabel", e.Message.UserLabel.ToString());
             } else {
-                _logger.WriteAttributeString("userLabel", "none");
+                _logger.Writer.WriteAttributeString("userLabel", "none");
             }
-            _logger.WriteAttributeString("groundTruthLabel", e.Message.GroundTruthLabel.ToString());
-            _logger.WriteAttributeString("isHighlighted", e.Message.IsHighlighted.ToString());
-            _logger.WriteAttributeString("isPredictionCorrect", e.Message.IsPredictionCorrect.ToString());
-            _logger.WriteAttributeString("predictionLabel", e.Message.Prediction.Label.ToString());
-            _logger.WriteAttributeString("predictionConfidence", e.Message.Prediction.Confidence.ToString());
-            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.Writer.WriteAttributeString("groundTruthLabel", e.Message.GroundTruthLabel.ToString());
+            _logger.Writer.WriteAttributeString("isHighlighted", e.Message.IsHighlighted.ToString());
+            _logger.Writer.WriteAttributeString("isPredictionCorrect", e.Message.IsPredictionCorrect.ToString());
+            _logger.Writer.WriteAttributeString("predictionLabel", e.Message.Prediction.Label.ToString());
+            _logger.Writer.WriteAttributeString("predictionConfidence", e.Message.Prediction.Confidence.ToString());
+            _logger.Writer.WriteAttributeString("predictionConfidenceDirection", e.Message.PredictionConfidenceDirection.ToString());
+            _logger.logTime();
 
             MessageVM.Message = e.Message;
             MessageVM.Message.HighlightWithWord(HeatMapVM.ToHighlight);
 
-            logEndElement(_logger);
-        }
-
-        /// <summary>
-        /// Close the current XML element and flush the stream to disk. 
-        /// </summary>
-        /// <param name="logger"></param>
-        private void logEndElement(XmlWriter logger) {
-            _logger.WriteEndElement();
-            _logger.Flush();
+            _logger.logEndElement();
         }
 
         #endregion

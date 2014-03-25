@@ -142,6 +142,7 @@
     <Compile Include="Libs\ArrowPolyline.cs" />
     <Compile Include="Model\Enums.cs" />
     <Compile Include="Model\Evaluator.cs" />
+    <Compile Include="Model\Logger.cs" />
     <Compile Include="Model\NewsCollection.cs" />
     <Compile Include="Model\NewsItem.cs" />
     <Compile Include="Utilities.cs" />

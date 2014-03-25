@@ -1,4 +1,5 @@
-﻿using MessagePredictor.View;
+﻿using MessagePredictor.Model;
+using MessagePredictor.View;
 using System;
 using System.IO;
 using System.Windows;
@@ -47,7 +48,7 @@ namespace MessagePredictor
             AutoUpdatePredictions
         }
 
-        private XmlWriter _logger;
+        private Logger _logger;
 
         // Called on Application startup. Handle any command line arguments, load our configuration properties, 
         // and then build the ViewModel and View.
@@ -55,18 +56,18 @@ namespace MessagePredictor
         {
             base.OnStartup(e);
 
-            _logger = BuildLogger();
-            _logger.WriteStartDocument();
-            _logger.WriteStartElement("MessagePredictorLog");
+            _logger = new Logger();
+            _logger.Writer.WriteStartDocument();
+            _logger.Writer.WriteStartElement("MessagePredictorLog");
 
             LoadPropertiesFile();
-            _logger.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
-            _logger.WriteAttributeString("dataset", this.Properties[PropertyKey.DatasetFile].ToString());
-            _logger.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
-            _logger.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
-            _logger.WriteAttributeString("system", Environment.OSVersion.ToString());
-            _logger.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
-            _logger.WriteAttributeString("runtime", Environment.Version.ToString());
+            _logger.Writer.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
+            _logger.Writer.WriteAttributeString("dataset", this.Properties[PropertyKey.DatasetFile].ToString());
+            _logger.Writer.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
+            _logger.Writer.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
+            _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
+            _logger.Writer.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
+            _logger.Writer.WriteAttributeString("runtime", Environment.Version.ToString());
 
             // Use a longer tooltip timeout (20 seconds)
             ToolTipService.ShowDurationProperty.OverrideMetadata(
@@ -77,24 +78,24 @@ namespace MessagePredictor
             window.DataContext = vm;
             window.Loaded += window_Loaded;
             window.Show();
-            _logger.WriteStartElement("WindowOpen");
-            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            _logger.WriteEndElement();
-            _logger.WriteStartElement("Actions");
+            _logger.Writer.WriteStartElement("WindowOpen");
+            _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.Writer.WriteEndElement();
+            _logger.Writer.WriteStartElement("UserActions");
         }
 
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
 
-            _logger.WriteEndElement(); // End <actions/> element
-            _logger.WriteStartElement("WindowClose");
-            _logger.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
-            _logger.WriteEndElement();
+            _logger.Writer.WriteEndElement(); // End <actions/> element
+            _logger.Writer.WriteStartElement("WindowClose");
+            _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.Writer.WriteEndElement();
 
-            _logger.WriteEndElement(); // End root element
-            _logger.WriteEndDocument();
-            _logger.Close();
+            _logger.Writer.WriteEndElement(); // End root element
+            _logger.Writer.WriteEndDocument();
+            _logger.Writer.Close();
         }
 
         /// <summary>
@@ -241,24 +242,6 @@ namespace MessagePredictor
             } catch (FileNotFoundException e) {
                 Console.Error.WriteLine("Could not load properties file: {0}", e.Message);
             }
-        }
-
-        private XmlWriter BuildLogger()
-        {
-            // If our log directory doesn't exist, create it.
-            string logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, LogDir);
-            if (!Directory.Exists(logDir)) {
-                Directory.CreateDirectory(logDir);
-            }
-
-            // Create a new log file
-            string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.LogDir, "log.xml");
-            XmlWriterSettings settings = new XmlWriterSettings();
-            settings.Indent = true;
-            settings.IndentChars = "\t";
-            XmlWriter logger = XmlWriter.Create(logFile, settings);
-
-            return logger;
         }
 
         #region Event handlers
