@@ -24,10 +24,12 @@ namespace MessagePredictor.ViewModel
         private MessageWindow _messageWindow;
         private string _tooltipContent;
         private Label _unknownLabel;
+        private Logger _logger;
 
-        public HeatMapViewModel(NewsCollection messages, Label unknownLabel)
+        public HeatMapViewModel(NewsCollection messages, Label unknownLabel, Logger logger)
             : base()
         {
+            _logger = logger;
             _messages = messages;
             _heatMapView = BuildCollectionViewSourceForCollection(_messages);
             _currentMessage = null;
@@ -66,12 +68,33 @@ namespace MessagePredictor.ViewModel
                     if (CurrentMessage != null) {
                         CurrentMessage.HighlightWithWord(ToHighlight);
                         if (_messageWindow == null) {
+                            _logger.Writer.WriteStartElement("OpenMessageWindow");
+                            _logger.Writer.WriteAttributeString("message", CurrentMessage.Id.ToString());
+                            if (CurrentMessage.UserLabel != null) {
+                                _logger.Writer.WriteAttributeString("userFolder", CurrentMessage.UserLabel.ToString());
+                            } else {
+                                _logger.Writer.WriteAttributeString("userFolder", "Unknown");
+                            }
+                            _logger.Writer.WriteAttributeString("predictedTopic", CurrentMessage.Prediction.Label.ToString());
+                            _logger.Writer.WriteAttributeString("isHighlighted", CurrentMessage.IsHighlighted.ToString());
+                            _logger.logTime();
                             _messageWindow = new MessageWindow();
                             _messageWindow.Closed += _messageWindow_Closed;
                             _messageWindow.DataContext = this;
                             _messageWindow.Owner = App.Current.MainWindow;
                             _messageWindow.Show();
                         } else {
+                            _logger.logEndElement(); // We changed our message
+                            _logger.Writer.WriteStartElement("OpenMessageWindow");
+                            _logger.Writer.WriteAttributeString("message", CurrentMessage.Id.ToString());
+                            if (CurrentMessage.UserLabel != null) {
+                                _logger.Writer.WriteAttributeString("userFolder", CurrentMessage.UserLabel.ToString());
+                            } else {
+                                _logger.Writer.WriteAttributeString("userFolder", "Unknown");
+                            }
+                            _logger.Writer.WriteAttributeString("predictedTopic", CurrentMessage.Prediction.Label.ToString());
+                            _logger.Writer.WriteAttributeString("isHighlighted", CurrentMessage.IsHighlighted.ToString());
+                            _logger.logTime();
                             _messageWindow.Activate();
                         }
                     }
@@ -113,9 +136,12 @@ namespace MessagePredictor.ViewModel
 
         void _messageWindow_Closed(object sender, EventArgs e)
         {
-            _messageWindow.Close();
-            _messageWindow = null;
-            CurrentMessage = null;
+            if (_messageWindow != null) {
+                _logger.logEndElement();
+                _messageWindow.Close();
+                _messageWindow = null;
+                CurrentMessage = null;
+            }
         }
 
         private void MarkMessagesContainingWord(string word)

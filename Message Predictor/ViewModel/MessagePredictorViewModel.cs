@@ -103,7 +103,7 @@ namespace MessagePredictor
             _featureSetVM.FeatureTextEdited += _featureSetVM_FeatureTextEdited;
             _featureSetVM.FeaturePriorEdited += _featureSetVM_FeaturePriorsEdited;
 
-            _heatMapVM = new HeatMapViewModel(_messages, _folderListVM.UnknownLabel);
+            _heatMapVM = new HeatMapViewModel(_messages, _folderListVM.UnknownLabel, _logger);
             _heatMapVM.HighlightTextChanged += _heatMapVM_HighlightTextChanged;
 
             _messageListViewSource = new CollectionViewSource();
@@ -111,7 +111,7 @@ namespace MessagePredictor
 
 
             // Setup our Commands
-            UpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
+            ManuallyUpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
             LabelMessage = new RelayCommand<Label>(PerformLabelMessage, CanPerformLabelMessage);
 
             // Start with our current folder pointing at the collection of unlabeled items.
@@ -119,8 +119,8 @@ namespace MessagePredictor
 
             // Evaluate the classifier (so we can show predictions to the user)
             UpdateVocabForce();
-            PerformUpdatePredictions();
-            PerformUpdatePredictions(); // Do this twice to avoid showing any change indicators at the start
+            UpdatePredictions();
+            UpdatePredictions(); // Do this twice to avoid showing any change indicators at the start
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
@@ -149,8 +149,15 @@ namespace MessagePredictor
             get { return _autoUpdatePredictions; }
             set
             {
-                if (SetProperty<bool>(ref _autoUpdatePredictions, value))
-                    UpdatePredictions.RaiseCanExecuteChanged();
+                if (SetProperty<bool>(ref _autoUpdatePredictions, value)) {
+                    _logger.Writer.WriteStartElement("ChangedAutoUpdatePredictions");
+                    _logger.Writer.WriteAttributeString("value", value.ToString());
+                    _logger.logTime();
+
+                    ManuallyUpdatePredictions.RaiseCanExecuteChanged();
+
+                    _logger.logEndElement();
+                }
             }
         }
 
@@ -160,7 +167,13 @@ namespace MessagePredictor
             set
             {
                 if (SetProperty<bool>(ref _onlyShowRecentChanges, value)) {
+                    _logger.Writer.WriteStartElement("ChangedOnlyShowRecentChanges");
+                    _logger.Writer.WriteAttributeString("value", value.ToString());
+                    _logger.logTime();
+
                     UpdateFilters(_onlyShowRecentChanges);
+
+                    _logger.logEndElement();
                 }
             }
         }
@@ -205,7 +218,7 @@ namespace MessagePredictor
 
         #region Commands
 
-        public RelayCommand UpdatePredictions { get; private set; }
+        public RelayCommand ManuallyUpdatePredictions { get; private set; }
         public RelayCommand<Label> LabelMessage { get; private set; }
 
         private bool CanPerformUpdatePredictions()
@@ -220,20 +233,13 @@ namespace MessagePredictor
 
         private void PerformUpdatePredictions()
         {
-            Mouse.OverrideCursor = Cursors.Wait;
-
             Console.WriteLine("Update predictions");
-            if (_vocab.HasUpdatedTokens) {
-                UpdateVocab();
-            }
+            _logger.Writer.WriteStartElement("ManuallyUpdatePredictions");
+            _logger.logTime();
 
-            TrainClassifier(_classifier, FilterToTrainingSet(_messages));
-            PredictMessages(_classifier, _messages);
-            _evaluatorVM.EvaluatePredictions(_messages);
-            _folderListVM.UpdateFolderCounts(_messages);
-            _messageListViewSource.View.Refresh();
+            UpdatePredictions();
 
-            Mouse.OverrideCursor = null;
+            _logger.logEndElement();
         }
 
         private bool CanPerformLabelMessage(Label label)
@@ -264,6 +270,8 @@ namespace MessagePredictor
                 d.DialogMessage = string.Format("This message is already in the {0} folder.", label);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
+                _logger.Writer.WriteAttributeString("wrongFolder", "False");
+                _logger.Writer.WriteAttributeString("sameFolder", "True");
                 _logger.logEndElement();
                 return;
             }
@@ -276,9 +284,14 @@ namespace MessagePredictor
                 d.DialogMessage = string.Format("For this experiment, we can't let you move this message to the {0} folder.\n\nThe person who wrote this message says it's about {1}.", label, item.GroundTruthLabel);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
+                _logger.Writer.WriteAttributeString("wrongFolder", "True");
+                _logger.Writer.WriteAttributeString("sameFolder", "False");
                 _logger.logEndElement();
                 return;
             }
+
+            _logger.Writer.WriteAttributeString("sameFolder", "False");
+            _logger.Writer.WriteAttributeString("wrongFolder", "False");
 
             item.UserLabel = label;
 
@@ -299,7 +312,7 @@ namespace MessagePredictor
 
             // If autoupdate is on, retrain the classifier
             if (AutoUpdatePredictions) {
-                PerformUpdatePredictions();
+                UpdatePredictions();
             } else {
                 // Still need to update our view
                 _folderListVM.UpdateFolderCounts(_messages);
@@ -334,6 +347,23 @@ namespace MessagePredictor
         #endregion
 
         #region Private methods
+
+        private void UpdatePredictions()
+        {
+            Mouse.OverrideCursor = Cursors.Wait;
+
+            if (_vocab.HasUpdatedTokens) {
+                UpdateVocab();
+            }
+
+            TrainClassifier(_classifier, FilterToTrainingSet(_messages));
+            PredictMessages(_classifier, _messages);
+            _evaluatorVM.EvaluatePredictions(_messages);
+            _folderListVM.UpdateFolderCounts(_messages);
+            _messageListViewSource.View.Refresh();
+
+            Mouse.OverrideCursor = null;
+        }
 
         private void UpdateVocabForce()
         {
@@ -583,7 +613,7 @@ namespace MessagePredictor
             _classifier.TryGetFeatureSystemWeight(id, e.Feature.Label, out weight);
             e.Feature.SystemWeight = weight;
             if (AutoUpdatePredictions) {
-                PerformUpdatePredictions();
+                UpdatePredictions();
             }
         }
 
@@ -591,7 +621,7 @@ namespace MessagePredictor
         {
             UpdateVocab();
             if (AutoUpdatePredictions) {
-                PerformUpdatePredictions();
+                UpdatePredictions();
             }
 
             // If the removed feature was highlighted, reset the highlight.
@@ -609,7 +639,7 @@ namespace MessagePredictor
         void _featureSetVM_FeaturePriorsEdited(object sender, FeatureSetViewModel.FeaturePriorEditedEventArgs e)
         {
             Console.WriteLine("weight edited. Adjust feature weights to correspond to the proportion of user-adjust heights");
-            PerformUpdatePredictions();
+            UpdatePredictions();
             //if (AutoUpdatePredictions) {
             //    PerformUpdatePredictions();
             //}
@@ -642,25 +672,27 @@ namespace MessagePredictor
 
         private void _folderListVM_SelectedMessageChanged(object sender, FolderViewModel.SelectedMessageChangedEventArgs e)
         {
-            _logger.Writer.WriteStartElement("SelectedMessage");
-            _logger.Writer.WriteAttributeString("id", e.Message.Id.ToString());
-            if (e.Message.UserLabel != null) {
-                _logger.Writer.WriteAttributeString("userLabel", e.Message.UserLabel.ToString());
-            } else {
-                _logger.Writer.WriteAttributeString("userLabel", "none");
+            if (e.Message != null) {
+                _logger.Writer.WriteStartElement("SelectedMessage");
+                _logger.Writer.WriteAttributeString("id", e.Message.Id.ToString());
+                if (e.Message.UserLabel != null) {
+                    _logger.Writer.WriteAttributeString("userLabel", e.Message.UserLabel.ToString());
+                } else {
+                    _logger.Writer.WriteAttributeString("userLabel", "none");
+                }
+                _logger.Writer.WriteAttributeString("groundTruthLabel", e.Message.GroundTruthLabel.ToString());
+                _logger.Writer.WriteAttributeString("isHighlighted", e.Message.IsHighlighted.ToString());
+                _logger.Writer.WriteAttributeString("isPredictionCorrect", e.Message.IsPredictionCorrect.ToString());
+                _logger.Writer.WriteAttributeString("predictionLabel", e.Message.Prediction.Label.ToString());
+                _logger.Writer.WriteAttributeString("predictionConfidence", e.Message.Prediction.Confidence.ToString());
+                _logger.Writer.WriteAttributeString("predictionConfidenceDirection", e.Message.PredictionConfidenceDirection.ToString());
+                _logger.logTime();
+
+                MessageVM.Message = e.Message;
+                MessageVM.Message.HighlightWithWord(HeatMapVM.ToHighlight);
+
+                _logger.logEndElement();
             }
-            _logger.Writer.WriteAttributeString("groundTruthLabel", e.Message.GroundTruthLabel.ToString());
-            _logger.Writer.WriteAttributeString("isHighlighted", e.Message.IsHighlighted.ToString());
-            _logger.Writer.WriteAttributeString("isPredictionCorrect", e.Message.IsPredictionCorrect.ToString());
-            _logger.Writer.WriteAttributeString("predictionLabel", e.Message.Prediction.Label.ToString());
-            _logger.Writer.WriteAttributeString("predictionConfidence", e.Message.Prediction.Confidence.ToString());
-            _logger.Writer.WriteAttributeString("predictionConfidenceDirection", e.Message.PredictionConfidenceDirection.ToString());
-            _logger.logTime();
-
-            MessageVM.Message = e.Message;
-            MessageVM.Message.HighlightWithWord(HeatMapVM.ToHighlight);
-
-            _logger.logEndElement();
         }
 
         #endregion
