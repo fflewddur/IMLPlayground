@@ -344,6 +344,16 @@ namespace MessagePredictor
             _logger.logEndElement();
         }
 
+        public void LogFeatureSet()
+        {
+            _classifier.LogFeatureSet(_logger.Writer);
+        }
+
+        public void LogTrainingSet()
+        {
+            _classifier.LogTrainingSet(_logger.Writer);
+        }
+
         #endregion
 
         #region Private methods

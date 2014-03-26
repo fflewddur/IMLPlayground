@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace LibIML
 {
@@ -480,6 +481,20 @@ namespace LibIML
             TestPrC(_pClass);
             TestPrWGivenC(_pWordGivenClass);
             OnRetrained(new EventArgs());
+        }
+
+        public void LogFeatureSet(XmlWriter writer)
+        {
+            writer.WriteStartElement("FeatureSet");
+
+            writer.WriteEndElement();
+        }
+
+        public void LogTrainingSet(XmlWriter writer)
+        {
+            writer.WriteStartElement("TrainingSet");
+
+            writer.WriteEndElement();
         }
 
         #endregion

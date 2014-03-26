@@ -49,6 +49,7 @@ namespace MessagePredictor
         }
 
         private Logger _logger;
+        MessagePredictorViewModel _vm;
 
         // Called on Application startup. Handle any command line arguments, load our configuration properties, 
         // and then build the ViewModel and View.
@@ -73,9 +74,9 @@ namespace MessagePredictor
             ToolTipService.ShowDurationProperty.OverrideMetadata(
                 typeof(DependencyObject), new FrameworkPropertyMetadata(20000));
 
-            MessagePredictorViewModel vm = new MessagePredictorViewModel(_logger);
+            _vm = new MessagePredictorViewModel(_logger);
             var window = new MessagePredictorWindow();
-            window.DataContext = vm;
+            window.DataContext = _vm;
             window.Loaded += window_Loaded;
             window.Show();
             _logger.Writer.WriteStartElement("WindowOpen");
@@ -92,6 +93,10 @@ namespace MessagePredictor
             _logger.Writer.WriteStartElement("WindowClose");
             _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             _logger.Writer.WriteEndElement();
+
+            // Log the feature set and training set
+            _vm.LogFeatureSet();
+            _vm.LogTrainingSet();
 
             _logger.Writer.WriteEndElement(); // End root element
             _logger.Writer.WriteEndDocument();

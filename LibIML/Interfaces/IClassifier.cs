@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace LibIML
 {
@@ -13,24 +14,21 @@ namespace LibIML
         string Name { get; }
         IEnumerable<Label> Labels { get; }
         Vocabulary Vocab { get; }
-        //IReadOnlyDictionary<Label, HashSet<Feature>> FeaturesPerClass { get; }
-        //Label PositiveLabel { get; }
-        //Label NegativeLabel { get; }
 
         void AddInstance(IInstance instance);
         void AddInstances(IEnumerable<IInstance> instances);
         void AddPriors(IEnumerable<Feature> priors);
         void UpdateCountsForNewFeature(int id);
         Prediction PredictInstance(IInstance instance);
-        //void UpdatePrior(Label label, int feature, double prior);
         void Train(); // Train the classifier on all added training instances
-        //IEnumerable<Feature> GetFeatures();
         void ClearInstances(); // Remove all existing training instances
         bool TryGetFeatureSystemWeight(int id, Label label, out double weight);
         bool TryGetFeatureUserWeight(int id, Label label, out double weight);
         bool TryGetFeatureUserPrior(int id, Label label, out double prior);
         bool TryGetSystemFeatureSum(Label label, out double sum);
         bool IsFeatureMostImportantForLabel(int id, Label label);
+        void LogFeatureSet(XmlWriter writer);
+        void LogTrainingSet(XmlWriter writer);
 
         Task<bool> SaveArffFile(string filePath);
     }
