@@ -2,6 +2,7 @@
 <!-- Sample configuration file -->
 <MessagePredictorProperties>
   <Condition>Treatment</Condition>
+  <!--<Condition>Control</Condition>-->
   <TimeLimit minutes="10" seconds="0" />
   <DataSet file="20news-sports-bydate-train.zip">
     <Topic1 trainSize="10" testSize="500" vocabSize="5" systemLabel="rec.sport.hockey" userLabel="Hockey" color="#FF38C9FF" colorDesc="blue" />

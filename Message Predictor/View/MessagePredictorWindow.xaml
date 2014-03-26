@@ -35,15 +35,17 @@
                     
                     <!-- Folders -->
                     <Label Grid.Row="0" Style="{StaticResource headerStyle1}">Folders</Label>
-                    <local:FolderList Grid.Row="1" Style="{StaticResource contentStyle}"/>
+                    <local:FolderList Grid.Row="1" />
                     
                     <!-- Prediction overview -->
-                    <Label Grid.Row="2" Style="{StaticResource headerStyle1}">Predictions</Label>
-                    <local:PredictionOverview Grid.Row="3" Style="{StaticResource contentStyle}"/>
+                    <Label Grid.Row="2" Style="{StaticResource ResourceKey=explanationContent}">
+                        <Label Style="{StaticResource headerStyle1}">Predictions</Label>
+                    </Label>
+                    <local:PredictionOverview Grid.Row="3" Style="{StaticResource ResourceKey=explanationContent}"/>
                     
                     <!-- Word overview -->
                     <!--<Label Grid.Row="4" Style="{StaticResource headerStyle1}">Words</Label>-->
-                    <local:MessageHeatMap Grid.Row="5" Style="{StaticResource contentStyle}"  DataContext="{Binding HeatMapVM}"/>
+                    <local:MessageHeatMap Grid.Row="5" DataContext="{Binding HeatMapVM}" Style="{StaticResource ResourceKey=explanationContent}"/>
                 </Grid>
 
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="true" Width="4" Background="White"/>
@@ -58,13 +60,14 @@
                     
                     <!-- Messages -->
                     
-                    <local:MessageList Grid.Row="0" Style="{StaticResource contentStyle}"/>
+                    <local:MessageList Grid.Row="0"/>
 
-                    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="true" Height="4" Background="White"/>
+                    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="true" Height="4" Background="White"
+                                  Style="{StaticResource ResourceKey=explanationContent}"/>
                     
                     <!-- Important words -->
                     
-                    <local:ImportantWordsContainer Grid.Row="2" Style="{StaticResource contentStyle}" DataContext="{Binding FeatureSetVM}"/>
+                    <local:ImportantWordsContainer Grid.Row="2" Style="{StaticResource ResourceKey=explanationContent}" DataContext="{Binding FeatureSetVM}"/>
                 </Grid>
             </Grid>
         </Grid>

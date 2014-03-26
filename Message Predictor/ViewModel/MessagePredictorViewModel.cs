@@ -39,6 +39,7 @@ namespace MessagePredictor
         // Application settings (set at startup)
         int _desiredVocabSize;
         App.Condition _condition;
+        bool _showExplanations;
 
         // UI preferences (user-modifiable)
         bool _autoUpdatePredictions;
@@ -72,6 +73,11 @@ namespace MessagePredictor
 
             // Convenient accessor for our treatment condition
             _condition = (App.Condition)App.Current.Properties[App.PropertyKey.Condition];
+            if (_condition == App.Condition.Treatment) {
+                ShowExplanations = true;
+            } else {
+                ShowExplanations = false;
+            }
 
             // Update our test set in light of our new vocabulary
             timer.Restart();
@@ -126,6 +132,12 @@ namespace MessagePredictor
         }
 
         #region Properties
+
+        public bool ShowExplanations
+        {
+            get { return _showExplanations; }
+            private set { SetProperty<bool>(ref _showExplanations, value); }
+        }
 
         public CollectionViewSource MessageListViewSource
         {

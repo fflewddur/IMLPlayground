@@ -36,10 +36,6 @@
         <Setter Property="TextBlock.TextAlignment" Value="Center"/>
         <Setter Property="TextBlock.Margin" Value="0"/>
     </Style>
-    <Style x:Key="contentStyle">
-        <!--<Setter Property="Control.FontSize" Value="12" />-->
-        <!--<Setter Property="Control.FontFamily" Value="Segoe UI" />-->
-    </Style>
     <Style x:Key="buttonStyle">
         <Setter Property="Control.Padding" Value="10 5" />
         <Setter Property="Control.VerticalAlignment" Value="Center" />
@@ -96,6 +92,16 @@
                 </TransformGroup>
             </Setter.Value>
         </Setter>
+    </Style>
+    
+    <!-- Stuff to hide depending on treatment -->
+    <Style x:Key="explanationContent" TargetType="Control">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding DataContext.ShowExplanations, RelativeSource={RelativeSource AncestorType=local:MessagePredictorWindow}}" Value="False">
+                <Setter Property="Visibility" Value="Collapsed"/>
+                <Setter Property="Background" Value="Blue"/>
+            </DataTrigger>
+        </Style.Triggers>
     </Style>
     
     <!-- Message list -->
