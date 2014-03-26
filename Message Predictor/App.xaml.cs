@@ -97,6 +97,7 @@ namespace MessagePredictor
             // Log the feature set and training set
             _vm.LogFeatureSet();
             _vm.LogTrainingSet();
+            _vm.LogClassifierEvaluation();
 
             _logger.Writer.WriteEndElement(); // End root element
             _logger.Writer.WriteEndDocument();

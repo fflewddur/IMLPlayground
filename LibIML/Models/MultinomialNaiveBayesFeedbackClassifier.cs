@@ -486,14 +486,39 @@ namespace LibIML
         public void LogFeatureSet(XmlWriter writer)
         {
             writer.WriteStartElement("FeatureSet");
-
+            foreach (int id in _vocab.FeatureIds) {
+                foreach (Label l in _labels) {
+                    double sysWeight, userWeight, userPrior;
+                    string characters = _vocab.GetWord(id);
+                    TryGetFeatureSystemWeight(id, l, out sysWeight);
+                    TryGetFeatureUserWeight(id, l, out userWeight);
+                    TryGetFeatureUserPrior(id, l, out userPrior);
+                    writer.WriteStartElement("Feature");
+                    writer.WriteAttributeString("characters", characters);
+                    writer.WriteAttributeString("label", l.ToString());
+                    writer.WriteAttributeString("systemWeight", sysWeight.ToString());
+                    writer.WriteAttributeString("userWeight", userWeight.ToString());
+                    writer.WriteAttributeString("userPrior", userPrior.ToString());
+                    writer.WriteEndElement();
+                }
+            }
             writer.WriteEndElement();
         }
 
         public void LogTrainingSet(XmlWriter writer)
         {
             writer.WriteStartElement("TrainingSet");
-
+            foreach (KeyValuePair<Label, HashSet<IInstance>> pair in _trainingSet) {
+                writer.WriteStartElement("Topic");
+                writer.WriteAttributeString("label", pair.Key.ToString());
+                writer.WriteAttributeString("count", pair.Value.Count.ToString());
+                foreach (IInstance instance in pair.Value) {
+                    writer.WriteStartElement("Message");
+                    writer.WriteAttributeString("id", instance.Id.ToString());
+                    writer.WriteEndElement();
+                }
+                writer.WriteEndElement();
+            }
             writer.WriteEndElement();
         }
 

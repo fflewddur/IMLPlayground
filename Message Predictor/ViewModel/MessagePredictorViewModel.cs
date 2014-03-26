@@ -354,6 +354,31 @@ namespace MessagePredictor
             _classifier.LogTrainingSet(_logger.Writer);
         }
 
+        public void LogClassifierEvaluation()
+        {
+            Label positive = Labels[0];
+            Label negative = Labels[1];
+            
+            _evaluatorVM.EvaluateClassifier(_messages, positive, negative);
+
+            _logger.Writer.WriteStartElement("Evaluation");
+            _logger.Writer.WriteStartElement("PositiveLabel");
+            _logger.Writer.WriteString(positive.ToString());
+            _logger.Writer.WriteEndElement();
+            _logger.Writer.WriteStartElement("NegativeLabel");
+            _logger.Writer.WriteString(negative.ToString());
+            _logger.Writer.WriteEndElement();
+
+            _logger.Writer.WriteElementString("TruePositives", _evaluatorVM.TruePositives.ToString());
+            _logger.Writer.WriteElementString("TrueNegatives", _evaluatorVM.TrueNegatives.ToString());
+            _logger.Writer.WriteElementString("FalsePositives", _evaluatorVM.FalsePositives.ToString());
+            _logger.Writer.WriteElementString("FalseNegatives", _evaluatorVM.FalseNegatives.ToString());
+            _logger.Writer.WriteElementString("F1Positive", _evaluatorVM.F1Positive.ToString());
+            _logger.Writer.WriteElementString("F1Negative", _evaluatorVM.F1Negative.ToString());
+            _logger.Writer.WriteElementString("F1Weighted", _evaluatorVM.F1Weighted.ToString());
+            _logger.logEndElement();
+        }
+
         #endregion
 
         #region Private methods
