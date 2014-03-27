@@ -10,7 +10,7 @@
     <Grid>
         <StackPanel Orientation="Horizontal" Margin="10 10 10 0" HorizontalAlignment="Left">
             <Button Padding="10 5" Margin="0 0 50 0" Command="{Binding ManuallyUpdatePredictions}">
-                <TextBlock TextAlignment="Center">Update<LineBreak/>predictions</TextBlock>
+                <Label Content="   Update&#10;predictions" HorizontalContentAlignment="Center"/>
             </Button>
             <Label VerticalContentAlignment="Center">
                 <TextBlock TextAlignment="Right">Update predictions<LineBreak />automatically</TextBlock>
