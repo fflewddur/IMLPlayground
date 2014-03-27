@@ -320,6 +320,9 @@ namespace LibIML
                 foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                     double pWord;
                     if (_pWordGivenClass[l].TryGetValue(pair.Key, out pWord)) {
+                        if (pair.Value > 0) {
+                            evidence.HasFeatures = true;
+                        }
                         importantWordsTotal += (int)pair.Value;
                         importantWordsUnique++;
                         double weight = Math.Exp(pair.Value * Math.Log(pWord));

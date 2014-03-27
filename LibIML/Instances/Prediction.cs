@@ -167,7 +167,11 @@ namespace LibIML
                 smallestConf = double.MaxValue, largestConf = double.MinValue;
             Label smallestCountLabel = null, smallestWeightLabel = null, smallestConfLabel = null, 
                 largestCountLabel = null, largestWeightLabel = null, largestConfLabel = null;
+            bool hasFeatures = false;
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
+                if (!hasFeatures) {
+                    hasFeatures = pair.Value.HasFeatures;
+                }
                 if (pair.Value.InstanceCount <= smallestCount) {
                     smallestCount = pair.Value.InstanceCount;
                     smallestCountLabel = pair.Key;
@@ -200,13 +204,13 @@ namespace LibIML
             // Build ClassPrHeader and ClassPrDesc
             sbHeader.Clear();
             if (smallestCount == largestCount) {
-                sbHeader.AppendFormat("The {0} folder has as many messages as the {1} folder", largestCountLabel, smallestCountLabel);
-                sbDesc.AppendFormat("This makes the computer think each Unknown message is equally likely to be about {0} or {1}.",
+                sbHeader.AppendFormat("Folder size: The {0} folder has as many messages as the {1} folder", largestCountLabel, smallestCountLabel);
+                sbDesc.AppendFormat("So the computer think each Unknown message is equally likely to be about {0} or {1}.",
                    largestCountLabel, smallestCountLabel);
             } else {
-                sbHeader.AppendFormat("The {0} folder has more messages than the {1} folder", largestCountLabel, smallestCountLabel);
+                sbHeader.AppendFormat("Folder size: The {0} folder has more messages than the {1} folder", largestCountLabel, smallestCountLabel);
                 double ratio = Math.Round(largestCount / (double)smallestCount, 1);
-                sbDesc.AppendFormat("There are {0:N1} times more messages in the {1} folder than the {2} folder, so the computer thinks each Unknonw message is {0:N1} times more likely to be about {1} than {2}.",
+                sbDesc.AppendFormat("So the computer thinks each Unknown message is {0:N1} times more likely to be about {1} than {2}.",
                     ratio, largestCountLabel.ToString(), smallestCountLabel.ToString());
             }
             ClassPrHeader = sbHeader.ToString();
@@ -225,16 +229,21 @@ namespace LibIML
             //ClassPrDesc = sbDesc.ToString();
 
             // Build FeaturePrHeader
-            sbHeader.Clear();
-            sbHeader.AppendFormat("More important words are associated with {0} than {1}", largestWeightLabel, smallestWeightLabel);
-            FeaturePrHeader = sbHeader.ToString();
-
             // Build FeaturePrDesc
+            sbHeader.Clear();
             sbDesc.Clear();
             if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
-                sbDesc.AppendFormat("Because the size of the {0} words equals the size of the {1} words, the computer thinks this message is equally likely to be about either.",
-                    largestWeightLabel, smallestWeightLabel);
+                if (!hasFeatures) {
+                    sbHeader.Append("Message words: No important words occur in this message");
+                    sbDesc.AppendFormat("Without important words, only Folder Size will be used to predict this message's topic.",
+                        largestWeightLabel, smallestWeightLabel);
+                } else {
+                    sbHeader.AppendFormat("Message words: This words in this message are equally important to {0} and {1}", largestWeightLabel, smallestWeightLabel);
+                    sbDesc.AppendFormat("Because the size of the {0} words equals the size of the {1} words, only Folder Size will be used to predict this message's topic.",
+                        largestWeightLabel, smallestWeightLabel);
+                }
             } else {
+                sbHeader.AppendFormat("Message words: This message has more important words about {0} than about {1}", largestWeightLabel, smallestWeightLabel);
                 double ratio = Math.Round(largestWeight / smallestWeight, 1);
                 string ratioDesc;
                 if (ratio > 1000) {
@@ -250,9 +259,10 @@ namespace LibIML
                     }
                 }
 
-                sbDesc.AppendFormat("This makes the computer think this message is {1} times more likely to be about {0} than {2}.",
+                sbDesc.AppendFormat("So the computer think this message is {1} times more likely to be about {0} than {2}.",
                     largestWeightLabel, ratioDesc, smallestWeightLabel);
             }
+            FeaturePrHeader = sbHeader.ToString();
             FeaturePrDesc = sbDesc.ToString();
 
             // Also update data for our confidence pie chart

@@ -20,6 +20,7 @@ namespace LibIML
         private double _prDocGivenClass; // Sum of feature weights * feature count for this label
         private double _pDoc; // Probability of this document
         private string _classImbalanceTooltip;
+        private bool _hasFeatures;
         private Label _label;
 
         public Evidence(Label label)
@@ -30,6 +31,7 @@ namespace LibIML
             TotalInstanceCount = -1;
             SourceItems = new List<Feature>();
             EvidenceItems = new List<Feature>();
+            HasFeatures = false;
             Label = label;
         }
 
@@ -74,6 +76,12 @@ namespace LibIML
         {
             get { return _totalInstanceCount; }
             set { SetProperty<int>(ref _totalInstanceCount, value); }
+        }
+
+        public bool HasFeatures
+        {
+            get { return _hasFeatures; }
+            set { SetProperty<bool>(ref _hasFeatures, value); }
         }
 
         public double Confidence

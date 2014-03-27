@@ -90,10 +90,10 @@
             </local:EvidenceGraph>-->
         <TextBlock Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Margin="25 0 15 5" TextWrapping="Wrap" TextAlignment="Left"
                    Text="{Binding MessageVM.Message.Prediction.FeaturePrDesc, Mode=OneWay}" Foreground="Gray"
-                   HorizontalAlignment="Left" Style="{StaticResource ResourceKey=hideIfNoFeatures}"/>
+                   HorizontalAlignment="Left" />
 
         <StackPanel  Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
-            <Label FontSize="50" FontWeight="Bold" Foreground="Gray" HorizontalContentAlignment="Center">+</Label>
+            <Label FontSize="50" FontWeight="Light" Foreground="Gray" HorizontalContentAlignment="Center" Style="{StaticResource ResourceKey=hideIfNoFeatures}">AND</Label>
             <TextBlock FontWeight="Bold" Margin="5"  Text="{Binding MessageVM.Message.Prediction.ClassPrHeader, Mode=OneWay}" 
                        TextWrapping="Wrap" TextAlignment="Center"/>
         </StackPanel>
@@ -131,7 +131,7 @@
         </TextBlock>
 
         <StackPanel Grid.Row="9" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical">
-            <Label FontSize="50" FontWeight="Bold" Foreground="Gray" HorizontalContentAlignment="Center">=</Label>
+            <Label FontSize="50" FontWeight="Light" Foreground="Gray" HorizontalContentAlignment="Center">YIELDS</Label>
             <TextBlock FontWeight="Bold" Margin="25 15 5 5" Text="{Binding MessageVM.Message.Prediction.ConfidenceHeader}"
                        TextWrapping="Wrap" TextAlignment="Center"></TextBlock>
         </StackPanel>
