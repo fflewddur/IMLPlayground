@@ -98,6 +98,8 @@ namespace MessagePredictor.View
                             r.Foreground = SystemColors.HighlightTextBrush;
                             p.Inlines.Add(r);
                         }
+                    } else if (element.Name == "linebreak") {
+                        p.Inlines.Add(new LineBreak());
                     }
                 }
 

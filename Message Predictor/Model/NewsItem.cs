@@ -145,7 +145,7 @@ namespace MessagePredictor.Model
                 PreviousPrediction = prev;
                 if (Prediction.Label == GroundTruthLabel)
                     IsPredictionCorrect = true;
-                else 
+                else
                     IsPredictionCorrect = false;
 
                 if (PreviousPrediction != null) {
@@ -265,27 +265,26 @@ namespace MessagePredictor.Model
                 featureWords.Add(highlightedFeature);
             }
 
-            // Split the text on the features, then join it back together with <feature> tags surrounding each feature
-            string replaced = AllText;
-            if (featureWords.Count > 0) {
-                string featurePattern = @"\b(" + string.Join("|", featureWords) + @")\b";
-                Regex featureRegex = new Regex(featurePattern, RegexOptions.IgnoreCase);
-                replaced = featureRegex.Replace(replaced, "<feature>$1<feature>");
-                // Split the text on newlines
+            // Ensure linebreaks won't break the highlighting
+            List<string> featureWordPatterns = new List<string>();
+            for (int i = 0; i < featureWords.Count; i++) {
+                featureWordPatterns.Add(Regex.Replace(featureWords[i], @"\s+", @"\s(\r?\n)?"));
             }
-            string[] lines = replaced.Split(new string[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+            // Split the text on the features, then join it back together with <feature> tags surrounding each feature
+            string[] lines = AllText.Split(new string[] { "\r\n", "\n" }, 3, StringSplitOptions.None);
+            string featurePattern = @"\b(" + string.Join("|", featureWordPatterns) + @")\b";
+            Regex featureRegex = new Regex(featurePattern, RegexOptions.IgnoreCase);
+            
+            for (int i = 0; i < 3 && featureWords.Count > 0; i++) {
+                lines[i] = featureRegex.Replace(lines[i], "<feature>$1<feature>");
+            }
 
             XElement root = new XElement("message");
 
             if (lines.Length > 1) {
-                // Get the Subject (1st line)
-                //root.Add(new XElement("subject", lines[0]));
-
-                // Get the Sender (2nd line)
-                //root.Add(new XElement("sender", lines[1]));
-
-                // Get everything else
                 for (int i = 0; i < lines.Length; i++) {
+
                     // First line is the subject, second line is the sender, everything else is the message body
                     XElement line;
                     if (i == 0) {
@@ -295,24 +294,24 @@ namespace MessagePredictor.Model
                     } else {
                         line = new XElement("line");
                     }
-                    
-                    //XElement line = new XElement("line");
-                    string[] phrases = lines[i].Split(new string[] { "<feature>" }, StringSplitOptions.None); // Split on features/non-features
 
+                    string[] phrases = lines[i].Split(new string[] { "<feature>" }, StringSplitOptions.None); // Split on features/non-features
+                    Regex linebreakRegex = new Regex(@"\r?\n");
                     foreach (string phrase in phrases) {
+                        string phraseWithoutLinebreak = linebreakRegex.Replace(phrase, " ");
                         XElement phraseElement;
 
                         // If this is our highlighted feature, tag it appropriately
-                        if (string.Equals(phrase, highlightedFeature, StringComparison.InvariantCultureIgnoreCase)) {
+                        if (string.Equals(phraseWithoutLinebreak, highlightedFeature, StringComparison.InvariantCultureIgnoreCase)) {
                             phraseElement = new XElement("highlightedFeature", phrase);
-                        } else if (featureWords.Contains(phrase, StringComparer.InvariantCultureIgnoreCase)) {
+                        } else if (featureWords.Contains(phraseWithoutLinebreak, StringComparer.InvariantCultureIgnoreCase)) {
                             // Otherwise, see if this is a feature
                             phraseElement = new XElement("feature", phrase);
                         } else {
                             // Or just normal text
                             phraseElement = new XElement("normal", phrase);
                         }
-
+                        
                         line.Add(phraseElement);
                     }
 
