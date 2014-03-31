@@ -87,7 +87,14 @@ namespace LibIML
         public double Confidence
         {
             get { return _confidence; }
-            set { SetProperty<double>(ref _confidence, value); }
+            set {
+                // Never let confidence go round up to 100%
+                double newVal = value;
+                if (newVal > .994) {
+                    newVal = .994;
+                }
+                SetProperty<double>(ref _confidence, newVal);
+            }
         }
 
         public double PrClass
