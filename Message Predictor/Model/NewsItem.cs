@@ -279,14 +279,24 @@ namespace MessagePredictor.Model
 
             if (lines.Length > 1) {
                 // Get the Subject (1st line)
-                root.Add(new XElement("subject", lines[0]));
+                //root.Add(new XElement("subject", lines[0]));
 
                 // Get the Sender (2nd line)
-                root.Add(new XElement("sender", lines[1]));
+                //root.Add(new XElement("sender", lines[1]));
 
                 // Get everything else
-                for (int i = 2; i < lines.Length; i++) {
-                    XElement line = new XElement("line");
+                for (int i = 0; i < lines.Length; i++) {
+                    // First line is the subject, second line is the sender, everything else is the message body
+                    XElement line;
+                    if (i == 0) {
+                        line = new XElement("subject");
+                    } else if (i == 1) {
+                        line = new XElement("sender");
+                    } else {
+                        line = new XElement("line");
+                    }
+                    
+                    //XElement line = new XElement("line");
                     string[] phrases = lines[i].Split(new string[] { "<feature>" }, StringSplitOptions.None); // Split on features/non-features
 
                     foreach (string phrase in phrases) {

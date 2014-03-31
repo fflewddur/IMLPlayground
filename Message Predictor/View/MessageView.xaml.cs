@@ -51,45 +51,58 @@ namespace MessagePredictor.View
             XDocument doc = XDocument.Parse(text);
 
             Paragraph p = new Paragraph();
-            foreach (XElement line in doc.Root.Elements())
-            {
-                if (line.Name == "subject")
-                {
-                    Bold b = new Bold(new Run(line.Value.ToString()));
-                    p.Inlines.Add(b);
-                    p.Inlines.Add(new LineBreak());
-                }
-                else if (line.Name == "sender") 
-                {
+            foreach (XElement line in doc.Root.Elements()) {
+                if (line.Name == "sender") {
                     p.Inlines.Add("From: ");
-                    Italic em = new Italic(new Run(line.Value.ToString()));
-                    p.Inlines.Add(em);
-                    p.Inlines.Add(new LineBreak());
                 }
-                else if (line.Name == "line")
-                {
-                    foreach (XElement element in line.Elements())
-                    {
-                        if (element.Name == "normal")
-                        {
+
+                foreach (XElement element in line.Elements()) {
+                    if (element.Name == "normal") {
+                        if (line.Name == "subject") {
+                            Bold b = new Bold(new Run(element.Value.ToString()));
+                            p.Inlines.Add(b);
+                        } else if (line.Name == "sender") {
+                            Italic em = new Italic(new Run(element.Value.ToString()));
+                            p.Inlines.Add(em);
+                        } else {
                             p.Inlines.Add(element.Value.ToString());
                         }
-                        else if (element.Name == "feature")
-                        {
+                    } else if (element.Name == "feature") {
+                        if (line.Name == "subject") {
+                            Bold b = new Bold(new Run(element.Value.ToString()));
+                            b.Background = SystemColors.ActiveCaptionBrush;
+                            p.Inlines.Add(b);
+                        } else if (line.Name == "sender") {
+                            Italic em = new Italic(new Run(element.Value.ToString()));
+                            em.Background = SystemColors.ActiveCaptionBrush;
+                            p.Inlines.Add(em);
+                        } else {
                             Run r = new Run(element.Value.ToString());
                             r.Background = SystemColors.ActiveCaptionBrush;
                             p.Inlines.Add(r);
-                        } 
-                        else if (element.Name == "highlightedFeature")
-                        {
+                        }
+                    } else if (element.Name == "highlightedFeature") {
+                        if (line.Name == "subject") {
+                            Bold b = new Bold(new Run(element.Value.ToString()));
+                            b.Background = SystemColors.HighlightBrush;
+                            b.Foreground = SystemColors.HighlightTextBrush;
+                            p.Inlines.Add(b);
+                        } else if (line.Name == "sender") {
+                            Italic em = new Italic(new Run(element.Value.ToString()));
+                            em.Background = SystemColors.HighlightBrush;
+                            em.Foreground = SystemColors.HighlightTextBrush;
+                            p.Inlines.Add(em);
+                        } else {
                             Run r = new Run(element.Value.ToString());
                             r.Background = SystemColors.HighlightBrush;
                             r.Foreground = SystemColors.HighlightTextBrush;
-                            
                             p.Inlines.Add(r);
                         }
                     }
-                    
+                }
+
+                p.Inlines.Add(new LineBreak());
+                if (line.Name == "sender") {
                     p.Inlines.Add(new LineBreak());
                 }
             }
