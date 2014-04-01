@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Documents;
 using System.Xml.Linq;
 using Xceed.Wpf.Toolkit;
@@ -19,9 +20,9 @@ namespace MessagePredictor.View
 
         private void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            Xceed.Wpf.Toolkit.RichTextBox tb = sender as Xceed.Wpf.Toolkit.RichTextBox;
-            MessagePredictorViewModel vm = tb.DataContext as MessagePredictorViewModel;
-            vm.FeatureSetVM.HighlightFeature.Execute(tb.Selection.Text.Trim());
+            //Xceed.Wpf.Toolkit.RichTextBox tb = sender as Xceed.Wpf.Toolkit.RichTextBox;
+            //MessagePredictorViewModel vm = tb.DataContext as MessagePredictorViewModel;
+            //vm.FeatureSetVM.HighlightFeature.Execute(tb.Selection.Text.Trim());
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -30,6 +31,31 @@ namespace MessagePredictor.View
             if (vm != null && e.VerticalChange != 0) {
                 vm.LogMessageScrolled(e.VerticalChange, e.VerticalOffset);
             }
+        }
+
+        private void RTF_ContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            FindMenu.Items.Clear();
+
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            Xceed.Wpf.Toolkit.RichTextBox rtb = sender as Xceed.Wpf.Toolkit.RichTextBox;
+            string text = rtb.Selection.Text.Trim();
+
+            MenuItem item = new MenuItem();
+            item.DataContext = vm;
+            if (text != null && text.Length > 0) {
+                // Text might include new lines, so strip them out
+                text = text.Replace('\n', ' ');
+                item.Header = string.Format("Find messages containing '{0}'", text);
+                Binding binding = new Binding();
+                binding.Path = new PropertyPath("FindText");
+                item.SetBinding(MenuItem.CommandProperty, binding);
+                item.CommandParameter = text;
+            } else {
+                item.Header = "No text is selected";
+                item.IsEnabled = false;
+            }
+            FindMenu.Items.Add(item);
         }
     }
 

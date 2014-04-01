@@ -21,8 +21,12 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>-->
-                <xctk:RichTextBox Grid.Column="0" Text="{Binding MessageVM.Message.DocumentReadOnly}" IsReadOnly="True" 
-                                          SelectionChanged="RichTextBox_SelectionChanged" BorderThickness="0" Padding="5 10 5 0">
+                <xctk:RichTextBox Grid.Column="0" Text="{Binding MessageVM.Message.DocumentReadOnly}" IsReadOnly="True" Name="RTF"
+                                  ContextMenuOpening="RTF_ContextMenuOpening"
+                                  AutoWordSelection="True" SelectionChanged="RichTextBox_SelectionChanged" BorderThickness="0" Padding="5 10 5 0">
+                    <xctk:RichTextBox.ContextMenu>
+                        <ContextMenu x:Name="FindMenu"/>
+                    </xctk:RichTextBox.ContextMenu>
                     <xctk:RichTextBox.TextFormatter>
                         <local:MyFormatter />
                     </xctk:RichTextBox.TextFormatter>

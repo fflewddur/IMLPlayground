@@ -37,7 +37,7 @@
             <ToggleSwitch:HorizontalToggleSwitch IsChecked="{Binding OnlyShowRecentChanges, Mode=TwoWay}" />
             <Label Margin="50 0 5 0" VerticalContentAlignment="Center" Style="{StaticResource ResourceKey=explanationContent}">Find</Label>
             <TextBox MaxLines="1" MinWidth="150" Height="25" SpellCheck.IsEnabled="True" VerticalContentAlignment="Center" 
-                     Text="{Binding HeatMapVM.ToHighlight, Delay=200, UpdateSourceTrigger=PropertyChanged, Mode=OneWayToSource}"
+                     Text="{Binding HeatMapVM.ToHighlight, Delay=200, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                      Style="{StaticResource ResourceKey=explanationContent}"/>
         </StackPanel>
     </Grid>

@@ -119,6 +119,7 @@ namespace MessagePredictor
             // Setup our Commands
             ManuallyUpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
             LabelMessage = new RelayCommand<Label>(PerformLabelMessage, CanPerformLabelMessage);
+            FindText = new RelayCommand<string>(PerformFindText, CanPerformFindText);
 
             // Start with our current folder pointing at the collection of unlabeled items.
             AutoUpdatePredictions = (bool)App.Current.Properties[MessagePredictor.App.PropertyKey.AutoUpdatePredictions];
@@ -232,6 +233,7 @@ namespace MessagePredictor
 
         public RelayCommand ManuallyUpdatePredictions { get; private set; }
         public RelayCommand<Label> LabelMessage { get; private set; }
+        public RelayCommand<string> FindText { get; private set; }
 
         private bool CanPerformUpdatePredictions()
         {
@@ -333,6 +335,20 @@ namespace MessagePredictor
 
             Mouse.OverrideCursor = null;
             _logger.logEndElement();
+        }
+
+        private bool CanPerformFindText(string text)
+        {
+            if (text != null && text.Length > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        private void PerformFindText(string text)
+        {
+            HeatMapVM.ToHighlight = text;
         }
 
         #endregion
