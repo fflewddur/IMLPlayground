@@ -214,6 +214,23 @@ namespace MessagePredictor.ViewModel
 
         #region Public methods
 
+        /// <summary>
+        /// If there is a feature that matches 'word', select it.
+        /// </summary>
+        /// <param name="word"></param>
+        public void SelectFeature(string word)
+        {
+            Feature toFind = new Feature(word);
+            foreach (Feature f in _featureSet) {
+                if (f.Equals(toFind)) {
+                    f.IsSelected = true;
+                } else {
+                    f.IsSelected = false;
+                }
+            }
+            _featureText = word;
+        }
+
         public void LogFeatureTabChanged(string tabName)
         {
             _logger.Writer.WriteStartElement("FeatureTabChanged");
@@ -484,7 +501,9 @@ namespace MessagePredictor.ViewModel
             AddFeatureDialog dialog = new AddFeatureDialog();
             dialog.Owner = App.Current.MainWindow;
             AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels);
-            vm.Word = _featureText;
+            if (!IsTextForSelectedFeature(_featureText)) {
+                vm.Word = _featureText;
+            }
             vm.PropertyChanged += AddFeatureVM_PropertyChanged;
             dialog.DataContext = vm;
             bool? result = dialog.ShowDialog();
@@ -529,6 +548,22 @@ namespace MessagePredictor.ViewModel
             }
         }
 
+        private bool IsTextForSelectedFeature(string text)
+        {
+            bool retval = false;
+
+            if (text != null && text.Length > 0) {
+                Feature toFind = new Feature(text);
+                foreach (Feature f in _featureSet) {
+                    if (toFind.Equals(f) && f.IsSelected) {
+                        retval = true;
+                    }
+                }
+            }
+
+            return retval;
+        }
+
         private void FeatureTextChanged(string text)
         {
             _featureTextEditedTimer.Stop();
@@ -553,9 +588,7 @@ namespace MessagePredictor.ViewModel
 
         private bool CanPerformApplyFeatureAdjustments()
         {
-            // FIXME just for testing
-            //return _featureImportanceAdjusted;
-            return true;
+            return _featureImportanceAdjusted;
         }
 
         private void PerformApplyFeatureAdjustments()

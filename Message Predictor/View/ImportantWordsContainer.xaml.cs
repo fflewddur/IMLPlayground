@@ -64,5 +64,16 @@ namespace MessagePredictor.View
                 vm.LogFeatureTabChanged(tabName);
             }
         }
+
+        private void ShowImportantWordsExplanation(object sender, RoutedEventArgs e)
+        {
+            Dialog d = new Dialog();
+            d.Owner = App.Current.MainWindow;
+            d.DialogTitle = "Important words";
+            d.DialogMessage = "The computer only looks for a small number of words in each message; all of them are listed under 'Important words'.\n\n" +
+                "You can tell the computer about new words it should look for using the 'Add a new word or phrase' button, or tell the computer not to look for certain words by removing them from this list.\n\n" +
+                "If a message doesn't contain any of these important words, the computer will have difficulty predicting its topic.";
+            d.ShowDialog();
+        }
     }
 }

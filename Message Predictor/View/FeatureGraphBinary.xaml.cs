@@ -116,6 +116,15 @@ namespace MessagePredictor.View
         private void Rectangle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             StopAdjustingFeature();
+
+            // Also select this feature
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            FrameworkElement fe = sender as FrameworkElement;
+
+            if (vm != null && fe != null) {
+                Feature f = fe.DataContext as Feature;
+                vm.HighlightFeature.Execute(f.Characters);
+            }
         }
 
         private void Grid_MouseLeave(object sender, MouseEventArgs e)

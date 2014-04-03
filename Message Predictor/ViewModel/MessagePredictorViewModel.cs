@@ -717,6 +717,8 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("text", e.Text);
             _logger.logTime();
 
+            FeatureSetVM.SelectFeature(e.Text);
+
             if (MessageVM.Message != null) {
                 MessageVM.Message.HighlightWithWord(e.Text);
             }

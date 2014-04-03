@@ -16,6 +16,8 @@ namespace LibIML.Features
         private double _percentOfReason; // Percentage of total evidence 
         private FeatureImportance _topic1Importance;
         private FeatureImportance _topic2Importance;
+        private string _tooltipText;
+        private bool _isSelected;
 
         public Feature(string characters) : base()
         {
@@ -103,6 +105,18 @@ namespace LibIML.Features
             private set { SetProperty<FeatureImportance>(ref _topic2Importance, value); }
         }
 
+        public string TooltipText
+        {
+            get { return _tooltipText; }
+            private set { SetProperty<string>(ref _tooltipText, value); }
+        }
+
+        public bool IsSelected
+        {
+            get { return _isSelected; }
+            set { SetProperty<bool>(ref _isSelected, value); }
+        }
+
         #endregion
 
         #region Override methods
@@ -153,11 +167,15 @@ namespace LibIML.Features
         void topicImportanceChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "UserWeight" || e.PropertyName == "SystemWeight") {
-                if (_topic1Importance.GetWeight() >= _topic2Importance.GetWeight()) {
+                double topic1Weight = _topic1Importance.GetWeight();
+                double topic2Weight = _topic2Importance.GetWeight();
+                if (topic1Weight >= topic2Weight) {
                     this.MostImportantLabel = _topic1Importance.Label;
                 } else {
                     this.MostImportantLabel = _topic2Importance.Label;
                 }
+                TooltipText = string.Format("The computer thinks the chance of seeing '{0}' in a message about {1} is {2:0%},\n vs. a {3:0%} chance in a message about {4}.",
+                    Characters, Topic1Importance.Label, topic1Weight, topic2Weight, Topic2Importance.Label);
             }
         }
 

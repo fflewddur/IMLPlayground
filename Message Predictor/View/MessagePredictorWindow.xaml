@@ -62,7 +62,7 @@
                     
                     <local:MessageList Grid.Row="0"/>
 
-                    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="true" Height="4" Background="White"
+                    <GridSplitter Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Center" ShowsPreview="true" Height="4"
                                   Style="{StaticResource ResourceKey=explanationContent}"/>
                     
                     <!-- Important words -->

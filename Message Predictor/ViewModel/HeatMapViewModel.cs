@@ -34,6 +34,7 @@ namespace MessagePredictor.ViewModel
             _heatMapView = BuildCollectionViewSourceForCollection(_messages);
             _currentMessage = null;
             _unknownLabel = unknownLabel;
+            _toHighlight = "";
         }
 
         #region Properties
