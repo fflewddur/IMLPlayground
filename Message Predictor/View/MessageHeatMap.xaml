@@ -23,8 +23,13 @@
                   SelectionMode="Single" ItemsSource="{Binding HeatMapView.View}" SelectedItem="{Binding CurrentMessage}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible" 
                   ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}"
-                  ItemContainerStyle="{StaticResource ResourceKey=heatMapItemContainer}" ToolTip="{Binding TooltipContent}"
+                  ItemContainerStyle="{StaticResource ResourceKey=heatMapItemContainer}" 
                   >
+            <ListView.ToolTip>
+                <ToolTip Placement="Right">
+                    <TextBlock Text="{Binding TooltipContent}"/>
+                </ToolTip>
+            </ListView.ToolTip>
             <ListView.GroupStyle>
                 <GroupStyle>
                     <GroupStyle.HeaderTemplate>

@@ -36,8 +36,12 @@
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Grid PreviewMouseMove="Rectangle_PreviewMouseMove" PreviewMouseLeftButtonUp="Rectangle_PreviewMouseLeftButtonUp"
-                              ToolTip="{Binding TooltipText}">
+                        <Grid PreviewMouseMove="Rectangle_PreviewMouseMove" PreviewMouseLeftButtonUp="Rectangle_PreviewMouseLeftButtonUp">
+                            <Grid.ToolTip>
+                                <ToolTip Placement="Right">
+                                    <TextBlock Text="{Binding TooltipText}"/>
+                                </ToolTip>
+                            </Grid.ToolTip>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="Auto"/>
