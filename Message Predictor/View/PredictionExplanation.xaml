@@ -30,7 +30,7 @@
 
         <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Vertical">
             <Label Background="{Binding MessageVM.Message.Prediction.Label.Color}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
-                   Foreground="White" FontWeight="Bold" Content="{Binding MessageVM.Message.Prediction.Label}" ContentStringFormat="Why {0}?"></Label>
+                   Foreground="White" FontSize="24" Content="{Binding MessageVM.Message.Prediction.Label}" ContentStringFormat="Why {0}?"></Label>
             <TextBlock FontWeight="Bold" Margin="5 15 5 5" Text="{Binding MessageVM.Message.Prediction.FeaturePrHeader,Mode=OneWay}"
                        TextWrapping="Wrap" TextAlignment="Center"/>
 
@@ -54,7 +54,7 @@
                     <DataTemplate>
                         <Label Foreground="{Binding Label.Color}" FontWeight="Bold" FontSize="{Binding FontSize}" Content="{Binding FeatureText}">
                             <Label.ToolTip>
-                                <Label Content="{Binding}"/>
+                                <Label Content="{Binding TooltipText}"/>
                             </Label.ToolTip>
                         </Label>
                     </DataTemplate>

@@ -16,6 +16,7 @@ namespace LibIML.Instances
         private int _count;
         private double _ratio;
         private double _fontSize;
+        private string _tooltipText;
         //private string _word;
         //private int _id;
         //private int _count;
@@ -27,6 +28,7 @@ namespace LibIML.Instances
             _featureText = featureText;
             _featureId = featureId;
             _count = count;
+            UpdateTooltip();
         }
 
         //public EvidenceItem(string word, int id, int count, double systemWeight, double userWeight)
@@ -55,7 +57,10 @@ namespace LibIML.Instances
         public Label Label
         {
             get { return _label; }
-            set { _label = value; }
+            set { 
+                _label = value;
+                UpdateTooltip();
+            }
         }
 
         public double Label1Pr
@@ -65,6 +70,7 @@ namespace LibIML.Instances
             {
                 _label1Pr = value;
                 UpdateRatio();
+                UpdateTooltip();
             }
         }
 
@@ -75,6 +81,7 @@ namespace LibIML.Instances
             {
                 _label2Pr = value;
                 UpdateRatio();
+                UpdateTooltip();
             }
         }
 
@@ -98,6 +105,12 @@ namespace LibIML.Instances
         {
             get { return _fontSize; }
             private set { _fontSize = value; }
+        }
+
+        public string TooltipText
+        {
+            get { return _tooltipText; }
+            private set { _tooltipText = value; }
         }
 
         //public string Word
@@ -151,6 +164,19 @@ namespace LibIML.Instances
             } else {
                 Ratio = double.NaN;
             }
+        }
+
+        private void UpdateTooltip()
+        {
+            string times;
+            if (Count != 1) {
+                times = "times";
+            } else {
+                times = "time";
+            }
+
+            TooltipText = string.Format("'{0}' is in this message {1} {2}.\nIt makes the computer think this message might be about {3}", 
+                FeatureText, Count, times, Label);
         }
     }
 }

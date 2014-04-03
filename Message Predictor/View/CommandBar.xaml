@@ -39,6 +39,7 @@
             <TextBox MaxLines="1" MinWidth="150" Height="25" SpellCheck.IsEnabled="True" VerticalContentAlignment="Center" 
                      Text="{Binding HeatMapVM.ToHighlight, Delay=200, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
                      Style="{StaticResource ResourceKey=explanationContent}"/>
+            <Button Padding="10 5" Margin="10 15 0 15" Command="{Binding ClearFindText}">Clear</Button>
         </StackPanel>
     </Grid>
 </UserControl>
