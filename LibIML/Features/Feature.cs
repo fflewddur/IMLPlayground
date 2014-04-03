@@ -10,16 +10,10 @@ namespace LibIML.Features
     [Serializable]
     public class Feature : ViewModelBase, IEquatable<Feature>, IComparable<Feature>
     {
-        public static readonly int BAR_WIDTH = 25; // The default width (in pixels) for each bar
-
-        //public const double PIXELS_TO_WEIGHT = 100;
-
         private string _characters;
         private bool _userAdded;
         private Label _mostImportantLabel;
-        private double _pixelsToWeight;
         private double _percentOfReason; // Percentage of total evidence 
-        //private List<FeatureImportance> _featureImportance;
         private FeatureImportance _topic1Importance;
         private FeatureImportance _topic2Importance;
 
@@ -89,20 +83,6 @@ namespace LibIML.Features
         {
             get { return _mostImportantLabel; }
             private set { _mostImportantLabel = value; }
-        }
-
-        public double PixelsToWeight
-        {
-            get { return _pixelsToWeight; }
-            set
-            {
-                if (SetProperty<double>(ref _pixelsToWeight, value)) {
-                    // FIXME We'll need to revise how we do this
-                    //SystemHeight = SystemWeight * PixelsToWeight;
-                    //UserHeight = UserWeight * PixelsToWeight;
-                    //Width = Count * BAR_WIDTH;
-                }
-            }
         }
 
         public double PercentOfReason

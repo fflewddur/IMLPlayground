@@ -174,6 +174,22 @@ namespace LibIML
             return retval;
         }
 
+        public bool TryGetSystemFeatureSum(out double sum)
+        {
+            bool retval = true;
+
+            sum = 0;
+            foreach (Label l in _labels) {
+                double labelSum;
+                if (!TryGetSystemFeatureSum(l, out labelSum)) {
+                    retval = false;
+                }
+                sum += labelSum;
+            }
+
+            return retval;
+        }
+
         public bool IsFeatureMostImportantForLabel(int id, Label label)
         {
             Label mostImportantLabel = null;

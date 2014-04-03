@@ -26,7 +26,7 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
         private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
-        private IReadOnlyList<CollectionViewSource> _collectionViewSourcesGraph;
+        //private IReadOnlyList<CollectionViewSource> _collectionViewSourcesGraph;
         private CollectionViewSource _collectionViewSourceGraph;
         private string _featureText; // The feature the user is currently typing in
         private DispatcherTimer _featureTextEditedTimer;
@@ -48,7 +48,7 @@ namespace MessagePredictor.ViewModel
             _userAdded = new List<Feature>();
             _userRemoved = new List<Feature>();
             _collectionViewSourcesOverview = BuildCollectionViewSourcesOverview(labels);
-            _collectionViewSourcesGraph = BuildCollectionViewSourcesGraph(labels);
+            //_collectionViewSourcesGraph = BuildCollectionViewSourcesGraph(labels);
             _collectionViewSourceGraph = BuildCollectionViewSourceGraph();
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
@@ -104,11 +104,11 @@ namespace MessagePredictor.ViewModel
             private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesOverview, value); }
         }
 
-        public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesGraph
-        {
-            get { return _collectionViewSourcesGraph; }
-            private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesGraph, value); }
-        }
+        //public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesGraph
+        //{
+        //    get { return _collectionViewSourcesGraph; }
+        //    private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesGraph, value); }
+        //}
 
         public CollectionViewSource FeatureSetViewSourceGraph
         {
@@ -225,14 +225,9 @@ namespace MessagePredictor.ViewModel
         public void LogFeatureAdjustBegin(Feature feature, FeatureImportance fi)
         {
             _logger.Writer.WriteStartElement("FeatureAdjustmentBegin");
-            _logger.Writer.WriteAttributeString("feature", feature.Characters);
-            _logger.Writer.WriteAttributeString("label", fi.Label.ToString());
-            _logger.Writer.WriteAttributeString("userHeight", fi.UserHeight.ToString());
-            _logger.Writer.WriteAttributeString("systemHeight", fi.SystemHeight.ToString());
-            _logger.Writer.WriteAttributeString("userWeight", fi.UserWeight.ToString());
-            _logger.Writer.WriteAttributeString("userPrior", fi.UserPrior.ToString());
-            _logger.Writer.WriteAttributeString("systemWeight", fi.SystemWeight.ToString());
+            _logger.Writer.WriteAttributeString("adjustingLabel", fi.Label.ToString());
             _logger.logTime();
+            _logger.logFeature(feature);
         }
 
         public void LogFeatureAdjustEnd(Feature feature, FeatureImportance fi)
@@ -271,13 +266,8 @@ namespace MessagePredictor.ViewModel
         public void AddUserFeature(Feature feature)
         {
             _logger.Writer.WriteStartElement("AddFeature");
-            _logger.Writer.WriteAttributeString("feature", feature.Characters);
-            //_logger.Writer.WriteAttributeString("weightType", feature.WeightType.ToString());
-            //_logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
-            //_logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
-            //_logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
-            //_logger.Writer.WriteAttributeString("label", feature.Label.ToString());
             _logger.logTime();
+            _logger.logFeature(feature);
             _logger.logEndElement();
 
             // If the user previously removed this feature, clear it from the list of removed features
@@ -295,22 +285,14 @@ namespace MessagePredictor.ViewModel
         public void RemoveUserFeature(Feature feature)
         {
             _logger.Writer.WriteStartElement("RemoveFeature");
-            _logger.Writer.WriteAttributeString("feature", feature.Characters);
-            //_logger.Writer.WriteAttributeString("weightType", feature.WeightType.ToString());
-            //_logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
-            //_logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
-            //_logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
             _logger.logTime();
+            _logger.logFeature(feature);
             _logger.logEndElement();
-
-            // Create a feature with the same word, but that will match any label
-            //Feature anyLabel = new Feature(feature.Characters, Label.AnyLabel);
 
             // If the user previously added this feature manually, remove it from our list
             _userAdded.Remove(feature);
 
             // Ensure we don't add this feature to the list multiple times
-            //if (!_userRemoved.Contains(feature))
             _userRemoved.Add(feature);
 
             // Update the UI right away, even if we don't retrain
@@ -321,7 +303,6 @@ namespace MessagePredictor.ViewModel
 
         public double AdjustUserFeatureHeight(FeatureImportance fi, double heightDelta)
         {
-            // FIXME need to update for new Feature code
             if (fi.UserHeight + heightDelta < FeatureImportance.MINIMUM_HEIGHT) {
                 heightDelta = -1 * (fi.UserHeight - FeatureImportance.MINIMUM_HEIGHT);
             }
@@ -382,18 +363,22 @@ namespace MessagePredictor.ViewModel
             // Computer our new pixelsToWeight ratio
             double maxWeight = 0;
             foreach (Feature f in FeatureSet) {
-                // FIXME need to update for new feature code
-                //double weight = f.SystemWeight + f.UserWeight;
-                //if (maxWeight < weight) {
-                //    maxWeight = weight;
-                //}
+                double weight = f.Topic1Importance.SystemWeight + f.Topic1Importance.UserWeight;
+                if (maxWeight < weight) {
+                    maxWeight = weight;
+                }
+                weight = f.Topic2Importance.SystemWeight + f.Topic2Importance.UserWeight;
+                if (maxWeight < weight) {
+                    maxWeight = weight;
+                }
             }
             // Subtract ~50px because of the tabbed item headers
             _pixelsToWeight = (PERCENT_HEIGHT_OF_MAX_BAR * (_featureGraphHeight - 50)) / maxWeight;
 
             // Update the PixelsToWeight value for each Feature
             foreach (Feature f in FeatureSet) {
-                f.PixelsToWeight = _pixelsToWeight;
+                f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
+                f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
             }
         }
 
@@ -459,6 +444,10 @@ namespace MessagePredictor.ViewModel
                     f.Topic2Importance.UserWeight = weight;
                 }
 
+                Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}", 
+                    f.Characters, f.Topic1Importance.Label, f.Topic1Importance.UserWeight, f.Topic1Importance.SystemWeight);
+                Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}",
+                    f.Characters, f.Topic2Importance.Label, f.Topic2Importance.UserWeight, f.Topic2Importance.SystemWeight);
                 // Figure out which label this feature is most important for
                 //f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, f.Label);
             }
@@ -502,7 +491,8 @@ namespace MessagePredictor.ViewModel
             if (result == true) {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
                 Feature f = new Feature(vm.Word.ToLower(), _labels[0], _labels[1], true);
-                f.PixelsToWeight = _pixelsToWeight;
+                f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
+                f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
                 if (vm.SelectedWeight == vm.Weights[0]) {
                     if (label == f.Topic1Importance.Label) {
                         f.Topic1Importance.WeightType = FeatureImportance.Weight.High;
@@ -516,8 +506,6 @@ namespace MessagePredictor.ViewModel
                         f.Topic2Importance.WeightType = FeatureImportance.Weight.Medium;
                     }
                 }
-                //f.MostImportant = true; // If the user added this to a given label, then it's always most important to that label.
-
                 AddUserFeature(f);
             }
 
@@ -561,7 +549,9 @@ namespace MessagePredictor.ViewModel
 
         private bool CanPerformApplyFeatureAdjustments()
         {
-            return _featureImportanceAdjusted;
+            // FIXME just for testing
+            //return _featureImportanceAdjusted;
+            return true;
         }
 
         private void PerformApplyFeatureAdjustments()
@@ -570,54 +560,64 @@ namespace MessagePredictor.ViewModel
             _logger.Writer.WriteStartElement("ApplyFeatureAdjustments");
             _logger.logTime();
 
-            foreach (Label label in Labels) {
-                UpdateFeaturePriors(label);
-            }
+            UpdateFeaturePriors();
 
             _featureImportanceAdjusted = false;
 
             _logger.logEndElement();
         }
 
-        private void UpdateFeaturePriors(Label label)
+        private void UpdateFeaturePriors()
         {
             // Don't fire a featureWeightEdited event while we're updating these values
             _featurePriorsEditedTimer.Stop();
 
-            Console.WriteLine("UpdateFeaturePriors for {0}", label);
+            Console.WriteLine("UpdateFeaturePriors");
 
             // FIXME need to rework this for new feature code
 
-            //IEnumerable<Feature> labelFeatures = _featureSet.Where(f => f.Label == label);
-
             //// Get the sum of user heights for each feature
-            //double userHeightSum = 0;
-            //foreach (Feature f in labelFeatures) {
-            //    userHeightSum += f.UserHeight;
-            //}
+            double userHeightSumTopic1 = 0;
+            double userHeightSumTopic2 = 0;
+            foreach (Feature f in _featureSet) {
+                userHeightSumTopic1 += f.Topic1Importance.UserHeight;
+                userHeightSumTopic2 += f.Topic2Importance.UserHeight;
+            }
 
             //// Get the sum of system heights for each feature
-            //double systemHeightSum = 0;
-            //foreach (Feature f in labelFeatures) {
-            //    systemHeightSum += f.SystemHeight;
-            //}
+            double systemHeightSumTopic1 = 0;
+            double systemHeightSumTopic2 = 0;
+            foreach (Feature f in _featureSet) {
+                systemHeightSumTopic1 += f.Topic1Importance.SystemHeight;
+                systemHeightSumTopic2 += f.Topic2Importance.SystemHeight;
+            }
 
             //// Get the sum of counts for each feature
-            //double systemFeatureCountSum = 0;
-            //_classifier.TryGetSystemFeatureSum(label, out systemFeatureCountSum);
+            double systemFeatureCountSumTopic1 = 0;
+            double systemFeatureCountSumTopic2 = 0;
+            _classifier.TryGetSystemFeatureSum(_labels[0], out systemFeatureCountSumTopic1);
+            _classifier.TryGetSystemFeatureSum(_labels[1], out systemFeatureCountSumTopic2);
 
             //// Get the ratio of area of user importance vs. area of system importance
             //// (This tells us what the sum of user priors should be, relative to the sum of feature counts)
-            //double userToSystemRatio = userHeightSum / systemHeightSum;
-            //double desiredPriorSum = userToSystemRatio * systemFeatureCountSum;
+            double userToSystemRatioTopic1 = Math.Round((userHeightSumTopic1 / systemHeightSumTopic1), 3);
+            double userToSystemRatioTopic2 = Math.Round((userHeightSumTopic2 / systemHeightSumTopic2), 3);
+            double desiredPriorSumTopic1 = Math.Round((userToSystemRatioTopic1 * systemFeatureCountSumTopic1), 3);
+            double desiredPriorSumTopic2 = Math.Round((userToSystemRatioTopic2 * systemFeatureCountSumTopic2), 3);
 
             //// Get the percentage of the total prior value that should assigned to each feature
-            //Console.WriteLine("userHeightSum: {0} systemHeightSum: {1} userToSystemRatio: {2} systemFeatureCountSum: {3}", userHeightSum, systemHeightSum, userToSystemRatio, systemFeatureCountSum);
-            //foreach (Feature f in labelFeatures) {
-            //    Console.Write("Old prior for {0} = {1}, ", f.Characters, f.UserPrior);
-            //    f.UserPrior = (f.UserHeight / userHeightSum) * desiredPriorSum;
-            //    Console.WriteLine("new prior = {0}", f.UserPrior);
-            //}
+            Console.WriteLine("userHeightSum1: {0} systemHeightSum1: {1} userToSystemRatio1: {2} systemFeatureCountSum1: {3} desiredPriorSum1: {4}", 
+                userHeightSumTopic1, systemHeightSumTopic1, userToSystemRatioTopic1, systemFeatureCountSumTopic1, desiredPriorSumTopic1);
+            Console.WriteLine("userHeightSum2: {0} systemHeightSum2: {1} userToSystemRatio2: {2} systemFeatureCountSum2: {3} desiredPriorSum2: {4}",
+                userHeightSumTopic2, systemHeightSumTopic2, userToSystemRatioTopic2, systemFeatureCountSumTopic2, desiredPriorSumTopic2);
+            foreach (Feature f in _featureSet) {
+                Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic1Importance.UserPrior, f.Topic1Importance.Label);
+                f.Topic1Importance.UserPrior = Math.Round(((f.Topic1Importance.UserHeight / userHeightSumTopic1) * desiredPriorSumTopic1), 2);
+                Console.WriteLine("new prior = {0}", f.Topic1Importance.UserPrior);
+                Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic2Importance.UserPrior, f.Topic2Importance.Label);
+                f.Topic2Importance.UserPrior = Math.Round(((f.Topic2Importance.UserHeight / userHeightSumTopic2) * desiredPriorSumTopic2), 2);
+                Console.WriteLine("new prior = {0}", f.Topic2Importance.UserPrior);
+            }
 
             _featurePriorsEditedTimer.Start();
         }

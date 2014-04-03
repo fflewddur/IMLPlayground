@@ -8,7 +8,7 @@ namespace LibIML.Features
 {
     public class FeatureImportance : ViewModelBase
     {
-        public static readonly int MINIMUM_HEIGHT = 4; // The minimum height in pixels for each bar
+        public static readonly int MINIMUM_HEIGHT = 2; // The minimum height in pixels for each bar
 
         public enum Weight
         {
@@ -31,6 +31,7 @@ namespace LibIML.Features
         private double _userWeight;
         private double _userPrior;
         private int _count;
+        private double _pixelsToWeight;
 
         public FeatureImportance(Label label)
             : base()
@@ -81,8 +82,7 @@ namespace LibIML.Features
             set
             {
                 if (SetProperty<double>(ref _systemWeight, value)) {
-                    //SystemHeight = SystemWeight * PixelsToWeight;
-                    SystemHeight = SystemWeight * 100;
+                    SystemHeight = SystemWeight * PixelsToWeight;
                 }
             }
         }
@@ -97,8 +97,7 @@ namespace LibIML.Features
             set
             {
                 if (SetProperty<double>(ref _userWeight, value)) {
-                    //UserHeight = UserWeight * PixelsToWeight;
-                    UserHeight = UserWeight * 100;
+                    UserHeight = UserWeight * PixelsToWeight;
                 }
             }
         }
@@ -135,6 +134,18 @@ namespace LibIML.Features
                     value = MINIMUM_HEIGHT;
                 }
                 SetProperty<double>(ref _userHeight, value);
+            }
+        }
+
+        public double PixelsToWeight
+        {
+            get { return _pixelsToWeight; }
+            set
+            {
+                if (SetProperty<double>(ref _pixelsToWeight, value)) {
+                    SystemHeight = SystemWeight * PixelsToWeight;
+                    UserHeight = UserWeight * PixelsToWeight;
+                }
             }
         }
 

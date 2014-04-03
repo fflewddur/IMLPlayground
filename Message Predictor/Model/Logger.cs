@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibIML.Features;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -40,6 +41,31 @@ namespace MessagePredictor.Model
         public void logTime()
         {
             _writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+        }
+
+        public void logFeature(Feature f)
+        {
+            _writer.WriteStartElement("Feature");
+            _writer.WriteAttributeString("characters", f.Characters);
+            _writer.WriteAttributeString("userAdded", f.UserAdded.ToString());
+            _writer.WriteAttributeString("mostImportantLabel", f.MostImportantLabel.ToString());
+            logTime();
+            logFeatureImportance(f.Topic1Importance);
+            logFeatureImportance(f.Topic2Importance);
+            
+            _writer.WriteEndElement();
+        }
+
+        public void logFeatureImportance(FeatureImportance fi)
+        {
+            _writer.WriteStartElement("FeatureImportance");
+            _writer.WriteAttributeString("label", fi.Label.ToString());
+            _writer.WriteAttributeString("userHeight", fi.UserHeight.ToString());
+            _writer.WriteAttributeString("systemHeight", fi.SystemHeight.ToString());
+            _writer.WriteAttributeString("userWeight", fi.UserWeight.ToString());
+            _writer.WriteAttributeString("userPrior", fi.UserPrior.ToString());
+            _writer.WriteAttributeString("systemWeight", fi.SystemWeight.ToString());
+            _writer.WriteEndElement();
         }
 
         /// <summary>
