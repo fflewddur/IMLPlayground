@@ -101,7 +101,7 @@ namespace MessagePredictor.View
             _currentFeature = feature;
             Mouse.OverrideCursor = Cursors.SizeNS;
             FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
-            vm.LogFeatureAdjustBegin(feature);
+            //vm.LogFeatureAdjustBegin(feature);
         }
 
         private void Rectangle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -118,7 +118,7 @@ namespace MessagePredictor.View
         {
             if (_currentFeature != null) {
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
-                vm.LogFeatureAdjustEnd(_currentFeature);
+                //vm.LogFeatureAdjustEnd(_currentFeature);
                 _mouseOrigY = -1;
                 _currentFeature = null;
                 Mouse.OverrideCursor = null;

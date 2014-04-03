@@ -57,9 +57,11 @@
                                 <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="{Binding Label.Color}" 
                                            VerticalAlignment="Bottom" Cursor="SizeNS" Margin="5 0 1 0"
                                            PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" />
-                                <Separator Grid.Row="1" Width="20" Height="1" Background="Black" Margin="5 0 1 0" />
+                                <Separator Grid.Row="1" Width="20" Height="1" Background="Black" Margin="5 0 1 0" Cursor="SizeNS"
+                                           PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown"/>
                                 <Rectangle Grid.Row="2" Width="20" Height="{Binding SystemHeight}" Fill="{Binding Label.Color}" 
-                                           SnapsToDevicePixels="True" Margin="5 0 1 0"/>
+                                           SnapsToDevicePixels="True" Margin="5 0 1 0" Cursor="SizeNS"
+                                           PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown"/>
                             </Grid>
                             
                             <!-- Topic 2 bar -->
@@ -72,9 +74,11 @@
                                 <Rectangle Grid.Row="0"  Width="20" Height="{Binding UserHeight}" Fill="{Binding Label.Color}" 
                                            VerticalAlignment="Bottom" Cursor="SizeNS" Margin="1 0 5 0"
                                            PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" />
-                                <Separator Grid.Row="1" Width="20" Height="1" Background="Black" Margin="1 0 5 0" />
+                                <Separator Grid.Row="1" Width="20" Height="1" Background="Black" Margin="1 0 5 0" Cursor="SizeNS"
+                                           PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown"/>
                                 <Rectangle Grid.Row="2" Width="20" Height="{Binding SystemHeight}" Fill="{Binding Label.Color}" 
-                                           SnapsToDevicePixels="True" Margin="1 0 5 0"/>
+                                           SnapsToDevicePixels="True" Margin="1 0 5 0" Cursor="SizeNS"
+                                           PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown"/>
                             </Grid>
 
                             <!-- X-axis -->

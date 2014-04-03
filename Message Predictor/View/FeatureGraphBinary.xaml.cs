@@ -25,7 +25,8 @@ namespace MessagePredictor.View
     public partial class FeatureGraphBinary : UserControl
     {
         private double _mouseOrigY;
-        private FeatureImportance _currentFeature;
+        private Feature _currentFeature;
+        private FeatureImportance _currentFeatureImportance;
 
         #region Dependency properties
 
@@ -101,11 +102,15 @@ namespace MessagePredictor.View
         {
             _mouseOrigY = e.GetPosition(this).Y;
             FrameworkElement fe = sender as FrameworkElement;
+            FrameworkElement parent = fe.Parent as FrameworkElement;
+            FrameworkElement grandParent = parent.Parent as FrameworkElement;
             FeatureImportance fi = fe.DataContext as FeatureImportance;
-            _currentFeature = fi;
+            Feature f = grandParent.DataContext as Feature;
+            _currentFeatureImportance = fi;
+            _currentFeature = f;
             Mouse.OverrideCursor = Cursors.SizeNS;
             FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
-            //vm.LogFeatureAdjustBegin(feature);
+            vm.LogFeatureAdjustBegin(f, fi);
         }
 
         private void Rectangle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -120,10 +125,11 @@ namespace MessagePredictor.View
 
         private void StopAdjustingFeature()
         {
-            if (_currentFeature != null) {
+            if (_currentFeatureImportance != null) {
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
-                //vm.LogFeatureAdjustEnd(_currentFeature);
+                vm.LogFeatureAdjustEnd(_currentFeature, _currentFeatureImportance);
                 _mouseOrigY = -1;
+                _currentFeatureImportance = null;
                 _currentFeature = null;
                 Mouse.OverrideCursor = null;
             }
@@ -131,11 +137,11 @@ namespace MessagePredictor.View
 
         private void Rectangle_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton == MouseButtonState.Pressed && _currentFeature != null && _mouseOrigY >= 0) {
+            if (e.LeftButton == MouseButtonState.Pressed && _currentFeatureImportance != null && _mouseOrigY >= 0) {
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
-                vm.AdjustUserFeatureHeight(_currentFeature, delta);
+                vm.AdjustUserFeatureHeight(_currentFeatureImportance, delta);
                 _mouseOrigY = y;
 
                 //Console.WriteLine("Dragging {0}", delta);

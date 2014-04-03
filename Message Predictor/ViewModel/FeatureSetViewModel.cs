@@ -222,29 +222,29 @@ namespace MessagePredictor.ViewModel
             _logger.logEndElement();
         }
 
-        public void LogFeatureAdjustBegin(Feature feature)
+        public void LogFeatureAdjustBegin(Feature feature, FeatureImportance fi)
         {
             _logger.Writer.WriteStartElement("FeatureAdjustmentBegin");
             _logger.Writer.WriteAttributeString("feature", feature.Characters);
-            //_logger.Writer.WriteAttributeString("userHeight", feature.UserHeight.ToString());
-            //_logger.Writer.WriteAttributeString("systemHeight", feature.SystemHeight.ToString());
-            //_logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
-            //_logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
-            //_logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
-            //_logger.Writer.WriteAttributeString("label", feature.Label.ToString());
+            _logger.Writer.WriteAttributeString("label", fi.Label.ToString());
+            _logger.Writer.WriteAttributeString("userHeight", fi.UserHeight.ToString());
+            _logger.Writer.WriteAttributeString("systemHeight", fi.SystemHeight.ToString());
+            _logger.Writer.WriteAttributeString("userWeight", fi.UserWeight.ToString());
+            _logger.Writer.WriteAttributeString("userPrior", fi.UserPrior.ToString());
+            _logger.Writer.WriteAttributeString("systemWeight", fi.SystemWeight.ToString());
             _logger.logTime();
         }
 
-        public void LogFeatureAdjustEnd(Feature feature)
+        public void LogFeatureAdjustEnd(Feature feature, FeatureImportance fi)
         {
             _logger.Writer.WriteStartElement("FeatureAdjustmentEnd");
             _logger.Writer.WriteAttributeString("feature", feature.Characters);
-            //_logger.Writer.WriteAttributeString("userHeight", feature.UserHeight.ToString());
-            //_logger.Writer.WriteAttributeString("systemHeight", feature.SystemHeight.ToString());
-            //_logger.Writer.WriteAttributeString("userWeight", feature.UserWeight.ToString());
-            //_logger.Writer.WriteAttributeString("userPrior", feature.UserPrior.ToString());
-            //_logger.Writer.WriteAttributeString("systemWeight", feature.SystemWeight.ToString());
-            //_logger.Writer.WriteAttributeString("label", feature.Label.ToString());
+            _logger.Writer.WriteAttributeString("label", fi.Label.ToString());
+            _logger.Writer.WriteAttributeString("userHeight", fi.UserHeight.ToString());
+            _logger.Writer.WriteAttributeString("systemHeight", fi.SystemHeight.ToString());
+            _logger.Writer.WriteAttributeString("userWeight", fi.UserWeight.ToString());
+            _logger.Writer.WriteAttributeString("userPrior", fi.UserPrior.ToString());
+            _logger.Writer.WriteAttributeString("systemWeight", fi.SystemWeight.ToString());
             _logger.logTime();
             _logger.logEndElement();
             _logger.logEndElement(); // Also end the FeatureAdjustBegin element
