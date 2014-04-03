@@ -1,0 +1,121 @@
+﻿<UserControl x:Class="MessagePredictor.View.FeatureGraphBinary"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:petzold="clr-namespace:Petzold.Media2D" 
+             mc:Ignorable="d" 
+             Name="root"
+             d:DesignHeight="300" d:DesignWidth="800">
+    <ScrollViewer ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollChanged="ScrollViewer_ScrollChanged">
+        <Grid Margin="10" MouseLeave="Grid_MouseLeave" Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Vertical" Style="{StaticResource ResourceKey=rotated270}">
+                <Label HorizontalContentAlignment="Center">Importance</Label>
+                <Canvas Width="150" Height="14">
+                    <petzold:ArrowLine X1="0" Y1="7" X2="150" Y2="7" ArrowEnds="End" StrokeThickness="1"
+                           Fill="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}" 
+                           Stroke="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"/>
+                </Canvas>
+            </StackPanel>
+
+
+            <!--<Separator Grid.Column="0" Style="{StaticResource ResourceKey=rotated90}"/>-->
+
+            <ItemsControl Grid.Column="1" Name="FeatureControl" ItemsSource="{Binding ItemsSource,ElementName=root}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid PreviewMouseMove="Rectangle_PreviewMouseMove" PreviewMouseLeftButtonUp="Rectangle_PreviewMouseLeftButtonUp" Background="Transparent">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <!-- Topic 1 bar -->
+                            <Grid Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" DataContext="{Binding Topic1Importance}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Rectangle Grid.Row="0" Width="20" Height="{Binding UserHeight}" Fill="{Binding Label.Color}" 
+                                           VerticalAlignment="Bottom" Cursor="SizeNS" Margin="5 0 1 0"
+                                           PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" />
+                                <Separator Grid.Row="1" Width="20" Height="1" Background="Black" Margin="5 0 1 0" />
+                                <Rectangle Grid.Row="2" Width="20" Height="{Binding SystemHeight}" Fill="{Binding Label.Color}" 
+                                           SnapsToDevicePixels="True" Margin="5 0 1 0"/>
+                            </Grid>
+                            
+                            <!-- Topic 2 bar -->
+                            <Grid Grid.Row="0" Grid.Column="1" HorizontalAlignment="Left" DataContext="{Binding Topic2Importance}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Rectangle Grid.Row="0"  Width="20" Height="{Binding UserHeight}" Fill="{Binding Label.Color}" 
+                                           VerticalAlignment="Bottom" Cursor="SizeNS" Margin="1 0 5 0"
+                                           PreviewMouseLeftButtonDown="Rectangle_PreviewMouseLeftButtonDown" SnapsToDevicePixels="True" />
+                                <Separator Grid.Row="1" Width="20" Height="1" Background="Black" Margin="1 0 5 0" />
+                                <Rectangle Grid.Row="2" Width="20" Height="{Binding SystemHeight}" Fill="{Binding Label.Color}" 
+                                           SnapsToDevicePixels="True" Margin="1 0 5 0"/>
+                            </Grid>
+
+                            <!-- X-axis -->
+                            <Separator Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0 0 0 2"
+                                       Background="{DynamicResource {x:Static SystemColors.ControlDarkDarkBrushKey}}"/>
+
+                            <!-- Feature word -->
+                            <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Text="{Binding Characters, Mode=OneWay}" Padding="5 2"
+                                       TextAlignment="Center">
+                                <TextBlock.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem HeaderStringFormat="Find '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Find_Click"/>
+                                        <MenuItem HeaderStringFormat="Remove '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Remove_Click"/>
+                                    </ContextMenu>
+                                </TextBlock.ContextMenu>
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Background" Value="LightGray"/>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Grid Grid.Column="2" VerticalAlignment="Center" Margin="10 0 0 0">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Button Grid.Row="0" VerticalAlignment="Center" Margin="5" Command="{Binding AddFeature}" CommandParameter="{Binding ElementName=root,Path=Label}" Style="{StaticResource ResourceKey=buttonStyle}">Add a new word or phrase</Button>
+                <Button Grid.Row="1" VerticalAlignment="Center" Margin="5" Command="{Binding ApplyFeatureAdjustments}" Style="{StaticResource ResourceKey=buttonStyle}">Apply importance changes</Button>
+
+            </Grid>
+
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -18,7 +18,11 @@
             <TabItem Header="Overview" Style="{StaticResource ResourceKey=tabItemStyle}">
                 <local:ImportantWordsOverview />
             </TabItem>
-            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding Labels[0].Color}">
+            <TabItem Header="Adjust important words" Style="{StaticResource ResourceKey=tabItemStyle}">
+                <local:FeatureGraphBinary ItemsSource="{Binding FeatureSetViewSourceGraph.View}" 
+                                          GraphColor1="{Binding Labels[0].Color}" GraphColor2="{Binding Labels[1].Color}"/>
+            </TabItem>
+            <!--<TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding Labels[0].Color}">
                 <TabItem.Header>
                     <TextBlock Text="{Binding Labels[0], StringFormat='Adjust {0} words'}"/>
                 </TabItem.Header>
@@ -31,7 +35,7 @@
                 </TabItem.Header>
                 <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSourcesGraph[1].View}" Label="{Binding Labels[1]}" 
                                     GraphColorUser="{Binding Labels[1].Color}" GraphColorSystem="{Binding Labels[1].Color}" />
-            </TabItem>
+            </TabItem>-->
         </TabControl>
     </Grid>
 </UserControl>

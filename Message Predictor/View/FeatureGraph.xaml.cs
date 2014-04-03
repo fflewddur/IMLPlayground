@@ -1,4 +1,5 @@
 ﻿using LibIML;
+using LibIML.Features;
 using MessagePredictor.ViewModel;
 using System;
 using System.Collections;
@@ -85,7 +86,7 @@ namespace MessagePredictor.View
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
-                vm.AdjustUserFeatureHeight(_currentFeature, delta);
+                //vm.AdjustUserFeatureHeight(_currentFeature, delta);
                 _mouseOrigY = y;
 
                 //Console.WriteLine("Dragging {0}", delta);
@@ -184,7 +185,7 @@ namespace MessagePredictor.View
         {
             FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
             if (vm != null && e.HorizontalChange != 0) {
-                vm.LogFeatureGraphScrolled(Label.ToString(), e.HorizontalChange, e.HorizontalOffset);
+                //vm.LogFeatureGraphScrolled(Label.ToString(), e.HorizontalChange, e.HorizontalOffset);
             }
         }
     }

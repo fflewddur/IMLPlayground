@@ -1,74 +1,75 @@
-﻿using System;
+﻿using LibIML.Features;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibIML
+namespace LibIML.Features
 {
     [Serializable]
     public class Feature : ViewModelBase, IEquatable<Feature>, IComparable<Feature>
     {
-        public static readonly int MINIMUM_HEIGHT = 4; // The minimum height in pixels for each bar
         public static readonly int BAR_WIDTH = 25; // The default width (in pixels) for each bar
 
-        public enum Weight
-        {
-            None,
-            Custom,
-            Medium,
-            High
-        };
-
         //public const double PIXELS_TO_WEIGHT = 100;
-        public const double WEIGHT_NONE = 0;
-        public const double WEIGHT_DEFAULT = 1;
-        public const double WEIGHT_MEDIUM = 2;
-        public const double WEIGHT_HIGH = 4;
 
         private string _characters;
-        private Label _label;
         private bool _userAdded;
-        private Weight _weightType;
-        private double _systemWeight;
-        private double _userWeight;
-        private double _userPrior;
-        private int _count;
-        private double _width;
-        private bool _mostImportantLabel;
-        private double _systemHeight;
-        private double _userHeight;
+        private Label _mostImportantLabel;
         private double _pixelsToWeight;
         private double _percentOfReason; // Percentage of total evidence 
+        //private List<FeatureImportance> _featureImportance;
+        private FeatureImportance _topic1Importance;
+        private FeatureImportance _topic2Importance;
 
-        // We use this constructor for the FeatureGraphs
-        public Feature(string characters, Label label)
-            : base()
+        public Feature(string characters) : base()
         {
-            _characters = characters;
-            _label = label;
-            _count = 1;
-            _mostImportantLabel = false;
-            _weightType = Weight.Custom;
-            _userWeight = WEIGHT_DEFAULT;
-            _userPrior = WEIGHT_DEFAULT;
-            _systemWeight = 0;
+            Characters = characters;
         }
 
-        public Feature(string characters, Label label, bool userAdded) : this(characters, label)
+        public Feature(string characters, Label topic1, Label topic2) : this(characters)
+        {
+            _topic1Importance = new FeatureImportance(topic1);
+            _topic2Importance = new FeatureImportance(topic2);
+            _topic1Importance.PropertyChanged += topicImportanceChanged;
+            _topic2Importance.PropertyChanged += topicImportanceChanged;
+        }
+
+        public Feature(string characters, Label topic1, Label topic2, bool userAdded)
+            : this(characters, topic1, topic2)
         {
             _userAdded = userAdded;
         }
 
+        // We use this constructor for the FeatureGraphs
+        //public Feature(string characters, Label label)
+        //    : base()
+        //{
+        //    _characters = characters;
+        //    _label = label;
+        //    _count = 1;
+        //    _mostImportantLabel = false;
+        //    _weightType = Weight.Custom;
+        //    _userWeight = WEIGHT_DEFAULT;
+        //    _userPrior = WEIGHT_DEFAULT;
+        //    _systemWeight = 0;
+        //}
+
+        //public Feature(string characters, Label label, bool userAdded) : this(characters, label)
+        //{
+        //    _userAdded = userAdded;
+        //}
+
         // We use this constructor for the EvidenceGraphs
-        public Feature(string characters, Label label, int count, double sysWeight, double userWeight) : this(characters, label, false)
-        {
-            _count = count;
-            _userWeight = userWeight;
-            _systemWeight = sysWeight;
-            //Console.WriteLine("weight={0}", _systemWeight);
-            PixelsToWeight = 10;
-        }
+        //public Feature(string characters, Label label, int count, double sysWeight, double userWeight) : this(characters, label, false)
+        //{
+        //    _count = count;
+        //    _userWeight = userWeight;
+        //    _systemWeight = sysWeight;
+        //    //Console.WriteLine("weight={0}", _systemWeight);
+        //    PixelsToWeight = 10;
+        //}
 
         #region Properties
 
@@ -78,114 +79,16 @@ namespace LibIML
             private set { _characters = value; }
         }
 
-        public Label Label
-        {
-            get { return _label; }
-            private set { _label = Label; }
-        }
-
         public bool UserAdded
         {
             get { return _userAdded; }
             private set { _userAdded = value; }
         }
 
-        public Weight WeightType
-        {
-            get { return _weightType; }
-            set
-            {
-                if (SetProperty<Weight>(ref _weightType, value)) {
-                    switch (_weightType) {
-                        case Weight.None:
-                            UserPrior = WEIGHT_NONE;
-                            break;
-                        case Weight.Medium:
-                            UserPrior = WEIGHT_MEDIUM;
-                            break;
-                        case Weight.High:
-                            UserPrior = WEIGHT_HIGH;
-                            break;
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// The system-determined weight, relative to all other feature weights.
-        /// This is used for explaining the relative importance of each feature.
-        /// </summary>
-        public double SystemWeight
-        {
-            get { return _systemWeight; }
-            set
-            {
-                if (SetProperty<double>(ref _systemWeight, value)) {
-                    SystemHeight = SystemWeight * PixelsToWeight;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The user-specified prior, relative to all other priors.
-        /// This is used for explaining the relative importance of each feature.
-        /// </summary>
-        public double UserWeight
-        {
-            get { return _userWeight; }
-            set
-            {
-                if (SetProperty<double>(ref _userWeight, value)) {
-                    UserHeight = UserWeight * PixelsToWeight;
-                }
-            }
-        }
-
-        public double UserPrior
-        {
-            get { return _userPrior; }
-            set { SetProperty<double>(ref _userPrior, value); }
-        }
-
-        /// <summary>
-        /// Number of times this feature occurs in the given document.
-        /// Used by Evidence class.
-        /// </summary>
-        public int Count
-        {
-            get { return _count; }
-            set { SetProperty<int>(ref _count, value); }
-        }
-
-        public bool MostImportant
+        public Label MostImportantLabel
         {
             get { return _mostImportantLabel; }
-            set { _mostImportantLabel = value; }
-        }
-
-        public double SystemHeight
-        {
-            get { return _systemHeight; }
-            private set { SetProperty<double>(ref _systemHeight, value); }
-        }
-
-        public double UserHeight
-        {
-            get { return _userHeight; }
-            set
-            {
-                // Minimum height (so the user can drag the bar back up)
-                //if (value < MINIMUM_HEIGHT) {
-                //    value = MINIMUM_HEIGHT;
-                //}
-                SetProperty<double>(ref _userHeight, value);
-            }
-        }
-
-        public double Width
-        {
-            get { return _width; }
-            private set { SetProperty<double>(ref _width, value); }
+            private set { _mostImportantLabel = value; }
         }
 
         public double PixelsToWeight
@@ -194,9 +97,10 @@ namespace LibIML
             set
             {
                 if (SetProperty<double>(ref _pixelsToWeight, value)) {
-                    SystemHeight = SystemWeight * PixelsToWeight;
-                    UserHeight = UserWeight * PixelsToWeight;
-                    Width = Count * BAR_WIDTH;
+                    // FIXME We'll need to revise how we do this
+                    //SystemHeight = SystemWeight * PixelsToWeight;
+                    //UserHeight = UserWeight * PixelsToWeight;
+                    //Width = Count * BAR_WIDTH;
                 }
             }
         }
@@ -207,6 +111,18 @@ namespace LibIML
             set { SetProperty<double>(ref _percentOfReason, value); }
         }
 
+        public FeatureImportance Topic1Importance
+        {
+            get { return _topic1Importance; }
+            private set { SetProperty<FeatureImportance>(ref _topic1Importance, value); }
+        }
+
+        public FeatureImportance Topic2Importance
+        {
+            get { return _topic2Importance; }
+            private set { SetProperty<FeatureImportance>(ref _topic2Importance, value); }
+        }
+
         #endregion
 
         #region Override methods
@@ -215,7 +131,8 @@ namespace LibIML
         {
             StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("{0} (label={1}, weight type={2}, user weight={3}, prior={5}, system weight={4})", Characters, Label, this.WeightType, UserWeight, SystemWeight, UserPrior);
+            //sb.AppendFormat("{0} (label={1}, weight type={2}, user weight={3}, prior={5}, system weight={4})", Characters, Label, this.WeightType, UserWeight, SystemWeight, UserPrior);
+            sb.AppendFormat("{0}", Characters);
 
             return sb.ToString();
         }
@@ -230,18 +147,13 @@ namespace LibIML
 
         public bool Equals(Feature other)
         {
-            if (Label != Label.AnyLabel && other.Label != Label.AnyLabel)
-                return (Characters == other.Characters) && (Label == other.Label);
-            else
-                return (Characters == other.Characters);
+            return (Characters.Equals(other.Characters));
         }
 
         public override int GetHashCode()
         {
             int hash = 17;
             hash = hash * 31 + Characters.GetHashCode();
-            //if (Label != Label.AnyLabel)
-            hash += hash * 31 + Label.GetHashCode();
             return hash;
         }
 
@@ -250,11 +162,22 @@ namespace LibIML
             if (other == null) {
                 return 1;
             } else {
-                int retval = this.Characters.CompareTo(other.Characters);
-                if (retval == 0) {
-                    return this.Label.CompareTo(other.Label);
-                } else
-                    return retval;
+                return Characters.CompareTo(other.Characters);
+            }
+        }
+
+        #endregion
+
+        #region Callbacks
+
+        void topicImportanceChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "UserWeight" || e.PropertyName == "SystemWeight") {
+                if (_topic1Importance.GetWeight() >= _topic2Importance.GetWeight()) {
+                    this.MostImportantLabel = _topic1Importance.Label;
+                } else {
+                    this.MostImportantLabel = _topic2Importance.Label;
+                }
             }
         }
 

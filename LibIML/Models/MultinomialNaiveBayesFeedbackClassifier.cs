@@ -1,4 +1,5 @@
-﻿using LibIML.Instances;
+﻿using LibIML.Features;
+using LibIML.Instances;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -261,16 +262,9 @@ namespace LibIML
         public void AddPriors(IEnumerable<Feature> priors)
         {
             foreach (Feature f in priors) {
-                double weight;
-                //if (f.WeightType == Feature.Weight.High)
-                //    weight = 10;
-                //else if (f.WeightType == Feature.Weight.Medium)
-                //    weight = 5;
-                //else
-                weight = f.UserPrior;
-
                 int id = _vocab.GetWordId(f.Characters, true);
-                _perClassFeaturePriors[f.Label][id] = weight;
+                _perClassFeaturePriors[f.Topic1Importance.Label][id] = f.Topic1Importance.UserPrior;
+                _perClassFeaturePriors[f.Topic2Importance.Label][id] = f.Topic2Importance.UserPrior;
             }
             //Train();
         }
@@ -330,7 +324,15 @@ namespace LibIML
                         string word = _vocab.GetWord(pair.Key);
                         TryGetFeatureUserWeight(pair.Key, l, out userWeight);
                         TryGetFeatureSystemWeight(pair.Key, l, out sysWeight);
-                        Feature f = new Feature(word, l, (int)pair.Value, sysWeight, userWeight);
+                        Feature f = new Feature(word, Labels.ElementAt(0), Labels.ElementAt(1));
+                        if (l == f.Topic1Importance.Label) {
+                            f.Topic1Importance.SystemWeight = sysWeight;
+                            f.Topic1Importance.UserWeight = userWeight;
+                        } else if (l == f.Topic2Importance.Label) {
+                            f.Topic2Importance.SystemWeight = sysWeight;
+                            f.Topic2Importance.UserWeight = userWeight;
+                        }
+                        //Feature f = new Feature(word, l, (int)pair.Value, sysWeight, userWeight);
                         evidence.SourceItems.Add(f);
                         if (l == topic1) {
                             evidenceItems[pair.Key].Label1Pr = weight;

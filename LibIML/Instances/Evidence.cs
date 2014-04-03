@@ -1,4 +1,5 @@
-﻿using LibIML.Instances;
+﻿using LibIML.Features;
+using LibIML.Instances;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -142,35 +143,35 @@ namespace LibIML
         //    }
         //}
 
-        public string GetExplanationString()
-        {
-            StringBuilder sb = new StringBuilder();
+        //public string GetExplanationString()
+        //{
+        //    StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("PrDocGivenClass = {0} | ", PrDocGivenClass);
-            foreach (Feature item in SourceItems) {
-                double contribution = 0.5 * (Math.Pow(item.UserWeight + item.SystemWeight, item.Count)) / PrDoc;
-                sb.AppendFormat("{0} ({1}) = {2} ({3} + {4})^{5} ", item.Characters, item.Label, contribution, item.UserWeight, item.SystemWeight, item.Count);
-            }
+        //    sb.AppendFormat("PrDocGivenClass = {0} | ", PrDocGivenClass);
+        //    foreach (Feature item in SourceItems) {
+        //        double contribution = 0.5 * (Math.Pow(item.UserWeight + item.SystemWeight, item.Count)) / PrDoc;
+        //        sb.AppendFormat("{0} ({1}) = {2} ({3} + {4})^{5} ", item.Characters, item.Label, contribution, item.UserWeight, item.SystemWeight, item.Count);
+        //    }
 
-            return sb.ToString();
-        }
+        //    return sb.ToString();
+        //}
 
         #region Override methods
 
-        public override string ToString()
-        {
-            StringBuilder sb = new StringBuilder();
+        //public override string ToString()
+        //{
+        //    StringBuilder sb = new StringBuilder();
 
-            sb.AppendFormat("Confidence={0:N2} ", Confidence);
-            sb.AppendFormat("ClassPr={0:N2} ", PrClass);
-            sb.AppendFormat("PrDoc={0} ", PrDoc);
-            foreach (Feature item in SourceItems) {
-                sb.AppendFormat("{0}={4:N4} ({1}*({2:N4}+{3:N4})) ", item.Characters, item.Count, item.SystemWeight, item.UserWeight, 
-                    item.Count * (item.SystemWeight + item.UserWeight));
-            }
+        //    sb.AppendFormat("Confidence={0:N2} ", Confidence);
+        //    sb.AppendFormat("ClassPr={0:N2} ", PrClass);
+        //    sb.AppendFormat("PrDoc={0} ", PrDoc);
+        //    foreach (Feature item in SourceItems) {
+        //        sb.AppendFormat("{0}={4:N4} ({1}*({2:N4}+{3:N4})) ", item.Characters, item.Count, item.SystemWeight, item.UserWeight, 
+        //            item.Count * (item.SystemWeight + item.UserWeight));
+        //    }
 
-            return sb.ToString();
-        }
+        //    return sb.ToString();
+        //}
 
         #endregion
     }

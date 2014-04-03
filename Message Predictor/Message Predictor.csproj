@@ -180,6 +180,9 @@
     <Compile Include="View\FeatureGraph.xaml.cs">
       <DependentUpon>FeatureGraph.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\FeatureGraphBinary.xaml.cs">
+      <DependentUpon>FeatureGraphBinary.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FolderList.xaml.cs">
       <DependentUpon>FolderList.xaml</DependentUpon>
     </Compile>
@@ -239,6 +242,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\FeatureGraph.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\FeatureGraphBinary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

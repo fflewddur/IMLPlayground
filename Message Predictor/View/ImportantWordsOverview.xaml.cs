@@ -1,4 +1,5 @@
 ﻿using LibIML;
+using LibIML.Features;
 using MessagePredictor.ViewModel;
 using System;
 using System.Collections.Generic;

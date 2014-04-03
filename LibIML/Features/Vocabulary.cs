@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibIML.Features;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -536,7 +537,7 @@ namespace LibIML
             _restrictedIds.Clear();
             foreach (KeyValuePair<int, double> pair in HighIG) {
                 string word = _allIdsToWords[pair.Key];
-                Feature feature = new Feature(word, Label.AnyLabel);
+                Feature feature = new Feature(word);
                 // Ensure the user didn't remove this feature
                 if (forceExclude == null || !forceExclude.Contains(feature)) {
                     AddElementToRestricted(pair.Key);

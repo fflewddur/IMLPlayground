@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LibIML;
+using LibIML.Features;
 using MessagePredictor.Model;
 using MessagePredictor.View;
 using MessagePredictor.ViewModel;
@@ -673,8 +674,10 @@ namespace MessagePredictor
             _classifier.UpdateCountsForNewFeature(id);
             _classifier.Train();
             double weight;
-            _classifier.TryGetFeatureSystemWeight(id, e.Feature.Label, out weight);
-            e.Feature.SystemWeight = weight;
+            _classifier.TryGetFeatureSystemWeight(id, e.Feature.Topic1Importance.Label, out weight);
+            e.Feature.Topic1Importance.SystemWeight = weight;
+            _classifier.TryGetFeatureSystemWeight(id, e.Feature.Topic2Importance.Label, out weight);
+            e.Feature.Topic2Importance.SystemWeight = weight;
             if (AutoUpdatePredictions) {
                 UpdatePredictions();
             }
