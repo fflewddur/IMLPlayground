@@ -10,16 +10,18 @@ namespace MessagePredictor.ViewModel
 {
     public class AddFeatureDialogViewModel : ViewModelBase
     {
-        private Label _label;
+        private IReadOnlyList<Label> _labels;
         private string _word;
         private List<string> _weights;
+        private Label _selectedLabel;
         private string _selectedWeight;
         private bool _addIsEnabled;
 
-        public AddFeatureDialogViewModel(Label label)
+        public AddFeatureDialogViewModel(IReadOnlyList<Label> labels)
             : base()
         {
-            Label = label;
+            Labels = labels;
+            SelectedLabel = Labels[0];
             Word = ""; // use an empty string, not null, to make it easier to style the empty string with placeholder text.
             Weights = new List<string>();
             Weights.Add("Very important");
@@ -28,10 +30,16 @@ namespace MessagePredictor.ViewModel
             AddIsEnabled = false;
         }
 
-        public Label Label
+        public IReadOnlyList<Label> Labels
         {
-            get { return _label; }
-            set { SetProperty<Label>(ref _label, value); }
+            get { return _labels; }
+            set { SetProperty<IReadOnlyList<Label>>(ref _labels, value); }
+        }
+
+        public Label SelectedLabel
+        {
+            get { return _selectedLabel; }
+            set { SetProperty<Label>(ref _selectedLabel, value); }
         }
 
         public string Word

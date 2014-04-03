@@ -3,8 +3,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="Add a word or phrase" 
-        Height="190" Width="300" 
-        MinHeight="190" MinWidth="200" 
+        Height="240" Width="340" 
+        MinHeight="240" MinWidth="200" 
         ResizeMode="CanResizeWithGrip" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         WindowStyle="ToolWindow"
@@ -14,13 +14,20 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0" ContentStringFormat="Add a word about {0}" Content="{Binding Label.UserLabel}" Style="{StaticResource ResourceKey=headerStyleDialog}"/>
-        
-        <TextBox Grid.Row="1" Text="{Binding Word, UpdateSourceTrigger=PropertyChanged}" Padding="4 5" Name="PhraseTextBox">
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource ResourceKey=headerStyleDialog}" TextWrapping="Wrap">
+            Add a word or phrase that the computer should use to predict message topics:
+        </TextBlock>
+
+        <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Word, UpdateSourceTrigger=PropertyChanged}" Padding="4 5" Name="PhraseTextBox">
             <TextBox.Style>
                 <Style TargetType="TextBox">
                     <Setter Property="Background" Value="White" />
@@ -43,10 +50,15 @@
             </TextBox.Style>
         </TextBox>
 
-        <ComboBox Grid.Row="2" SelectedIndex="0" Margin="0 10 0 10" ItemsSource="{Binding Weights}" SelectedItem="{Binding SelectedWeight}" Style="{StaticResource ResourceKey=comboBoxStyle}" 
+        <Label Grid.Row="2" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0 10 0 0">is</Label>
+        <ComboBox Grid.Row="2" Grid.Column="1" SelectedIndex="0" Margin="0 10 0 0" ItemsSource="{Binding Weights}" SelectedItem="{Binding SelectedWeight}" Style="{StaticResource ResourceKey=comboBoxStyle}" 
+                  ItemContainerStyle="{StaticResource ResourceKey=comboBoxItemContainerStyle}" />
+
+        <Label Grid.Row="3" Grid.Column="0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0 10 0 10">to</Label>
+        <ComboBox Grid.Row="3" Grid.Column="1" SelectedIndex="0" Margin="0 10 0 10" ItemsSource="{Binding Labels}" SelectedItem="{Binding SelectedLabel}" Style="{StaticResource ResourceKey=comboBoxStyle}" 
                   ItemContainerStyle="{StaticResource ResourceKey=comboBoxItemContainerStyle}" />
         
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right">
+        <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button Margin="0 0 10 0" IsCancel="True" Style="{StaticResource ResourceKey=buttonStyle}">Cancel</Button>
             <Button Click="Done_Click" IsDefault="True" IsEnabled="{Binding AddIsEnabled}" Content="Add" Style="{StaticResource ResourceKey=buttonStyle}"/>
         </StackPanel>

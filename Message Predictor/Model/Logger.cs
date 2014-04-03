@@ -48,7 +48,11 @@ namespace MessagePredictor.Model
             _writer.WriteStartElement("Feature");
             _writer.WriteAttributeString("characters", f.Characters);
             _writer.WriteAttributeString("userAdded", f.UserAdded.ToString());
-            _writer.WriteAttributeString("mostImportantLabel", f.MostImportantLabel.ToString());
+            if (f.MostImportantLabel != null) {
+                _writer.WriteAttributeString("mostImportantLabel", f.MostImportantLabel.ToString());
+            } else {
+                _writer.WriteAttributeString("mostImportantLabel", "");
+            }
             logTime();
             logFeatureImportance(f.Topic1Importance);
             logFeatureImportance(f.Topic2Importance);

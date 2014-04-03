@@ -20,8 +20,8 @@ namespace LibIML.Features
 
         public const double WEIGHT_NONE = 0;
         public const double WEIGHT_DEFAULT = 1;
-        public const double WEIGHT_MEDIUM = 2;
-        public const double WEIGHT_HIGH = 4;
+        public const double WEIGHT_MEDIUM = 4;
+        public const double WEIGHT_HIGH = 8;
 
         private double _systemHeight;
         private double _userHeight;

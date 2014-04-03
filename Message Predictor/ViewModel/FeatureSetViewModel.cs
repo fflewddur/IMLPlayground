@@ -58,7 +58,7 @@ namespace MessagePredictor.ViewModel
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
             AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
-            AddFeature = new RelayCommand<Label>(PerformAddFeature);
+            AddFeature = new RelayCommand(PerformAddFeature);
             FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature);
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
             FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
@@ -135,7 +135,7 @@ namespace MessagePredictor.ViewModel
 
         public RelayCommand<string> HighlightFeature { get; private set; }
         public RelayCommand<Feature> AddFeatureViaSelection { get; private set; }
-        public RelayCommand<Label> AddFeature { get; private set; }
+        public RelayCommand AddFeature { get; private set; }
         public RelayCommand<Feature> FeatureRemove { get; private set; }
         public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
         public RelayCommand<Feature> FeatureSomewhatImportant { get; private set; }
@@ -476,34 +476,38 @@ namespace MessagePredictor.ViewModel
 
         }
 
-        private void PerformAddFeature(Label label)
+        private void PerformAddFeature()
         {
             _logger.Writer.WriteStartElement("ShowAddFeatureDialog");
             _logger.logTime();
 
             AddFeatureDialog dialog = new AddFeatureDialog();
             dialog.Owner = App.Current.MainWindow;
-            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(label);
+            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels);
             vm.Word = _featureText;
             vm.PropertyChanged += AddFeatureVM_PropertyChanged;
             dialog.DataContext = vm;
             bool? result = dialog.ShowDialog();
             if (result == true) {
-                Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.Label);
+                Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.SelectedLabel);
                 Feature f = new Feature(vm.Word.ToLower(), _labels[0], _labels[1], true);
                 f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
                 f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
                 if (vm.SelectedWeight == vm.Weights[0]) {
-                    if (label == f.Topic1Importance.Label) {
+                    if (vm.SelectedLabel == f.Topic1Importance.Label) {
                         f.Topic1Importance.WeightType = FeatureImportance.Weight.High;
-                    } else if (label == f.Topic2Importance.Label) {
+                        f.Topic2Importance.UserPrior = .01;
+                    } else if (vm.SelectedLabel == f.Topic2Importance.Label) {
                         f.Topic2Importance.WeightType = FeatureImportance.Weight.High;
+                        f.Topic1Importance.UserPrior = .01;
                     }
                 } else if (vm.SelectedWeight == vm.Weights[1]) {
-                    if (label == f.Topic1Importance.Label) {
+                    if (vm.SelectedLabel == f.Topic1Importance.Label) {
                         f.Topic1Importance.WeightType = FeatureImportance.Weight.Medium;
-                    } else if (label == f.Topic2Importance.Label) {
+                        f.Topic2Importance.UserPrior = .01;
+                    } else if (vm.SelectedLabel == f.Topic2Importance.Label) {
                         f.Topic2Importance.WeightType = FeatureImportance.Weight.Medium;
+                        f.Topic1Importance.UserPrior = .01;
                     }
                 }
                 AddUserFeature(f);
