@@ -17,11 +17,15 @@ namespace MessagePredictor.ViewModel
         private string _selectedWeight;
         private bool _addIsEnabled;
 
-        public AddFeatureDialogViewModel(IReadOnlyList<Label> labels)
+        public AddFeatureDialogViewModel(IReadOnlyList<Label> labels, Label selectedLabel)
             : base()
         {
             Labels = labels;
-            SelectedLabel = Labels[0];
+            if (selectedLabel != null) {
+                SelectedLabel = selectedLabel;
+            } else {
+                SelectedLabel = Labels[0];
+            }
             Word = ""; // use an empty string, not null, to make it easier to style the empty string with placeholder text.
             Weights = new List<string>();
             Weights.Add("Very important");

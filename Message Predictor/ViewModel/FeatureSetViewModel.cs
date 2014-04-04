@@ -26,9 +26,9 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
         private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
-        //private IReadOnlyList<CollectionViewSource> _collectionViewSourcesGraph;
         private CollectionViewSource _collectionViewSourceGraph;
         private string _featureText; // The feature the user is currently typing in
+        private Label _previousLabel; // The last label the user added a feature for
         private DispatcherTimer _featureTextEditedTimer;
         private DispatcherTimer _featurePriorsEditedTimer;
         private DispatcherTimer _featureGraphHeightChangedTimer;
@@ -48,7 +48,6 @@ namespace MessagePredictor.ViewModel
             _userAdded = new List<Feature>();
             _userRemoved = new List<Feature>();
             _collectionViewSourcesOverview = BuildCollectionViewSourcesOverview(labels);
-            //_collectionViewSourcesGraph = BuildCollectionViewSourcesGraph(labels);
             _collectionViewSourceGraph = BuildCollectionViewSourceGraph();
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
@@ -63,6 +62,7 @@ namespace MessagePredictor.ViewModel
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
             FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
             ApplyFeatureAdjustments = new RelayCommand(PerformApplyFeatureAdjustments, CanPerformApplyFeatureAdjustments);
+            CancelFeatureAdjustments = new RelayCommand(PerformCancelFeatureAdjustments, CanPerformCancelFeatureAdjustments);
 
             _classifier.Retrained += classifier_Retrained;
             _vocab.Updated += vocab_Updated;
@@ -104,12 +104,6 @@ namespace MessagePredictor.ViewModel
             private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesOverview, value); }
         }
 
-        //public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesGraph
-        //{
-        //    get { return _collectionViewSourcesGraph; }
-        //    private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesGraph, value); }
-        //}
-
         public CollectionViewSource FeatureSetViewSourceGraph
         {
             get { return _collectionViewSourceGraph; }
@@ -140,6 +134,7 @@ namespace MessagePredictor.ViewModel
         public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
         public RelayCommand<Feature> FeatureSomewhatImportant { get; private set; }
         public RelayCommand ApplyFeatureAdjustments { get; private set; }
+        public RelayCommand CancelFeatureAdjustments { get; private set; }
 
         #endregion
 
@@ -500,7 +495,7 @@ namespace MessagePredictor.ViewModel
 
             AddFeatureDialog dialog = new AddFeatureDialog();
             dialog.Owner = App.Current.MainWindow;
-            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels);
+            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels, _previousLabel);
             if (!IsTextForSelectedFeature(_featureText)) {
                 vm.Word = _featureText;
             }
@@ -509,6 +504,7 @@ namespace MessagePredictor.ViewModel
             bool? result = dialog.ShowDialog();
             if (result == true) {
                 Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.SelectedLabel);
+                _previousLabel = vm.SelectedLabel;
                 Feature f = new Feature(vm.Word.ToLower(), _labels[0], _labels[1], true);
                 f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
                 f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
@@ -657,6 +653,16 @@ namespace MessagePredictor.ViewModel
             }
 
             _featurePriorsEditedTimer.Start();
+        }
+
+        private bool CanPerformCancelFeatureAdjustments()
+        {
+            return _featureImportanceAdjusted;
+        }
+
+        private void PerformCancelFeatureAdjustments()
+        {
+
         }
 
         private IReadOnlyList<CollectionViewSource> BuildCollectionViewSourcesOverview(IReadOnlyList<Label> labels)

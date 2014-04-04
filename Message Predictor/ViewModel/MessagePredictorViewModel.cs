@@ -26,6 +26,7 @@ namespace MessagePredictor
         Vocabulary _vocab;
         MultinomialNaiveBayesFeedbackClassifier _classifier;
         Logger _logger;
+        LinkedList<UserAction> _actions;
 
         // Viewmodels (and data for this viewmodel)
         private FolderListViewModel _folderListVM;
@@ -52,6 +53,7 @@ namespace MessagePredictor
             Stopwatch timer = new Stopwatch();
 
             _logger = logger;
+            _actions = new LinkedList<UserAction>(); // Store undo-able user actions
 
             timer.Start();
             //List<NewsCollection> folders = new List<NewsCollection>();

@@ -145,6 +145,7 @@
     <Compile Include="Model\Logger.cs" />
     <Compile Include="Model\NewsCollection.cs" />
     <Compile Include="Model\NewsItem.cs" />
+    <Compile Include="Model\UserAction.cs" />
     <Compile Include="Utilities.cs" />
     <Compile Include="ViewModel\AddFeatureDialogViewModel.cs" />
     <Compile Include="ViewModel\Base\ViewModelCollectionBase.cs" />
