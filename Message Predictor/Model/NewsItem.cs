@@ -8,10 +8,11 @@ using System.IO;
 using System.Windows.Documents;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
+using System.ComponentModel;
 
 namespace MessagePredictor.Model
 {
-    class NewsItem : ViewModelBase, IInstance
+    class NewsItem : ViewModelBase, IInstance, IEditableObject
     {
         private readonly double MIN_CONFIDENCE_CHANGE = .01;
 
@@ -34,6 +35,7 @@ namespace MessagePredictor.Model
         private bool _isHighlighted; // Should this message be highlighted in the heatmap?
         private string _document; // The message in XML for easier displaying (including highlighting of features)
         private Vocabulary _vocab; // Keep a reference to the most recent Vocabulary we've computed features for; needed for displaying _document with features highlighted
+        private bool _isInEditMode;
 
         public NewsItem()
             : base()
@@ -211,6 +213,12 @@ namespace MessagePredictor.Model
             private set { SetProperty<SparseVector>(ref _featureCounts, value); }
         }
 
+        public bool IsInEditMode
+        {
+            get { return _isInEditMode; }
+            private set { SetProperty<bool>(ref _isInEditMode, value); }
+        }
+
         #endregion
 
         #region Public methods
@@ -247,6 +255,25 @@ namespace MessagePredictor.Model
         public void HighlightWithWord(string word)
         {
             UpdateDocument(_vocab, word);
+        }
+
+        #endregion
+
+        #region IEditableObject support
+        
+        public void BeginEdit()
+        {
+            IsInEditMode = true;
+        }
+
+        public void CancelEdit()
+        {
+            IsInEditMode = false;
+        }
+        
+        public void EndEdit()
+        {
+            IsInEditMode = false;
         }
 
         #endregion

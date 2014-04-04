@@ -12,6 +12,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace MessagePredictor.ViewModel
 {
@@ -153,6 +154,8 @@ namespace MessagePredictor.ViewModel
 
         private void MarkMessagesContainingWord(string word)
         {
+            Mouse.OverrideCursor = Cursors.Wait;
+
             // Null strings crash our Regex
             if (word == null) {
                 word = "";
@@ -165,15 +168,45 @@ namespace MessagePredictor.ViewModel
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
-            using (_heatMapView.DeferRefresh()) {
-                Parallel.ForEach(_messages, (item, state, index) =>
-                {
-                    if (!isEmpty && containsWord.Match(item.AllText).Success)
-                        item.IsHighlighted = true;
-                    else
-                        item.IsHighlighted = false;
-                });
+            List<NewsItem> edited = new List<NewsItem>();
+            using (_heatMapView.View.DeferRefresh()) {
+                foreach (NewsItem item in _messages) {
+                    if (!isEmpty && containsWord.Match(item.AllText).Success) {
+                        if (!item.IsHighlighted) {
+                            item.IsHighlighted = true;
+                            edited.Add(item);
+                        }
+                    } else {
+                        if (item.IsHighlighted) {
+                            item.IsHighlighted = false;
+                            edited.Add(item);
+                        }
+                    }
+                    
+                }
+                //Parallel.ForEach(_messages, (item, state, index) =>
+                //{
+                //    item.BeginEdit();
+                //    if (!isEmpty && containsWord.Match(item.AllText).Success) {
+                //        item.IsHighlighted = true;
+                //    } else {
+                //        item.IsHighlighted = false;
+                //    }
+                //    item.EndEdit();
+                //    //(_heatMapView.View as IEditableCollectionView).EditItem(item);
+                //    //(_heatMapView.View as IEditableCollectionView).CommitEdit();
+
+                //});
             }
+
+            // Tell our view to re-sort the modified items
+            IEditableCollectionView view = _heatMapView.View as IEditableCollectionView;
+            foreach (NewsItem item in edited) {
+                view.EditItem(item);
+                view.CommitEdit();
+            }
+
+            Mouse.OverrideCursor = null;
 
             timer.Stop();
             Console.WriteLine("Time to highlight word: {0}", timer.Elapsed);
@@ -209,43 +242,61 @@ namespace MessagePredictor.ViewModel
             CollectionViewSource cvs = new CollectionViewSource();
             cvs.Source = collection;
             ListCollectionView view = cvs.View as ListCollectionView;
-            //view.CustomSort = new SortByHighlight();
+            view.CustomSort = new SortMessageItems();
             view.GroupDescriptions.Clear();
             view.GroupDescriptions.Add(new PropertyGroupDescription("UserLabel", new LabelToStringConverter()));
             view.IsLiveGrouping = true;
             //cvs.IsLiveGroupingRequested = true;
 
-            view.SortDescriptions.Clear();
-            view.SortDescriptions.Add(new SortDescription("UserLabel", ListSortDirection.Descending));
-            view.SortDescriptions.Add(new SortDescription("IsHighlighted", ListSortDirection.Descending));
+            //view.SortDescriptions.Clear();
+            //view.SortDescriptions.Add(new SortDescription("UserLabel", ListSortDirection.Descending));
+            //view.SortDescriptions.Add(new SortDescription("IsHighlighted", ListSortDirection.Descending));
             view.IsLiveSorting = true;
             //cvs.IsLiveSortingRequested = true;
 
             return cvs;
         }
 
-        //private class SortByHighlight : IComparer<NewsItem>, IComparer
-        //{
-        //    public int Compare(object a, object b)
-        //    {
-        //        NewsItem na = a as NewsItem;
-        //        NewsItem nb = b as NewsItem;
-        //        if (na == null || nb == null)
-        //            throw new ArgumentException("SortByHighlight can only sort NewsItem objects");
-        //        else
-        //            return Compare(na, nb);
-        //    }
+        private class SortMessageItems : IComparer<NewsItem>, IComparer
+        {
+            public int Compare(object a, object b)
+            {
+                NewsItem na = a as NewsItem;
+                NewsItem nb = b as NewsItem;
+                if (na == null || nb == null)
+                    throw new ArgumentException("SortByHighlight can only sort NewsItem objects");
+                else
+                    return Compare(na, nb);
+            }
 
-        //    public int Compare(NewsItem a, NewsItem b)
-        //    {
-        //        if (a.IsHighlighted && !b.IsHighlighted)
-        //            return -1;
-        //        else if (!a.IsHighlighted && b.IsHighlighted)
-        //            return 1;
-        //        else
-        //            return 0;
-        //    }
-        //}
+            public int Compare(NewsItem a, NewsItem b)
+            {
+                int labelCmp = 0;
+                if (a.UserLabel == null && b.UserLabel != null) {
+                    labelCmp = 1;
+                } else if (a.UserLabel != null && b.UserLabel == null) {
+                    labelCmp = -1;
+                } else if (a.UserLabel == null && b.UserLabel == null) {
+                    labelCmp = 0;
+                } else {
+                    labelCmp = a.UserLabel.CompareTo(b.UserLabel);
+                }
+
+                // Secondary sort on highlighted items
+                if (labelCmp == 0) {
+                    if (a.IsHighlighted && !b.IsHighlighted) {
+                        labelCmp = -1;
+                    } else if (!a.IsHighlighted && b.IsHighlighted) {
+                        labelCmp = 1;
+                    } else {
+                        labelCmp = 0;
+                    }
+                }
+
+                return labelCmp;
+
+            }
+        }
 
         #endregion
 
