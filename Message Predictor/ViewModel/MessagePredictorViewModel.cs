@@ -338,6 +338,8 @@ namespace MessagePredictor
                 _messageListViewSource.View.Refresh();
             }
 
+            HeatMapVM.RefreshMap();
+
             Mouse.OverrideCursor = null;
             _logger.logEndElement();
         }

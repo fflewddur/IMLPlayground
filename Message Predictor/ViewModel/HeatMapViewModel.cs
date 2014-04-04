@@ -51,11 +51,14 @@ namespace MessagePredictor.ViewModel
             set
             {
                 if (SetProperty<string>(ref _toHighlight, value)) {
+                    Console.WriteLine("Updated ToHighlight to {0}", value);
                     OnHighlightTextChanged(new HighlightTextChangedEventArgs(_toHighlight));
                     MarkMessagesContainingWord(ToHighlight);
                     UpdateTooltipContent(ToHighlight);
-                    if (CurrentMessage != null)
+                    if (CurrentMessage != null) {
                         CurrentMessage.HighlightWithWord(ToHighlight);
+                    }
+                    this.RefreshMap();
                 }
             }
         }
@@ -129,6 +132,15 @@ namespace MessagePredictor.ViewModel
         {
             if (HighlightTextChanged != null)
                 HighlightTextChanged(this, e);
+        }
+
+        #endregion
+
+        #region Public methods
+
+        public void RefreshMap()
+        {
+            _heatMapView.View.Refresh();
         }
 
         #endregion
@@ -212,7 +224,7 @@ namespace MessagePredictor.ViewModel
             view.SortDescriptions.Clear();
             view.SortDescriptions.Add(new SortDescription("UserLabel", ListSortDirection.Descending));
             view.SortDescriptions.Add(new SortDescription("IsHighlighted", ListSortDirection.Descending));
-            view.IsLiveSorting = true;
+            //view.IsLiveSorting = true;
             //cvs.IsLiveSortingRequested = true;
 
             return cvs;

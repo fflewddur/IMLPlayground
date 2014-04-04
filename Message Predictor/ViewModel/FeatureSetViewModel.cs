@@ -25,6 +25,7 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userAdded;
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
+        private List<Feature> _priorFeatureSet; // Hold our feature set prior to any adjustments
         private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
         private CollectionViewSource _collectionViewSourceGraph;
         private string _featureText; // The feature the user is currently typing in
