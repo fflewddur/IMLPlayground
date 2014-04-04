@@ -58,7 +58,6 @@ namespace MessagePredictor.ViewModel
                     if (CurrentMessage != null) {
                         CurrentMessage.HighlightWithWord(ToHighlight);
                     }
-                    this.RefreshMap();
                 }
             }
         }
@@ -138,11 +137,6 @@ namespace MessagePredictor.ViewModel
 
         #region Public methods
 
-        public void RefreshMap()
-        {
-            _heatMapView.View.Refresh();
-        }
-
         #endregion
 
         #region Private methods
@@ -218,13 +212,13 @@ namespace MessagePredictor.ViewModel
             //view.CustomSort = new SortByHighlight();
             view.GroupDescriptions.Clear();
             view.GroupDescriptions.Add(new PropertyGroupDescription("UserLabel", new LabelToStringConverter()));
-            //view.IsLiveGrouping = true;
+            view.IsLiveGrouping = true;
             //cvs.IsLiveGroupingRequested = true;
 
             view.SortDescriptions.Clear();
             view.SortDescriptions.Add(new SortDescription("UserLabel", ListSortDirection.Descending));
             view.SortDescriptions.Add(new SortDescription("IsHighlighted", ListSortDirection.Descending));
-            //view.IsLiveSorting = true;
+            view.IsLiveSorting = true;
             //cvs.IsLiveSortingRequested = true;
 
             return cvs;
