@@ -199,6 +199,10 @@ namespace MessagePredictor.ViewModel
                 //});
             }
 
+            timer.Stop();
+            Console.WriteLine("Time to highlight word: {0}", timer.Elapsed);
+            timer.Restart();
+
             // Tell our view to re-sort the modified items
             IEditableCollectionView view = _heatMapView.View as IEditableCollectionView;
             foreach (NewsItem item in edited) {
@@ -209,7 +213,7 @@ namespace MessagePredictor.ViewModel
             Mouse.OverrideCursor = null;
 
             timer.Stop();
-            Console.WriteLine("Time to highlight word: {0}", timer.Elapsed);
+            Console.WriteLine("Time to update display: {0}", timer.Elapsed);
         }
 
         private void UpdateTooltipContent(string word)
@@ -251,7 +255,7 @@ namespace MessagePredictor.ViewModel
             //view.SortDescriptions.Clear();
             //view.SortDescriptions.Add(new SortDescription("UserLabel", ListSortDirection.Descending));
             //view.SortDescriptions.Add(new SortDescription("IsHighlighted", ListSortDirection.Descending));
-            view.IsLiveSorting = true;
+            //view.IsLiveSorting = true;
             //cvs.IsLiveSortingRequested = true;
 
             return cvs;
