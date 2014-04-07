@@ -12,6 +12,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace MessagePredictor.View
 {
@@ -27,7 +28,21 @@ namespace MessagePredictor.View
 
         private void DataGrid_Selected(object sender, RoutedEventArgs e)
         {
+            
+        }
 
+        private void DataGrid_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            Console.WriteLine("Sorting: {0} {1} {2}", e.Column.Header, e.Column.SortDirection, e.Column.SortMemberPath);
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            // This even fires *before* the sort, so we need to anticipate what will happen. Null -> Ascending -> Descending
+            ListSortDirection d;
+            if (e.Column.SortDirection == ListSortDirection.Descending || string.IsNullOrEmpty(e.Column.SortDirection.ToString())) {
+                d = ListSortDirection.Ascending;
+            } else {
+                d = ListSortDirection.Descending;
+            }
+            vm.LogMessageListSorted(e.Column.SortMemberPath, d.ToString());
         }
 
         /// <summary>

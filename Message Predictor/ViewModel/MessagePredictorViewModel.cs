@@ -117,7 +117,7 @@ namespace MessagePredictor
 
             _messageListViewSource = new CollectionViewSource();
             _messageListViewSource.Source = _messages;
-
+            _messageListViewSource.View.CurrentChanged += View_CurrentChanged;
 
             // Setup our Commands
             ManuallyUpdatePredictions = new RelayCommand(PerformUpdatePredictions, CanPerformUpdatePredictions);
@@ -387,6 +387,15 @@ namespace MessagePredictor
             _logger.logEndElement();
         }
 
+        public void LogMessageListSorted(string sortField, string direction)
+        {
+            _logger.Writer.WriteStartElement("MessageListSorted");
+            _logger.Writer.WriteAttributeString("field", sortField);
+            _logger.Writer.WriteAttributeString("direction", direction);
+            _logger.logTime();
+            _logger.logEndElement();
+        }
+
         public void LogFeatureSet()
         {
             _classifier.LogFeatureSet(_logger.Writer);
@@ -401,7 +410,7 @@ namespace MessagePredictor
         {
             Label positive = Labels[0];
             Label negative = Labels[1];
-            
+
             _evaluatorVM.EvaluateClassifier(_messages, positive, negative);
 
             _logger.Writer.WriteStartElement("Evaluation");
@@ -768,6 +777,7 @@ namespace MessagePredictor
                 _logger.Writer.WriteAttributeString("predictionLabel", e.Message.Prediction.Label.ToString());
                 _logger.Writer.WriteAttributeString("predictionConfidence", e.Message.Prediction.Confidence.ToString());
                 _logger.Writer.WriteAttributeString("predictionConfidenceDirection", e.Message.PredictionConfidenceDirection.ToString());
+                _logger.Writer.WriteAttributeString("messagePosition", _messageListViewSource.View.CurrentPosition.ToString());
                 _logger.logTime();
 
                 MessageVM.Message = e.Message;
@@ -776,6 +786,27 @@ namespace MessagePredictor
                 _logger.logEndElement();
             }
         }
+
+        void View_CurrentChanged(object sender, EventArgs e)
+        {
+            int order = _messageListViewSource.View.CurrentPosition;
+            NewsItem item = _messageListViewSource.View.CurrentItem as NewsItem;
+            if (order >= 0) {
+                _logger.Writer.WriteStartElement("SelectedMessageOrder");
+                _logger.Writer.WriteAttributeString("order", order.ToString());
+                if (item != null) {
+                    _logger.Writer.WriteAttributeString("id", item.Id.ToString());
+                } else {
+                    _logger.Writer.WriteAttributeString("id", "-1");
+                }
+                _logger.logTime();
+                _logger.Writer.WriteValue(order);
+                _logger.logEndElement();
+            }
+        }
+
+
+
 
         #endregion
     }
