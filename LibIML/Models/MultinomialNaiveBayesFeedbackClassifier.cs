@@ -292,6 +292,7 @@ namespace LibIML
         /// <returns>A prediction for this instance.</returns>
         public Prediction PredictInstance(IInstance instance)
         {
+            Console.WriteLine("PredictInstance {0}", instance.Id);
             Label labelWinner = null;
             Label labelLoser = null;
             Prediction prediction = new Prediction();
@@ -336,8 +337,10 @@ namespace LibIML
                         importantWordsTotal += (int)pair.Value;
                         importantWordsUnique++;
                         double weight = Math.Exp(pair.Value * Math.Log(pWord));
+                        
                         double userWeight, sysWeight;
                         string word = _vocab.GetWord(pair.Key);
+                        Console.WriteLine("feature {0} probability = {1}, count={2}, log(prob)={3}", word, pWord, pair.Value, Math.Log(weight));
                         TryGetFeatureUserWeight(pair.Key, l, out userWeight);
                         TryGetFeatureSystemWeight(pair.Key, l, out sysWeight);
                         Feature f = new Feature(word, Labels.ElementAt(0), Labels.ElementAt(1));
