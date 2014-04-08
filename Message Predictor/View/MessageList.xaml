@@ -13,7 +13,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="7*" />
+            <ColumnDefinition Width="6*" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="9*" />
         </Grid.ColumnDefinitions>
@@ -22,7 +22,7 @@
         
         <!-- Summary list -->
         <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding MessageListViewSource.View}" AutoGenerateColumns="False" 
-                  SelectedItem="{Binding FolderListVM.SelectedFolder.SelectedMessage}" Sorting="DataGrid_Sorting"
+                  SelectedItem="{Binding FolderListVM.SelectedFolder.SelectedMessage}" Sorting="DataGrid_Sorting" Loaded="DataGrid_Loaded"
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
                   SelectionUnit="FullRow" GridLinesVisibility="Horizontal" ScrollViewer.VerticalScrollBarVisibility="Visible">
             <DataGrid.CellStyle>
@@ -46,11 +46,12 @@
                 <DataGridTemplateColumn SortMemberPath="Prediction.Label" Width="1*" Header="{StaticResource ResourceKey=messageListTopicHeader}" 
                                         CellTemplate="{StaticResource ResourceKey=messageListTopicTemplate}" />
                 <DataGridTemplateColumn SortMemberPath="Prediction.Confidence" Width="1*" Header="{StaticResource ResourceKey=messageListConfHeader}"
-                                        CellTemplate="{StaticResource ResourceKey=messageListConfTemplate}" />
+                                        CellTemplate="{StaticResource ResourceKey=messageListConfTemplate}" 
+                                        x:Name="PredictionConfidenceCol"/>
             </DataGrid.Columns>
         </DataGrid>
 
-        <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="true" Width="4" Background="White"/>
+        <GridSplitter Grid.Column="1" Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="True" Width="4" />
 
         <!-- Message content -->
         <local:MessageView Grid.Row="1" Grid.Column="2"/>

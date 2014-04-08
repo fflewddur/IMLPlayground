@@ -57,6 +57,14 @@ namespace MessagePredictor.View
             }
             FindMenu.Items.Add(item);
         }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            if (!vm.ShowExplanations) {
+                PredictionExplanationCol.Width = GridLength.Auto;
+            }
+        }
     }
 
     public class MyFormatter : ITextFormatter

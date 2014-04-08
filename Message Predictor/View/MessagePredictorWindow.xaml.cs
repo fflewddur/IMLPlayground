@@ -27,5 +27,13 @@ namespace MessagePredictor.View
             InitializeComponent();
 
         }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e)
+        {
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            if (!vm.ShowExplanations) {
+                ImportantWordsRow.Height = GridLength.Auto;
+            }
+        }
     }
 }

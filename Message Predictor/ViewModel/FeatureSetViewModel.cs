@@ -457,10 +457,10 @@ namespace MessagePredictor.ViewModel
                     f.Topic2Importance.UserWeight = weight;
                 }
 
-                Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}", 
-                    f.Characters, f.Topic1Importance.Label, f.Topic1Importance.UserWeight, f.Topic1Importance.SystemWeight);
-                Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}",
-                    f.Characters, f.Topic2Importance.Label, f.Topic2Importance.UserWeight, f.Topic2Importance.SystemWeight);
+                //Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}", 
+                //    f.Characters, f.Topic1Importance.Label, f.Topic1Importance.UserWeight, f.Topic1Importance.SystemWeight);
+                //Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}",
+                //    f.Characters, f.Topic2Importance.Label, f.Topic2Importance.UserWeight, f.Topic2Importance.SystemWeight);
                 // Figure out which label this feature is most important for
                 //f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, f.Label);
             }

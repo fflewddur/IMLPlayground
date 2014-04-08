@@ -45,6 +45,14 @@ namespace MessagePredictor.View
             vm.LogMessageListSorted(e.Column.SortMemberPath, d.ToString());
         }
 
+        private void DataGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            if (!vm.ShowExplanations) {
+                PredictionConfidenceCol.Visibility = Visibility.Collapsed;
+            }
+        }
+
         /// <summary>
         /// Start a drag event for moving items to different folders.
         /// </summary>
