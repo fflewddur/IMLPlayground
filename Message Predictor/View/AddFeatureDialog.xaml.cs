@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePredictor.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -24,9 +25,16 @@ namespace MessagePredictor.View
             InitializeComponent();
         }
 
-        private void Done_Click(object sender, RoutedEventArgs e)
+        private void Add_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = true;
+            AddFeatureDialogViewModel vm = this.DataContext as AddFeatureDialogViewModel;
+            vm.ProcessFeatureToAdd();
+            this.Close();
         }
+
+        private void Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
+        }        
     }
 }

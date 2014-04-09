@@ -54,7 +54,7 @@ namespace MessagePredictor.ViewModel
             set
             {
                 if (SetProperty<string>(ref _toHighlight, value)) {
-                    Console.WriteLine("Updated ToHighlight to {0}", value);
+                    //Console.WriteLine("Updated ToHighlight to {0}", value);
                     OnHighlightTextChanged(new HighlightTextChangedEventArgs(_toHighlight));
                     MarkMessagesContainingWord(ToHighlight);
                     UpdateTooltipContent(ToHighlight);

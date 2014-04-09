@@ -25,7 +25,7 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userAdded;
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
-        private List<Feature> _priorFeatureSet; // Hold our feature set prior to any adjustments
+        //private List<Feature> _priorFeatureSet; // Hold our feature set prior to any adjustments
         private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
         private CollectionViewSource _collectionViewSourceGraph;
         private string _featureText; // The feature the user is currently typing in
@@ -37,6 +37,7 @@ namespace MessagePredictor.ViewModel
         private double _pixelsToWeight; // How many pixels to use to display each unit of feature weight (changes based on display size)
         private bool _featureImportanceAdjusted;
         private Logger _logger;
+        private AddFeatureDialog _addFeatureDialog;
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels, Logger logger)
             : base()
@@ -494,46 +495,49 @@ namespace MessagePredictor.ViewModel
             _logger.Writer.WriteStartElement("ShowAddFeatureDialog");
             _logger.logTime();
 
-            AddFeatureDialog dialog = new AddFeatureDialog();
-            dialog.Owner = App.Current.MainWindow;
-            AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels, _previousLabel);
-            if (!IsTextForSelectedFeature(_featureText)) {
-                vm.Word = _featureText;
-            }
-            vm.PropertyChanged += AddFeatureVM_PropertyChanged;
-            dialog.DataContext = vm;
-            bool? result = dialog.ShowDialog();
-            if (result == true) {
-                Console.WriteLine("add word: {0} with weight {1} to topic {2}", vm.Word, vm.SelectedWeight, vm.SelectedLabel);
-                _previousLabel = vm.SelectedLabel;
-                Feature f = new Feature(vm.Word.ToLower(), _labels[0], _labels[1], true);
-                f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
-                f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
-                if (vm.SelectedWeight == vm.Weights[0]) {
-                    if (vm.SelectedLabel == f.Topic1Importance.Label) {
-                        f.Topic1Importance.WeightType = FeatureImportance.Weight.High;
-                        f.Topic2Importance.UserPrior = .01;
-                    } else if (vm.SelectedLabel == f.Topic2Importance.Label) {
-                        f.Topic2Importance.WeightType = FeatureImportance.Weight.High;
-                        f.Topic1Importance.UserPrior = .01;
-                    }
-                } else if (vm.SelectedWeight == vm.Weights[1]) {
-                    if (vm.SelectedLabel == f.Topic1Importance.Label) {
-                        f.Topic1Importance.WeightType = FeatureImportance.Weight.Medium;
-                        f.Topic2Importance.UserPrior = .01;
-                    } else if (vm.SelectedLabel == f.Topic2Importance.Label) {
-                        f.Topic2Importance.WeightType = FeatureImportance.Weight.Medium;
-                        f.Topic1Importance.UserPrior = .01;
-                    }
+            if (_addFeatureDialog == null) {
+                _addFeatureDialog = new AddFeatureDialog();
+                _addFeatureDialog.Closed += _addFeatureDialog_Closed;
+                _addFeatureDialog.Owner = App.Current.MainWindow;
+                AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels, _previousLabel);
+                if (!IsTextForSelectedFeature(_featureText)) {
+                    vm.Word = _featureText;
                 }
-                AddUserFeature(f);
+                vm.PropertyChanged += AddFeatureVM_PropertyChanged;
+                vm.AddFeature += AddFeatureVM_AddFeature;
+                _addFeatureDialog.DataContext = vm;
+                //bool? result = dialog.ShowDialog();
+                _addFeatureDialog.Show();
+            } else {
+                if (_addFeatureDialog.WindowState == System.Windows.WindowState.Minimized) {
+                    _addFeatureDialog.WindowState = System.Windows.WindowState.Normal; // restore a minimized window
+                } else {
+                    _addFeatureDialog.Activate(); // bring the window to the top of the desktop
+                }
             }
+
+            _logger.logEndElement();
+        }
+
+        void _addFeatureDialog_Closed(object sender, EventArgs e)
+        {
+            _addFeatureDialog = null;
+            _logger.Writer.WriteStartElement("CloseAddFeatureDialog");
+            _logger.logTime();
+            _logger.logEndElement();
 
             // Let anyone watching know that the user has closed the dialog, so _featureText is now empty.
             _featureText = "";
             OnFeatureTextEdited(new FeatureTextEditedEventArgs(_featureText));
+        }
 
-            _logger.logEndElement();
+        private void AddFeatureVM_AddFeature(object sender, AddFeatureDialogViewModel.AddFeatureEventArgs e)
+        {
+            _previousLabel = e.Label;
+            Feature f = e.Feature;
+            f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
+            f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
+            AddUserFeature(f);
         }
 
         private void AddFeatureVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)

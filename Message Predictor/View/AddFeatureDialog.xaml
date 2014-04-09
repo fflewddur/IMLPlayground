@@ -7,7 +7,6 @@
         MinHeight="240" MinWidth="200" 
         ResizeMode="CanResizeWithGrip" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
-        WindowStyle="ToolWindow"
         Style="{StaticResource ResourceKey=windowStyle}"
         FocusManager.FocusedElement="{Binding ElementName=PhraseTextBox}">
     <Grid Margin="10">
@@ -66,8 +65,10 @@
         </ComboBox>
 
         <StackPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Margin="0 0 10 0" IsCancel="True" Style="{StaticResource ResourceKey=buttonStyle}">Cancel</Button>
-            <Button Click="Done_Click" IsDefault="True" IsEnabled="{Binding AddIsEnabled}" Content="Add" Style="{StaticResource ResourceKey=buttonStyle}"/>
+            <Button Margin="0 0 10 0" IsCancel="True" Style="{StaticResource ResourceKey=buttonStyle}"
+                    Click="Cancel_Click">Cancel</Button>
+            <Button Click="Add_Click" IsDefault="True" IsEnabled="{Binding AddIsEnabled}" 
+                    Content="Add" Style="{StaticResource ResourceKey=buttonStyle}"/>
         </StackPanel>
     </Grid>
 </Window>

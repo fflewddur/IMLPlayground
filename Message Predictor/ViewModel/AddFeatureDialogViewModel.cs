@@ -1,5 +1,6 @@
 ﻿using GalaSoft.MvvmLight.Command;
 using LibIML;
+using LibIML.Features;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -77,5 +78,56 @@ namespace MessagePredictor.ViewModel
             get { return _addIsEnabled; }
             set { SetProperty<bool>(ref _addIsEnabled, value); }
         }
+
+        #region Events
+
+        public class AddFeatureEventArgs : EventArgs
+        {
+            public readonly Feature Feature;
+            public readonly Label Label;
+            public AddFeatureEventArgs(Feature feature, Label label)
+            {
+                Feature = feature;
+                Label = label;
+            }
+        }
+
+        public event EventHandler<AddFeatureEventArgs> AddFeature;
+
+        protected virtual void OnAddFeature(AddFeatureEventArgs e)
+        {
+            if (AddFeature != null)
+                AddFeature(this, e);
+        }
+
+        #endregion
+
+        #region Public methods
+
+        public void ProcessFeatureToAdd()
+        {
+            Feature f = new Feature(this.Word.ToLower(), this.Labels[0], this.Labels[1], true);
+            if (this.SelectedWeight == this.Weights[0]) {
+                if (this.SelectedLabel == f.Topic1Importance.Label) {
+                    f.Topic1Importance.WeightType = FeatureImportance.Weight.High;
+                    f.Topic2Importance.UserPrior = .01;
+                } else if (this.SelectedLabel == f.Topic2Importance.Label) {
+                    f.Topic2Importance.WeightType = FeatureImportance.Weight.High;
+                    f.Topic1Importance.UserPrior = .01;
+                }
+            } else if (this.SelectedWeight == this.Weights[1]) {
+                if (this.SelectedLabel == f.Topic1Importance.Label) {
+                    f.Topic1Importance.WeightType = FeatureImportance.Weight.Medium;
+                    f.Topic2Importance.UserPrior = .01;
+                } else if (this.SelectedLabel == f.Topic2Importance.Label) {
+                    f.Topic2Importance.WeightType = FeatureImportance.Weight.Medium;
+                    f.Topic1Importance.UserPrior = .01;
+                }
+            }
+
+            OnAddFeature(new AddFeatureEventArgs(f, this.SelectedLabel));
+        }
+
+        #endregion
     }
 }
