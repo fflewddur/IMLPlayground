@@ -15,7 +15,7 @@ using System.Xml;
 
 namespace MessagePredictor.ViewModel
 {
-    class FeatureSetViewModel : ViewModelBase
+    public class FeatureSetViewModel : ViewModelBase
     {
         public static readonly double PERCENT_HEIGHT_OF_MAX_BAR = 0.55;
 

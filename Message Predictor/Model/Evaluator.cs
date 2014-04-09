@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace MessagePredictor.Model
 {
-    class Evaluator : ViewModelBase
+    public class Evaluator : ViewModelBase
     {
         private Label _label;
         private int _correctPredictionCount;

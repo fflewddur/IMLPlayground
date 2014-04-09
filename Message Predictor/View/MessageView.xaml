@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
              xmlns:local="clr-namespace:MessagePredictor.View" 
-             mc:Ignorable="d" 
+             mc:Ignorable="d" DataContextChanged="UserControl_DataContextChanged"
              d:DesignHeight="600" d:DesignWidth="500">
     <Grid>
         <!--<TabControl>-->
@@ -27,9 +27,9 @@
                     <xctk:RichTextBox.ContextMenu>
                         <ContextMenu x:Name="FindMenu"/>
                     </xctk:RichTextBox.ContextMenu>
-                    <xctk:RichTextBox.TextFormatter>
+                    <!--<xctk:RichTextBox.TextFormatter>
                         <local:MyFormatter />
-                    </xctk:RichTextBox.TextFormatter>
+                    </xctk:RichTextBox.TextFormatter>-->
                 </xctk:RichTextBox>
                 <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="4" Style="{StaticResource ResourceKey=explanationContent}"/>
                 <local:PredictionExplanation Grid.Column="2" Margin="0 0 10 0" Style="{StaticResource ResourceKey=explanationContent}"/>

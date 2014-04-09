@@ -4,7 +4,7 @@ using System;
 
 namespace MessagePredictor.ViewModel
 {
-    class FolderViewModel : ViewModelBase
+    public class FolderViewModel : ViewModelBase
     {
         private Label _label;
         private int _messageCount;

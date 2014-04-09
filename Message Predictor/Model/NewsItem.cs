@@ -12,7 +12,7 @@ using System.ComponentModel;
 
 namespace MessagePredictor.Model
 {
-    class NewsItem : ViewModelBase, IInstance, IEditableObject
+    public class NewsItem : ViewModelBase, IInstance, IEditableObject
     {
         private readonly double MIN_CONFIDENCE_CHANGE = .01;
 

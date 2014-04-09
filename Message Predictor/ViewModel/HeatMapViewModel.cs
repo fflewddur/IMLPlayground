@@ -16,7 +16,7 @@ using System.Windows.Input;
 
 namespace MessagePredictor.ViewModel
 {
-    class HeatMapViewModel : ViewModelBase
+    public class HeatMapViewModel : ViewModelBase
     {
         private NewsCollection _messages;
         private CollectionViewSource _heatMapView;

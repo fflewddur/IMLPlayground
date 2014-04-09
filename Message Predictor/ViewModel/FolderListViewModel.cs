@@ -5,11 +5,11 @@ using System.Collections.Generic;
 
 namespace MessagePredictor.ViewModel
 {
-    class FolderListViewModel : ViewModelBase
+    public class FolderListViewModel : ViewModelBase
     {
-        List<FolderViewModel> _folders;
-        Label _unknownLabel;
-        FolderViewModel _selectedFolder;
+        private List<FolderViewModel> _folders;
+        private Label _unknownLabel;
+        private FolderViewModel _selectedFolder;
 
         public FolderListViewModel(IReadOnlyList<Evaluator> evaluators)
             : base()

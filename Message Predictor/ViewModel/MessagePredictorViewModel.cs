@@ -18,15 +18,15 @@ using System.Xml;
 
 namespace MessagePredictor
 {
-    class MessagePredictorViewModel : ViewModelBase
+    public class MessagePredictorViewModel : ViewModelBase
     {
         // Models
         private NewsCollection _messages;
-        List<Label> _labels;
-        Vocabulary _vocab;
-        MultinomialNaiveBayesFeedbackClassifier _classifier;
-        Logger _logger;
-        LinkedList<UserAction> _actions;
+        private List<Label> _labels;
+        private Vocabulary _vocab;
+        private MultinomialNaiveBayesFeedbackClassifier _classifier;
+        private Logger _logger;
+        private LinkedList<UserAction> _actions;
 
         // Viewmodels (and data for this viewmodel)
         private FolderListViewModel _folderListVM;

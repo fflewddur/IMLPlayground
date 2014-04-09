@@ -6,7 +6,7 @@ using System.Diagnostics;
 
 namespace MessagePredictor.ViewModel
 {
-    class EvaluatorViewModel : ViewModelBase
+    public class EvaluatorViewModel : ViewModelBase
     {
         private List<Evaluator> _evaluators;
         private int _recentlyChangedCount = 0;

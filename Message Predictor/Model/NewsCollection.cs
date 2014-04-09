@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MessagePredictor.Model
 {
-    class NewsCollection : ViewModelCollectionBase<NewsItem>
+    public class NewsCollection : ViewModelCollectionBase<NewsItem>
     {
         public NewsCollection()
             : base()

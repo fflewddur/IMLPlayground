@@ -13,9 +13,14 @@ namespace MessagePredictor.View
     /// </summary>
     public partial class MessageView : UserControl
     {
+        private MyFormatter _textFormatter;
+
         public MessageView()
         {
             InitializeComponent();
+
+            _textFormatter = new MyFormatter();
+            RTF.TextFormatter = _textFormatter;
         }
 
         private void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
@@ -65,10 +70,26 @@ namespace MessagePredictor.View
                 PredictionExplanationCol.Width = GridLength.Auto;
             }
         }
+
+        private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            _textFormatter.SetVM(vm);
+        }
     }
 
     public class MyFormatter : ITextFormatter
     {
+        private MessagePredictorViewModel _vm;
+
+        public MyFormatter()
+        {
+
+        }
+
+        public void SetVM(MessagePredictorViewModel vm) {
+            _vm = vm;
+        }
 
         public string GetText(System.Windows.Documents.FlowDocument document)
         {
@@ -78,7 +99,7 @@ namespace MessagePredictor.View
         public void SetText(System.Windows.Documents.FlowDocument document, string text)
         {
             document.Blocks.Clear();
-
+            
             if (string.IsNullOrWhiteSpace(text))
                 return;
 
@@ -104,15 +125,21 @@ namespace MessagePredictor.View
                     } else if (element.Name == "feature") {
                         if (line.Name == "subject") {
                             Bold b = new Bold(new Run(element.Value.ToString()));
-                            b.Background = SystemColors.ActiveCaptionBrush;
+                            if (_vm.ShowExplanations) {
+                                b.Background = SystemColors.ActiveCaptionBrush;
+                            }
                             p.Inlines.Add(b);
                         } else if (line.Name == "sender") {
                             Italic em = new Italic(new Run(element.Value.ToString()));
-                            em.Background = SystemColors.ActiveCaptionBrush;
+                            if (_vm.ShowExplanations) {
+                                em.Background = SystemColors.ActiveCaptionBrush;
+                            }
                             p.Inlines.Add(em);
                         } else {
                             Run r = new Run(element.Value.ToString());
-                            r.Background = SystemColors.ActiveCaptionBrush;
+                            if (_vm.ShowExplanations) {
+                                r.Background = SystemColors.ActiveCaptionBrush;
+                            }
                             p.Inlines.Add(r);
                         }
                     } else if (element.Name == "highlightedFeature") {

@@ -10,7 +10,7 @@ namespace MessagePredictor.ViewModel
     /// <summary>
     /// Handle the display of the currently-selected message
     /// </summary>
-    class MessageViewModel : ViewModelBase
+    public class MessageViewModel : ViewModelBase
     {
         private NewsItem _message;
 

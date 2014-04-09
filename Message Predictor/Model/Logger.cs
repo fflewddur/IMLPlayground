@@ -9,7 +9,7 @@ using System.Xml;
 
 namespace MessagePredictor.Model
 {
-    class Logger
+    public class Logger
     {
         XmlWriter _writer;
 
