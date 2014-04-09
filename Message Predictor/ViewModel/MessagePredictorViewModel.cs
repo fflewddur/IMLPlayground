@@ -198,7 +198,10 @@ namespace MessagePredictor
         public List<string> TextToHighlight
         {
             get { return _textToHighlight; }
-            private set { SetProperty<List<string>>(ref _textToHighlight, value); }
+            private set
+            {
+                SetProperty<List<string>>(ref _textToHighlight, value);
+            }
         }
 
         public MessageViewModel MessageVM

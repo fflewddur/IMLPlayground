@@ -61,6 +61,7 @@ namespace MessagePredictor.ViewModel
                     if (CurrentMessage != null) {
                         CurrentMessage.HighlightWithWord(ToHighlight);
                     }
+                    CommandManager.InvalidateRequerySuggested();
                 }
             }
         }
