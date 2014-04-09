@@ -99,7 +99,6 @@
         <Style.Triggers>
             <DataTrigger Binding="{Binding DataContext.ShowExplanations, RelativeSource={RelativeSource AncestorType=local:MessagePredictorWindow}}" Value="False">
                 <Setter Property="Visibility" Value="Collapsed"/>
-                <Setter Property="Background" Value="Blue"/>
             </DataTrigger>
         </Style.Triggers>
     </Style>
@@ -116,6 +115,7 @@
                 <MultiDataTrigger.Conditions>
                     <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="False"/>
                     <Condition Binding="{Binding RecentlyChanged}" Value="True"/>
+                    <Condition Binding="{Binding DataContext.ShowExplanations, RelativeSource={RelativeSource AncestorType=local:MessagePredictorWindow}}" Value="True"/>
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="LightSalmon" />
                 <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='Had been {0}', Converter={StaticResource ResourceKey=convStringFormat}}"/>
@@ -301,7 +301,8 @@
                             </TextBlock.Text>
                         </TextBlock>
                         <local:DirectionArrow Grid.Column="1" Direction="{Binding Evaluator.CorrectPredictionDirection}" 
-                                              UnitOfMeasure="Correct predictions" Difference="{Binding Evaluator.CorrectPredictionDifference}"/>
+                                              UnitOfMeasure="Correct predictions" Difference="{Binding Evaluator.CorrectPredictionDifference}"
+                                              Style="{StaticResource ResourceKey=explanationContent}"/>
                     </Grid>
                     <TextBlock Grid.Row="2" Text="correct predictions" 
                            Style="{StaticResource folderDetails}"/>
