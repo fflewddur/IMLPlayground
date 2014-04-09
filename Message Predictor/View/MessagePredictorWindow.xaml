@@ -45,7 +45,7 @@
                     
                     <!-- Word overview -->
                     <!--<Label Grid.Row="4" Style="{StaticResource headerStyle1}">Words</Label>-->
-                    <local:MessageHeatMap Grid.Row="5" DataContext="{Binding HeatMapVM}" Style="{StaticResource ResourceKey=explanationContent}"/>
+                    <local:MessageHeatMap Grid.Row="5" DataContext="{Binding HeatMapVM}" Style="{StaticResource ResourceKey=explanationContent}" />
                 </Grid>
 
                 <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="true" Width="4" Background="White"/>

@@ -26,6 +26,26 @@ namespace MessagePredictor.View
         public MessageHeatMap()
         {
             InitializeComponent();
+
+            this.DataContextChanged += MessageHeatMap_DataContextChanged;
+        }
+
+        void MessageHeatMap_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            HeatMapViewModel vm = this.DataContext as HeatMapViewModel;
+            if (vm != null) {
+                vm.HighlightTextChanged += vm_HighlightTextChanged;
+            }
+        }
+
+        private void vm_HighlightTextChanged(object sender, HeatMapViewModel.HighlightTextChangedEventArgs e)
+        {
+            ScrollToTop();
+        }
+
+        private void ScrollToTop()
+        {
+            HeatMap.ScrollIntoView(HeatMap.Items[0]);
         }
     }
 }

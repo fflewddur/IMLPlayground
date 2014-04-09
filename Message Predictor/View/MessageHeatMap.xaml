@@ -19,7 +19,7 @@
         <!--Search for a word to see which messages it is in.-->
         <TextBlock Grid.Row="1" Name="NoContentMessage" Style="{StaticResource ResourceKey=heatMapNoContentStyle}"></TextBlock>
 
-        <ListView Grid.Row="1" Name="HeatMap" Style="{StaticResource ResourceKey=heatMapListViewStyle}"
+        <ListView Grid.Row="1" Name="HeatMap" Style="{StaticResource ResourceKey=heatMapListViewStyle}" 
                   SelectionMode="Single" ItemsSource="{Binding HeatMapView.View}" SelectedItem="{Binding CurrentMessage}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Visible" 
                   ItemsPanel="{StaticResource ResourceKey=heatMapPanel}" ItemTemplate="{StaticResource ResourceKey=heatMapItemTemplate}"

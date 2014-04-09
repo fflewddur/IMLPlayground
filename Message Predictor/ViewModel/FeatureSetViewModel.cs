@@ -612,8 +612,6 @@ namespace MessagePredictor.ViewModel
 
             Console.WriteLine("UpdateFeaturePriors");
 
-            // FIXME need to rework this for new feature code
-
             //// Get the sum of user heights for each feature
             double userHeightSumTopic1 = 0;
             double userHeightSumTopic2 = 0;
@@ -644,17 +642,17 @@ namespace MessagePredictor.ViewModel
             double desiredPriorSumTopic2 = Math.Round((userToSystemRatioTopic2 * systemFeatureCountSumTopic2), 3);
 
             //// Get the percentage of the total prior value that should assigned to each feature
-            Console.WriteLine("userHeightSum1: {0} systemHeightSum1: {1} userToSystemRatio1: {2} systemFeatureCountSum1: {3} desiredPriorSum1: {4}", 
-                userHeightSumTopic1, systemHeightSumTopic1, userToSystemRatioTopic1, systemFeatureCountSumTopic1, desiredPriorSumTopic1);
-            Console.WriteLine("userHeightSum2: {0} systemHeightSum2: {1} userToSystemRatio2: {2} systemFeatureCountSum2: {3} desiredPriorSum2: {4}",
-                userHeightSumTopic2, systemHeightSumTopic2, userToSystemRatioTopic2, systemFeatureCountSumTopic2, desiredPriorSumTopic2);
+            //Console.WriteLine("userHeightSum1: {0} systemHeightSum1: {1} userToSystemRatio1: {2} systemFeatureCountSum1: {3} desiredPriorSum1: {4}", 
+            //    userHeightSumTopic1, systemHeightSumTopic1, userToSystemRatioTopic1, systemFeatureCountSumTopic1, desiredPriorSumTopic1);
+            //Console.WriteLine("userHeightSum2: {0} systemHeightSum2: {1} userToSystemRatio2: {2} systemFeatureCountSum2: {3} desiredPriorSum2: {4}",
+            //    userHeightSumTopic2, systemHeightSumTopic2, userToSystemRatioTopic2, systemFeatureCountSumTopic2, desiredPriorSumTopic2);
             foreach (Feature f in _featureSet) {
-                Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic1Importance.UserPrior, f.Topic1Importance.Label);
+                //Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic1Importance.UserPrior, f.Topic1Importance.Label);
                 f.Topic1Importance.UserPrior = Math.Round(((f.Topic1Importance.UserHeight / userHeightSumTopic1) * desiredPriorSumTopic1), 2);
-                Console.WriteLine("new prior = {0}", f.Topic1Importance.UserPrior);
-                Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic2Importance.UserPrior, f.Topic2Importance.Label);
+                //Console.WriteLine("new prior = {0}", f.Topic1Importance.UserPrior);
+                //Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic2Importance.UserPrior, f.Topic2Importance.Label);
                 f.Topic2Importance.UserPrior = Math.Round(((f.Topic2Importance.UserHeight / userHeightSumTopic2) * desiredPriorSumTopic2), 2);
-                Console.WriteLine("new prior = {0}", f.Topic2Importance.UserPrior);
+                //Console.WriteLine("new prior = {0}", f.Topic2Importance.UserPrior);
             }
 
             _featurePriorsEditedTimer.Start();
