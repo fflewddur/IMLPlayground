@@ -42,7 +42,7 @@
             </DataGrid.CellStyle>
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="auto" SortDirection="Ascending" />
-                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="6*"/>
+                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="5*"/>
                 <DataGridTemplateColumn SortMemberPath="Prediction.Label" Width="1*" Header="{StaticResource ResourceKey=messageListTopicHeader}" 
                                         CellTemplate="{StaticResource ResourceKey=messageListTopicTemplate}" />
                 <DataGridTemplateColumn SortMemberPath="Prediction.Confidence" Width="1*" Header="{StaticResource ResourceKey=messageListConfHeader}"
