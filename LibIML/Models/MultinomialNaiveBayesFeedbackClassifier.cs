@@ -395,7 +395,7 @@ namespace LibIML
                 pClassGivenDoc[l] = (_pClass[l] * pDocGivenClass[l]) / pDoc; // For log likelihood, with normalization
                 prediction.EvidencePerClass[l].NumClasses = Labels.Count();
                 prediction.EvidencePerClass[l].PrDoc = pDoc;
-                prediction.EvidencePerClass[l].PrDocGivenClass = pDocGivenClassLog[l];
+                prediction.EvidencePerClass[l].PrDocGivenClass = pDocGivenClass[l];
                 //prediction.EvidencePerClass[l].UpdateHeightsForEvidenceExplanation();
                 //Console.WriteLine("label={3}, pDocGivenClass={0:N3}, log(pDocGivenClass)={1:N3}, pDoc={2:N3}, pClass={4:N2}, conf={5:N3}, eFeatureWeight={6:N3}", pDocGivenClass[l], Math.Log(pDocGivenClass[l]), pDoc, l, _pClass[l],
                 //    pClassGivenDoc[l], prediction.EvidencePerClass[l].PrDocGivenClass);
