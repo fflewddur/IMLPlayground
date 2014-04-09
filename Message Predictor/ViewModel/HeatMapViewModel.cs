@@ -18,6 +18,7 @@ namespace MessagePredictor.ViewModel
 {
     public class HeatMapViewModel : ViewModelBase
     {
+        private readonly MessagePredictorViewModel _messagePredictorVM;
         private NewsCollection _messages;
         private CollectionViewSource _heatMapView;
         private string _toHighlight;
@@ -27,9 +28,10 @@ namespace MessagePredictor.ViewModel
         private Label _unknownLabel;
         private Logger _logger;
 
-        public HeatMapViewModel(NewsCollection messages, Label unknownLabel, Logger logger)
+        public HeatMapViewModel(MessagePredictorViewModel vm, NewsCollection messages, Label unknownLabel, Logger logger)
             : base()
         {
+            _messagePredictorVM = vm;
             _logger = logger;
             _messages = messages;
             _heatMapView = BuildCollectionViewSourceForCollection(_messages);
@@ -82,7 +84,7 @@ namespace MessagePredictor.ViewModel
                             _logger.Writer.WriteAttributeString("predictedTopic", CurrentMessage.Prediction.Label.ToString());
                             _logger.Writer.WriteAttributeString("isHighlighted", CurrentMessage.IsHighlighted.ToString());
                             _logger.logTime();
-                            _messageWindow = new MessageWindow();
+                            _messageWindow = new MessageWindow(this._messagePredictorVM);
                             _messageWindow.Closed += _messageWindow_Closed;
                             _messageWindow.DataContext = this;
                             _messageWindow.Owner = App.Current.MainWindow;

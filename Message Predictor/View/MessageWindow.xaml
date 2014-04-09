@@ -10,10 +10,8 @@
         Height="700" Width="700">
     <Grid>
         <xctk:RichTextBox Text="{Binding CurrentMessage.DocumentReadOnly}" IsReadOnly="True" BorderThickness="0" Padding="10"
-                          ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto">
-            <xctk:RichTextBox.TextFormatter>
-                <local:MyFormatter />
-            </xctk:RichTextBox.TextFormatter>
+                          ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                          Name="RTB">
         </xctk:RichTextBox>
     </Grid>
 </Window>

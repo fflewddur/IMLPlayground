@@ -20,9 +20,15 @@ namespace MessagePredictor.View
     /// </summary>
     public partial class MessageWindow : Window
     {
-        public MessageWindow()
+        MyFormatter _textFormatter;
+
+        public MessageWindow(MessagePredictorViewModel vm)
         {
             InitializeComponent();
+
+            //MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            _textFormatter = new MyFormatter(vm);
+            RTB.TextFormatter = _textFormatter;
         }
     }
 }

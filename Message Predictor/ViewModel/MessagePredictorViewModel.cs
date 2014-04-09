@@ -112,7 +112,7 @@ namespace MessagePredictor
             _featureSetVM.FeatureTextEdited += _featureSetVM_FeatureTextEdited;
             _featureSetVM.FeaturePriorEdited += _featureSetVM_FeaturePriorsEdited;
 
-            _heatMapVM = new HeatMapViewModel(_messages, _folderListVM.UnknownLabel, _logger);
+            _heatMapVM = new HeatMapViewModel(this, _messages, _folderListVM.UnknownLabel, _logger);
             _heatMapVM.HighlightTextChanged += _heatMapVM_HighlightTextChanged;
 
             _messageListViewSource = new CollectionViewSource();

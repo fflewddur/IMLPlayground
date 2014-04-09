@@ -19,7 +19,8 @@ namespace MessagePredictor.View
         {
             InitializeComponent();
 
-            _textFormatter = new MyFormatter();
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            _textFormatter = new MyFormatter(vm);
             RTF.TextFormatter = _textFormatter;
         }
 
@@ -82,9 +83,9 @@ namespace MessagePredictor.View
     {
         private MessagePredictorViewModel _vm;
 
-        public MyFormatter()
+        public MyFormatter(MessagePredictorViewModel vm)
         {
-
+            _vm = vm;
         }
 
         public void SetVM(MessagePredictorViewModel vm) {
