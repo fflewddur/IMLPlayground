@@ -292,13 +292,13 @@ namespace LibIML
         /// <returns>A prediction for this instance.</returns>
         public Prediction PredictInstance(IInstance instance)
         {
-            Console.WriteLine("PredictInstance {0}", instance.Id);
+            //Console.WriteLine("PredictInstance {0}", instance.Id);
             Label labelWinner = null;
             Label labelLoser = null;
             Prediction prediction = new Prediction();
 
             // Compute Pr(d|c)
-            Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
+            Dictionary<Label, double> pDocGivenClassLog = new Dictionary<Label, double>();
             int importantWordsUnique = 0; // how many of the features show up in the message?
             int importantWordsTotal = 0; // how many instances of features show up in the message?
             int trainingSetSize = 0;
@@ -340,7 +340,7 @@ namespace LibIML
                         
                         double userWeight, sysWeight;
                         string word = _vocab.GetWord(pair.Key);
-                        Console.WriteLine("feature {0} probability = {1}, count={2}, log(prob)={3}", word, pWord, pair.Value, Math.Log(weight));
+                        //Console.WriteLine("feature {0} probability = {1}, count={2}, log(prob)={3}", word, pWord, pair.Value, Math.Log(weight));
                         TryGetFeatureUserWeight(pair.Key, l, out userWeight);
                         TryGetFeatureSystemWeight(pair.Key, l, out sysWeight);
                         Feature f = new Feature(word, Labels.ElementAt(0), Labels.ElementAt(1));
@@ -363,7 +363,7 @@ namespace LibIML
                     }
                 }
                 
-                pDocGivenClass[l] = Math.Exp(prob);
+                pDocGivenClassLog[l] = prob;
                 //evidence.FeatureWeight = pDocGivenClass[l];
                 prediction.EvidencePerClass[l] = evidence;
             }
@@ -372,9 +372,19 @@ namespace LibIML
             prediction.ImportantWordTotal = importantWordsTotal / Labels.Count();
             prediction.ImportantWordUniques = importantWordsUnique / Labels.Count();
 
-            // Compute Pr(d)
-            double pDoc = 0;
+            // Get the largest pr(doc | class)
+            double largestPDocGivenClassLog = double.MinValue;
             foreach (Label l in Labels) {
+                if (pDocGivenClassLog[l] > largestPDocGivenClassLog) {
+                    largestPDocGivenClassLog = pDocGivenClassLog[l];
+                }
+            }
+
+            // Compute Pr(d) and compute pDocGivenClass
+            double pDoc = 0;
+            Dictionary<Label, double> pDocGivenClass = new Dictionary<Label, double>();
+            foreach (Label l in Labels) {
+                pDocGivenClass[l] =  Math.Exp(pDocGivenClassLog[l] - largestPDocGivenClassLog);
                 pDoc += _pClass[l] * pDocGivenClass[l];
             }
             //Console.WriteLine("pDoc: {0}", pDoc);
@@ -385,7 +395,7 @@ namespace LibIML
                 pClassGivenDoc[l] = (_pClass[l] * pDocGivenClass[l]) / pDoc; // For log likelihood, with normalization
                 prediction.EvidencePerClass[l].NumClasses = Labels.Count();
                 prediction.EvidencePerClass[l].PrDoc = pDoc;
-                prediction.EvidencePerClass[l].PrDocGivenClass = pDocGivenClass[l];
+                prediction.EvidencePerClass[l].PrDocGivenClass = pDocGivenClassLog[l];
                 //prediction.EvidencePerClass[l].UpdateHeightsForEvidenceExplanation();
                 //Console.WriteLine("label={3}, pDocGivenClass={0:N3}, log(pDocGivenClass)={1:N3}, pDoc={2:N3}, pClass={4:N2}, conf={5:N3}, eFeatureWeight={6:N3}", pDocGivenClass[l], Math.Log(pDocGivenClass[l]), pDoc, l, _pClass[l],
                 //    pClassGivenDoc[l], prediction.EvidencePerClass[l].PrDocGivenClass);
