@@ -157,6 +157,7 @@ namespace MessagePredictor.View
                 _currentFeature = null;
                 _currentFeatureAdjusted = false;
                 _currentAction = null;
+                vm.ApplyFeatureAdjustments.Execute(null);
                 Mouse.OverrideCursor = null;
             }
         }
