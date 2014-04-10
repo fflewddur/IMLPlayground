@@ -25,6 +25,7 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userAdded;
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
+        private LinkedList<UserAction> _userActions;
         //private List<Feature> _priorFeatureSet; // Hold our feature set prior to any adjustments
         //private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
         private CollectionViewSource _collectionViewSourceGraph;
@@ -49,6 +50,7 @@ namespace MessagePredictor.ViewModel
             _featureSet = new ObservableCollection<Feature>();
             _userAdded = new List<Feature>();
             _userRemoved = new List<Feature>();
+            _userActions = new LinkedList<UserAction>();
             //_collectionViewSourcesOverview = BuildCollectionViewSourcesOverview(labels);
             _collectionViewSourceGraph = BuildCollectionViewSourceGraph();
             _featureText = null;
@@ -210,6 +212,11 @@ namespace MessagePredictor.ViewModel
         #endregion
 
         #region Public methods
+
+        public void AddUserAction(UserAction action)
+        {
+            _userActions.AddFirst(action);
+        }
 
         /// <summary>
         /// If there is a feature that matches 'word', select it.

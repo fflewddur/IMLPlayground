@@ -1,5 +1,6 @@
 ﻿using LibIML;
 using LibIML.Features;
+using MessagePredictor.Model;
 using MessagePredictor.ViewModel;
 using System;
 using System.Collections;
@@ -25,8 +26,10 @@ namespace MessagePredictor.View
     public partial class FeatureGraphBinary : UserControl
     {
         private double _mouseOrigY;
+        private bool _currentFeatureAdjusted;
         private Feature _currentFeature;
         private FeatureImportance _currentFeatureImportance;
+        private UserAction _currentAction;
 
         #region Dependency properties
 
@@ -100,17 +103,13 @@ namespace MessagePredictor.View
 
         private void Rectangle_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _mouseOrigY = e.GetPosition(this).Y;
             FrameworkElement fe = sender as FrameworkElement;
             FrameworkElement parent = fe.Parent as FrameworkElement;
             FrameworkElement grandParent = parent.Parent as FrameworkElement;
             FeatureImportance fi = fe.DataContext as FeatureImportance;
             Feature f = grandParent.DataContext as Feature;
-            _currentFeatureImportance = fi;
-            _currentFeature = f;
-            Mouse.OverrideCursor = Cursors.SizeNS;
-            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
-            vm.LogFeatureAdjustBegin(f, fi);
+            
+            StartAdjustingFeature(e.GetPosition(this).Y, f, fi);
         }
 
         private void Rectangle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -132,14 +131,32 @@ namespace MessagePredictor.View
             StopAdjustingFeature();
         }
 
+        private void StartAdjustingFeature(double mousePositionY, Feature f, FeatureImportance fi)
+        {
+            _mouseOrigY = mousePositionY;
+            _currentFeatureAdjusted = false;
+            _currentFeatureImportance = fi;
+            _currentFeature = f;
+            _currentAction = new UserAction(UserAction.ActionType.AdjustFeaturePrior, f, fi.Label);
+            Mouse.OverrideCursor = Cursors.SizeNS;
+            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+            vm.LogFeatureAdjustBegin(f, fi);
+        }
+
         private void StopAdjustingFeature()
         {
             if (_currentFeatureImportance != null) {
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 vm.LogFeatureAdjustEnd(_currentFeature, _currentFeatureImportance);
+                if (_currentFeatureAdjusted) {
+                    // If the feature was adjusted, add it to our list of undo-able actions
+                    vm.AddUserAction(_currentAction);
+                }
                 _mouseOrigY = -1;
                 _currentFeatureImportance = null;
                 _currentFeature = null;
+                _currentFeatureAdjusted = false;
+                _currentAction = null;
                 Mouse.OverrideCursor = null;
             }
         }
@@ -150,6 +167,9 @@ namespace MessagePredictor.View
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
                 double y = e.GetPosition(this).Y;
                 double delta = _mouseOrigY - y;
+                if (delta != 0) {
+                    _currentFeatureAdjusted = true;
+                }
                 vm.AdjustUserFeatureHeight(_currentFeatureImportance, delta);
                 _mouseOrigY = y;
 

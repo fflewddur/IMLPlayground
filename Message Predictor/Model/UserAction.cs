@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace MessagePredictor.Model
 {
-    class UserAction
+    public class UserAction
     {
         public enum ActionType
         {
