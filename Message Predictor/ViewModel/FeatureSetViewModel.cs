@@ -39,6 +39,7 @@ namespace MessagePredictor.ViewModel
         private bool _featureImportanceAdjusted;
         private Logger _logger;
         private AddFeatureDialog _addFeatureDialog;
+        private string _undoButtonText;
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels, Logger logger)
             : base()
@@ -58,6 +59,7 @@ namespace MessagePredictor.ViewModel
             _featurePriorsEditedTimer = new DispatcherTimer();
             _featureGraphHeightChangedTimer = new DispatcherTimer();
             _featureImportanceAdjusted = false;
+            _undoButtonText = "Undo";
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
             AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
@@ -125,6 +127,12 @@ namespace MessagePredictor.ViewModel
                     _featureGraphHeightChangedTimer.Start();
                 }
             }
+        }
+
+        public string UndoButtonText
+        {
+            get { return _undoButtonText; }
+            private set { SetProperty<string>(ref _undoButtonText, value); }
         }
 
         #endregion
@@ -216,6 +224,7 @@ namespace MessagePredictor.ViewModel
         public void AddUserAction(UserAction action)
         {
             _userActions.AddFirst(action);
+            UpdateUndoButtonText();
         }
 
         /// <summary>
@@ -336,6 +345,30 @@ namespace MessagePredictor.ViewModel
         #endregion
 
         #region Private methods
+
+        private void UpdateUndoButtonText()
+        {
+            string desc = "Undo"; // Default text
+            
+            // Do we have any undo-able actions?
+            UserAction action;
+            if (_userActions.Count > 0) {
+                action = _userActions.First.Value;
+                switch (action.Type) {
+                    case UserAction.ActionType.AdjustFeaturePrior:
+                        desc = "Undo importance adjustment";
+                        break;
+                    case UserAction.ActionType.AddFeature:
+                        desc = "Undo add word";
+                        break;
+                    case UserAction.ActionType.RemoveFeature:
+                        desc = "Undo remove word";
+                        break;
+                }
+            }
+            
+            UndoButtonText = desc;
+        }
 
         private void FeatureSet_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
@@ -674,6 +707,7 @@ namespace MessagePredictor.ViewModel
         {
             UserAction action = _userActions.First.Value;
             _userActions.RemoveFirst();
+            UpdateUndoButtonText();
             Console.WriteLine("Undo: {0}", action.Desc);
             switch (action.Type) {
                 case UserAction.ActionType.AdjustFeaturePrior:
