@@ -108,12 +108,12 @@
                                     </Style.Triggers>
                                 </Style>
                             </Grid.Style>
-                            <Grid.ContextMenu>
+                            <!--<Grid.ContextMenu>
                                 <ContextMenu>
-                                    <!--<MenuItem HeaderStringFormat="Find '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Find_Click"/>-->
+                                    --><!--<MenuItem HeaderStringFormat="Find '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Find_Click"/>--><!--
                                     <MenuItem HeaderStringFormat="Remove '{0}'" Header="{Binding Characters, Mode=OneWay}" Click="Remove_Click"/>
                                 </ContextMenu>
-                            </Grid.ContextMenu>
+                            </Grid.ContextMenu>-->
                         </Grid>
 
                     </DataTemplate>
@@ -128,6 +128,13 @@
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0" VerticalAlignment="Center" Margin="5" Command="{Binding AddFeature}" CommandParameter="{Binding ElementName=root,Path=Label}" Style="{StaticResource ResourceKey=buttonStyle}">Add a new word or phrase</Button>
                 <!--<Button Grid.Row="1" VerticalAlignment="Center" Margin="5" Command="{Binding ApplyFeatureAdjustments}" Style="{StaticResource ResourceKey=buttonStyle}">Apply importance changes</Button>-->
+                <Button Grid.Row="1" VerticalAlignment="Center" Margin="5" Command="{Binding FeatureRemove}" CommandParameter="{Binding SelectedFeature}"
+                        Style="{StaticResource ResourceKey=buttonStyle}" Content="Remove word"
+                        >
+                    <Button.ToolTip>
+                        <Label Content="{Binding SelectedFeature.Characters}" ContentStringFormat="Remove '{0}' from list of important words"/>
+                    </Button.ToolTip>
+                </Button>
                 <Button Grid.Row="2" VerticalAlignment="Center" Margin="5" Command="{Binding UndoUserAction}" 
                         Style="{StaticResource ResourceKey=buttonStyle}" Content="{Binding UndoButtonText}"
                         ToolTip="{Binding UndoButtonTooltip}"/>

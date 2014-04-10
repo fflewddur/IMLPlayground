@@ -30,6 +30,7 @@ namespace MessagePredictor.ViewModel
         //private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
         private CollectionViewSource _collectionViewSourceGraph;
         private string _featureText; // The feature the user is currently typing in
+        private Feature _selectedFeature; // The highlighted feature in the UI
         private Label _previousLabel; // The last label the user added a feature for
         private DispatcherTimer _featureTextEditedTimer;
         private DispatcherTimer _featurePriorsEditedTimer;
@@ -65,7 +66,7 @@ namespace MessagePredictor.ViewModel
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
             AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
             AddFeature = new RelayCommand(PerformAddFeature);
-            FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature);
+            FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature, CanPerformRemoveFeature);
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
             FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
             ApplyFeatureAdjustments = new RelayCommand(PerformApplyFeatureAdjustments, CanPerformApplyFeatureAdjustments);
@@ -140,6 +141,12 @@ namespace MessagePredictor.ViewModel
         {
             get { return _undoButtonTooltip; }
             private set { SetProperty<string>(ref _undoButtonTooltip, value); }
+        }
+
+        public Feature SelectedFeature
+        {
+            get { return _selectedFeature; }
+            set { SetProperty<Feature>(ref _selectedFeature, value); }
         }
 
         #endregion
@@ -241,12 +248,18 @@ namespace MessagePredictor.ViewModel
         public void SelectFeature(string word)
         {
             Feature toFind = new Feature(word);
+            bool found = false;
             foreach (Feature f in _featureSet) {
                 if (f.Equals(toFind)) {
                     f.IsSelected = true;
+                    found = true;
+                    SelectedFeature = f;
                 } else {
                     f.IsSelected = false;
                 }
+            }
+            if (!found) {
+                SelectedFeature = null;
             }
             _featureText = word;
         }
@@ -632,6 +645,11 @@ namespace MessagePredictor.ViewModel
             _featureTextEditedTimer.Stop();
             _featureText = text;
             _featureTextEditedTimer.Start();
+        }
+
+        private bool CanPerformRemoveFeature(Feature feature)
+        {
+            return (feature != null);
         }
 
         private void PerformRemoveFeature(Feature feature)

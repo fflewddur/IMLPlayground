@@ -123,6 +123,7 @@ namespace MessagePredictor.View
             if (vm != null && fe != null) {
                 Feature f = fe.DataContext as Feature;
                 vm.HighlightFeature.Execute(f.Characters);
+                vm.SelectedFeature = f;
             }
         }
 
