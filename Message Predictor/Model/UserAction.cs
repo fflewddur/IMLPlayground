@@ -68,13 +68,13 @@ namespace MessagePredictor.Model
 
             switch(type) {
                 case ActionType.AdjustFeaturePrior:
-                    desc = string.Format("Undo adjust importance of {0} to {1}", feature.Characters, label);
+                    desc = string.Format("Undo adjust importance of '{0}' to {1}", feature.Characters, label);
                     break;
                 case ActionType.AddFeature:
-                    desc = string.Format("Undo add {0} to list of important words", feature.Characters);
+                    desc = string.Format("Undo add '{0}' to list of important words", feature.Characters);
                     break;
                 case ActionType.RemoveFeature:
-                    desc = string.Format("Undo remove {0} from list of important words", feature.Characters);
+                    desc = string.Format("Undo remove '{0}' from list of important words", feature.Characters);
                     break;
                 default:
                     desc = "Unknown action";

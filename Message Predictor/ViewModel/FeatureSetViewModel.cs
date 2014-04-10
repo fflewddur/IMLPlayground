@@ -40,6 +40,7 @@ namespace MessagePredictor.ViewModel
         private Logger _logger;
         private AddFeatureDialog _addFeatureDialog;
         private string _undoButtonText;
+        private string _undoButtonTooltip;
 
         public FeatureSetViewModel(IClassifier classifier, Vocabulary vocab, IReadOnlyList<Label> labels, Logger logger)
             : base()
@@ -133,6 +134,12 @@ namespace MessagePredictor.ViewModel
         {
             get { return _undoButtonText; }
             private set { SetProperty<string>(ref _undoButtonText, value); }
+        }
+
+        public string UndoButtonTooltip
+        {
+            get { return _undoButtonTooltip; }
+            private set { SetProperty<string>(ref _undoButtonTooltip, value); }
         }
 
         #endregion
@@ -359,7 +366,8 @@ namespace MessagePredictor.ViewModel
         private void UpdateUndoButtonText()
         {
             string desc = "Undo"; // Default text
-            
+            string tooltip = null;
+
             // Do we have any undo-able actions?
             UserAction action;
             if (_userActions.Count > 0) {
@@ -367,17 +375,21 @@ namespace MessagePredictor.ViewModel
                 switch (action.Type) {
                     case UserAction.ActionType.AdjustFeaturePrior:
                         desc = "Undo importance adjustment";
+                        tooltip = action.Desc;
                         break;
                     case UserAction.ActionType.AddFeature:
                         desc = "Undo add word";
+                        tooltip = action.Desc;
                         break;
                     case UserAction.ActionType.RemoveFeature:
                         desc = "Undo remove word";
+                        tooltip = action.Desc;
                         break;
                 }
             }
             
             UndoButtonText = desc;
+            UndoButtonTooltip = tooltip;
         }
 
         private void FeatureSet_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
