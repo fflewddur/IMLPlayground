@@ -26,7 +26,7 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
         //private List<Feature> _priorFeatureSet; // Hold our feature set prior to any adjustments
-        private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
+        //private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
         private CollectionViewSource _collectionViewSourceGraph;
         private string _featureText; // The feature the user is currently typing in
         private Label _previousLabel; // The last label the user added a feature for
@@ -49,7 +49,7 @@ namespace MessagePredictor.ViewModel
             _featureSet = new ObservableCollection<Feature>();
             _userAdded = new List<Feature>();
             _userRemoved = new List<Feature>();
-            _collectionViewSourcesOverview = BuildCollectionViewSourcesOverview(labels);
+            //_collectionViewSourcesOverview = BuildCollectionViewSourcesOverview(labels);
             _collectionViewSourceGraph = BuildCollectionViewSourceGraph();
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
@@ -100,11 +100,11 @@ namespace MessagePredictor.ViewModel
             set { SetProperty<ObservableCollection<Feature>>(ref _featureSet, value); }
         }
 
-        public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesOverview
-        {
-            get { return _collectionViewSourcesOverview; }
-            private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesOverview, value); }
-        }
+        //public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesOverview
+        //{
+        //    get { return _collectionViewSourcesOverview; }
+        //    private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesOverview, value); }
+        //}
 
         public CollectionViewSource FeatureSetViewSourceGraph
         {
@@ -473,9 +473,9 @@ namespace MessagePredictor.ViewModel
 
             UpdateFeatureHeights();
             // Refresh our source views
-            foreach (CollectionViewSource cvs in _collectionViewSourcesOverview) {
-                cvs.View.Refresh();
-            }
+            //foreach (CollectionViewSource cvs in _collectionViewSourcesOverview) {
+            //    cvs.View.Refresh(); // FIXME too slow
+            //}
 
             _featureImportanceAdjusted = false;
         }

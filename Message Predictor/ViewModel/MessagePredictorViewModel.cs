@@ -6,6 +6,7 @@ using MessagePredictor.View;
 using MessagePredictor.ViewModel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -316,11 +317,16 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("wrongFolder", "False");
 
             item.UserLabel = label;
+            
+            // Let the view know we updated this data
+            IEditableCollectionView view = _messageListViewSource.View as IEditableCollectionView;
+            view.EditItem(item);
+            view.CommitEdit();
 
             // Try to select the next message. If there is no next message, select the previous message.
-            if (!_messageListViewSource.View.MoveCurrentToNext()) {
-                _messageListViewSource.View.MoveCurrentToPrevious();
-            }
+            //if (!_messageListViewSource.View.MoveCurrentToNext()) {
+            //    _messageListViewSource.View.MoveCurrentToPrevious();
+            //}
 
             if (label == null) {
                 // If we moved something to Unknown, remove it from our vocabulary
@@ -338,7 +344,7 @@ namespace MessagePredictor
             } else {
                 // Still need to update our view
                 _folderListVM.UpdateFolderCounts(_messages);
-                _messageListViewSource.View.Refresh();
+                //_messageListViewSource.View.Refresh(); // FIXME super slow
             }
 
             Mouse.OverrideCursor = null;
@@ -441,16 +447,33 @@ namespace MessagePredictor
         private void UpdatePredictions()
         {
             Mouse.OverrideCursor = Cursors.Wait;
-
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             if (_vocab.HasUpdatedTokens) {
                 UpdateVocab();
+                watch.Stop();
+                Console.WriteLine("Time to update vocab: {0}", watch.Elapsed);
+                watch.Restart();
             }
-
             TrainClassifier(_classifier, FilterToTrainingSet(_messages));
+            watch.Stop();
+            Console.WriteLine("Time to train classifier: {0}", watch.Elapsed);
+            watch.Restart();
             PredictMessages(_classifier, _messages);
+            watch.Stop();
+            Console.WriteLine("Time to predict messages: {0}", watch.Elapsed);
+            watch.Restart();
             _evaluatorVM.EvaluatePredictions(_messages);
+            watch.Stop();
+            Console.WriteLine("Time to evaluate predictions: {0}", watch.Elapsed);
+            watch.Restart();
             _folderListVM.UpdateFolderCounts(_messages);
-            _messageListViewSource.View.Refresh();
+            watch.Stop();
+            Console.WriteLine("Time to update folder counts: {0}", watch.Elapsed);
+            watch.Restart();
+            //_messageListViewSource.View.Refresh();
+            watch.Stop();
+            Console.WriteLine("Time to refresh view: {0}", watch.Elapsed);
 
             Mouse.OverrideCursor = null;
         }
