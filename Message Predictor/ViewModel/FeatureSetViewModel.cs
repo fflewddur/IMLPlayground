@@ -300,6 +300,11 @@ namespace MessagePredictor.ViewModel
             _logger.logFeature(feature);
             _logger.logEndElement();
 
+            // Allow the user to undo this action
+            UserAction action = new UserAction(UserAction.ActionType.AddFeature, feature, null);
+            _userActions.AddFirst(action);
+            UpdateUndoButtonText();
+
             // If the user previously removed this feature, clear it from the list of removed features
             _userRemoved.Remove(feature);
             // If the user already added this feature, overwrite the previous version
@@ -318,6 +323,11 @@ namespace MessagePredictor.ViewModel
             _logger.logTime();
             _logger.logFeature(feature);
             _logger.logEndElement();
+
+            // Allow the user to undo this action
+            UserAction action = new UserAction(UserAction.ActionType.RemoveFeature, feature, null);
+            _userActions.AddFirst(action);
+            UpdateUndoButtonText();
 
             // If the user previously added this feature manually, remove it from our list
             _userAdded.Remove(feature);
@@ -732,6 +742,22 @@ namespace MessagePredictor.ViewModel
                     // Let anyone watching know that the feature priors have changed
                     _featurePriorsEditedTimer.Stop();
                     _featurePriorsEditedTimer.Start();
+                    break;
+                case UserAction.ActionType.RemoveFeature:
+                    // Remove this feature from the list of removed features
+                    _userRemoved.Remove(action.Feature);
+                    _userAdded.Add(action.Feature);
+                    // Update the UI right away, even if we don't retrain
+                    FeatureSet.Add(action.Feature);
+                    OnFeatureAdded(new FeatureAddedEventArgs(action.Feature));
+                    break;
+                case UserAction.ActionType.AddFeature:
+                    // Remove this feature from the list of added features
+                    _userAdded.Remove(action.Feature);
+                    _userRemoved.Add(action.Feature);
+                    // Update the UI right away, even if we don't retrain
+                    FeatureSet.Remove(action.Feature);
+                    OnFeatureRemoved(new FeatureRemovedEventArgs(action.Feature.Characters));
                     break;
                 default:
                     Console.WriteLine("Error: Unknown user action '{0}'", action.Desc);
