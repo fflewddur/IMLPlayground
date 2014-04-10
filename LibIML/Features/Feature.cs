@@ -38,6 +38,29 @@ namespace LibIML.Features
             _userAdded = userAdded;
         }
 
+        /// <summary>
+        /// Create a copy of the given Feature.
+        /// </summary>
+        /// <param name="toCopy"></param>
+        public Feature(Feature toCopy)
+            : base()
+        {
+            Characters = toCopy.Characters;
+            if (toCopy.Topic1Importance != null) {
+                _topic1Importance = new FeatureImportance(toCopy.Topic1Importance);
+                _topic1Importance.PropertyChanged += topicImportanceChanged;
+            }
+            if (toCopy.Topic2Importance != null) {
+                _topic2Importance = new FeatureImportance(toCopy.Topic2Importance);
+                _topic2Importance.PropertyChanged += topicImportanceChanged;
+            }
+            UserAdded = toCopy.UserAdded;
+            PercentOfReason = toCopy.PercentOfReason;
+            MostImportantLabel = toCopy.MostImportantLabel;
+            TooltipText = toCopy.TooltipText;
+            IsSelected = toCopy.IsSelected;
+        }
+
         // We use this constructor for the FeatureGraphs
         //public Feature(string characters, Label label)
         //    : base()

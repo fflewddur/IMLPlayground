@@ -43,6 +43,20 @@ namespace LibIML.Features
             _systemWeight = 0;
         }
 
+        /// <summary>
+        /// Create a copy of the given FeatureImportance.
+        /// </summary>
+        /// <param name="toCopy"></param>
+        public FeatureImportance(FeatureImportance toCopy) : this(toCopy.Label)
+        {
+            _pixelsToWeight = toCopy.PixelsToWeight; // Don't re-calculate heights yet
+            WeightType = toCopy.WeightType;
+            UserPrior = toCopy.UserPrior;
+            UserWeight = toCopy.UserWeight;
+            SystemWeight = toCopy.SystemWeight;
+            Count = toCopy.Count;
+        }
+
         #region Properties
 
         public Label Label
