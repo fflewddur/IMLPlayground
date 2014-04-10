@@ -66,7 +66,7 @@ namespace MessagePredictor.ViewModel
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
             FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
             ApplyFeatureAdjustments = new RelayCommand(PerformApplyFeatureAdjustments, CanPerformApplyFeatureAdjustments);
-            CancelFeatureAdjustments = new RelayCommand(PerformCancelFeatureAdjustments, CanPerformCancelFeatureAdjustments);
+            UndoUserAction = new RelayCommand(PerformUndoUserAction, CanPerformUndoUserAction);
 
             _classifier.Retrained += classifier_Retrained;
             _vocab.Updated += vocab_Updated;
@@ -138,7 +138,7 @@ namespace MessagePredictor.ViewModel
         public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
         public RelayCommand<Feature> FeatureSomewhatImportant { get; private set; }
         public RelayCommand ApplyFeatureAdjustments { get; private set; }
-        public RelayCommand CancelFeatureAdjustments { get; private set; }
+        public RelayCommand UndoUserAction { get; private set; }
 
         #endregion
 
@@ -665,14 +665,44 @@ namespace MessagePredictor.ViewModel
             _featurePriorsEditedTimer.Start();
         }
 
-        private bool CanPerformCancelFeatureAdjustments()
+        private bool CanPerformUndoUserAction()
         {
-            return _featureImportanceAdjusted;
+            return (_userActions.Count > 0);
         }
 
-        private void PerformCancelFeatureAdjustments()
+        private void PerformUndoUserAction()
         {
-
+            UserAction action = _userActions.First.Value;
+            _userActions.RemoveFirst();
+            Console.WriteLine("Undo: {0}", action.Desc);
+            switch (action.Type) {
+                case UserAction.ActionType.AdjustFeaturePrior:
+                    // Find the right feature and reset its user prior
+                    foreach (Feature f in _featureSet) {
+                        if (f.Equals(action.Feature)) {
+                            if (f.Topic1Importance.Label.Equals(action.Label)) {
+                                //Console.WriteLine("Resetting prior for {0} ({1}) from {2} to {3}",
+                                //    action.Feature.Characters, action.Feature.Topic1Importance.Label, f.Topic1Importance.UserPrior, action.Feature.Topic1Importance.UserPrior);
+                                f.Topic1Importance.UserPrior = action.Feature.Topic1Importance.UserPrior;
+                                f.Topic1Importance.ForceHeightUpdate();
+                            } else if (f.Topic2Importance.Label.Equals(action.Label)) {
+                                //Console.WriteLine("Resetting prior for {0} ({1}) from {2} to {3}",
+                                //    action.Feature.Characters, action.Feature.Topic2Importance.Label, f.Topic2Importance.UserPrior, action.Feature.Topic2Importance.UserPrior);
+                                f.Topic2Importance.UserPrior = action.Feature.Topic2Importance.UserPrior;
+                                f.Topic2Importance.ForceHeightUpdate();
+                            }
+                            //_featureImportanceAdjusted = true;
+                        }
+                    }
+                    //ApplyFeatureAdjustments.Execute(null);
+                    // Let anyone watching know that the feature priors have changed
+                    _featurePriorsEditedTimer.Stop();
+                    _featurePriorsEditedTimer.Start();
+                    break;
+                default:
+                    Console.WriteLine("Error: Unknown user action '{0}'", action.Desc);
+                    break;
+            }
         }
 
         private IReadOnlyList<CollectionViewSource> BuildCollectionViewSourcesOverview(IReadOnlyList<Label> labels)

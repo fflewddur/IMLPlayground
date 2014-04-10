@@ -172,6 +172,12 @@ namespace LibIML.Features
             return _userWeight + _systemWeight;
         }
 
+        public void ForceHeightUpdate()
+        {
+            SystemHeight = SystemWeight * PixelsToWeight;
+            UserHeight = UserWeight * PixelsToWeight;
+        }
+
         #endregion
     }
 }

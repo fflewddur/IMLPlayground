@@ -128,7 +128,7 @@
                 </Grid.RowDefinitions>
                 <Button Grid.Row="0" VerticalAlignment="Center" Margin="5" Command="{Binding AddFeature}" CommandParameter="{Binding ElementName=root,Path=Label}" Style="{StaticResource ResourceKey=buttonStyle}">Add a new word or phrase</Button>
                 <Button Grid.Row="1" VerticalAlignment="Center" Margin="5" Command="{Binding ApplyFeatureAdjustments}" Style="{StaticResource ResourceKey=buttonStyle}">Apply importance changes</Button>
-                <Button Grid.Row="2" VerticalAlignment="Center" Margin="5" Command="{Binding CancelFeatureAdjustments}" Style="{StaticResource ResourceKey=buttonStyle}">Cancel changes</Button>
+                <Button Grid.Row="2" VerticalAlignment="Center" Margin="5" Command="{Binding UndoUserAction}" Style="{StaticResource ResourceKey=buttonStyle}">Undo</Button>
             </Grid>
 
         </Grid>
