@@ -43,13 +43,16 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="auto" SortDirection="Ascending" />
-                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="5*"/>
+                <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="auto" SortDirection="Ascending" 
+                                    HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>
+                <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="5*" 
+                                    HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>
                 <DataGridTemplateColumn SortMemberPath="Prediction.Label" Width="1*" Header="{StaticResource ResourceKey=messageListTopicHeader}" 
-                                        CellTemplate="{StaticResource ResourceKey=messageListTopicTemplate}" />
+                                        CellTemplate="{StaticResource ResourceKey=messageListTopicTemplate}"
+                                        HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>
                 <DataGridTemplateColumn SortMemberPath="Prediction.Confidence" Width="1*" Header="{StaticResource ResourceKey=messageListConfHeader}"
                                         CellTemplate="{StaticResource ResourceKey=messageListConfTemplate}" 
-                                        x:Name="PredictionConfidenceCol"/>
+                                        x:Name="PredictionConfidenceCol" HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>
             </DataGrid.Columns>
         </DataGrid>
 
