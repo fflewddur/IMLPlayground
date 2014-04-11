@@ -142,8 +142,6 @@ namespace LibIML
             private set { SetProperty<bool>(ref _confidencePieLarge, value); }
         }
 
-        
-
         public double ConfidencePieSlice
         {
             get { return _confidencePieSlice; }

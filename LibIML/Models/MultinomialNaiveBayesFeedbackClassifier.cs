@@ -336,7 +336,7 @@ namespace LibIML
                         }
                         importantWordsTotal += (int)pair.Value;
                         importantWordsUnique++;
-                        double weight = Math.Exp(pair.Value * Math.Log(pWord));
+                        double weight = pair.Value * Math.Log(pWord);
                         
                         double userWeight, sysWeight;
                         string word = _vocab.GetWord(pair.Key);
@@ -354,17 +354,16 @@ namespace LibIML
                         //Feature f = new Feature(word, l, (int)pair.Value, sysWeight, userWeight);
                         evidence.SourceItems.Add(f);
                         if (l == topic1) {
-                            evidenceItems[pair.Key].Label1Pr = weight;
+                            evidenceItems[pair.Key].Label1Pr = userWeight + sysWeight;
                         } else if (l == topic2) {
-                            evidenceItems[pair.Key].Label2Pr = weight;
+                            evidenceItems[pair.Key].Label2Pr = userWeight + sysWeight;
                         }
                         //Console.WriteLine("Feature={3}, weight={0}, userWeight={1}, sysWeight={2}, count={4}", weight, userWeight, sysWeight, word, (int)pair.Value);
-                        prob += Math.Log(weight);
+                        prob += weight;
                     }
                 }
                 
                 pDocGivenClassLog[l] = prob;
-                //evidence.FeatureWeight = pDocGivenClass[l];
                 prediction.EvidencePerClass[l] = evidence;
             }
             
@@ -424,9 +423,9 @@ namespace LibIML
             prediction.Label = labelWinner;
             prediction.Confidence = prediction.EvidencePerClass[labelWinner].Confidence;
             //prediction.UpdateEvidenceGraphData();
-            prediction.UpdatePrDescriptions();
+            //prediction.UpdatePrDescriptions();
             prediction.EvidenceItems = evidenceItems.Values.OrderBy(i => i.FeatureText).ToList();
-            //Console.WriteLine("Prediction: {0} ({1:0%})", labelWinner, prediction.Confidence);
+            ////Console.WriteLine("Prediction: {0} ({1:0%})", labelWinner, prediction.Confidence);
             foreach (EvidenceItem ei in prediction.EvidenceItems) {
                 if (labelWinner == topic2) {
                     ei.InvertRatio();

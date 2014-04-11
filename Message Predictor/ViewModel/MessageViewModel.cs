@@ -1,4 +1,5 @@
-﻿using MessagePredictor.Model;
+﻿using LibIML;
+using MessagePredictor.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +20,34 @@ namespace MessagePredictor.ViewModel
             get { return _message; }
             set
             {
-                if (SetProperty<NewsItem>(ref _message, value)) {
-
+                if (_message != null) {
+                    _message.PropertyChanged -= _message_PropertyChanged;
                 }
+
+                if (SetProperty<NewsItem>(ref _message, value)) {
+                    UpdateMessageForViewing(_message);
+                    _message.PropertyChanged += _message_PropertyChanged;
+                }
+            }
+        }
+
+        /// <summary>
+        /// When this item's prediction is updated, also update the UI.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        void _message_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Prediction") {
+                Message.Prediction.UpdatePrDescriptions();
             }
         }
 
         private void UpdateMessageForViewing(NewsItem message)
         {
-            
+            if (message != null) {
+                message.Prediction.UpdatePrDescriptions();
+            }
         }
     }
 }
