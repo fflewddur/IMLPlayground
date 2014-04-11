@@ -102,7 +102,11 @@ namespace MessagePredictor.ViewModel
                             _logger.Writer.WriteAttributeString("predictedTopic", CurrentMessage.Prediction.Label.ToString());
                             _logger.Writer.WriteAttributeString("isHighlighted", CurrentMessage.IsHighlighted.ToString());
                             _logger.logTime();
-                            _messageWindow.Activate();
+                            if (_messageWindow.WindowState == System.Windows.WindowState.Minimized) {
+                                _messageWindow.WindowState = System.Windows.WindowState.Normal;
+                            } else {
+                                _messageWindow.Activate();
+                            }
                         }
                     }
                 }

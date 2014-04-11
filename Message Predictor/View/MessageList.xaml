@@ -6,6 +6,7 @@
              mc:Ignorable="d" 
              xmlns:local="clr-namespace:MessagePredictor.View" 
              xmlns:model="clr-namespace:MessagePredictor.Model" 
+             DataContextChanged="UserControl_DataContextChanged"
              d:DesignHeight="400" d:DesignWidth="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -21,10 +22,11 @@
         <Label Grid.Row="0" Grid.ColumnSpan="3" Style="{StaticResource headerStyle1}">Messages</Label>
         
         <!-- Summary list -->
-        <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding MessageListViewSource.View}" AutoGenerateColumns="False" 
+        <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding MessageListViewSource.View}" AutoGenerateColumns="False" Name="Grid"
                   SelectedItem="{Binding FolderListVM.SelectedFolder.SelectedMessage}" Sorting="DataGrid_Sorting" Loaded="DataGrid_Loaded"
                   CanUserAddRows="False" CanUserDeleteRows="False" CanUserReorderColumns="False" IsReadOnly="True" SelectionMode="Single" 
-                  SelectionUnit="FullRow" GridLinesVisibility="Horizontal" ScrollViewer.VerticalScrollBarVisibility="Visible">
+                  SelectionUnit="FullRow" GridLinesVisibility="Horizontal" ScrollViewer.VerticalScrollBarVisibility="Visible"
+                  ScrollViewer.ScrollChanged="Grid_ScrollChanged">
             <DataGrid.CellStyle>
                 <Style TargetType="DataGridCell">
                     <Setter Property="BorderThickness" Value="0"/>

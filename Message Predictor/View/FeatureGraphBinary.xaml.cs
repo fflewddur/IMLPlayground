@@ -97,7 +97,7 @@ namespace MessagePredictor.View
         {
             FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
             if (vm != null && e.HorizontalChange != 0) {
-                vm.LogFeatureGraphScrolled(e.HorizontalChange, e.HorizontalOffset);
+                vm.LogControlScrolled("FeatureGraph", e.HorizontalChange, e.HorizontalOffset);
             }
         }
 

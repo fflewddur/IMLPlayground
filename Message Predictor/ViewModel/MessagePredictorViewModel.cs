@@ -237,6 +237,28 @@ namespace MessagePredictor
 
         #endregion
 
+        #region Events
+
+        public class SelectedMessageProgrammaticallyChangedEventArgs : EventArgs
+        {
+            public readonly NewsItem Message;
+
+            public SelectedMessageProgrammaticallyChangedEventArgs(NewsItem message)
+            {
+                Message = message;
+            }
+        }
+
+        public event EventHandler<SelectedMessageProgrammaticallyChangedEventArgs> SelectedMessageProgrammaticallyChanged;
+
+        protected virtual void OnSelectedMessageProgrammaticallyChanged(SelectedMessageProgrammaticallyChangedEventArgs e)
+        {
+            if (SelectedMessageProgrammaticallyChanged != null)
+                SelectedMessageProgrammaticallyChanged(this, e);
+        }
+
+        #endregion
+
         #region Commands
 
         public RelayCommand ManuallyUpdatePredictions { get; private set; }
@@ -387,9 +409,28 @@ namespace MessagePredictor
             _folderListVM.SelectFolderByIndex(0);
         }
 
+        /// <summary>
+        /// Select the given message.
+        /// </summary>
+        /// <param name="message"></param>
+        public void SelectMessage(NewsItem message)
+        {
+            _folderListVM.SelectMessage(message);
+            OnSelectedMessageProgrammaticallyChanged(new SelectedMessageProgrammaticallyChangedEventArgs(message));
+        }
+
         public void LogMessageScrolled(double change, double offset)
         {
-            _logger.Writer.WriteStartElement("FeatureGraphScrolled");
+            _logger.Writer.WriteStartElement("MessageScrolled");
+            _logger.Writer.WriteAttributeString("change", change.ToString());
+            _logger.Writer.WriteAttributeString("offset", offset.ToString());
+            _logger.logTime();
+            _logger.logEndElement();
+        }
+
+        public void LogMessageListScrolled(double change, double offset)
+        {
+            _logger.Writer.WriteStartElement("MessageListScrolled");
             _logger.Writer.WriteAttributeString("change", change.ToString());
             _logger.Writer.WriteAttributeString("offset", offset.ToString());
             _logger.logTime();

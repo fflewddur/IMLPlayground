@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MessagePredictor.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,14 +22,28 @@ namespace MessagePredictor.View
     public partial class MessageWindow : Window
     {
         MyFormatter _textFormatter;
+        MessagePredictorViewModel _vm;
 
         public MessageWindow(MessagePredictorViewModel vm)
         {
             InitializeComponent();
 
             //MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
-            _textFormatter = new MyFormatter(vm);
+            _vm = vm;
+            _textFormatter = new MyFormatter(_vm);
             RTB.TextFormatter = _textFormatter;
+        }
+
+        private void Goto_Click(object sender, RoutedEventArgs e)
+        {
+            HeatMapViewModel hmvm = this.DataContext as HeatMapViewModel;
+            _vm.SelectMessage(hmvm.CurrentMessage);
+            this.Close();
+        }
+
+        private void Close_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

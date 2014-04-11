@@ -304,9 +304,9 @@ namespace MessagePredictor.ViewModel
             _logger.logEndElement();
         }
 
-        public void LogFeatureGraphScrolled(double change, double offset)
+        public void LogControlScrolled(string control, double change, double offset)
         {
-            _logger.Writer.WriteStartElement("FeatureGraphScrolled");
+            _logger.Writer.WriteStartElement(control + "Scrolled");
             _logger.Writer.WriteAttributeString("change", change.ToString());
             _logger.Writer.WriteAttributeString("offset", offset.ToString());
             _logger.logTime();
@@ -567,7 +567,7 @@ namespace MessagePredictor.ViewModel
 
         private void PerformAddFeature()
         {
-            _logger.Writer.WriteStartElement("ShowAddFeatureDialog");
+            _logger.Writer.WriteStartElement("AddFeatureDialog");
             _logger.logTime();
 
             if (_addFeatureDialog == null) {
@@ -591,15 +591,15 @@ namespace MessagePredictor.ViewModel
                 }
             }
 
-            _logger.logEndElement();
+            //_logger.logEndElement();
         }
 
         void _addFeatureDialog_Closed(object sender, EventArgs e)
         {
             _addFeatureDialog = null;
-            _logger.Writer.WriteStartElement("CloseAddFeatureDialog");
-            _logger.logTime();
-            _logger.logEndElement();
+            //_logger.Writer.WriteStartElement("CloseAddFeatureDialog");
+            //_logger.logTime();
+            _logger.logEndElement(); // Close "AddFeatureDialog" element
 
             // Let anyone watching know that the user has closed the dialog, so _featureText is now empty.
             _featureText = "";
@@ -749,6 +749,9 @@ namespace MessagePredictor.ViewModel
             _userActions.RemoveFirst();
             UpdateUndoButtonText();
             Console.WriteLine("Undo: {0}", action.Desc);
+            _logger.Writer.WriteStartElement("Undo");
+            _logger.Writer.WriteAttributeString("action", action.Type.ToString());
+            _logger.logTime();
             switch (action.Type) {
                 case UserAction.ActionType.AdjustFeaturePrior:
                     // Find the right feature and reset its user prior
@@ -793,6 +796,7 @@ namespace MessagePredictor.ViewModel
                     Console.WriteLine("Error: Unknown user action '{0}'", action.Desc);
                     break;
             }
+            _logger.logEndElement();
         }
 
         private IReadOnlyList<CollectionViewSource> BuildCollectionViewSourcesOverview(IReadOnlyList<Label> labels)

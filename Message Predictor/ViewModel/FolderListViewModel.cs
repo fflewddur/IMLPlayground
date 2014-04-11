@@ -124,6 +124,23 @@ namespace MessagePredictor.ViewModel
             }
         }
 
+        public void SelectMessage(NewsItem message)
+        {
+            // Figure out which folder holds this message and select it
+            foreach (FolderViewModel folder in _folders) {
+                Label l = null;
+                if (folder.Label != _unknownLabel) {
+                    l = folder.Label;
+                }
+                if (message.UserLabel == l) {
+                    SelectedFolder = folder;
+                }
+            }
+
+            // Then select the message
+            SelectedFolder.SelectedMessage = message;
+        }
+
         #endregion
     }
 }

@@ -21,9 +21,24 @@ namespace MessagePredictor.View
     /// </summary>
     public partial class MessageList : UserControl
     {
+        private MessagePredictorViewModel _vm;
+
         public MessageList()
         {
             InitializeComponent();
+
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            if (vm != null) {
+                _vm = vm;
+                _vm.SelectedMessageProgrammaticallyChanged += _vm_SelectedMessageProgrammaticallyChanged;
+            }
+        }
+
+        private void _vm_SelectedMessageProgrammaticallyChanged(object sender, MessagePredictorViewModel.SelectedMessageProgrammaticallyChangedEventArgs e)
+        {
+            Grid.SelectedItem = e.Message;
+            Grid.UpdateLayout();
+            Grid.ScrollIntoView(Grid.SelectedItem);
         }
 
         private void DataGrid_Selected(object sender, RoutedEventArgs e)
@@ -50,6 +65,22 @@ namespace MessagePredictor.View
             MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
             if (!vm.ShowExplanations) {
                 PredictionConfidenceCol.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void UserControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
+            if (vm != null) {
+                _vm = vm;
+                _vm.SelectedMessageProgrammaticallyChanged += _vm_SelectedMessageProgrammaticallyChanged;
+            }
+        }
+
+        private void Grid_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (_vm != null) {
+                _vm.LogMessageListScrolled(e.VerticalChange, e.VerticalOffset);
             }
         }
 

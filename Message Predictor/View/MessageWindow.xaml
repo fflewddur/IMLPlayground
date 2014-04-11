@@ -4,14 +4,26 @@
         xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns:local="clr-namespace:MessagePredictor.View" 
         WindowStartupLocation="CenterOwner"
-        WindowStyle="ToolWindow"
         Style="{StaticResource ResourceKey=windowStyle}"
         Title="MessageWindow"
         Height="700" Width="700">
     <Grid>
-        <xctk:RichTextBox Text="{Binding CurrentMessage.DocumentReadOnly}" IsReadOnly="True" BorderThickness="0" Padding="10"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <xctk:RichTextBox Grid.Row="0" HorizontalAlignment="Center"
+                          Text="{Binding CurrentMessage.DocumentReadOnly}" IsReadOnly="True" BorderThickness="0" Padding="10"
                           ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Auto"
                           Name="RTB">
         </xctk:RichTextBox>
+        
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="10" HorizontalAlignment="Center">
+            <Button Style="{StaticResource ResourceKey=buttonStyle}" MinWidth="80" Margin="0 0 20 0"
+                    Click="Goto_Click">Go to message</Button>
+            <Button Style="{StaticResource ResourceKey=buttonStyle}" MinWidth="80"
+                    Click="Close_Click">Close</Button>
+        </StackPanel>
     </Grid>
 </Window>
