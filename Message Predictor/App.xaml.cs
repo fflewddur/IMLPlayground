@@ -31,6 +31,7 @@ namespace MessagePredictor
             Condition,
             TimeLimit,
             DatasetFile,
+            TestDatasetFile,
             Topic1TrainSize,
             Topic1TestSize,
             Topic1VocabSize,
@@ -64,6 +65,7 @@ namespace MessagePredictor
             LoadPropertiesFile();
             _logger.Writer.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
             _logger.Writer.WriteAttributeString("dataset", this.Properties[PropertyKey.DatasetFile].ToString());
+            _logger.Writer.WriteAttributeString("testDataset", this.Properties[PropertyKey.TestDatasetFile].ToString());
             _logger.Writer.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
             _logger.Writer.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
             _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
@@ -95,9 +97,11 @@ namespace MessagePredictor
             _logger.Writer.WriteEndElement();
 
             // Log the feature set and training set
+            _vm.UpdateDatasetForLogging();
             _vm.LogFeatureSet();
             _vm.LogTrainingSet();
-            _vm.LogClassifierEvaluation();
+            _vm.LogClassifierEvaluationTraining();
+            _vm.LogClassifierEvaluationTest();
 
             _logger.Writer.WriteEndElement(); // End root element
             _logger.Writer.WriteEndDocument();
@@ -243,6 +247,10 @@ namespace MessagePredictor
                         }
                     } else if (element.Name == "AutoUpdatePredictions") {
                         LoadAutoUpdatePredictionsProperty(element);
+                    } else if (element.Name == "TestDataSet") {
+                        if (element.Attribute("file") != null) {
+                            this.Properties[PropertyKey.TestDatasetFile] = element.Attribute("file").Value.ToString();
+                        }
                     }
                 }
             } catch (FileNotFoundException e) {

@@ -23,6 +23,7 @@ namespace MessagePredictor
     {
         // Models
         private NewsCollection _messages;
+        private NewsCollection _testMessages;
         private List<Label> _labels;
         private Vocabulary _vocab;
         private MultinomialNaiveBayesFeedbackClassifier _classifier;
@@ -59,6 +60,7 @@ namespace MessagePredictor
             timer.Start();
             //List<NewsCollection> folders = new List<NewsCollection>();
             _messages = LoadDataset();
+            _testMessages = LoadTestDataset(); // Also load the test set, but use the existing labels
             timer.Stop();
             Console.WriteLine("Time to load data set: {0}", timer.Elapsed);
 
@@ -339,7 +341,7 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("wrongFolder", "False");
 
             item.UserLabel = label;
-            
+
             // Let the view know we updated this data
             IEditableCollectionView view = _messageListViewSource.View as IEditableCollectionView;
             view.EditItem(item);
@@ -456,14 +458,15 @@ namespace MessagePredictor
             _classifier.LogTrainingSet(_logger.Writer);
         }
 
-        public void LogClassifierEvaluation()
+        public void LogClassifierEvaluation(string datasetName, NewsCollection messages)
         {
             Label positive = Labels[0];
             Label negative = Labels[1];
 
-            _evaluatorVM.EvaluateClassifier(_messages, positive, negative);
+            _evaluatorVM.EvaluateClassifier(messages, positive, negative);
 
             _logger.Writer.WriteStartElement("Evaluation");
+            _logger.Writer.WriteAttributeString("dataset", datasetName);
             _logger.Writer.WriteStartElement("PositiveLabel");
             _logger.Writer.WriteString(positive.ToString());
             _logger.Writer.WriteEndElement();
@@ -479,6 +482,49 @@ namespace MessagePredictor
             _logger.Writer.WriteElementString("F1Negative", _evaluatorVM.F1Negative.ToString());
             _logger.Writer.WriteElementString("F1Weighted", _evaluatorVM.F1Weighted.ToString());
             _logger.logEndElement();
+        }
+
+        public void LogClassifierEvaluationTraining()
+        {
+            LogClassifierEvaluation("training", _messages);
+        }
+
+        public void LogClassifierEvaluationTest()
+        {
+            LogClassifierEvaluation("test", _testMessages);
+        }
+
+        public void UpdateDatasetForLogging()
+        {
+            if (_vocab.HasUpdatedTokens) {
+                UpdateVocab();
+            }
+            TrainClassifier(_classifier, FilterToTrainingSet(_messages));
+
+            // Training set
+            Parallel.ForEach(_messages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(_vocab, true);
+            });
+            PredictMessages(_classifier, _messages);
+
+            // Test set
+            Parallel.ForEach(_testMessages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(_vocab, true);
+            });
+            PredictMessages(_classifier, _testMessages);
+
+
+
         }
 
         #endregion
@@ -668,6 +714,14 @@ namespace MessagePredictor
             _labels.Add(new Label(App.Current.Properties[App.PropertyKey.Topic2UserLabel].ToString(), App.Current.Properties[App.PropertyKey.Topic2SystemLabel].ToString(),
                 (Brush)App.Current.Properties[App.PropertyKey.Topic2Color], App.Current.Properties[App.PropertyKey.Topic2ColorDesc].ToString()));
 
+            NewsCollection dataset = NewsCollection.CreateFromZip(path, _labels);
+
+            return dataset;
+        }
+
+        private NewsCollection LoadTestDataset()
+        {
+            string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.DataDir, App.Current.Properties[App.PropertyKey.TestDatasetFile].ToString());
             NewsCollection dataset = NewsCollection.CreateFromZip(path, _labels);
 
             return dataset;

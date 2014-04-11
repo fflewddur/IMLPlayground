@@ -8,5 +8,6 @@
     <Topic1 trainSize="10" testSize="500" vocabSize="5" systemLabel="rec.sport.hockey" userLabel="Hockey" color="#FF38C9FF" colorDesc="blue" />
     <Topic2 trainSize="10" testSize="500" vocabSize="5" systemLabel="rec.sport.baseball" userLabel="Baseball" color="#FF69D643" colorDesc="green"/>
   </DataSet>
+  <TestDataSet file="20news-sports-bydate-test.zip" />
   <AutoUpdatePredictions>true</AutoUpdatePredictions>
 </MessagePredictorProperties>
