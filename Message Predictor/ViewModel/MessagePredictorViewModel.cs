@@ -760,16 +760,22 @@ namespace MessagePredictor
             }
 
             UpdateVocab();
-            int id = _vocab.GetWordId(e.Feature.Characters, true);
-            _classifier.UpdateCountsForNewFeature(id);
-            _classifier.Train();
-            double weight;
-            _classifier.TryGetFeatureSystemWeight(id, e.Feature.Topic1Importance.Label, out weight);
-            e.Feature.Topic1Importance.SystemWeight = weight;
-            _classifier.TryGetFeatureSystemWeight(id, e.Feature.Topic2Importance.Label, out weight);
-            e.Feature.Topic2Importance.SystemWeight = weight;
+            //int id = _vocab.GetWordId(e.Feature.Characters, true);
+            //_classifier.UpdateCountsForNewFeature(id);
+            //_classifier.Train();
+            //double weight;
+            //_classifier.TryGetFeatureSystemWeight(id, e.Feature.Topic1Importance.Label, out weight);
+            //e.Feature.Topic1Importance.SystemWeight = weight;
+            //_classifier.TryGetFeatureSystemWeight(id, e.Feature.Topic2Importance.Label, out weight);
+            //e.Feature.Topic2Importance.SystemWeight = weight;
+            //_classifier.TryGetFeatureUserWeight(id, e.Feature.Topic1Importance.Label, out weight);
+            //e.Feature.Topic1Importance.UserWeight = weight;
+            //_classifier.TryGetFeatureUserWeight(id, e.Feature.Topic2Importance.Label, out weight);
+            //e.Feature.Topic2Importance.UserWeight = weight;
             if (AutoUpdatePredictions) {
                 UpdatePredictions();
+            } else {
+                TrainClassifier(_classifier, FilterToTrainingSet(_messages));
             }
         }
 

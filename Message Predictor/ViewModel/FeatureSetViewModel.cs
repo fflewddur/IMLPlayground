@@ -313,6 +313,17 @@ namespace MessagePredictor.ViewModel
             _logger.logEndElement();
         }
 
+        public void LogShowImportantWordsExplanationStart()
+        {
+            _logger.Writer.WriteStartElement("ShowImportantWordsExplanation");
+            _logger.logTime();
+        }
+
+        public void LogShowImportantWordsExplanationEnd()
+        {
+            _logger.logEndElement();
+        }
+
         public void AddUserFeature(Feature feature)
         {
             _logger.Writer.WriteStartElement("AddFeature");
@@ -777,6 +788,8 @@ namespace MessagePredictor.ViewModel
                     _featurePriorsEditedTimer.Start();
                     break;
                 case UserAction.ActionType.RemoveFeature:
+                    // Ensure the feature isn't selected
+                    action.Feature.IsSelected = false;
                     // Remove this feature from the list of removed features
                     _userRemoved.Remove(action.Feature);
                     _userAdded.Add(action.Feature);

@@ -21,7 +21,7 @@
             </TabItem>-->
         <!--<TabItem Header="Adjust important words" Style="{StaticResource ResourceKey=tabItemStyle}">-->
 
-        <TextBlock Grid.Row="1" Margin="5 10 5 5" FontStyle="Italic">
+        <TextBlock Grid.Row="1" Margin="5 10 5 5" FontStyle="Italic" Foreground="Gray">
             These are all of the words the computer used to make its predictions (<Hyperlink Click="ShowImportantWordsExplanation">learn more</Hyperlink>).
         </TextBlock>
         

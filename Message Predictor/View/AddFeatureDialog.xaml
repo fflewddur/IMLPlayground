@@ -22,10 +22,14 @@
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Style="{StaticResource ResourceKey=headerStyleDialog}" TextWrapping="Wrap">
+        <StackPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"  Orientation="Vertical">
+            <TextBlock Style="{StaticResource ResourceKey=headerStyleDialog}" TextWrapping="Wrap">
             Add a word or phrase that the computer should use to predict message topics:
-        </TextBlock>
-
+            </TextBlock>
+            <TextBlock TextWrapping="Wrap" Foreground="Gray" FontStyle="Italic" Margin="0 0 0 10">
+                Good words to chose occur often in messages about one topic, but rarely in messages about the other topic.
+            </TextBlock>
+        </StackPanel>
         <TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding Word, UpdateSourceTrigger=PropertyChanged}" Padding="4 5" Name="PhraseTextBox">
             <TextBox.Style>
                 <Style TargetType="TextBox">
