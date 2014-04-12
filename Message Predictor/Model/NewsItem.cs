@@ -15,12 +15,15 @@ namespace MessagePredictor.Model
     public class NewsItem : ViewModelBase, IInstance, IEditableObject
     {
         private readonly double MIN_CONFIDENCE_CHANGE = .01;
+        private static Regex _newlineRegex = new Regex(@"\r?\n");
+        private static Regex _whitespaceRegex = new Regex(@"\s\s+");
 
         private int _id;
         private int _order;
         private string _originalGroup;
         private string _subject;
         private string _body;
+        private string _bodySingleLine;
         private string _author;
         private Dictionary<string, int> _tokenCounts;
         private Prediction _prediction;
@@ -74,7 +77,20 @@ namespace MessagePredictor.Model
         public string Body
         {
             get { return _body; }
-            private set { SetProperty<string>(ref _body, value); }
+            private set
+            {
+                if (SetProperty<string>(ref _body, value)) {
+                    string body = _newlineRegex.Replace(_body, " ");
+                    body = _whitespaceRegex.Replace(body, " ");
+                    BodySingleLine = body;
+                }
+            }
+        }
+
+        public string BodySingleLine
+        {
+            get { return _bodySingleLine; }
+            private set { SetProperty<string>(ref _bodySingleLine, value); }
         }
 
         public string Author
@@ -103,7 +119,12 @@ namespace MessagePredictor.Model
 
         public string AllText
         {
-            get { return Subject + "\n" + Author + "\n" + Body; }
+            get { return string.Format("{0}\n{1}\n{2}", Subject, Author, Body); }
+        }
+
+        public string AllTextSingleLine
+        {
+            get { return string.Format("{0}\n{1}\n{2}", Subject, Author, BodySingleLine); }
         }
 
         public string Document
@@ -243,9 +264,9 @@ namespace MessagePredictor.Model
             Document = null; // force our document to re-parse the next time it's requested for display
         }
 
-        public bool TokenizeForString(string token)
+        public bool TokenizeForPattern(Regex pattern, string token)
         {
-            int count = new Regex(Regex.Escape(token)).Matches(AllText).Count;
+            int count = pattern.Matches(AllTextSingleLine).Count;
             if (count > 0)
                 TokenCounts[token] = count;
 

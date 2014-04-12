@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LibIML
@@ -18,7 +19,7 @@ namespace LibIML
         Prediction PreviousPrediction { get; }
         bool RecentlyChanged { get; }
         
-        bool TokenizeForString(string token);
+        bool TokenizeForPattern(Regex pattern, string token);
         void ComputeFeatureVector(Vocabulary vocab, bool isRestricted);
     }
 }

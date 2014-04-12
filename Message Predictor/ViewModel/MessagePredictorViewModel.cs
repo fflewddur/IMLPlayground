@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
@@ -805,9 +806,11 @@ namespace MessagePredictor
                 // If we created a new vocab element, include it in our documents' tokenizations
                 //int id = _vocab.GetWordId(e.Tokens, false);
                 int df = 0;
+                Regex featureRegex = new Regex(Regex.Escape(e.Feature.Characters), RegexOptions.IgnoreCase);
                 foreach (IInstance instance in _messages) {
-                    if (instance.TokenizeForString(e.Feature.Characters))
+                    if (instance.TokenizeForPattern(featureRegex, e.Feature.Characters)) {
                         df++;
+                    }
                 }
                 // Update our vocab with the correct document frequency
                 _vocab.AddToken(e.Feature.Characters, df);
