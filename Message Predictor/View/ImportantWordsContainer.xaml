@@ -15,33 +15,11 @@
 
         <Label Grid.Row="0" Style="{StaticResource headerStyle1}">Important words</Label>
 
-        <!--<TabControl Grid.Row="1" SelectionChanged="TabControl_SelectionChanged">-->
-        <!--<TabItem Header="Overview" Style="{StaticResource ResourceKey=tabItemStyle}">
-                <local:ImportantWordsOverview />
-            </TabItem>-->
-        <!--<TabItem Header="Adjust important words" Style="{StaticResource ResourceKey=tabItemStyle}">-->
-
         <TextBlock Grid.Row="1" Margin="5 10 5 5" FontStyle="Italic" Foreground="Gray">
             These are all of the words the computer used to make its predictions (<Hyperlink Click="ShowImportantWordsExplanation">learn more</Hyperlink>).
         </TextBlock>
         
         <local:FeatureGraphBinary Grid.Row="2" ItemsSource="{Binding FeatureSetViewSourceGraph.View}" 
                                           GraphColor1="{Binding Labels[0].Color}" GraphColor2="{Binding Labels[1].Color}"/>
-        <!--</TabItem>-->
-        <!--<TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding Labels[0].Color}">
-                <TabItem.Header>
-                    <TextBlock Text="{Binding Labels[0], StringFormat='Adjust {0} words'}"/>
-                </TabItem.Header>
-                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSourcesGraph[0].View}" Label="{Binding Labels[0]}" 
-                                    GraphColorUser="{Binding Labels[0].Color}" GraphColorSystem="{Binding Labels[0].Color}"/>
-            </TabItem>
-            <TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding Labels[1].Color}">
-                <TabItem.Header>
-                    <TextBlock Text="{Binding Labels[1], StringFormat='Adjust {0} words'}"/>
-                </TabItem.Header>
-                <local:FeatureGraph ItemsSource="{Binding FeatureSetViewSourcesGraph[1].View}" Label="{Binding Labels[1]}" 
-                                    GraphColorUser="{Binding Labels[1].Color}" GraphColorSystem="{Binding Labels[1].Color}" />
-            </TabItem>-->
-        <!--</TabControl>-->
     </Grid>
 </UserControl>
