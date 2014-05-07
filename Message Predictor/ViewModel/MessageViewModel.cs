@@ -15,6 +15,12 @@ namespace MessagePredictor.ViewModel
     {
         private NewsItem _message;
 
+        public MessageViewModel()
+            : base()
+        {
+
+        }
+
         public NewsItem Message
         {
             get { return _message; }
@@ -26,6 +32,9 @@ namespace MessagePredictor.ViewModel
 
                 if (SetProperty<NewsItem>(ref _message, value)) {
                     UpdateMessageForViewing(_message);
+                }
+
+                if (_message != null) {
                     _message.PropertyChanged += _message_PropertyChanged;
                 }
             }
@@ -45,7 +54,7 @@ namespace MessagePredictor.ViewModel
 
         private void UpdateMessageForViewing(NewsItem message)
         {
-            if (message != null) {
+            if (message != null && message.Prediction != null) {
                 message.Prediction.UpdatePrDescriptions();
             }
         }
