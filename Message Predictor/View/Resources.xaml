@@ -120,20 +120,10 @@
                 <Setter Property="Background" Value="LightSalmon" />
                 <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='Had been {0}', Converter={StaticResource ResourceKey=convStringFormat}}"/>
             </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True"/>
-                    <Condition Binding="{Binding IsPredictionCorrect}" Value="True"/>
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="LightGreen" />
-            </MultiDataTrigger>
-            <MultiDataTrigger>
-                <MultiDataTrigger.Conditions>
-                    <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True"/>
-                    <Condition Binding="{Binding IsPredictionCorrect}" Value="False"/>
-                </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="LightPink" />
-            </MultiDataTrigger>
+            <DataTrigger Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True">
+                <Setter Property="Background" Value="{Binding Prediction.Label.Color}" />
+                <Setter Property="Foreground" Value="White" />
+            </DataTrigger>
         </Style.Triggers>
     </Style>
 
