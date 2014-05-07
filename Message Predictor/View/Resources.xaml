@@ -14,6 +14,9 @@
     <SolidColorBrush x:Key="baseballBrushUser" Color="#FF2EBB2E" />
     <SolidColorBrush x:Key="baseballBrushSystem" Color="#FF127812" />-->
 
+    <SolidColorBrush x:Key="topicChangedBrush" Color="#FF575757" />
+    <SolidColorBrush x:Key="heatMapUnknownBrush" Color="#FF575757" />
+    
     <Style x:Key="windowStyle" TargetType="Window">
         <Setter Property="FontFamily" Value="Sego UI" />
         <Setter Property="FontSize" Value="14" />
@@ -117,7 +120,8 @@
                     <Condition Binding="{Binding RecentlyChanged}" Value="True"/>
                     <Condition Binding="{Binding DataContext.ShowExplanations, RelativeSource={RelativeSource AncestorType=local:MessagePredictorWindow}}" Value="True"/>
                 </MultiDataTrigger.Conditions>
-                <Setter Property="Background" Value="LightSalmon" />
+                <Setter Property="Background" Value="{StaticResource ResourceKey=topicChangedBrush}" />
+                <Setter Property="Foreground" Value="White" />
                 <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='Had been {0}', Converter={StaticResource ResourceKey=convStringFormat}}"/>
             </MultiDataTrigger>
             <DataTrigger Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True">
@@ -229,10 +233,20 @@
                     <Setter Property="Stroke" Value="{DynamicResource {x:Static SystemColors.InactiveBorderBrush}}" />
                     <Setter Property="StrokeThickness" Value="1" />
                     <Style.Triggers>
-                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
-                            <Setter Property="Fill" Value="{DynamicResource {x:Static SystemColors.HighlightBrushKey}}" />
-                            <!--<Setter Property="Stroke" Value="Gray"/>-->
-                        </DataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="False"/>
+                                <Condition Binding="{Binding IsHighlighted}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Fill" Value="{StaticResource ResourceKey=heatMapUnknownBrush}" />
+                        </MultiDataTrigger>
+                        <MultiDataTrigger>
+                            <MultiDataTrigger.Conditions>
+                                <Condition Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True"/>
+                                <Condition Binding="{Binding IsHighlighted}" Value="True" />
+                            </MultiDataTrigger.Conditions>
+                            <Setter Property="Fill" Value="{Binding UserLabel.Color}" />
+                        </MultiDataTrigger>
                     </Style.Triggers>
                 </Style>
             </Rectangle.Style>
