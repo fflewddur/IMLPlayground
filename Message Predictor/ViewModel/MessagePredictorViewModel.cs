@@ -341,6 +341,10 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("sameFolder", "False");
             _logger.Writer.WriteAttributeString("wrongFolder", "False");
 
+            // If we're moving the item to Unknown, it's label should be null
+            if (label == FolderListVM.UnknownLabel) {
+                label = null;
+            }
             item.UserLabel = label;
 
             // Let the view know we updated this data
