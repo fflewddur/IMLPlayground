@@ -23,7 +23,6 @@ namespace LibIML
         private Dictionary<Label, int> _perClassFeatureCountSums;
         private Dictionary<Label, double> _perClassFeaturePriorSums;
         private Dictionary<Label, HashSet<IInstance>> _trainingSet;
-        //private Dictionary<Label, HashSet<Feature>> _featuresPerClass; // This gives us a single property to expose with all of the feature data for each class
 
         // Store these for efficiency
         private Dictionary<Label, double> _pClass;
@@ -35,7 +34,6 @@ namespace LibIML
             _perClassFeaturePriors = new Dictionary<Label, Dictionary<int, double>>();
             _perClassFeatureCountSums = new Dictionary<Label, int>();
             _perClassFeaturePriorSums = new Dictionary<Label, double>();
-            //_featuresPerClass = new Dictionary<Label, HashSet<Feature>>();
             _trainingSet = new Dictionary<Label, HashSet<IInstance>>();
             _pClass = new Dictionary<Label, double>();
             _pWordGivenClass = new Dictionary<Label, Dictionary<int, double>>();
@@ -229,7 +227,6 @@ namespace LibIML
                 }
                 int totalDf;
                 _perClassFeatureCounts[label].TryGetValue(id, out totalDf);
-                //Console.WriteLine("Total DF of {0} for {1}: {2}", _vocab.GetWord(id), label, totalDf);
             }
         }
 

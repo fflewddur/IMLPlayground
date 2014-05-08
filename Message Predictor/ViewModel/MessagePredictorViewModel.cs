@@ -808,14 +808,26 @@ namespace MessagePredictor
             if (_vocab.AddToken(e.Feature.Characters, -1)) // Use -1 for doc frequency for now, we'll fix it below
             {
                 // If we created a new vocab element, include it in our documents' tokenizations
-                //int id = _vocab.GetWordId(e.Tokens, false);
                 int df = 0;
-                Regex featureRegex = new Regex(Regex.Escape(e.Feature.Characters), RegexOptions.IgnoreCase);
+                Regex featureRegex = new Regex(@"\b" + Regex.Escape(e.Feature.Characters) + @"\b", RegexOptions.IgnoreCase);
+
+                // FIXME Do we only want this from our training set, or the entire data set?
                 foreach (IInstance instance in _messages) {
                     if (instance.TokenizeForPattern(featureRegex, e.Feature.Characters)) {
                         df++;
                     }
                 }
+
+                //// Build a frequency from our training set
+                //foreach (IInstance instance in this.FilterToTrainingSet(_messages)) {
+                //    if (instance.TokenizeForPattern(featureRegex, e.Feature.Characters)) {
+                //        df++;
+                //    }
+                //}
+                //// And update the tokenization for our test set
+                //foreach (IInstance instance in this.FilterToTestSet(_messages)) {
+                //    instance.TokenizeForPattern(featureRegex, e.Feature.Characters);
+                //}
                 // Update our vocab with the correct document frequency
                 _vocab.AddToken(e.Feature.Characters, df);
             }
