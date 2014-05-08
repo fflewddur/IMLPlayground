@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:MessagePredictor.View" 
              mc:Ignorable="d" 
              d:DesignHeight="200" d:DesignWidth="500">
-    <Grid SizeChanged="Grid_SizeChanged" DataContextChanged="Grid_DataContextChanged">
+    <Grid SizeChanged="Grid_SizeChanged" DataContextChanged="Grid_DataContextChanged" HorizontalAlignment="Center">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
