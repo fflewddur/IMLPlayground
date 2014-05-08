@@ -585,7 +585,7 @@ namespace MessagePredictor.ViewModel
                 _addFeatureDialog = new AddFeatureDialog();
                 _addFeatureDialog.Closed += _addFeatureDialog_Closed;
                 _addFeatureDialog.Owner = App.Current.MainWindow;
-                AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels, _previousLabel);
+                AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels);
                 if (!IsTextForSelectedFeature(_featureText)) {
                     vm.Word = _featureText;
                 }

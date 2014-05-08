@@ -18,15 +18,17 @@ namespace MessagePredictor.ViewModel
         private string _selectedWeight;
         private bool _addIsEnabled;
 
-        public AddFeatureDialogViewModel(IReadOnlyList<Label> labels, Label selectedLabel)
+        public AddFeatureDialogViewModel(IReadOnlyList<Label> labels)
             : base()
         {
+            //List<Label> localLabels = new List<Label>();
+            //localLabels.Add(new Label())
             Labels = labels;
-            if (selectedLabel != null) {
-                SelectedLabel = selectedLabel;
-            } else {
-                SelectedLabel = Labels[0];
-            }
+            //if (selectedLabel != null) {
+            //    SelectedLabel = selectedLabel;
+            //} else {
+            //    SelectedLabel = Labels[0];
+            //}
             Word = ""; // use an empty string, not null, to make it easier to style the empty string with placeholder text.
             Weights = new List<string>();
             Weights.Add("Very important");
@@ -44,7 +46,11 @@ namespace MessagePredictor.ViewModel
         public Label SelectedLabel
         {
             get { return _selectedLabel; }
-            set { SetProperty<Label>(ref _selectedLabel, value); }
+            set {
+                if (SetProperty<Label>(ref _selectedLabel, value)) {
+                    UpdateAddButton();
+                }
+            }
         }
 
         public string Word
@@ -53,10 +59,7 @@ namespace MessagePredictor.ViewModel
             set
             {
                 if (SetProperty<string>(ref _word, value)) {
-                    if (string.IsNullOrWhiteSpace(Word))
-                        AddIsEnabled = false;
-                    else
-                        AddIsEnabled = true;
+                    UpdateAddButton();
                 }
             }
         }
@@ -129,5 +132,13 @@ namespace MessagePredictor.ViewModel
         }
 
         #endregion
+
+        private void UpdateAddButton()
+        {
+            if (string.IsNullOrWhiteSpace(Word) || SelectedLabel == null)
+                AddIsEnabled = false;
+            else
+                AddIsEnabled = true;
+        }
     }
 }
