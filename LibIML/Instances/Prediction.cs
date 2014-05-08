@@ -210,13 +210,13 @@ namespace LibIML
             // Build ClassPrHeader and ClassPrDesc
             sbHeader.Clear();
             if (smallestCount == largestCount) {
-                sbHeader.AppendFormat("Folder size: The {0} folder has as many messages as the {1} folder", largestCountLabel, smallestCountLabel);
+                sbHeader.AppendFormat("The {0} folder has as many messages as the {1} folder", largestCountLabel, smallestCountLabel);
                 sbDesc.AppendFormat("So the computer think each Unknown message is equally likely to be about {0} or {1}.",
                    largestCountLabel, smallestCountLabel);
             } else {
-                sbHeader.AppendFormat("Folder size: The {0} folder has more messages than the {1} folder", largestCountLabel, smallestCountLabel);
+                sbHeader.AppendFormat("The {0} folder has more messages than the {1} folder", largestCountLabel, smallestCountLabel);
                 double ratio = Math.Round(largestCount / (double)smallestCount, 1);
-                sbDesc.AppendFormat("So the computer thinks each Unknown message is {0:N1} times more likely to be about {1} than {2}.",
+                sbDesc.AppendFormat("The difference makes the computer thinks each Unknown message is {0:N1} times more likely to be about {1} than {2}.",
                     ratio, largestCountLabel.ToString(), smallestCountLabel.ToString());
             }
             ClassPrHeader = sbHeader.ToString();
@@ -240,16 +240,16 @@ namespace LibIML
             sbDesc.Clear();
             if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
                 if (!hasFeatures) {
-                    sbHeader.Append("Message words: No important words occur in this message");
+                    sbHeader.Append("No important words occur in this message");
                     sbDesc.AppendFormat("Without important words, only Folder Size will be used to predict this message's topic.",
                         largestWeightLabel, smallestWeightLabel);
                 } else {
-                    sbHeader.AppendFormat("Message words: This words in this message are equally important to {0} and {1}", largestWeightLabel, smallestWeightLabel);
+                    sbHeader.AppendFormat("This words in this message are equally important to {0} and {1}", largestWeightLabel, smallestWeightLabel);
                     sbDesc.AppendFormat("Because the size of the {0} words equals the size of the {1} words, only Folder Size will be used to predict this message's topic.",
                         largestWeightLabel, smallestWeightLabel);
                 }
             } else {
-                sbHeader.AppendFormat("Message words: This message has more important words about {0} than about {1}", largestWeightLabel, smallestWeightLabel);
+                sbHeader.AppendFormat("This message has more important words about {0} than about {1}", largestWeightLabel, smallestWeightLabel);
                 double ratio = Math.Round(largestWeight / smallestWeight, 1);
                 string ratioDesc;
                 if (ratio > 1000) {
@@ -265,7 +265,7 @@ namespace LibIML
                     }
                 }
 
-                sbDesc.AppendFormat("So the computer think this message is {1} times more likely to be about {0} than {2}.",
+                sbDesc.AppendFormat("The difference makes the computer think this message is {1} times more likely to be about {0} than {2}.",
                     largestWeightLabel, ratioDesc, smallestWeightLabel);
             }
             FeaturePrHeader = sbHeader.ToString();
@@ -294,7 +294,11 @@ namespace LibIML
             ConfidenceHeader = sbHeader.ToString();
 
             sbDesc.Clear();
-            sbDesc.Append("Combining both parts makes the computer think this message is ");
+            if (hasFeatures) {
+                sbDesc.Append("Combining 'Important words' and 'Folder size' makes the computer think this message is ");
+            } else {
+                sbDesc.Append("Thus, 'Folder size' makes the computer think this message is ");
+            }
             if (Math.Round(smallestConf, 7) == Math.Round(largestConf, 7)) {
                 sbDesc.AppendFormat("equally likely to be about {0} or {1} (ties are broken in favor of {2}).", largestConfLabel, smallestConfLabel, this.Label);
             } else {
@@ -316,74 +320,6 @@ namespace LibIML
             }
             ConfidenceDesc = sbDesc.ToString();
         }
-
-        //public void UpdateEvidenceGraphData()
-        //{
-        //    // Get the sum of weights for all labels.
-        //    double weightSum = 0;
-        //    Dictionary<Label, double> perLabelWeightSum = new Dictionary<Label, double>();
-        //    Dictionary<Label, double> perLabelHeight = new Dictionary<Label, double>();
-        //    foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
-        //        double labelWeight = 0;
-        //        foreach (Feature f in pair.Value.SourceItems) {
-        //            // Multiply by -1 to reverse the sign; log(<1) will always be negative.
-
-        //            double featureWeight = -1 * (Math.Log(f.UserWeight + f.SystemWeight) * f.Count);
-        //            f.UserHeight = featureWeight; // Store this here because we need it later in this method.
-        //            labelWeight += featureWeight;
-        //        }
-        //        perLabelWeightSum[pair.Key] = labelWeight;
-        //        weightSum += labelWeight;
-        //    }
-        //    //Console.WriteLine("weightSum={0}", weightSum);
-        //    // Use Confidence to determine the height ratio between different labels
-        //    foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
-        //        //Console.WriteLine("Confidence for {0} = {1:N6}", pair.Key, pair.Value.Confidence);
-        //        perLabelHeight[pair.Key] = weightSum * pair.Value.Confidence;
-        //    }
-
-        //    // Now figure out the height ratio for different bars; store the results in EvidenceItems.
-        //    double highestHeight = double.MinValue;
-        //    foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
-        //        pair.Value.EvidenceItems.Clear();
-        //        foreach (Feature f in pair.Value.SourceItems) {
-        //            // 1 - % because the smaller the ln(weight), the more important the feature
-        //            //double featurePercent = 1 - ((f.UserHeight) / perLabelWeightSum[pair.Key]);
-        //            double featurePercent = ((f.UserHeight) / perLabelWeightSum[pair.Key]);
-        //            if (featurePercent <= 0) {
-        //                featurePercent = 1; // If there's only one feature, it was solely responsible.
-        //            }
-        //            double featureHeight = (perLabelHeight[pair.Key] * featurePercent) / f.Count;
-        //            if (featureHeight > highestHeight) {
-        //                highestHeight = featureHeight;
-        //            }
-        //            //Console.WriteLine("featureHeight ({0}, height={3:N3}): '{1}' = {2:N6} ({4:P})", f.Label, f.Characters, featureHeight, perLabelHeight[pair.Key], featurePercent);
-        //            Feature evidenceFeature = new Feature(f.Characters, f.Label, f.Count, featureHeight, 0);
-        //            evidenceFeature.PercentOfReason = featurePercent;
-        //            pair.Value.EvidenceItems.Add(evidenceFeature);
-        //        }
-        //    }
-
-        //    // Keep our bars within a reasonable pixel height range;
-        //    double heightAdjustmentRatio = 1.0;
-        //    if (highestHeight > MAX_HEIGHT) {
-        //        heightAdjustmentRatio = MAX_HEIGHT / highestHeight;
-        //    } else if (highestHeight < MIN_HEIGHT) {
-        //        heightAdjustmentRatio = MIN_HEIGHT / highestHeight;
-        //    }
-
-        //    // Make sure each bar is at least 2px tall
-        //    foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
-        //        foreach (Feature f in pair.Value.EvidenceItems) {
-        //            f.SystemWeight = f.SystemWeight * heightAdjustmentRatio;
-        //            if ((f.SystemWeight * f.PixelsToWeight) < 2) {
-        //                f.SystemWeight = 2 / f.PixelsToWeight;
-        //            }
-        //        }
-
-        //        pair.Value.EvidenceItems.Sort();
-        //    }
-        //}
 
         private void UpdateImportantWordDesc()
         {
