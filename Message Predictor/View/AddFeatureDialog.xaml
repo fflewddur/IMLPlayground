@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         Title="Add a word or phrase" 
-        Height="320" Width="340" 
+        Height="320" Width="380" 
         MinHeight="240" MinWidth="200" 
         ResizeMode="CanResizeWithGrip" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
