@@ -33,7 +33,7 @@
                 </TextBlock>
             </Label.ToolTip>
         </Label>
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding EvaluatorVM.Evaluators[0].Label,StringFormat='Average {0}&#x0a;confidence'}"
+        <!--<TextBlock Grid.Row="1" Grid.Column="0" Text="{Binding EvaluatorVM.Evaluators[0].Label,StringFormat='Average {0}&#x0a;confidence'}"
                    TextWrapping="Wrap" FontStyle="Italic" VerticalAlignment="Center" Margin="5 0 10 0">
             <TextBlock.ToolTip>
                 <TextBlock >
@@ -45,8 +45,8 @@
                     </TextBlock.Text>
                 </TextBlock>
             </TextBlock.ToolTip>
-        </TextBlock>
-        <Label Grid.Row="2" Grid.Column="0" Content="{Binding EvaluatorVM.Evaluators[1].Label}" Margin="0 10 10 0">
+        </TextBlock>-->
+        <Label Grid.Row="2" Grid.Column="0" Content="{Binding EvaluatorVM.Evaluators[1].Label}" Margin="0 0 10 0">
             <Label.ToolTip>
                 <TextBlock >
                     <TextBlock.Text>
@@ -58,7 +58,7 @@
                 </TextBlock>
             </Label.ToolTip>
         </Label>
-        <TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding EvaluatorVM.Evaluators[1].Label,StringFormat='Average {0}&#x0a;confidence'}" 
+        <!--<TextBlock Grid.Row="3" Grid.Column="0" Text="{Binding EvaluatorVM.Evaluators[1].Label,StringFormat='Average {0}&#x0a;confidence'}" 
                    TextWrapping="Wrap" FontStyle="Italic" VerticalAlignment="Center" Margin="5 0 10 0">
             <TextBlock.ToolTip>
                 <TextBlock >
@@ -70,12 +70,12 @@
                     </TextBlock.Text>
                 </TextBlock>
             </TextBlock.ToolTip>
-        </TextBlock>
-        <Label Grid.Row="4" Grid.Column="0" Content="Total changed" FontWeight="SemiBold" Margin="0 10 10 0">
+        </TextBlock>-->
+        <!--<Label Grid.Row="4" Grid.Column="0" Content="Total changed" FontWeight="SemiBold" Margin="0 10 10 0">
             <Label.ToolTip>
                 <Label Content="{Binding EvaluatorVM.RecentlyChangedCount}" ContentStringFormat="{}{0:N0} messages just changed their topic prediction."/>
             </Label.ToolTip>
-        </Label>
+        </Label>-->
 
         <!-- Values -->
         <Label Grid.Row="0" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].TotalPredictionCount}" ContentStringFormat="{}{0:N0}" 
@@ -91,7 +91,7 @@
                 </TextBlock>
             </Label.ToolTip>
         </Label>
-        <Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].AverageConfidence}" ContentStringFormat="{}{0:0%}"
+        <!--<Label Grid.Row="1" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[0].AverageConfidence}" ContentStringFormat="{}{0:0%}"
                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontStyle="Italic">
             <Label.ToolTip>
                 <TextBlock >
@@ -103,9 +103,9 @@
                     </TextBlock.Text>
                 </TextBlock>
             </Label.ToolTip>
-        </Label>
+        </Label>-->
         <Label Grid.Row="2" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].TotalPredictionCount}" ContentStringFormat="{}{0:N0}"
-               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0 10 0 0">
+               HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0 0 0 0">
             <Label.ToolTip>
                 <TextBlock >
                     <TextBlock.Text>
@@ -117,7 +117,7 @@
                 </TextBlock>
             </Label.ToolTip>
         </Label>
-        <Label Grid.Row="3" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].AverageConfidence}" ContentStringFormat="{}{0:0%}"
+        <!--<Label Grid.Row="3" Grid.Column="1" Content="{Binding EvaluatorVM.Evaluators[1].AverageConfidence}" ContentStringFormat="{}{0:0%}"
                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontStyle="Italic">
             <Label.ToolTip>
                 <TextBlock >
@@ -129,26 +129,26 @@
                     </TextBlock.Text>
                 </TextBlock>
             </Label.ToolTip>
-        </Label>
-        <Label Grid.Row="4" Grid.Column="1" Content="{Binding EvaluatorVM.RecentlyChangedCount}" ContentStringFormat="{}{0:N0}"
+        </Label>-->
+        <!--<Label Grid.Row="4" Grid.Column="1" Content="{Binding EvaluatorVM.RecentlyChangedCount}" ContentStringFormat="{}{0:N0}"
                HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Margin="0 10 0 0">
             <Label.ToolTip>
                 <Label Content="{Binding EvaluatorVM.RecentlyChangedCount}" ContentStringFormat="{}{0:N0} messages just changed their topic prediction."/>
             </Label.ToolTip>
-        </Label>
+        </Label>-->
 
         <!-- Direction arrows -->
         <local:DirectionArrow Grid.Row="0" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDirection}" 
                               UnitOfMeasure="{Binding EvaluatorVM.Evaluators[0].Label, StringFormat='Total predictions of {0}'}"
                               Difference="{Binding EvaluatorVM.Evaluators[0].TotalPredictionDifference}" HorizontalContentAlignment="Left" VerticalContentAlignment="Center"/>
-        <local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].AverageConfidenceDirection}" 
+        <!--<local:DirectionArrow Grid.Row="1" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[0].AverageConfidenceDirection}" 
                               UnitOfMeasure="Average confidence" VerticalContentAlignment="Center"
-                              Difference="{Binding EvaluatorVM.Evaluators[0].AverageConfidenceDifference,StringFormat='{}{0:0%}'}" HorizontalContentAlignment="Left"/>
+                              Difference="{Binding EvaluatorVM.Evaluators[0].AverageConfidenceDifference,StringFormat='{}{0:0%}'}" HorizontalContentAlignment="Left"/>-->
         <local:DirectionArrow Grid.Row="2" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDirection}" 
-                              UnitOfMeasure="{Binding EvaluatorVM.Evaluators[1].Label, StringFormat='Total predictions of {0}'}" Margin="0 10 0 0"
+                              UnitOfMeasure="{Binding EvaluatorVM.Evaluators[1].Label, StringFormat='Total predictions of {0}'}" Margin="0 0 0 0"
                               Difference="{Binding EvaluatorVM.Evaluators[1].TotalPredictionDifference}" HorizontalContentAlignment="Left"/>
-        <local:DirectionArrow Grid.Row="3" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].AverageConfidenceDirection}" 
+        <!--<local:DirectionArrow Grid.Row="3" Grid.Column="2" Direction="{Binding EvaluatorVM.Evaluators[1].AverageConfidenceDirection}" 
                               UnitOfMeasure="Average confidence" VerticalContentAlignment="Center"
-                              Difference="{Binding EvaluatorVM.Evaluators[1].AverageConfidenceDifference,StringFormat='{}{0:0%}'}" HorizontalContentAlignment="Left"/>
+                              Difference="{Binding EvaluatorVM.Evaluators[1].AverageConfidenceDifference,StringFormat='{}{0:0%}'}" HorizontalContentAlignment="Left"/>-->
     </Grid>
 </UserControl>
