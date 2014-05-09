@@ -8,8 +8,6 @@
              mc:Ignorable="d" DataContextChanged="UserControl_DataContextChanged"
              d:DesignHeight="600" d:DesignWidth="500">
     <Grid>
-        <!--<TabControl>-->
-        <!--<TabItem Header="Message" Style="{StaticResource ResourceKey=tabItemStyle}">-->
         <ScrollViewer ScrollViewer.VerticalScrollBarVisibility="Visible" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollChanged="ScrollViewer_ScrollChanged">
             <Grid Loaded="Grid_Loaded">
                 <Grid.ColumnDefinitions>
@@ -17,31 +15,16 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="2*" Name="PredictionExplanationCol"/>
                 </Grid.ColumnDefinitions>
-                <!--<Grid.RowDefinitions>
-                            <RowDefinition Height="*"/>
-                            <RowDefinition Height="*"/>
-                        </Grid.RowDefinitions>-->
                 <xctk:RichTextBox Grid.Column="0" Text="{Binding MessageVM.Message.DocumentReadOnly}" IsReadOnly="True" Name="RTF"
-                                  ContextMenuOpening="RTF_ContextMenuOpening"
+                                  ContextMenuOpening="RTF_ContextMenuOpening" 
                                   AutoWordSelection="True" SelectionChanged="RichTextBox_SelectionChanged" BorderThickness="0" Padding="5 10 5 0">
                     <xctk:RichTextBox.ContextMenu>
                         <ContextMenu x:Name="FindMenu"/>
                     </xctk:RichTextBox.ContextMenu>
-                    <!--<xctk:RichTextBox.TextFormatter>
-                        <local:MyFormatter />
-                    </xctk:RichTextBox.TextFormatter>-->
                 </xctk:RichTextBox>
                 <GridSplitter Grid.Column="1" VerticalAlignment="Stretch" HorizontalAlignment="Center" Width="4" Style="{StaticResource ResourceKey=explanationContent}"/>
                 <local:PredictionExplanation Grid.Column="2" Margin="0 0 10 0" Style="{StaticResource ResourceKey=explanationContent}"/>
             </Grid>
         </ScrollViewer>
-        <!--</TabItem>-->
-        <!--<TabItem Style="{StaticResource ResourceKey=tabItemStyle}" Background="{Binding MessageVM.Message.Prediction.Label.Color}">-->
-        <!--<TabItem.Header>
-                    <Label Content="{Binding MessageVM.Message.Prediction.Label}" ContentStringFormat="Why '{0}'?" Margin="0" Padding="0"></Label>
-                </TabItem.Header>-->
-        <!--<local:PredictionExplanation/>-->
-        <!--</TabItem>
-        </TabControl>-->
     </Grid>
 </UserControl>

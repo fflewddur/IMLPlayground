@@ -24,11 +24,17 @@ namespace MessagePredictor.View
             RTF.TextFormatter = _textFormatter;
         }
 
+        /// <summary>
+        /// When the selection changes, tell our view model.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void RichTextBox_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            //Xceed.Wpf.Toolkit.RichTextBox tb = sender as Xceed.Wpf.Toolkit.RichTextBox;
-            //MessagePredictorViewModel vm = tb.DataContext as MessagePredictorViewModel;
-            //vm.FeatureSetVM.HighlightFeature.Execute(tb.Selection.Text.Trim());
+            Xceed.Wpf.Toolkit.RichTextBox tb = sender as Xceed.Wpf.Toolkit.RichTextBox;
+            MessagePredictorViewModel vm = tb.DataContext as MessagePredictorViewModel;
+            vm.FeatureSetVM.SelectedText = tb.Selection.Text.Trim();
+            Console.WriteLine("selected text: {0}", vm.FeatureSetVM.SelectedText);
         }
 
         private void ScrollViewer_ScrollChanged(object sender, ScrollChangedEventArgs e)
@@ -100,6 +106,11 @@ namespace MessagePredictor.View
         public void SetText(System.Windows.Documents.FlowDocument document, string text)
         {
             document.Blocks.Clear();
+
+            // When the document changes, clear the selection
+            if (_vm != null) {
+                _vm.FeatureSetVM.SelectedText = null;
+            }
             
             if (string.IsNullOrWhiteSpace(text))
                 return;

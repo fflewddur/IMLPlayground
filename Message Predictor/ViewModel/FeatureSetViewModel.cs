@@ -26,12 +26,11 @@ namespace MessagePredictor.ViewModel
         private List<Feature> _userRemoved;
         private ObservableCollection<Feature> _featureSet;
         private LinkedList<UserAction> _userActions;
-        //private List<Feature> _priorFeatureSet; // Hold our feature set prior to any adjustments
-        //private IReadOnlyList<CollectionViewSource> _collectionViewSourcesOverview;
         private CollectionViewSource _collectionViewSourceGraph;
         private string _featureText; // The feature the user is currently typing in
+        private string _selectedText; // If the user has highlighted text in a message, use it as the default for a new feature
         private Feature _selectedFeature; // The highlighted feature in the UI
-        private Label _previousLabel; // The last label the user added a feature for
+        //private Label _previousLabel; // The last label the user added a feature for
         private DispatcherTimer _featureTextEditedTimer;
         private DispatcherTimer _featurePriorsEditedTimer;
         private DispatcherTimer _featureGraphHeightChangedTimer;
@@ -54,7 +53,6 @@ namespace MessagePredictor.ViewModel
             _userAdded = new List<Feature>();
             _userRemoved = new List<Feature>();
             _userActions = new LinkedList<UserAction>();
-            //_collectionViewSourcesOverview = BuildCollectionViewSourcesOverview(labels);
             _collectionViewSourceGraph = BuildCollectionViewSourceGraph();
             _featureText = null;
             _featureTextEditedTimer = new DispatcherTimer();
@@ -64,7 +62,6 @@ namespace MessagePredictor.ViewModel
             _undoButtonText = "Undo";
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
-            AddFeatureViaSelection = new RelayCommand<Feature>(PerformAddFeatureViaSelection);
             AddFeature = new RelayCommand(PerformAddFeature);
             FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature, CanPerformRemoveFeature);
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
@@ -106,12 +103,6 @@ namespace MessagePredictor.ViewModel
             set { SetProperty<ObservableCollection<Feature>>(ref _featureSet, value); }
         }
 
-        //public IReadOnlyList<CollectionViewSource> FeatureSetViewSourcesOverview
-        //{
-        //    get { return _collectionViewSourcesOverview; }
-        //    private set { SetProperty<IReadOnlyList<CollectionViewSource>>(ref _collectionViewSourcesOverview, value); }
-        //}
-
         public CollectionViewSource FeatureSetViewSourceGraph
         {
             get { return _collectionViewSourceGraph; }
@@ -149,12 +140,17 @@ namespace MessagePredictor.ViewModel
             set { SetProperty<Feature>(ref _selectedFeature, value); }
         }
 
+        public string SelectedText
+        {
+            get { return _selectedText; }
+            set { SetProperty<string>(ref _selectedText, value); }
+        }
+
         #endregion
 
         #region Commands
 
         public RelayCommand<string> HighlightFeature { get; private set; }
-        public RelayCommand<Feature> AddFeatureViaSelection { get; private set; }
         public RelayCommand AddFeature { get; private set; }
         public RelayCommand<Feature> FeatureRemove { get; private set; }
         public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
@@ -262,6 +258,7 @@ namespace MessagePredictor.ViewModel
                 SelectedFeature = null;
             }
             _featureText = word;
+            SelectedText = null;
         }
 
         public void LogFeatureTabChanged(string tabName)
@@ -571,11 +568,6 @@ namespace MessagePredictor.ViewModel
             FeatureTextChanged(text);
         }
 
-        private void PerformAddFeatureViaSelection(Feature feature)
-        {
-
-        }
-
         private void PerformAddFeature()
         {
             _logger.Writer.WriteStartElement("AddFeatureDialog");
@@ -586,8 +578,12 @@ namespace MessagePredictor.ViewModel
                 _addFeatureDialog.Closed += _addFeatureDialog_Closed;
                 _addFeatureDialog.Owner = App.Current.MainWindow;
                 AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels);
-                if (!IsTextForSelectedFeature(_featureText)) {
+                // If the user has searched for text, use it as the default
+                if (!string.IsNullOrWhiteSpace(_featureText) && !IsTextForSelectedFeature(_featureText)) {
                     vm.Word = _featureText;
+                } else if (!string.IsNullOrWhiteSpace(SelectedText)) {
+                    // If the user has selected text in the message, use it as the second default choice
+                    vm.Word = SelectedText;
                 }
                 vm.PropertyChanged += AddFeatureVM_PropertyChanged;
                 vm.AddFeature += AddFeatureVM_AddFeature;
@@ -619,7 +615,7 @@ namespace MessagePredictor.ViewModel
 
         private void AddFeatureVM_AddFeature(object sender, AddFeatureDialogViewModel.AddFeatureEventArgs e)
         {
-            _previousLabel = e.Label;
+            //_previousLabel = e.Label;
             Feature f = e.Feature;
             f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
             f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
