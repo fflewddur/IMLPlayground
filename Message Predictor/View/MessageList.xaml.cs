@@ -38,7 +38,9 @@ namespace MessagePredictor.View
         {
             Grid.SelectedItem = e.Message;
             Grid.UpdateLayout();
-            Grid.ScrollIntoView(Grid.SelectedItem);
+            if (Grid.SelectedItem != null) {
+                Grid.ScrollIntoView(Grid.SelectedItem);
+            }
         }
 
         private void DataGrid_Selected(object sender, RoutedEventArgs e)
@@ -63,7 +65,7 @@ namespace MessagePredictor.View
         private void DataGrid_Loaded(object sender, RoutedEventArgs e)
         {
             MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
-            if (!vm.ShowExplanations) {
+            if (vm != null && !vm.ShowExplanations) {
                 PredictionConfidenceCol.Visibility = Visibility.Collapsed;
             }
         }
