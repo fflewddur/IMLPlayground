@@ -36,9 +36,12 @@ namespace MessagePredictor.View
 
         private void _vm_SelectedMessageProgrammaticallyChanged(object sender, MessagePredictorViewModel.SelectedMessageProgrammaticallyChangedEventArgs e)
         {
+            MessagePredictorViewModel vm = sender as MessagePredictorViewModel;
+
             Grid.SelectedItem = e.Message;
             Grid.UpdateLayout();
-            if (Grid.SelectedItem != null) {
+            bool isVisible = vm.SelectedMessageIsVisible(e.Message);
+            if (Grid.SelectedItem != null && isVisible) {
                 Grid.ScrollIntoView(Grid.SelectedItem);
             } else {
                 Dialog d = new Dialog();
@@ -56,7 +59,7 @@ namespace MessagePredictor.View
 
         private void DataGrid_Sorting(object sender, DataGridSortingEventArgs e)
         {
-            Console.WriteLine("Sorting: {0} {1} {2}", e.Column.Header, e.Column.SortDirection, e.Column.SortMemberPath);
+            //Console.WriteLine("Sorting: {0} {1} {2}", e.Column.Header, e.Column.SortDirection, e.Column.SortMemberPath);
             MessagePredictorViewModel vm = this.DataContext as MessagePredictorViewModel;
             // This even fires *before* the sort, so we need to anticipate what will happen. Null -> Ascending -> Descending
             ListSortDirection d;

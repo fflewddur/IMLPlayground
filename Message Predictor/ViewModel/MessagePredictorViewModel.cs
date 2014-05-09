@@ -527,9 +527,12 @@ namespace MessagePredictor
                 instance.ComputeFeatureVector(_vocab, true);
             });
             PredictMessages(_classifier, _testMessages);
+        }
 
-
-
+        public bool SelectedMessageIsVisible(NewsItem item)
+        {
+            // TODO return false if the currently selected message isn't visible in the messageListView.
+            return _messageListViewSource.View.Contains(item);
         }
 
         #endregion
