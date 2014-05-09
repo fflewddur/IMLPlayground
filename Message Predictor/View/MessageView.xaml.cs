@@ -118,6 +118,7 @@ namespace MessagePredictor.View
             XDocument doc = XDocument.Parse(text);
 
             Paragraph p = new Paragraph();
+            bool lastWasFeature = false;
             foreach (XElement line in doc.Root.Elements()) {
                 if (line.Name == "sender") {
                     p.Inlines.Add("From: ");
@@ -125,52 +126,65 @@ namespace MessagePredictor.View
 
                 foreach (XElement element in line.Elements()) {
                     if (element.Name == "normal") {
+                        string s = element.Value.ToString();
                         if (line.Name == "subject") {
-                            Bold b = new Bold(new Run(element.Value.ToString()));
+                            Bold b = new Bold(new Run(s));
                             p.Inlines.Add(b);
                         } else if (line.Name == "sender") {
-                            Italic em = new Italic(new Run(element.Value.ToString()));
+                            Italic em = new Italic(new Run(s));
                             p.Inlines.Add(em);
                         } else {
-                            p.Inlines.Add(element.Value.ToString());
+                            p.Inlines.Add(s);
                         }
-                    } else if (element.Name == "feature") {
-                        if (line.Name == "subject") {
-                            Bold b = new Bold(new Run(element.Value.ToString()));
-                            if (_vm.ShowExplanations) {
-                                b.Background = SystemColors.ActiveCaptionBrush;
-                            }
-                            p.Inlines.Add(b);
-                        } else if (line.Name == "sender") {
-                            Italic em = new Italic(new Run(element.Value.ToString()));
-                            if (_vm.ShowExplanations) {
-                                em.Background = SystemColors.ActiveCaptionBrush;
-                            }
-                            p.Inlines.Add(em);
-                        } else {
-                            Run r = new Run(element.Value.ToString());
-                            if (_vm.ShowExplanations) {
-                                r.Background = SystemColors.ActiveCaptionBrush;
-                            }
-                            p.Inlines.Add(r);
+                        if (s.Length > 0) {
+                            lastWasFeature = false;
                         }
-                    } else if (element.Name == "highlightedFeature") {
-                        if (line.Name == "subject") {
-                            Bold b = new Bold(new Run(element.Value.ToString()));
-                            b.Background = SystemColors.HighlightBrush;
-                            b.Foreground = SystemColors.HighlightTextBrush;
-                            p.Inlines.Add(b);
-                        } else if (line.Name == "sender") {
-                            Italic em = new Italic(new Run(element.Value.ToString()));
-                            em.Background = SystemColors.HighlightBrush;
-                            em.Foreground = SystemColors.HighlightTextBrush;
-                            p.Inlines.Add(em);
-                        } else {
-                            Run r = new Run(element.Value.ToString());
-                            r.Background = SystemColors.HighlightBrush;
-                            r.Foreground = SystemColors.HighlightTextBrush;
-                            p.Inlines.Add(r);
+                    } else if (element.Name == "feature" || element.Name == "highlightedFeature") {
+                        if (lastWasFeature) {
+                            // Prevent features from bleeding into one another
+                            p.Inlines.Add(" ");
                         }
+
+                        if (element.Name == "feature") {
+                            if (line.Name == "subject") {
+                                Bold b = new Bold(new Run(element.Value.ToString()));
+                                if (_vm.ShowExplanations) {
+                                    b.Background = SystemColors.ActiveCaptionBrush;
+                                }
+                                p.Inlines.Add(b);
+                            } else if (line.Name == "sender") {
+                                Italic em = new Italic(new Run(element.Value.ToString()));
+                                if (_vm.ShowExplanations) {
+                                    em.Background = SystemColors.ActiveCaptionBrush;
+                                }
+                                p.Inlines.Add(em);
+                            } else {
+                                Run r = new Run(element.Value.ToString());
+                                if (_vm.ShowExplanations) {
+                                    r.Background = SystemColors.ActiveCaptionBrush;
+                                }
+                                p.Inlines.Add(r);
+                            }
+                        } else if (element.Name == "highlightedFeature") {
+                            if (line.Name == "subject") {
+                                Bold b = new Bold(new Run(element.Value.ToString()));
+                                b.Background = SystemColors.HighlightBrush;
+                                b.Foreground = SystemColors.HighlightTextBrush;
+                                p.Inlines.Add(b);
+                            } else if (line.Name == "sender") {
+                                Italic em = new Italic(new Run(element.Value.ToString()));
+                                em.Background = SystemColors.HighlightBrush;
+                                em.Foreground = SystemColors.HighlightTextBrush;
+                                p.Inlines.Add(em);
+                            } else {
+                                Run r = new Run(element.Value.ToString());
+                                r.Background = SystemColors.HighlightBrush;
+                                r.Foreground = SystemColors.HighlightTextBrush;
+                                p.Inlines.Add(r);
+                            }
+                        }
+
+                        lastWasFeature = true;
                     } else if (element.Name == "linebreak") {
                         p.Inlines.Add(new LineBreak());
                     }
