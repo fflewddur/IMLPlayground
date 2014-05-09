@@ -40,6 +40,12 @@ namespace MessagePredictor.View
             Grid.UpdateLayout();
             if (Grid.SelectedItem != null) {
                 Grid.ScrollIntoView(Grid.SelectedItem);
+            } else {
+                Dialog d = new Dialog();
+                d.DialogTitle = string.Format("Only showing recently changed messages");
+                d.DialogMessage = string.Format("This message wasn't impacted by your most recent change, but you have the \"Only Show Predictions that Just Changed\" option turned on. You'll need to turn it off to see this message in the list.");
+                d.Owner = App.Current.MainWindow;
+                d.ShowDialog();
             }
         }
 
