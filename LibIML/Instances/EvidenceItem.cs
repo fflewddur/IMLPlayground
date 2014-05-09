@@ -11,17 +11,13 @@ namespace LibIML.Instances
         private string _featureText;
         private int _featureId;
         private Label _label;
+        private Label _otherLabel;
         private double _label1Pr;
         private double _label2Pr;
         private int _count;
         private double _ratio;
         private double _fontSize;
         private string _tooltipText;
-        //private string _word;
-        //private int _id;
-        //private int _count;
-        //private double _systemWeight;
-        //private double _userWeight;
 
         public EvidenceItem(string featureText, int featureId, int count)
         {
@@ -30,15 +26,6 @@ namespace LibIML.Instances
             _count = count;
             UpdateTooltip();
         }
-
-        //public EvidenceItem(string word, int id, int count, double systemWeight, double userWeight)
-        //{
-        //    _word = word;
-        //    _id = id;
-        //    _count = count;
-        //    _systemWeight = systemWeight;
-        //    _userWeight = userWeight;
-        //}
 
         #region Properties
 
@@ -59,6 +46,16 @@ namespace LibIML.Instances
             get { return _label; }
             set { 
                 _label = value;
+                UpdateTooltip();
+            }
+        }
+
+        public Label OtherLabel
+        {
+            get { return _otherLabel; }
+            set
+            {
+                _otherLabel = value;
                 UpdateTooltip();
             }
         }
@@ -113,32 +110,6 @@ namespace LibIML.Instances
             private set { _tooltipText = value; }
         }
 
-        //public string Word
-        //{
-        //    get { return _word; }
-        //    private set { _word = value; }
-        //}
-
-        //public int Id
-        //{
-        //    get { return _id; }
-        //    private set { _id = value; }
-        //}
-
-
-
-        //public double SystemWeight
-        //{
-        //    get { return _systemWeight; }
-        //    private set { _systemWeight = value; }
-        //}
-
-        //public double UserWeight
-        //{
-        //    get { return _userWeight; }
-        //    private set { _userWeight = value; }
-        //}
-
         #endregion
 
         public void InvertRatio()
@@ -175,8 +146,22 @@ namespace LibIML.Instances
                 times = "time";
             }
 
-            TooltipText = string.Format("'{0}' is in this message {1} {2}.\nIt makes the computer think this message might be about {3}", 
-                FeatureText, Count, times, Label);
+            string ratioDesc;
+            if (Ratio > 1000) {
+                ratioDesc = "over 1,000";
+            } else {
+                if (Ratio > 100) {
+                    int ratioInt = (int)(Ratio / 10);
+                    ratioDesc = string.Format("{0:N0}", ratioInt * 10);
+                } else if (Ratio > 10) {
+                    ratioDesc = string.Format("{0:N0}", Ratio);
+                } else {
+                    ratioDesc = string.Format("{0:N1}", Ratio);
+                }
+            }
+
+            TooltipText = string.Format("'{0}' is in this message {1} {2}.\nThat makes the computer think this message is {4} times\nmore likely to be about be about {3} than {5}", 
+                FeatureText, Count, times, Label, ratioDesc, OtherLabel);
         }
     }
 }

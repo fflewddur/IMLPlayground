@@ -430,9 +430,11 @@ namespace LibIML
 
                 if (ei.Ratio > 1) {
                     ei.Label = labelWinner;
+                    ei.OtherLabel = labelLoser;
                 } else if (ei.Ratio < 1) {
                     ei.InvertRatio();
                     ei.Label = labelLoser;
+                    ei.OtherLabel = labelWinner;
                 }
 
                 //Console.WriteLine("  EvidenceItem = {0}", ei);
