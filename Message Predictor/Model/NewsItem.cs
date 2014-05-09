@@ -316,7 +316,7 @@ namespace MessagePredictor.Model
             // Ensure linebreaks won't break the highlighting
             List<string> featureWordPatterns = new List<string>();
             for (int i = 0; i < featureWords.Count; i++) {
-                featureWordPatterns.Add(Regex.Replace(featureWords[i], @"\s+", @"\s(\r?\n)?"));
+                featureWordPatterns.Add(Regex.Replace(Regex.Escape(featureWords[i]), @"\s+", @"\s(\r?\n)?"));
             }
 
             // Split the text on the features, then join it back together with <feature> tags surrounding each feature

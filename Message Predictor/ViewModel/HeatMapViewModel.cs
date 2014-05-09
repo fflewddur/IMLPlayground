@@ -169,7 +169,7 @@ namespace MessagePredictor.ViewModel
             }
 
             bool isEmpty = string.IsNullOrWhiteSpace(word);
-            string wordPattern = Regex.Replace(word.Trim(), @"\s+", @"\s(\r?\n)?");
+            string wordPattern = Regex.Replace(Regex.Escape(word.Trim()), @"\s+", @"\s(\r?\n)?");
             Regex containsWord = new Regex(@"\b(" + wordPattern + @")\b", RegexOptions.IgnoreCase);
 
             Stopwatch timer = new Stopwatch();
