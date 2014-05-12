@@ -10,6 +10,8 @@ namespace LibIML
 {
     public class Evidence : ViewModelBase
     {
+        public const int MAX_WIDTH = 300; // FIXME Hardcoded for now
+
         private List<Feature> _sourceItems;
         private List<Feature> _evidenceItems;
         private int _nClasses; // Number of classes (needed to normalize feature importance; we assume uniform class distribution)
@@ -22,9 +24,11 @@ namespace LibIML
         private string _classImbalanceTooltip;
         private bool _hasFeatures;
         private Label _label;
+        private double _labelWidth;
 
         public Evidence(Label label)
         {
+            _labelWidth = 10;
             Confidence = -1;
             PrClass = -1;
             InstanceCount = -1;
@@ -68,6 +72,7 @@ namespace LibIML
             {
                 if (SetProperty<int>(ref _instanceCount, value)) {
                     ClassImbalanceTooltip = string.Format("There are {0:N0} messages in the '{1}' folder.", InstanceCount, Label);
+                    LabelWidth = ComputeLabelWidth();
                 }
             }
         }
@@ -75,7 +80,12 @@ namespace LibIML
         public int TotalInstanceCount
         {
             get { return _totalInstanceCount; }
-            set { SetProperty<int>(ref _totalInstanceCount, value); }
+            set
+            {
+                if (SetProperty<int>(ref _totalInstanceCount, value)) {
+                    LabelWidth = ComputeLabelWidth();
+                }
+            }
         }
 
         public bool HasFeatures
@@ -121,6 +131,12 @@ namespace LibIML
             private set { SetProperty<Label>(ref _label, value); }
         }
 
+        public double LabelWidth
+        {
+            get { return _labelWidth; }
+            private set { SetProperty<double>(ref _labelWidth, value); }
+        }
+
         public string ClassImbalanceTooltip
         {
             get { return _classImbalanceTooltip; }
@@ -128,6 +144,11 @@ namespace LibIML
         }
 
         #endregion
+
+        private double ComputeLabelWidth()
+        {
+            return (_instanceCount / (double)_totalInstanceCount) * MAX_WIDTH;
+        }
 
         //public void UpdateHeightsForEvidenceExplanation()
         //{
