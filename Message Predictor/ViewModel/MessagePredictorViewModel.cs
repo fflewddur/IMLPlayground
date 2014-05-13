@@ -611,7 +611,6 @@ namespace MessagePredictor
 
             classifier.ClearInstances();
             classifier.AddInstances(trainingSet);
-            //classifier.AddPriors(FeatureSetVM.UserAddedFeatures);
             classifier.AddPriors(FeatureSetVM.FeatureSet);
             classifier.Train();
 

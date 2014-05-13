@@ -276,6 +276,10 @@ namespace LibIML
         {
             foreach (Feature f in priors) {
                 int id = _vocab.GetWordId(f.Characters, true);
+                if (Double.IsNaN(f.Topic1Importance.UserPrior))
+                    throw new ArgumentException("Topic1Importance.UserPrior can't be NaN");
+                if (Double.IsNaN(f.Topic2Importance.UserPrior))
+                    throw new ArgumentException("Topic2Importance.UserPrior can't be NaN");
                 _perClassFeaturePriors[f.Topic1Importance.Label][id] = f.Topic1Importance.UserPrior;
                 _perClassFeaturePriors[f.Topic2Importance.Label][id] = f.Topic2Importance.UserPrior;
             }
