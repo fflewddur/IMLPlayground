@@ -30,13 +30,12 @@ namespace MessagePredictor.ViewModel
         private string _featureText; // The feature the user is currently typing in
         private string _selectedText; // If the user has highlighted text in a message, use it as the default for a new feature
         private Feature _selectedFeature; // The highlighted feature in the UI
-        //private Label _previousLabel; // The last label the user added a feature for
         private DispatcherTimer _featureTextEditedTimer;
         private DispatcherTimer _featurePriorsEditedTimer;
         private DispatcherTimer _featureGraphHeightChangedTimer;
         private double _featureGraphHeight;
         private double _pixelsToWeight; // How many pixels to use to display each unit of feature weight (changes based on display size)
-        private bool _featureImportanceAdjusted;
+        //private bool _featureImportanceAdjusted;
         private Logger _logger;
         private AddFeatureDialog _addFeatureDialog;
         private string _undoButtonText;
@@ -58,7 +57,7 @@ namespace MessagePredictor.ViewModel
             _featureTextEditedTimer = new DispatcherTimer();
             _featurePriorsEditedTimer = new DispatcherTimer();
             _featureGraphHeightChangedTimer = new DispatcherTimer();
-            _featureImportanceAdjusted = false;
+            //_featureImportanceAdjusted = false;
             _undoButtonText = "Undo";
 
             HighlightFeature = new RelayCommand<string>(PerformHighlightFeature);
@@ -66,7 +65,7 @@ namespace MessagePredictor.ViewModel
             FeatureRemove = new RelayCommand<Feature>(PerformRemoveFeature, CanPerformRemoveFeature);
             FeatureVeryImportant = new RelayCommand<Feature>(PerformFeatureVeryImportant);
             FeatureSomewhatImportant = new RelayCommand<Feature>(PerformFeatureSomewhatImportant);
-            ApplyFeatureAdjustments = new RelayCommand(PerformApplyFeatureAdjustments, CanPerformApplyFeatureAdjustments);
+            ApplyFeatureAdjustments = new RelayCommand<Tuple<double, Label>>(PerformApplyFeatureAdjustments, CanPerformApplyFeatureAdjustments);
             UndoUserAction = new RelayCommand(PerformUndoUserAction, CanPerformUndoUserAction);
 
             _classifier.Retrained += classifier_Retrained;
@@ -155,7 +154,7 @@ namespace MessagePredictor.ViewModel
         public RelayCommand<Feature> FeatureRemove { get; private set; }
         public RelayCommand<Feature> FeatureVeryImportant { get; private set; }
         public RelayCommand<Feature> FeatureSomewhatImportant { get; private set; }
-        public RelayCommand ApplyFeatureAdjustments { get; private set; }
+        public RelayCommand<Tuple<double, Label>> ApplyFeatureAdjustments { get; private set; }
         public RelayCommand UndoUserAction { get; private set; }
 
         #endregion
@@ -375,9 +374,99 @@ namespace MessagePredictor.ViewModel
                 heightDelta = -1 * (fi.UserHeight - FeatureImportance.MINIMUM_HEIGHT);
             }
             fi.UserHeight += heightDelta;
-            _featureImportanceAdjusted = true;
+            //_featureImportanceAdjusted = true;
 
             return heightDelta;
+        }
+
+        public void UpdateFeaturePriors(Tuple<double, Label> diff)
+        {
+            Console.WriteLine("*** UpdateFeaturePriors() ***");
+
+            // Don't fire a featureWeightEdited event while we're updating these values
+            _featurePriorsEditedTimer.Stop();
+
+            Console.WriteLine("UpdateFeaturePriors");
+
+            // Get the sum of user heights for each feature
+            double userHeightSumTopic1 = 0;
+            double userHeightSumTopic2 = 0;
+            foreach (Feature f in _featureSet) {
+                userHeightSumTopic1 += f.Topic1Importance.UserHeight;
+                userHeightSumTopic2 += f.Topic2Importance.UserHeight;
+            }
+
+            // Get the sum of system heights for each feature
+            double systemHeightSumTopic1 = 0;
+            double systemHeightSumTopic2 = 0;
+            foreach (Feature f in _featureSet) {
+                systemHeightSumTopic1 += f.Topic1Importance.SystemHeight;
+                systemHeightSumTopic2 += f.Topic2Importance.SystemHeight;
+            }
+
+            // Get the sum of counts for each feature
+            double systemFeatureCountSumTopic1 = 0;
+            double systemFeatureCountSumTopic2 = 0;
+            _classifier.TryGetSystemFeatureSum(_labels[0], out systemFeatureCountSumTopic1);
+            _classifier.TryGetSystemFeatureSum(_labels[1], out systemFeatureCountSumTopic2);
+
+            // Get the current sum of prior values
+            double userPriorSumTopic1;
+            double userPriorSumTopic2;
+            _classifier.TryGetFeaturePriorSum(_labels[0], out userPriorSumTopic1);
+            _classifier.TryGetFeaturePriorSum(_labels[1], out userPriorSumTopic2);
+
+            // Get the ratio of area of user importance vs. area of system importance
+            // (This tells us what the sum of user priors should be, relative to the sum of feature counts)
+            double userToSystemRatioTopic1 = Math.Round((userHeightSumTopic1 / systemHeightSumTopic1), 3);
+            double userToSystemRatioTopic2 = Math.Round((userHeightSumTopic2 / systemHeightSumTopic2), 3);
+            if (Double.IsInfinity(userToSystemRatioTopic1)) {
+                userToSystemRatioTopic1 = 1;
+            }
+            if (Double.IsInfinity(userToSystemRatioTopic2)) {
+                userToSystemRatioTopic2 = 1;
+            }
+            double desiredPriorSumTopic1 = Math.Round((userToSystemRatioTopic1 * systemFeatureCountSumTopic1), 3);
+            double desiredPriorSumTopic2 = Math.Round((userToSystemRatioTopic2 * systemFeatureCountSumTopic2), 3);
+
+            // If there are no features in this topic, we might get 0 for the desiredPriorSum. Stick with the
+            // last priorSum in that case.
+            if (desiredPriorSumTopic1 <= 0) {
+                desiredPriorSumTopic1 = userPriorSumTopic1;
+                if (diff.Item2 == _labels[0]) {
+                    double ratio = (userHeightSumTopic1 + diff.Item1) / userHeightSumTopic1;
+                    desiredPriorSumTopic1 *= ratio;
+                    if (desiredPriorSumTopic1 <= 0) {
+                        desiredPriorSumTopic1 = .1;
+                    }
+                }
+            }
+            if (desiredPriorSumTopic2 <= 0) {
+                desiredPriorSumTopic2 = userPriorSumTopic2;
+                if (diff.Item2 == _labels[1]) {
+                    double ratio = (userHeightSumTopic2 + diff.Item1) / userHeightSumTopic2;
+                    desiredPriorSumTopic2 *= ratio;
+                    if (desiredPriorSumTopic2 <= 0) {
+                        desiredPriorSumTopic2 = .1;
+                    }
+                }
+            }
+
+            // Get the percentage of the total prior value that should assigned to each feature
+            Console.WriteLine("userHeightSum1: {0} systemHeightSum1: {1} userToSystemRatio1: {2} systemFeatureCountSum1: {3} desiredPriorSum1: {4}",
+                userHeightSumTopic1, systemHeightSumTopic1, userToSystemRatioTopic1, systemFeatureCountSumTopic1, desiredPriorSumTopic1);
+            Console.WriteLine("userHeightSum2: {0} systemHeightSum2: {1} userToSystemRatio2: {2} systemFeatureCountSum2: {3} desiredPriorSum2: {4}",
+                userHeightSumTopic2, systemHeightSumTopic2, userToSystemRatioTopic2, systemFeatureCountSumTopic2, desiredPriorSumTopic2);
+            foreach (Feature f in _featureSet) {
+                Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic1Importance.UserPrior, f.Topic1Importance.Label);
+                f.Topic1Importance.UserPrior = Math.Round(((f.Topic1Importance.UserHeight / userHeightSumTopic1) * desiredPriorSumTopic1), 2);
+                Console.WriteLine("new prior = {0}, sys weight = {1:N2}", f.Topic1Importance.UserPrior, f.Topic1Importance.SystemWeight);
+                Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic2Importance.UserPrior, f.Topic2Importance.Label);
+                f.Topic2Importance.UserPrior = Math.Round(((f.Topic2Importance.UserHeight / userHeightSumTopic2) * desiredPriorSumTopic2), 2);
+                Console.WriteLine("new prior = {0}, sys weight = {1:N2}", f.Topic2Importance.UserPrior, f.Topic2Importance.SystemWeight);
+            }
+
+            _featurePriorsEditedTimer.Start();
         }
 
         #endregion
@@ -501,19 +590,6 @@ namespace MessagePredictor.ViewModel
                     f.Topic2Importance.UserPrior = prior;
                     f.Topic2Importance.UserWeight = weight;
                     FeatureSet.Add(f);
-                    // These will be system-determined features, so be sure to add them to both labels.
-                    // Also include the default user weight and prior.
-                    //foreach (Label label in _labels) {
-                    //    Feature f = new Feature(word, label);
-                    //    f.PixelsToWeight = _pixelsToWeight;
-                    //    double prior, weight;
-                    //    _classifier.TryGetFeatureUserPrior(id, label, out prior);
-                    //    f.UserPrior = prior;
-                    //    _classifier.TryGetFeatureUserWeight(id, label, out weight);
-                    //    f.UserWeight = weight;
-
-                    //    FeatureSet.Add(f);
-                    //}
                 }
             }
 
@@ -541,12 +617,10 @@ namespace MessagePredictor.ViewModel
                     f.Topic2Importance.UserWeight = weight;
                 }
 
-                //Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}", 
-                //    f.Characters, f.Topic1Importance.Label, f.Topic1Importance.UserWeight, f.Topic1Importance.SystemWeight);
-                //Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}",
-                //    f.Characters, f.Topic2Importance.Label, f.Topic2Importance.UserWeight, f.Topic2Importance.SystemWeight);
-                // Figure out which label this feature is most important for
-                //f.MostImportant = _classifier.IsFeatureMostImportantForLabel(id, f.Label);
+                Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}",
+                    f.Characters, f.Topic1Importance.Label, f.Topic1Importance.UserWeight, f.Topic1Importance.SystemWeight);
+                Console.WriteLine("Feature {0} ({1}): userWeight={2}, sysWeight={3}",
+                    f.Characters, f.Topic2Importance.Label, f.Topic2Importance.UserWeight, f.Topic2Importance.SystemWeight);
             }
 
             // Remove anything marked for removal
@@ -560,7 +634,7 @@ namespace MessagePredictor.ViewModel
             //    cvs.View.Refresh(); // FIXME too slow
             //}
 
-            _featureImportanceAdjusted = false;
+            //_featureImportanceAdjusted = false;
         }
 
         private void PerformHighlightFeature(string text)
@@ -615,7 +689,6 @@ namespace MessagePredictor.ViewModel
 
         private void AddFeatureVM_AddFeature(object sender, AddFeatureDialogViewModel.AddFeatureEventArgs e)
         {
-            //_previousLabel = e.Label;
             Feature f = e.Feature;
             f.Topic1Importance.PixelsToWeight = _pixelsToWeight;
             f.Topic2Importance.PixelsToWeight = _pixelsToWeight;
@@ -674,75 +747,23 @@ namespace MessagePredictor.ViewModel
             Console.WriteLine("PerformFeatureSomewhatImportant on {0}", feature);
         }
 
-        private bool CanPerformApplyFeatureAdjustments()
+        private bool CanPerformApplyFeatureAdjustments(Tuple<double, Label> diff)
         {
-            return _featureImportanceAdjusted;
+            //return _featureImportanceAdjusted;
+            return true;
         }
 
-        private void PerformApplyFeatureAdjustments()
+        private void PerformApplyFeatureAdjustments(Tuple<double, Label> diff)
         {
             Console.WriteLine("Apply feature adjustments");
             _logger.Writer.WriteStartElement("ApplyFeatureAdjustments");
             _logger.logTime();
 
-            UpdateFeaturePriors();
+            UpdateFeaturePriors(diff);
 
-            _featureImportanceAdjusted = false;
+            //_featureImportanceAdjusted = false;
 
             _logger.logEndElement();
-        }
-
-        private void UpdateFeaturePriors()
-        {
-            // Don't fire a featureWeightEdited event while we're updating these values
-            _featurePriorsEditedTimer.Stop();
-
-            Console.WriteLine("UpdateFeaturePriors");
-
-            //// Get the sum of user heights for each feature
-            double userHeightSumTopic1 = 0;
-            double userHeightSumTopic2 = 0;
-            foreach (Feature f in _featureSet) {
-                userHeightSumTopic1 += f.Topic1Importance.UserHeight;
-                userHeightSumTopic2 += f.Topic2Importance.UserHeight;
-            }
-
-            //// Get the sum of system heights for each feature
-            double systemHeightSumTopic1 = 0;
-            double systemHeightSumTopic2 = 0;
-            foreach (Feature f in _featureSet) {
-                systemHeightSumTopic1 += f.Topic1Importance.SystemHeight;
-                systemHeightSumTopic2 += f.Topic2Importance.SystemHeight;
-            }
-
-            //// Get the sum of counts for each feature
-            double systemFeatureCountSumTopic1 = 0;
-            double systemFeatureCountSumTopic2 = 0;
-            _classifier.TryGetSystemFeatureSum(_labels[0], out systemFeatureCountSumTopic1);
-            _classifier.TryGetSystemFeatureSum(_labels[1], out systemFeatureCountSumTopic2);
-
-            //// Get the ratio of area of user importance vs. area of system importance
-            //// (This tells us what the sum of user priors should be, relative to the sum of feature counts)
-            double userToSystemRatioTopic1 = Math.Round((userHeightSumTopic1 / systemHeightSumTopic1), 3);
-            double userToSystemRatioTopic2 = Math.Round((userHeightSumTopic2 / systemHeightSumTopic2), 3);
-            double desiredPriorSumTopic1 = Math.Round((userToSystemRatioTopic1 * systemFeatureCountSumTopic1), 3);
-            double desiredPriorSumTopic2 = Math.Round((userToSystemRatioTopic2 * systemFeatureCountSumTopic2), 3);
-
-            //// Get the percentage of the total prior value that should assigned to each feature
-            //Console.WriteLine("userHeightSum1: {0} systemHeightSum1: {1} userToSystemRatio1: {2} systemFeatureCountSum1: {3} desiredPriorSum1: {4}", 
-            //    userHeightSumTopic1, systemHeightSumTopic1, userToSystemRatioTopic1, systemFeatureCountSumTopic1, desiredPriorSumTopic1);
-            //Console.WriteLine("userHeightSum2: {0} systemHeightSum2: {1} userToSystemRatio2: {2} systemFeatureCountSum2: {3} desiredPriorSum2: {4}",
-            //    userHeightSumTopic2, systemHeightSumTopic2, userToSystemRatioTopic2, systemFeatureCountSumTopic2, desiredPriorSumTopic2);
-            foreach (Feature f in _featureSet) {
-                //Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic1Importance.UserPrior, f.Topic1Importance.Label);
-                f.Topic1Importance.UserPrior = Math.Round(((f.Topic1Importance.UserHeight / userHeightSumTopic1) * desiredPriorSumTopic1), 2);
-                //Console.WriteLine("new prior = {0}", f.Topic1Importance.UserPrior);
-                //Console.Write("Old prior for {0} ({2}) = {1}, ", f.Characters, f.Topic2Importance.UserPrior, f.Topic2Importance.Label);
-                f.Topic2Importance.UserPrior = Math.Round(((f.Topic2Importance.UserHeight / userHeightSumTopic2) * desiredPriorSumTopic2), 2);
-                //Console.WriteLine("new prior = {0}", f.Topic2Importance.UserPrior);
-            }
-
-            _featurePriorsEditedTimer.Start();
         }
 
         private bool CanPerformUndoUserAction()
@@ -775,10 +796,8 @@ namespace MessagePredictor.ViewModel
                                 f.Topic2Importance.UserPrior = action.Feature.Topic2Importance.UserPrior;
                                 f.Topic2Importance.ForceHeightUpdate();
                             }
-                            //_featureImportanceAdjusted = true;
                         }
                     }
-                    //ApplyFeatureAdjustments.Execute(null);
                     // Let anyone watching know that the feature priors have changed
                     _featurePriorsEditedTimer.Stop();
                     _featurePriorsEditedTimer.Start();
