@@ -565,10 +565,10 @@ namespace MessagePredictor
             _folderListVM.UpdateFolderCounts(_messages);
             watch.Stop();
             Console.WriteLine("Time to update folder counts: {0}", watch.Elapsed);
-            watch.Restart();
+            //watch.Restart();
             //_messageListViewSource.View.Refresh();
-            watch.Stop();
-            Console.WriteLine("Time to refresh view: {0}", watch.Elapsed);
+            //watch.Stop();
+            //Console.WriteLine("Time to refresh view: {0}", watch.Elapsed);
 
             Mouse.OverrideCursor = null;
         }
@@ -849,6 +849,7 @@ namespace MessagePredictor
             //e.Feature.Topic2Importance.UserWeight = weight;
             if (AutoUpdatePredictions) {
                 UpdatePredictions();
+                //FeatureSetVM.UpdateFeaturePriors(); // FIXME this may cause two retrains?
             } else {
                 TrainClassifier(_classifier, FilterToTrainingSet(_messages));
             }
@@ -875,7 +876,7 @@ namespace MessagePredictor
 
         void _featureSetVM_FeaturePriorsEdited(object sender, FeatureSetViewModel.FeaturePriorEditedEventArgs e)
         {
-            Console.WriteLine("weight edited. Adjust feature weights to correspond to the proportion of user-adjust heights");
+            //Console.WriteLine("weight edited. Adjust feature weights to correspond to the proportion of user-adjust heights");
             UpdatePredictions();
             //if (AutoUpdatePredictions) {
             //    PerformUpdatePredictions();

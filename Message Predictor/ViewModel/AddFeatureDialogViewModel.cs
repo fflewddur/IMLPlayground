@@ -113,18 +113,18 @@ namespace MessagePredictor.ViewModel
             if (this.SelectedWeight == this.Weights[0]) {
                 if (this.SelectedLabel == f.Topic1Importance.Label) {
                     f.Topic1Importance.WeightType = FeatureImportance.Weight.High;
-                    f.Topic2Importance.UserPrior = .01;
+                    f.Topic2Importance.UserPrior = .25;
                 } else if (this.SelectedLabel == f.Topic2Importance.Label) {
                     f.Topic2Importance.WeightType = FeatureImportance.Weight.High;
-                    f.Topic1Importance.UserPrior = .01;
+                    f.Topic1Importance.UserPrior = .25;
                 }
             } else if (this.SelectedWeight == this.Weights[1]) {
                 if (this.SelectedLabel == f.Topic1Importance.Label) {
                     f.Topic1Importance.WeightType = FeatureImportance.Weight.Medium;
-                    f.Topic2Importance.UserPrior = .01;
+                    f.Topic2Importance.UserPrior = .25;
                 } else if (this.SelectedLabel == f.Topic2Importance.Label) {
                     f.Topic2Importance.WeightType = FeatureImportance.Weight.Medium;
-                    f.Topic1Importance.UserPrior = .01;
+                    f.Topic1Importance.UserPrior = .25;
                 }
             }
 

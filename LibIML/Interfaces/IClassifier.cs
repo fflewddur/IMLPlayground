@@ -26,6 +26,7 @@ namespace LibIML
         bool TryGetFeatureSystemWeight(int id, Label label, out double weight);
         bool TryGetFeatureUserWeight(int id, Label label, out double weight);
         bool TryGetFeatureUserPrior(int id, Label label, out double prior);
+        bool TryGetFeaturePriorSum(Label label, out double priorSum);
         bool TryGetSystemFeatureSum(out double sum);
         bool TryGetSystemFeatureSum(Label label, out double sum);
         bool IsFeatureMostImportantForLabel(int id, Label label);

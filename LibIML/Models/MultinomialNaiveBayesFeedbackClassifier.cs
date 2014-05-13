@@ -82,6 +82,22 @@ namespace LibIML
 
         #region Public methods
 
+        public bool TryGetFeaturePriorSum(Label label, out double priorSum)
+        {
+
+            bool retval = false;
+
+            priorSum = 0;
+            foreach (double prior in _perClassFeaturePriors[label].Values) {
+                priorSum += prior;
+            }
+            if (priorSum > 0) {
+                retval = true;
+            }
+
+            return retval;
+        }
+
         /// <summary>
         /// Get the relative system-determined importance of a given feature for a given label.
         /// </summary>
