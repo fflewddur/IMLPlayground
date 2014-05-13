@@ -143,9 +143,9 @@
                 <Button Grid.Row="2" VerticalAlignment="Center" Margin="5" Command="{Binding UndoUserAction}" 
                         Style="{StaticResource ResourceKey=buttonStyle}" Content="{Binding UndoButtonText}"
                         ToolTip="{Binding UndoButtonTooltip}"/>
-            <Button Grid.Row="3" VerticalAlignment="Center" Margin="5" Command="{Binding ApplyFeatureAdjustments}" 
+            <!--<Button Grid.Row="3" VerticalAlignment="Center" Margin="5" Command="{Binding ApplyFeatureAdjustments}" 
                         Style="{StaticResource ResourceKey=buttonStyle}" Content="Apply"
-                        />
+                        />-->
         </Grid>
 
         </Grid>

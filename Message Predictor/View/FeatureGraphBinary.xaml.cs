@@ -30,6 +30,7 @@ namespace MessagePredictor.View
         private Feature _currentFeature;
         private FeatureImportance _currentFeatureImportance;
         private UserAction _currentAction;
+        private double _origHeight;
 
         #region Dependency properties
 
@@ -138,6 +139,7 @@ namespace MessagePredictor.View
             _currentFeatureAdjusted = false;
             _currentFeatureImportance = fi;
             _currentFeature = f;
+            _origHeight = fi.UserHeight;
             _currentAction = new UserAction(UserAction.ActionType.AdjustFeaturePrior, f, fi.Label);
             Mouse.OverrideCursor = Cursors.SizeNS;
             FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
@@ -148,6 +150,9 @@ namespace MessagePredictor.View
         {
             if (_currentFeatureImportance != null) {
                 FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+
+                double newHeight = _currentFeatureImportance.UserHeight;
+                LibIML.Label l = _currentFeatureImportance.Label;
                 vm.LogFeatureAdjustEnd(_currentFeature, _currentFeatureImportance);
                 if (_currentFeatureAdjusted) {
                     // If the feature was adjusted, add it to our list of undo-able actions
@@ -158,7 +163,8 @@ namespace MessagePredictor.View
                 _currentFeature = null;
                 _currentFeatureAdjusted = false;
                 _currentAction = null;
-                vm.ApplyFeatureAdjustments.Execute(null);
+                vm.ApplyFeatureAdjustments.Execute(Tuple.Create<double, LibIML.Label>(newHeight - _origHeight, l));
+                _origHeight = 0;
                 Mouse.OverrideCursor = null;
             }
         }
