@@ -14,6 +14,9 @@ namespace MessagePredictor.ViewModel
     public class MessageViewModel : ViewModelBase
     {
         private NewsItem _message;
+        private bool _featurePrChanged;
+        private bool _classPrChanged;
+        private bool _confChanged;
 
         public MessageViewModel()
             : base()
@@ -31,13 +34,31 @@ namespace MessagePredictor.ViewModel
                 }
 
                 if (SetProperty<NewsItem>(ref _message, value)) {
-                    UpdateMessageForViewing(_message);
+                    UpdateMessageForViewing(_message, false);
                 }
 
                 if (_message != null) {
                     _message.PropertyChanged += _message_PropertyChanged;
                 }
             }
+        }
+
+        public bool FeaturePrChanged
+        {
+            get { return _featurePrChanged; }
+            private set { SetProperty<bool>(ref _featurePrChanged, value); }
+        }
+
+        public bool ClassPrChanged
+        {
+            get { return _classPrChanged; }
+            private set { SetProperty<bool>(ref _classPrChanged, value); }
+        }
+
+        public bool ConfChanged
+        {
+            get { return _confChanged; }
+            private set { SetProperty<bool>(ref _confChanged, value); }
         }
 
         /// <summary>
@@ -48,14 +69,27 @@ namespace MessagePredictor.ViewModel
         void _message_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName == "Prediction") {
-                Message.Prediction.UpdatePrDescriptions();
+                UpdateMessageForViewing(Message, true);
             }
         }
 
-        private void UpdateMessageForViewing(NewsItem message)
+        private void UpdateMessageForViewing(NewsItem message, bool showChanges)
         {
             if (message != null && message.Prediction != null) {
                 message.Prediction.UpdatePrDescriptions();
+                if (showChanges && message.PreviousPrediction != null) {
+                    if (message.Prediction.FeaturePrDesc != message.PreviousPrediction.FeaturePrDesc) {
+                        FeaturePrChanged = !FeaturePrChanged;
+                    }
+
+                    if (message.Prediction.ClassPrDesc != message.PreviousPrediction.ClassPrDesc) {
+                        ClassPrChanged = !ClassPrChanged;
+                    }
+
+                    if (message.Prediction.ConfidenceDesc != message.PreviousPrediction.ConfidenceDesc) {
+                        ConfChanged = !ConfChanged;
+                    }
+                }
             }
         }
     }
