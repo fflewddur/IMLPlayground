@@ -10,6 +10,7 @@ namespace LibIML
     public interface IInstance
     {
         int Id { get; }
+        int Order { get; }
         string AllText { get; }
         Dictionary<string, int> TokenCounts { get; set; }
         Label UserLabel { get; set; }

@@ -567,6 +567,7 @@ namespace LibIML
                 foreach (IInstance instance in pair.Value) {
                     writer.WriteStartElement("Message");
                     writer.WriteAttributeString("id", instance.Id.ToString());
+                    writer.WriteAttributeString("order", instance.Order.ToString());
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
