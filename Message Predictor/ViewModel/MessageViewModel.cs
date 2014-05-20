@@ -21,7 +21,9 @@ namespace MessagePredictor.ViewModel
         public MessageViewModel()
             : base()
         {
-
+            _featurePrChanged = false;
+            _classPrChanged = false;
+            _confChanged = false;
         }
 
         public NewsItem Message
@@ -78,6 +80,7 @@ namespace MessagePredictor.ViewModel
             if (message != null && message.Prediction != null) {
                 message.Prediction.UpdatePrDescriptions();
                 if (showChanges && message.PreviousPrediction != null) {
+                    message.PreviousPrediction.UpdatePrDescriptions();
                     if (message.Prediction.FeaturePrDesc != message.PreviousPrediction.FeaturePrDesc) {
                         FeaturePrChanged = !FeaturePrChanged;
                     }
@@ -89,6 +92,8 @@ namespace MessagePredictor.ViewModel
                     if (message.Prediction.ConfidenceDesc != message.PreviousPrediction.ConfidenceDesc) {
                         ConfChanged = !ConfChanged;
                     }
+                } else if (!showChanges && message.PreviousPrediction != null) {
+                    message.PreviousPrediction.UpdatePrDescriptions();
                 }
             }
         }

@@ -161,11 +161,10 @@ namespace MessagePredictor.Model
             get { return _prediction; }
             set
             {
-                Prediction prev = Prediction;
-                //RecentlyChanged = false;
-                SetProperty<Prediction>(ref _prediction, value);
-                // If our Prediction changed, store the old value in PreviousPrediction
-                PreviousPrediction = prev;
+                PreviousPrediction = Prediction;
+                
+                SetProperty<Prediction>(ref _prediction, value);                
+
                 if (Prediction.Label == GroundTruthLabel)
                     IsPredictionCorrect = true;
                 else
