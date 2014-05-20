@@ -124,7 +124,7 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{StaticResource ResourceKey=topicChangedBrush}" />
                 <Setter Property="Foreground" Value="White" />
-                <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='Had been {0}', Converter={StaticResource ResourceKey=convStringFormat}}"/>
+                <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='This prediction just changed from \'{0}\'', Converter={StaticResource ResourceKey=convStringFormat}}"/>
             </MultiDataTrigger>
             <DataTrigger Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True">
                 <Setter Property="Background" Value="{Binding Prediction.Label.Color}" />
