@@ -28,7 +28,7 @@
     <ProductName>Message Predictor</ProductName>
     <PublisherName>Oregon State University</PublisherName>
     <ApplicationRevision>3</ApplicationRevision>
-    <ApplicationVersion>0.3.0.%2a</ApplicationVersion>
+    <ApplicationVersion>0.10.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
