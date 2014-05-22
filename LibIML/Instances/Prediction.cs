@@ -174,6 +174,8 @@ namespace LibIML
             Label smallestCountLabel = null, smallestWeightLabel = null, smallestConfLabel = null, 
                 largestCountLabel = null, largestWeightLabel = null, largestConfLabel = null;
             bool hasFeatures = false;
+            bool hasClassImbalance = false;
+
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
                 if (!hasFeatures) {
                     hasFeatures = pair.Value.HasFeatures;
@@ -210,10 +212,16 @@ namespace LibIML
             // Build ClassPrHeader and ClassPrDesc
             sbHeader.Clear();
             if (smallestCount == largestCount) {
+                hasClassImbalance = false;
                 sbHeader.AppendFormat("The {0} folder has as many messages as the {1} folder", largestCountLabel, smallestCountLabel);
-                sbDesc.AppendFormat("So the computer think each Unknown message is equally likely to be about {0} or {1}.",
-                   largestCountLabel, smallestCountLabel);
+                if (Math.Round(smallestWeight, 14) == Math.Round(largestWeight, 14)) {
+                    sbDesc.AppendFormat("So the computer think each Unknown message is equally likely to be about {0} or {1}.",
+                       largestCountLabel, smallestCountLabel);
+                } else {
+                    sbDesc.AppendFormat("When folder sizes are equal, only Important Words will be used to predict this message's topic.");
+                }
             } else {
+                hasClassImbalance = true;
                 sbHeader.AppendFormat("The {0} folder has more messages than the {1} folder", largestCountLabel, smallestCountLabel);
                 double ratio = Math.Round(largestCount / (double)smallestCount, 1);
                 sbDesc.AppendFormat("The difference makes the computer thinks each Unknown message is {0:N1} times more likely to be about {1} than {2}.",
@@ -295,7 +303,11 @@ namespace LibIML
 
             sbDesc.Clear();
             if (hasFeatures) {
-                sbDesc.Append("Combining 'Important words' and 'Folder size' makes the computer think this message is ");
+                if (!hasClassImbalance) {
+                    sbDesc.Append("Thus, the 'Important words' make the computer think this message is ");
+                } else {
+                    sbDesc.Append("Combining 'Important words' and 'Folder size' makes the computer think this message is ");
+                }
             } else {
                 sbDesc.Append("Thus, 'Folder size' makes the computer think this message is ");
             }
