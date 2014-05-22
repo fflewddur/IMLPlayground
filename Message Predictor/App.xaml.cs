@@ -72,7 +72,9 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
             _logger.Writer.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
             _logger.Writer.WriteAttributeString("runtime", Environment.Version.ToString());
+            _logger.Writer.WriteAttributeString("machine", Environment.MachineName.ToString());
             _logger.Writer.WriteAttributeString("version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            _logger.Writer.WriteAttributeString("startTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
             // Use a longer tooltip timeout (20 seconds)
             ToolTipService.ShowDurationProperty.OverrideMetadata(
