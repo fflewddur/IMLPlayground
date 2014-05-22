@@ -27,7 +27,7 @@
         </StackPanel>
 
         <!-- Feature Pr grid -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" Name="FeatureGrid">
             <Grid.Background>
                     <SolidColorBrush x:Name="FeatureGridBackground" Color="White"/>
             </Grid.Background>
@@ -78,8 +78,24 @@
                         <Storyboard>
                             <ColorAnimation
                                 Storyboard.TargetName="FeatureGridBackground"
-                                Storyboard.TargetProperty="Color"
+                                Storyboard.TargetProperty="Color" Duration="0:0:1.5"
                                 From="White" To="Khaki" AutoReverse="True" RepeatBehavior="1x"/>
+                            <ThicknessAnimation
+                                Storyboard.TargetName="FeatureGrid"
+                                Storyboard.TargetProperty="Margin"
+                                From="0" To="80 0 -80 0" Duration="0:0:.5" BeginTime="0:0:0">
+                                <ThicknessAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </ThicknessAnimation.EasingFunction>
+                            </ThicknessAnimation>
+                            <ThicknessAnimation
+                                Storyboard.TargetName="FeatureGrid"
+                                Storyboard.TargetProperty="Margin"
+                                From="80 0 -80 0" To="0" Duration="0:0:1" BeginTime="0:0:.5">
+                                <ThicknessAnimation.EasingFunction>
+                                    <BounceEase Bounces="2" EasingMode="EaseOut" Bounciness="2" />
+                                </ThicknessAnimation.EasingFunction>
+                            </ThicknessAnimation>
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
@@ -91,7 +107,7 @@
         </StackPanel>
 
         <!-- Class Pr grid -->
-        <Grid Grid.Row="3">
+        <Grid Grid.Row="3" Name="ClassGrid">
             <Grid.Background>
                 <SolidColorBrush x:Name="ClassGridBackground" Color="White"/>
             </Grid.Background>
@@ -152,8 +168,24 @@
                         <Storyboard>
                             <ColorAnimation
                                 Storyboard.TargetName="ClassGridBackground"
-                                Storyboard.TargetProperty="Color"
+                                Storyboard.TargetProperty="Color" Duration="0:0:1.5"
                                 From="White" To="Khaki" AutoReverse="True" RepeatBehavior="1x"/>
+                            <ThicknessAnimation
+                                Storyboard.TargetName="ClassGrid"
+                                Storyboard.TargetProperty="Margin"
+                                From="0" To="80 0 -80 0" Duration="0:0:.5" BeginTime="0:0:0">
+                                <ThicknessAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </ThicknessAnimation.EasingFunction>
+                            </ThicknessAnimation>
+                            <ThicknessAnimation
+                                Storyboard.TargetName="ClassGrid"
+                                Storyboard.TargetProperty="Margin"
+                                From="80 0 -80 0" To="0" Duration="0:0:1" BeginTime="0:0:.5">
+                                <ThicknessAnimation.EasingFunction>
+                                    <BounceEase Bounces="2" EasingMode="EaseOut" Bounciness="2" />
+                                </ThicknessAnimation.EasingFunction>
+                            </ThicknessAnimation>
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
@@ -214,8 +246,24 @@
                         <Storyboard>
                             <ColorAnimation
                                 Storyboard.TargetName="PieGridBackground"
-                                Storyboard.TargetProperty="Color"
+                                Storyboard.TargetProperty="Color" Duration="0:0:1.5"
                                 From="White" To="Khaki" AutoReverse="True" RepeatBehavior="1x"/>
+                            <ThicknessAnimation
+                                Storyboard.TargetName="PieGrid"
+                                Storyboard.TargetProperty="Margin"
+                                From="0" To="80 0 -80 0" Duration="0:0:.5" BeginTime="0:0:0">
+                                <ThicknessAnimation.EasingFunction>
+                                    <QuadraticEase EasingMode="EaseOut"/>
+                                </ThicknessAnimation.EasingFunction>
+                            </ThicknessAnimation>
+                            <ThicknessAnimation
+                                Storyboard.TargetName="PieGrid"
+                                Storyboard.TargetProperty="Margin"
+                                From="80 0 -80 0" To="0" Duration="0:0:1" BeginTime="0:0:.5">
+                                <ThicknessAnimation.EasingFunction>
+                                    <BounceEase Bounces="2" EasingMode="EaseOut" Bounciness="2" />
+                                </ThicknessAnimation.EasingFunction>
+                            </ThicknessAnimation>
                         </Storyboard>
                     </BeginStoryboard>
                 </EventTrigger>
