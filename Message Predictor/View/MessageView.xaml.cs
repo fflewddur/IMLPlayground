@@ -63,6 +63,19 @@ namespace MessagePredictor.View
                 binding.Path = new PropertyPath("FindText");
                 item.SetBinding(MenuItem.CommandProperty, binding);
                 item.CommandParameter = text;
+
+                // Also add an item to add this text as a feature
+                FindMenu.Items.Add(item);
+                item = new MenuItem();
+                item.DataContext = vm.FeatureSetVM;
+                if (text.Contains(" ")) {
+                    item.Header = string.Format("Add '{0}' as an Important Phrase", text);
+                } else {
+                    item.Header = string.Format("Add '{0}' as an Important Word", text);
+                }
+                binding = new Binding();
+                binding.Path = new PropertyPath("AddFeature");
+                item.SetBinding(MenuItem.CommandProperty, binding);
             } else {
                 item.Header = "No text is selected";
                 item.IsEnabled = false;

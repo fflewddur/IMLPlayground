@@ -653,11 +653,11 @@ namespace MessagePredictor.ViewModel
                 _addFeatureDialog.Owner = App.Current.MainWindow;
                 AddFeatureDialogViewModel vm = new AddFeatureDialogViewModel(_labels);
                 // If the user has searched for text, use it as the default
-                if (!string.IsNullOrWhiteSpace(_featureText) && !IsTextForSelectedFeature(_featureText)) {
-                    vm.Word = _featureText;
-                } else if (!string.IsNullOrWhiteSpace(SelectedText)) {
-                    // If the user has selected text in the message, use it as the second default choice
+                if (!string.IsNullOrWhiteSpace(SelectedText)) {
                     vm.Word = SelectedText;
+                } else if (!string.IsNullOrWhiteSpace(_featureText) && !IsTextForSelectedFeature(_featureText)) {
+                    // If the user has selected text in the message, use it as the second default choice
+                    vm.Word = _featureText;
                 }
                 vm.PropertyChanged += AddFeatureVM_PropertyChanged;
                 vm.AddFeature += AddFeatureVM_AddFeature;
