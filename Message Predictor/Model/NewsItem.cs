@@ -173,6 +173,7 @@ namespace MessagePredictor.Model
                 if (PreviousPrediction != null) {
                     if (PreviousPrediction.Label == Prediction.Label) {
                         PredictionConfidenceDifference = Math.Abs(Prediction.Confidence - PreviousPrediction.Confidence);
+                        PredictionConfidenceDirection = Direction.None; // Always refresh this arrow
                         RecentlyChanged = false;
                         // If our label hasn't changed, check the direction of the confidence change.
                         // (Only show a confidence change if the difference is more than 1%)
