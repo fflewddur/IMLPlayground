@@ -2,6 +2,7 @@
 using MessagePredictor.View;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -71,6 +72,7 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
             _logger.Writer.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
             _logger.Writer.WriteAttributeString("runtime", Environment.Version.ToString());
+            _logger.Writer.WriteAttributeString("version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             // Use a longer tooltip timeout (20 seconds)
             ToolTipService.ShowDurationProperty.OverrideMetadata(
