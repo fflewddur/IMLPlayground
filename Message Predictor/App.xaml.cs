@@ -21,8 +21,16 @@ namespace MessagePredictor
 
         public enum Condition
         {
+            None,
             Control,
             Treatment
+        }
+
+        public enum Mode
+        {
+            None,
+            Tutorial,
+            Study
         }
 
         // Use these to access Application.Properties items.
@@ -33,6 +41,7 @@ namespace MessagePredictor
             TimeLimit,
             DatasetFile,
             TestDatasetFile,
+            TutorialDatasetFile,
             Topic1TrainSize,
             Topic1TestSize,
             Topic1VocabSize,
@@ -47,7 +56,24 @@ namespace MessagePredictor
             Topic2UserLabel,
             Topic2Color,
             Topic2ColorDesc,
-            AutoUpdatePredictions
+            AutoUpdatePredictions,
+            UserId,
+            Mode
+        }
+
+        private class Options
+        {
+            public Mode Mode;
+            public Condition Condition;
+            public bool ShowHelp;
+            public bool ShowVersion;
+            public string UserId;
+
+            public Options()
+            {
+                Mode = Mode.None;
+                Condition = Condition.None;
+            }
         }
 
         private Logger _logger;
@@ -59,16 +85,46 @@ namespace MessagePredictor
         {
             base.OnStartup(e);
 
-            _logger = new Logger();
+            Options options = ParseCommandOptions(e.Args);
+            if (options.ShowHelp) {
+                Console.WriteLine("Options:");
+                Console.WriteLine("\t-c [condition]\tStart either the 'control' or 'treatment' condition.");
+                Console.WriteLine("\t-h\t\tDisplay this message and exit");
+                Console.WriteLine("\t-m [mode]\tStart in either 'tutorial' or 'study' mode.");
+                Console.WriteLine("\t-p [id]\t\tSet the participant ID to [id]");
+                Console.WriteLine("\t-v\t\tDisplay the version number and exit");
+                Environment.Exit(0);
+            } else if (options.ShowVersion) {
+                Console.WriteLine("Message Predictor {0}", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                Environment.Exit(0);
+            }
+
+            _logger = new Logger(options.UserId);
             _logger.Writer.WriteStartDocument();
             _logger.Writer.WriteStartElement("MessagePredictorLog");
 
-            LoadPropertiesFile();
+            LoadPropertiesFile(options.Mode == Mode.Tutorial);
+
+            // If we specified command line arguments to over-ride the properties file, make sure that happens
+            if (options.Condition != Condition.None) {
+                this.Properties[PropertyKey.Condition] = options.Condition;
+            }
+            if (options.Mode != Mode.None) {
+                this.Properties[PropertyKey.Mode] = options.Mode;
+            }
+            if (!string.IsNullOrWhiteSpace(options.UserId)) {
+                this.Properties[PropertyKey.UserId] = options.UserId;
+            } else {
+                this.Properties[PropertyKey.UserId] = "dev"; // development identifier
+            }
+
             _logger.Writer.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
+            _logger.Writer.WriteAttributeString("mode", this.Properties[PropertyKey.Mode].ToString());
             _logger.Writer.WriteAttributeString("dataset", this.Properties[PropertyKey.DatasetFile].ToString());
             _logger.Writer.WriteAttributeString("testDataset", this.Properties[PropertyKey.TestDatasetFile].ToString());
             _logger.Writer.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
             _logger.Writer.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
+            _logger.Writer.WriteAttributeString("userid", this.Properties[PropertyKey.UserId].ToString());
             _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
             _logger.Writer.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
             _logger.Writer.WriteAttributeString("runtime", Environment.Version.ToString());
@@ -124,6 +180,16 @@ namespace MessagePredictor
                 condition = Condition.Treatment;
 
             this.Properties[PropertyKey.Condition] = condition;
+        }
+
+        private void LoadModeProperty(XElement element)
+        {
+            string modeString = element.Value.ToString();
+            Mode mode = Mode.Study;
+            if (modeString.Equals("Tutorial", StringComparison.InvariantCultureIgnoreCase))
+                mode = Mode.Tutorial;
+
+            this.Properties[PropertyKey.Mode] = mode;
         }
 
         /// <summary>
@@ -226,7 +292,7 @@ namespace MessagePredictor
         /// <summary>
         /// Load an XML file containing various runtime properties.
         /// </summary>
-        private void LoadPropertiesFile()
+        private void LoadPropertiesFile(bool isTutorial)
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "Properties.xml");
             try {
@@ -235,10 +301,12 @@ namespace MessagePredictor
                     if (element.Name == "Condition") // Are we running control or treatment?
                     {
                         LoadConditionProperty(element);
+                    } else if (element.Name == "Mode") {
+                        LoadModeProperty(element);
                     } else if (element.Name == "TimeLimit") // How long should we let the program run?
                     {
                         LoadTimeLimitProperty(element);
-                    } else if (element.Name == "DataSet") {
+                    } else if (element.Name == "DataSet" && !isTutorial) {
                         if (element.Attribute("file") != null)
                             this.Properties[PropertyKey.DatasetFile] = element.Attribute("file").Value.ToString();
 
@@ -255,11 +323,88 @@ namespace MessagePredictor
                         if (element.Attribute("file") != null) {
                             this.Properties[PropertyKey.TestDatasetFile] = element.Attribute("file").Value.ToString();
                         }
+                    } else if (element.Name == "TutorialDataSet" && isTutorial) {
+                        if (element.Attribute("file") != null)
+                            this.Properties[PropertyKey.DatasetFile] = element.Attribute("file").Value.ToString();
+
+                        foreach (XElement childElement in element.Elements()) {
+                            if (childElement.Name == "Topic1") {
+                                LoadTopicProperty(childElement, 1);
+                            } else if (childElement.Name == "Topic2") {
+                                LoadTopicProperty(childElement, 2);
+                            }
+                        }
                     }
                 }
             } catch (FileNotFoundException e) {
                 Console.Error.WriteLine("Could not load properties file: {0}", e.Message);
             }
+        }
+
+        private Options ParseCommandOptions(string[] args)
+        {
+            Options options = new Options();
+
+            for (int i = 0; i < args.Length; i++) {
+                switch (args[i]) {
+                    case "-c":
+                        i++;
+                        if (i < args.Length) {
+                            string c = args[i];
+                            if (c.Equals("treatment", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Condition = Condition.Treatment;
+                            } else if (c.Equals("control", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Condition = Condition.Control;
+                            } else {
+                                Console.Error.WriteLine("Error: {0} is not a valid condition. Use the -h option to view valid conditions.", c);
+                                Environment.Exit(1);
+                            }
+                        } else {
+                            Console.Error.WriteLine("Error: No condition specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-h":
+                        options.ShowHelp = true;
+                        break;
+                    case "-m":
+                        i++;
+                        if (i < args.Length) {
+                            string m = args[i];
+                            if (m.Equals("study", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Mode = Mode.Study;
+                            } else if (m.Equals("tutorial", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Mode = Mode.Tutorial;
+                            } else {
+                                Console.Error.WriteLine("Error: {0} is not a valid mode. Use the -h option to view valid mode.", m);
+                                Environment.Exit(1);
+                            }
+                        } else {
+                            Console.Error.WriteLine("Error: No mode specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-p":
+                        i++;
+                        if (i < args.Length) {
+                            string id = args[i];
+                            options.UserId = id;
+                        } else {
+                            Console.Error.WriteLine("Error: No user ID specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-v":
+                        options.ShowVersion = true;
+                        break;
+                    default:
+                        Console.Error.WriteLine("Error: Unknown argument '{0}'.", args[i]);
+                        options.ShowHelp = true;
+                        break;
+                }
+            }
+
+            return options;
         }
 
         #region Event handlers

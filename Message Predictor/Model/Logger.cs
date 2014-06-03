@@ -13,7 +13,7 @@ namespace MessagePredictor.Model
     {
         XmlWriter _writer;
 
-        public Logger()
+        public Logger(string userId)
         {
             // If our log directory doesn't exist, create it.
             string logDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.LogDir);
@@ -22,12 +22,13 @@ namespace MessagePredictor.Model
             }
 
             // Create a new log file
-            string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.LogDir, "log.xml");
+            if (string.IsNullOrWhiteSpace(userId)) {
+                userId = "dev";
+            }
+            string logFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, App.LogDir, string.Format("log-{0}.xml", userId));
             XmlWriterSettings settings = new XmlWriterSettings();
             settings.Indent = true;
             settings.IndentChars = "\t";
-            //XmlWriter logger = XmlWriter.Create(logFile, settings);
-
 
             _writer = XmlWriter.Create(logFile, settings);
         }

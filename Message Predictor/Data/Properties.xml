@@ -1,13 +1,18 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Sample configuration file -->
 <MessagePredictorProperties>
-  <Condition>Treatment</Condition>
-  <!--<Condition>Control</Condition>-->
+  <!--<Condition>Treatment</Condition>-->
+  <Condition>Control</Condition>
+  <Mode>Study</Mode>
   <TimeLimit minutes="10" seconds="0" />
   <DataSet file="20news-sports-bydate-train.zip">
     <Topic1 trainSize="10" testSize="500" vocabSize="5" systemLabel="rec.sport.hockey" userLabel="Hockey" color="#FF38C9FF" colorDesc="blue" />
     <Topic2 trainSize="10" testSize="500" vocabSize="5" systemLabel="rec.sport.baseball" userLabel="Baseball" color="#FF69D643" colorDesc="green"/>
   </DataSet>
   <TestDataSet file="20news-sports-bydate-test.zip" />
+  <TutorialDataSet file="20news-science-bydate-train.zip">
+    <Topic1 trainSize="10" testSize="500" vocabSize="5" systemLabel="sci.med" userLabel="Medicine" color="#FF38C9FF" colorDesc="blue" />
+    <Topic2 trainSize="10" testSize="500" vocabSize="5" systemLabel="sci.space" userLabel="Space" color="#FF69D643" colorDesc="green"/>
+  </TutorialDataSet>
   <AutoUpdatePredictions>true</AutoUpdatePredictions>
 </MessagePredictorProperties>
