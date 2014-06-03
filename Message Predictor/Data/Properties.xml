@@ -11,8 +11,8 @@
   </DataSet>
   <TestDataSet file="20news-sports-bydate-test.zip" />
   <TutorialDataSet file="20news-science-bydate-train.zip">
-    <Topic1 trainSize="10" testSize="500" vocabSize="5" systemLabel="sci.med" userLabel="Medicine" color="#FF38C9FF" colorDesc="blue" />
-    <Topic2 trainSize="10" testSize="500" vocabSize="5" systemLabel="sci.space" userLabel="Space" color="#FF69D643" colorDesc="green"/>
+    <Topic1 trainSize="10" testSize="500" vocabSize="5" systemLabel="sci.med" userLabel="Medicine" color="#FFDB6C56" colorDesc="red" />
+    <Topic2 trainSize="10" testSize="500" vocabSize="5" systemLabel="sci.space" userLabel="Space" color="#FF56C5DB" colorDesc="teal"/>
   </TutorialDataSet>
   <AutoUpdatePredictions>true</AutoUpdatePredictions>
 </MessagePredictorProperties>
