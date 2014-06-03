@@ -9,11 +9,6 @@
     <conv:StringFormatConverter x:Key="convStringFormat" />
     <conv:LabelToBoolConverter x:Key="convLabelToBool" />
 
-    <!--<SolidColorBrush x:Key="hockeyBrushUser" Color="#FFDC9717" />
-    <SolidColorBrush x:Key="hockeyBrushSystem" Color="#FFB66400" />
-    <SolidColorBrush x:Key="baseballBrushUser" Color="#FF2EBB2E" />
-    <SolidColorBrush x:Key="baseballBrushSystem" Color="#FF127812" />-->
-
     <SolidColorBrush x:Key="topicChangedBrush" Color="#FF575757" />
     <SolidColorBrush x:Key="heatMapUnknownBrush" Color="#FF575757" />
 

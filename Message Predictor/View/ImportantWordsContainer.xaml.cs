@@ -44,26 +44,26 @@ namespace MessagePredictor.View
             }
         }
 
-        private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            TabControl tc = sender as TabControl;
-            FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
-            if (vm != null) {
-                string tabName = "Unknown";
-                switch (tc.SelectedIndex) {
-                    case 0:
-                        tabName = "Overview";
-                        break;
-                    case 1:
-                        tabName = "Hockey";
-                        break;
-                    case 2:
-                        tabName = "Baseball";
-                        break;
-                }
-                vm.LogFeatureTabChanged(tabName);
-            }
-        }
+        //private void TabControl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        //{
+        //    TabControl tc = sender as TabControl;
+        //    FeatureSetViewModel vm = this.DataContext as FeatureSetViewModel;
+        //    if (vm != null) {
+        //        string tabName = "Unknown";
+        //        switch (tc.SelectedIndex) {
+        //            case 0:
+        //                tabName = "Overview";
+        //                break;
+        //            case 1:
+        //                tabName = "Hockey";
+        //                break;
+        //            case 2:
+        //                tabName = "Baseball";
+        //                break;
+        //        }
+        //        vm.LogFeatureTabChanged(tabName);
+        //    }
+        //}
 
         private void ShowImportantWordsExplanation(object sender, RoutedEventArgs e)
         {

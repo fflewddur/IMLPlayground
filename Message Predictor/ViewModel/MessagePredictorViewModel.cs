@@ -109,7 +109,7 @@ namespace MessagePredictor
             _folderListVM.SelectedFolderChanged += _folderListVM_SelectedFolderChanged;
             _folderListVM.SelectedMessageChanged += _folderListVM_SelectedMessageChanged;
 
-            _messageVM = new MessageViewModel();
+            _messageVM = new MessageViewModel(_labels);
 
             _featureSetVM = new FeatureSetViewModel(_classifier, _vocab, _labels, _logger);
             _featureSetVM.FeatureAdded += _featureSetVM_FeatureAdded;

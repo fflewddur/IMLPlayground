@@ -187,9 +187,7 @@
     <Compile Include="View\FolderList.xaml.cs">
       <DependentUpon>FolderList.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\ImportantWordsContainer.xaml.cs">
-      <DependentUpon>ImportantWordsContainer.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="View\ImportantWordsContainer.xaml.cs" />
     <Compile Include="View\ImportantWordsOverview.xaml.cs">
       <DependentUpon>ImportantWordsOverview.xaml</DependentUpon>
     </Compile>
@@ -251,8 +249,8 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="View\ImportantWordsContainer.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="View\ImportantWordsOverview.xaml">
       <SubType>Designer</SubType>
