@@ -58,13 +58,15 @@ namespace MessagePredictor
             Topic2ColorDesc,
             AutoUpdatePredictions,
             UserId,
-            Mode
+            Mode,
+            FullScreen
         }
 
         private class Options
         {
             public Mode Mode;
             public Condition Condition;
+            public bool FullScreen;
             public bool ShowHelp;
             public bool ShowVersion;
             public string UserId;
@@ -88,9 +90,10 @@ namespace MessagePredictor
             Options options = ParseCommandOptions(e.Args);
             if (options.ShowHelp) {
                 Console.WriteLine("Options:");
-                Console.WriteLine("\t-c [condition]\tStart either the 'control' or 'treatment' condition.");
+                Console.WriteLine("\t-c [condition]\tStart either the 'control' or 'treatment' condition");
+                Console.WriteLine("\t-f\t\tExpand window to full size of screen");
                 Console.WriteLine("\t-h\t\tDisplay this message and exit");
-                Console.WriteLine("\t-m [mode]\tStart in either 'tutorial' or 'study' mode.");
+                Console.WriteLine("\t-m [mode]\tStart in either 'tutorial' or 'study' mode");
                 Console.WriteLine("\t-p [id]\t\tSet the participant ID to [id]");
                 Console.WriteLine("\t-v\t\tDisplay the version number and exit");
                 Environment.Exit(0);
@@ -117,6 +120,7 @@ namespace MessagePredictor
             } else {
                 this.Properties[PropertyKey.UserId] = "dev"; // development identifier
             }
+            this.Properties[PropertyKey.FullScreen] = options.FullScreen;
 
             _logger.Writer.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
             _logger.Writer.WriteAttributeString("mode", this.Properties[PropertyKey.Mode].ToString());
@@ -125,6 +129,7 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
             _logger.Writer.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
             _logger.Writer.WriteAttributeString("userid", this.Properties[PropertyKey.UserId].ToString());
+            _logger.Writer.WriteAttributeString("fullScreen", this.Properties[PropertyKey.FullScreen].ToString());
             _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
             _logger.Writer.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
             _logger.Writer.WriteAttributeString("runtime", Environment.Version.ToString());
@@ -140,6 +145,9 @@ namespace MessagePredictor
             var window = new MessagePredictorWindow();
             window.DataContext = _vm;
             window.Loaded += window_Loaded;
+            if (options.FullScreen) {
+                window.WindowState = WindowState.Maximized;
+            }
             window.Show();
             _logger.Writer.WriteStartElement("WindowOpen");
             _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -363,6 +371,9 @@ namespace MessagePredictor
                             Console.Error.WriteLine("Error: No condition specified");
                             Environment.Exit(1);
                         }
+                        break;
+                    case "-f":
+                        options.FullScreen = true;
                         break;
                     case "-h":
                         options.ShowHelp = true;
