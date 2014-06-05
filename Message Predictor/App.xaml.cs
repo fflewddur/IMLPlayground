@@ -1,5 +1,6 @@
 ﻿using MessagePredictor.Model;
 using MessagePredictor.View;
+using MessagePredictor.ViewModel;
 using System;
 using System.IO;
 using System.Reflection;
@@ -70,6 +71,7 @@ namespace MessagePredictor
             public bool ShowHelp;
             public bool ShowVersion;
             public string UserId;
+            public bool OverWriteLog;
 
             public Options()
             {
@@ -94,6 +96,7 @@ namespace MessagePredictor
                 Console.WriteLine("\t-f\t\tExpand window to full size of screen");
                 Console.WriteLine("\t-h\t\tDisplay this message and exit");
                 Console.WriteLine("\t-m [mode]\tStart in either 'tutorial' or 'study' mode");
+                Console.WriteLine("\t-ow\t\tOverwrite the existing log file");
                 Console.WriteLine("\t-p [id]\t\tSet the participant ID to [id]");
                 Console.WriteLine("\t-v\t\tDisplay the version number and exit");
                 Environment.Exit(0);
@@ -101,10 +104,6 @@ namespace MessagePredictor
                 Console.WriteLine("Message Predictor {0}", Assembly.GetExecutingAssembly().GetName().Version.ToString());
                 Environment.Exit(0);
             }
-
-            _logger = new Logger(options.UserId);
-            _logger.Writer.WriteStartDocument();
-            _logger.Writer.WriteStartElement("MessagePredictorLog");
 
             LoadPropertiesFile(options.Mode == Mode.Tutorial);
 
@@ -121,6 +120,10 @@ namespace MessagePredictor
                 this.Properties[PropertyKey.UserId] = "dev"; // development identifier
             }
             this.Properties[PropertyKey.FullScreen] = options.FullScreen;
+
+            _logger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), options.OverWriteLog);
+            _logger.Writer.WriteStartDocument();
+            _logger.Writer.WriteStartElement("MessagePredictorLog");
 
             _logger.Writer.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
             _logger.Writer.WriteAttributeString("mode", this.Properties[PropertyKey.Mode].ToString());
@@ -162,6 +165,19 @@ namespace MessagePredictor
             _logger.Writer.WriteEndElement(); // End <actions/> element
             _logger.Writer.WriteStartElement("WindowClose");
             _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.Writer.WriteEndElement();
+
+            // Log the accuracy the user saw for each folder
+            _logger.Writer.WriteStartElement("FolderAccuracy");
+            foreach (FolderViewModel fvm in _vm.FolderListVM.Folders) {
+                _logger.Writer.WriteStartElement("Folder");
+                _logger.Writer.WriteAttributeString("label", fvm.Label.ToString());
+                if (fvm.Evaluator != null) {
+                    _logger.Writer.WriteAttributeString("correctPredictions", fvm.Evaluator.CorrectPredictionCount.ToString());
+                }
+                _logger.Writer.WriteAttributeString("totalMessages", fvm.MessageCount.ToString());
+                _logger.Writer.WriteEndElement();
+            }
             _logger.Writer.WriteEndElement();
 
             // Log the feature set and training set
@@ -394,6 +410,9 @@ namespace MessagePredictor
                             Console.Error.WriteLine("Error: No mode specified");
                             Environment.Exit(1);
                         }
+                        break;
+                    case "-ow":
+                        options.OverWriteLog = true;
                         break;
                     case "-p":
                         i++;

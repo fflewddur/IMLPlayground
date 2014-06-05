@@ -932,7 +932,7 @@ namespace MessagePredictor
                 _logger.Writer.WriteAttributeString("predictionLabel", e.Message.Prediction.Label.ToString());
                 _logger.Writer.WriteAttributeString("predictionConfidence", e.Message.Prediction.Confidence.ToString());
                 _logger.Writer.WriteAttributeString("predictionConfidenceDirection", e.Message.PredictionConfidenceDirection.ToString());
-                _logger.Writer.WriteAttributeString("messagePosition", _messageListViewSource.View.CurrentPosition.ToString());
+                //_logger.Writer.WriteAttributeString("messagePosition", _messageListViewSource.View.CurrentPosition.ToString()); // Doesn't work because the view hasn't updated yet
                 _logger.logTime();
 
                 MessageVM.Message = e.Message;
