@@ -168,14 +168,25 @@ namespace MessagePredictor
             _logger.Writer.WriteEndElement();
 
             // Log the accuracy the user saw for each folder
-            _logger.Writer.WriteStartElement("FolderAccuracy");
+            _logger.Writer.WriteStartElement("FolderResults");
             foreach (FolderViewModel fvm in _vm.FolderListVM.Folders) {
                 _logger.Writer.WriteStartElement("Folder");
                 _logger.Writer.WriteAttributeString("label", fvm.Label.ToString());
                 if (fvm.Evaluator != null) {
                     _logger.Writer.WriteAttributeString("correctPredictions", fvm.Evaluator.CorrectPredictionCount.ToString());
+                    _logger.Writer.WriteAttributeString("averageConfidence", fvm.Evaluator.TrainingSetAverageConfidence.ToString());
                 }
                 _logger.Writer.WriteAttributeString("totalMessages", fvm.MessageCount.ToString());
+                _logger.Writer.WriteEndElement();
+            }
+            _logger.Writer.WriteEndElement();
+
+            // Log the average confidence of each topic
+            _logger.Writer.WriteStartElement("AverageConfidence");
+            foreach (Evaluator evaluator in _vm.EvaluatorVM.Evaluators) {
+                _logger.Writer.WriteStartElement("TopicAverageConfidence");
+                _logger.Writer.WriteAttributeString("label", evaluator.Label.ToString());
+                _logger.Writer.WriteAttributeString("averageConfidence", evaluator.AverageConfidence.ToString());
                 _logger.Writer.WriteEndElement();
             }
             _logger.Writer.WriteEndElement();
