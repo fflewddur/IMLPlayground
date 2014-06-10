@@ -43,7 +43,7 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="auto" SortDirection="Ascending" 
+                <DataGridTextColumn Header="{StaticResource ResourceKey=messageListOrderHeader}"  Binding="{Binding Order}" Width="auto" SortDirection="Ascending" 
                                     HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="5*" 
                                     HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>

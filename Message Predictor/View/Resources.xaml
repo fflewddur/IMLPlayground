@@ -105,6 +105,10 @@
     
     <!-- Message list -->
 
+    <TextBlock TextAlignment="Center" x:Key="messageListOrderHeader">
+        Original<LineBreak />order
+    </TextBlock>
+    
     <TextBlock TextAlignment="Center" x:Key="messageListTopicHeader">
         Predicted<LineBreak />topic
     </TextBlock>
