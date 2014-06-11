@@ -12,7 +12,7 @@
     <SolidColorBrush x:Key="topicChangedBrush" Color="#FF575757" />
     <SolidColorBrush x:Key="heatMapUnknownBrush" Color="#FF575757" />
 
-    
+
 
     <Style x:Key="windowStyle" TargetType="Window">
         <Setter Property="FontFamily" Value="Sego UI" />
@@ -93,7 +93,7 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
     <!-- Stuff to hide depending on treatment -->
     <Style x:Key="explanationContent" TargetType="Control">
         <Style.Triggers>
@@ -102,13 +102,13 @@
             </DataTrigger>
         </Style.Triggers>
     </Style>
-    
+
     <!-- Message list -->
 
     <TextBlock TextAlignment="Center" x:Key="messageListOrderHeader">
         Original<LineBreak />order
     </TextBlock>
-    
+
     <TextBlock TextAlignment="Center" x:Key="messageListTopicHeader">
         Predicted<LineBreak />topic
     </TextBlock>
@@ -123,7 +123,7 @@
                 </MultiDataTrigger.Conditions>
                 <Setter Property="Background" Value="{StaticResource ResourceKey=topicChangedBrush}" />
                 <Setter Property="Foreground" Value="White" />
-                <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='This prediction just changed from \'{0}\'', Converter={StaticResource ResourceKey=convStringFormat}}"/>
+                <Setter Property="ToolTip" Value="{Binding PreviousPrediction.Label, ConverterParameter='This prediction just changed from {0}', Converter={StaticResource ResourceKey=convStringFormat}}"/>
             </MultiDataTrigger>
             <DataTrigger Binding="{Binding UserLabel, Converter={StaticResource ResourceKey=convLabelToBool}}" Value="True">
                 <Setter Property="Background" Value="{Binding Prediction.Label.Color}" />
@@ -135,7 +135,7 @@
     <Style x:Key="messageListHeaderStyle" TargetType="Control">
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
     </Style>
-    
+
     <DataTemplate x:Key="messageListTopicTemplate" DataType="model:NewsItem">
         <TextBlock TextAlignment="Center" Text="{Binding Prediction.Label}" Style="{StaticResource ResourceKey=messageListTopicStyle}" />
     </DataTemplate>
@@ -160,7 +160,7 @@
     <!-- End message list -->
 
     <!-- Prediction explanation -->
-    
+
     <Style x:Key="hideIfNoFeatures">
         <Style.Triggers>
             <DataTrigger Binding="{Binding MessageVM.Message.Prediction.ImportantWordUniques}" Value="0">
@@ -176,9 +176,9 @@
     <Style x:Key="importantWordsDropDownStyle" TargetType="xctk:DropDownButton">
         <Setter Property="Padding" Value="5 2"/>
     </Style>
-    
+
     <!-- End important words -->
-    
+
     <!-- Heat map -->
 
     <Style x:Key="heatMapHeaderStyle" TargetType="TextBlock">
@@ -199,10 +199,10 @@
             <DataTrigger Binding="{Binding ToHighlight}" Value="{x:Static sys:String.Empty}">
                 <Setter Property="Visibility" Value="Collapsed"/>
             </DataTrigger>
-            
+
         </Style.Triggers>
     </Style>
-    
+
     <Style x:Key="heatMapNoContentStyle" TargetType="TextBlock">
         <Setter Property="Foreground" Value="Gray"/>
         <Setter Property="FontStyle" Value="Italic"/>
