@@ -40,6 +40,7 @@ namespace MessagePredictor
             Unknown,
             Condition,
             TimeLimit,
+            EvalInterval,
             DatasetFile,
             TestDatasetFile,
             TutorialDatasetFile,
@@ -72,6 +73,8 @@ namespace MessagePredictor
             public bool ShowVersion;
             public string UserId;
             public bool OverWriteLog;
+            public int TimeLimit;
+            public int EvalInterval;
 
             public Options()
             {
@@ -95,9 +98,11 @@ namespace MessagePredictor
                 Console.WriteLine("\t-c [condition]\tStart either the 'control' or 'treatment' condition");
                 Console.WriteLine("\t-f\t\tExpand window to full size of screen");
                 Console.WriteLine("\t-h\t\tDisplay this message and exit");
+                Console.WriteLine("\t-i [interval]\tEvaluate classifier every [interval] seconds");
                 Console.WriteLine("\t-m [mode]\tStart in either 'tutorial' or 'study' mode");
                 Console.WriteLine("\t-ow\t\tOverwrite the existing log file");
                 Console.WriteLine("\t-p [id]\t\tSet the participant ID to [id]");
+                Console.WriteLine("\t-t [time]\tAutomatically close the application after [time] minutes");
                 Console.WriteLine("\t-v\t\tDisplay the version number and exit");
                 Environment.Exit(0);
             } else if (options.ShowVersion) {
@@ -120,6 +125,12 @@ namespace MessagePredictor
                 this.Properties[PropertyKey.UserId] = "dev"; // development identifier
             }
             this.Properties[PropertyKey.FullScreen] = options.FullScreen;
+            if (options.TimeLimit > 0) {
+                this.Properties[PropertyKey.TimeLimit] = options.TimeLimit;
+            }
+            if (options.EvalInterval > 0) {
+                this.Properties[PropertyKey.EvalInterval] = options.EvalInterval;
+            }
 
             _logger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), options.OverWriteLog);
             _logger.Writer.WriteStartDocument();
@@ -131,6 +142,7 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("testDataset", this.Properties[PropertyKey.TestDatasetFile].ToString());
             _logger.Writer.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
             _logger.Writer.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
+            _logger.Writer.WriteAttributeString("evalInterval", this.Properties[PropertyKey.EvalInterval].ToString());
             _logger.Writer.WriteAttributeString("userid", this.Properties[PropertyKey.UserId].ToString());
             _logger.Writer.WriteAttributeString("fullScreen", this.Properties[PropertyKey.FullScreen].ToString());
             _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
@@ -150,6 +162,9 @@ namespace MessagePredictor
             window.Loaded += window_Loaded;
             if (options.FullScreen) {
                 window.WindowState = WindowState.Maximized;
+            }
+            if ((int)this.Properties[PropertyKey.TimeLimit] > 0) {
+                window.WindowStyle = WindowStyle.None;
             }
             window.Show();
             _logger.Writer.WriteStartElement("WindowOpen");
@@ -241,6 +256,18 @@ namespace MessagePredictor
                 seconds = Int32.Parse(element.Attribute("seconds").Value.ToString());
 
             this.Properties[PropertyKey.TimeLimit] = (minutes * 60) + seconds;
+        }
+
+        private void LoadEvalIntervalProperty(XElement element)
+        {
+            int minutes = 0;
+            int seconds = 0;
+            if (element.Attribute("minutes") != null)
+                minutes = Int32.Parse(element.Attribute("minutes").Value.ToString());
+            if (element.Attribute("seconds") != null)
+                seconds = Int32.Parse(element.Attribute("seconds").Value.ToString());
+
+            this.Properties[PropertyKey.EvalInterval] = (minutes * 60) + seconds;
         }
 
         /// <summary>
@@ -341,6 +368,9 @@ namespace MessagePredictor
                     } else if (element.Name == "TimeLimit") // How long should we let the program run?
                     {
                         LoadTimeLimitProperty(element);
+                    } else if (element.Name == "EvalInterval") // When should we log evaluations of the classifier?
+                    {
+                        LoadEvalIntervalProperty(element);
                     } else if (element.Name == "DataSet" && !isTutorial) {
                         if (element.Attribute("file") != null)
                             this.Properties[PropertyKey.DatasetFile] = element.Attribute("file").Value.ToString();
@@ -405,6 +435,15 @@ namespace MessagePredictor
                     case "-h":
                         options.ShowHelp = true;
                         break;
+                    case "-i":
+                        i++;
+                        if (i < args.Length) {
+                            options.EvalInterval = int.Parse(args[i]);
+                        } else {
+                            Console.Error.WriteLine("Error: No evaluation interval specified");
+                            Environment.Exit(1);
+                        }
+                        break;
                     case "-m":
                         i++;
                         if (i < args.Length) {
@@ -432,6 +471,15 @@ namespace MessagePredictor
                             options.UserId = id;
                         } else {
                             Console.Error.WriteLine("Error: No user ID specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-t":
+                        i++;
+                        if (i < args.Length) {
+                            options.TimeLimit = int.Parse(args[i]) * 60; // Convert minutes to seconds
+                        } else {
+                            Console.Error.WriteLine("Error: No time limit specified");
                             Environment.Exit(1);
                         }
                         break;

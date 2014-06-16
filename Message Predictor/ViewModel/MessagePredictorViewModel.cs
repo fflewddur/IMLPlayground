@@ -13,10 +13,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 using System.Xml;
 
 namespace MessagePredictor
@@ -40,16 +42,19 @@ namespace MessagePredictor
         private EvaluatorViewModel _evaluatorVM;
         private CollectionViewSource _messageListViewSource;
         private CollectionViewSource _folderListViewSource;
-        List<string> _textToHighlight;
+        private List<string> _textToHighlight;
+        private DispatcherTimer _logTimer;
+        private int _logTimerCount;
+        private DispatcherTimer _runtimeTimer;
 
         // Application settings (set at startup)
-        int _desiredVocabSize;
-        App.Condition _condition;
-        bool _showExplanations;
+        private int _desiredVocabSize;
+        private App.Condition _condition;
+        private bool _showExplanations;
 
         // UI preferences (user-modifiable)
-        bool _autoUpdatePredictions;
-        bool _onlyShowRecentChanges;
+        private bool _autoUpdatePredictions;
+        private bool _onlyShowRecentChanges;
 
         public MessagePredictorViewModel(Logger logger)
         {
@@ -137,6 +142,23 @@ namespace MessagePredictor
             UpdateVocabForce();
             UpdatePredictions();
             UpdatePredictions(); // Do this twice to avoid showing any change indicators at the start
+
+            // Regularly log classifier accuracy
+            _logTimerCount = 0;
+            _logTimer = new DispatcherTimer();
+            _logTimer.Tick += _logTimer_Tick;
+            _logTimer.Interval = new TimeSpan(0, 0, (int)App.Current.Properties[MessagePredictor.App.PropertyKey.EvalInterval]);
+            if ((int)App.Current.Properties[MessagePredictor.App.PropertyKey.EvalInterval] > 0) {
+                _logTimer.Start();
+            }
+
+            // Exit the application when time is up
+            _runtimeTimer = new DispatcherTimer();
+            _runtimeTimer.Tick += _runtimeTimer_Tick;
+            _runtimeTimer.Interval = new TimeSpan(0, 0, (int)App.Current.Properties[MessagePredictor.App.PropertyKey.TimeLimit]);
+            if ((int)App.Current.Properties[MessagePredictor.App.PropertyKey.TimeLimit] > 0) {
+                _runtimeTimer.Start();
+            }
 
             Console.WriteLine("MessagePredictorViewModel() end");
         }
@@ -469,7 +491,7 @@ namespace MessagePredictor
             _classifier.LogTrainingSet(_logger.Writer);
         }
 
-        public void LogClassifierEvaluation(string datasetName, NewsCollection messages)
+        public void LogClassifierEvaluation(string datasetName, NewsCollection messages, int order)
         {
             Label positive = Labels[0];
             Label negative = Labels[1];
@@ -478,6 +500,8 @@ namespace MessagePredictor
 
             _logger.Writer.WriteStartElement("Evaluation");
             _logger.Writer.WriteAttributeString("dataset", datasetName);
+            _logger.Writer.WriteAttributeString("order", order.ToString());
+            _logger.logTime();
             _logger.Writer.WriteStartElement("PositiveLabel");
             _logger.Writer.WriteString(positive.ToString());
             _logger.Writer.WriteEndElement();
@@ -495,14 +519,14 @@ namespace MessagePredictor
             _logger.logEndElement();
         }
 
-        public void LogClassifierEvaluationTraining()
+        public void LogClassifierEvaluationTraining(int order = -1)
         {
-            LogClassifierEvaluation("training", _messages);
+            LogClassifierEvaluation("training", _messages, order);
         }
 
-        public void LogClassifierEvaluationTest()
+        public void LogClassifierEvaluationTest(int order = -1)
         {
-            LogClassifierEvaluation("test", _testMessages);
+            LogClassifierEvaluation("test", _testMessages, order);
         }
 
         public void UpdateDatasetForLogging()
@@ -960,8 +984,23 @@ namespace MessagePredictor
             }
         }
 
+        void _logTimer_Tick(object sender, EventArgs e)
+        {
+            //Console.WriteLine("logTimer elapsed");
+            LogClassifierEvaluationTraining(_logTimerCount);
+            _logTimerCount++;
+        }
 
-
+        void _runtimeTimer_Tick(object sender, EventArgs e)
+        {
+            //Console.WriteLine("runtimeTimer elapsed");
+            Dialog d = new Dialog();
+            d.DialogTitle = "That's all, folks!";
+            d.DialogMessage = "Time's up! Press 'Close' to close this application.";
+            d.Owner = App.Current.MainWindow;
+            d.ShowDialog();
+            App.Current.MainWindow.Close();
+        }
 
         #endregion
     }
