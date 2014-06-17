@@ -84,7 +84,8 @@ namespace MessagePredictor
         }
 
         private Logger _logger;
-        MessagePredictorViewModel _vm;
+        private MessagePredictorViewModel _vm;
+        private bool _crashed = false;
 
         // Called on Application startup. Handle any command line arguments, load our configuration properties, 
         // and then build the ViewModel and View.
@@ -132,7 +133,7 @@ namespace MessagePredictor
                 this.Properties[PropertyKey.EvalInterval] = options.EvalInterval;
             }
 
-            _logger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), options.OverWriteLog);
+            _logger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), options.OverWriteLog, false);
             _logger.Writer.WriteStartDocument();
             _logger.Writer.WriteStartElement("MessagePredictorLog");
 
@@ -171,6 +172,9 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             _logger.Writer.WriteEndElement();
             _logger.Writer.WriteStartElement("UserActions");
+
+            AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -496,6 +500,50 @@ namespace MessagePredictor
             return options;
         }
 
+        private void LogExceptionAndExit(Exception e)
+        {
+            if (_crashed) {
+                // If we've already crashed, don't do anything
+                return;
+            } else {
+                _crashed = true;
+            }
+
+            //Console.WriteLine("runtimeTimer elapsed");
+            Logger l = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), false, true);
+            l.Writer.WriteStartDocument();
+            l.Writer.WriteStartElement("MessagePredictorCrashLog");
+            
+            l.Writer.WriteStartElement("Exception");
+            l.Writer.WriteValue(e.Message);
+            l.Writer.WriteEndElement();
+
+            l.Writer.WriteStartElement("InnerException");
+            if (e.InnerException != null) {
+                l.Writer.WriteValue(e.InnerException.Message);
+            }
+            l.Writer.WriteEndElement();
+
+            l.Writer.WriteStartElement("StackTrace");
+            l.Writer.WriteValue(e.StackTrace);
+            l.Writer.WriteEndElement();
+
+            l.Writer.WriteEndElement(); // End root element
+            l.Writer.WriteEndDocument();
+            l.Writer.Close();
+
+            Dialog d = new Dialog();
+            d.DialogTitle = "Oh noes!";
+            string msg = "Unknown error :(";
+            if (e != null) {
+                msg = e.Message;
+            }
+            d.DialogMessage = string.Format("Something went wrong horribly wrong. Please flag down a helper and show them this error: {0}", msg);
+            d.Owner = App.Current.MainWindow;
+            d.ShowDialog();
+            App.Current.MainWindow.Close();
+        }
+
         #region Event handlers
 
         private void window_Loaded(object sender, RoutedEventArgs e)
@@ -505,11 +553,21 @@ namespace MessagePredictor
             vm.SelectDefaultMessage();
         }
 
-        #endregion
-
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-
+            LogExceptionAndExit(e.Exception);
         }
+
+        private void CurrentDomain_FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
+        {
+            LogExceptionAndExit(e.Exception);
+        }
+
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            LogExceptionAndExit(e.ExceptionObject as Exception);
+        }
+
+        #endregion
     }
 }

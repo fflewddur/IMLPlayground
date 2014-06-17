@@ -341,28 +341,30 @@ namespace MessagePredictor
             // Don't do anything if the message already has the desired label
             if (item.UserLabel == label || (item.UserLabel == null && label == FolderListVM.UnknownLabel)) {
                 Mouse.OverrideCursor = null;
+                _logger.Writer.WriteAttributeString("wrongFolder", "False");
+                _logger.Writer.WriteAttributeString("sameFolder", "True");
+                _logger.logEndElement();
+
                 Dialog d = new Dialog();
                 d.DialogTitle = string.Format("Already in {0}", label);
                 d.DialogMessage = string.Format("This message is already in the {0} folder.", label);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
-                _logger.Writer.WriteAttributeString("wrongFolder", "False");
-                _logger.Writer.WriteAttributeString("sameFolder", "True");
-                _logger.logEndElement();
                 return;
             }
 
             // Make sure the user is moving the item to the correct folder
             if (label != FolderListVM.UnknownLabel && label != item.GroundTruthLabel) {
                 Mouse.OverrideCursor = null;
+                _logger.Writer.WriteAttributeString("wrongFolder", "True");
+                _logger.Writer.WriteAttributeString("sameFolder", "False");
+                _logger.logEndElement();
+
                 Dialog d = new Dialog();
                 d.DialogTitle = string.Format("Not about {0}", label);
                 d.DialogMessage = string.Format("For this experiment, we can't let you move this message to the {0} folder.\n\nThe person who wrote this message says it's about {1}.", label, item.GroundTruthLabel);
                 d.Owner = App.Current.MainWindow;
                 d.ShowDialog();
-                _logger.Writer.WriteAttributeString("wrongFolder", "True");
-                _logger.Writer.WriteAttributeString("sameFolder", "False");
-                _logger.logEndElement();
                 return;
             }
 
