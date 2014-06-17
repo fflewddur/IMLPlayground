@@ -61,7 +61,8 @@ namespace MessagePredictor
             AutoUpdatePredictions,
             UserId,
             Mode,
-            FullScreen
+            FullScreen,
+            DevMode
         }
 
         private class Options
@@ -75,6 +76,7 @@ namespace MessagePredictor
             public bool OverWriteLog;
             public int TimeLimit;
             public int EvalInterval;
+            public bool DevMode;
 
             public Options()
             {
@@ -97,6 +99,7 @@ namespace MessagePredictor
             if (options.ShowHelp) {
                 Console.WriteLine("Options:");
                 Console.WriteLine("\t-c [condition]\tStart either the 'control' or 'treatment' condition");
+                Console.WriteLine("\t-d\t\tDeveloper mode");
                 Console.WriteLine("\t-f\t\tExpand window to full size of screen");
                 Console.WriteLine("\t-h\t\tDisplay this message and exit");
                 Console.WriteLine("\t-i [interval]\tEvaluate classifier every [interval] seconds");
@@ -126,6 +129,7 @@ namespace MessagePredictor
                 this.Properties[PropertyKey.UserId] = "dev"; // development identifier
             }
             this.Properties[PropertyKey.FullScreen] = options.FullScreen;
+            this.Properties[PropertyKey.DevMode] = options.DevMode;
             if (options.TimeLimit > 0) {
                 this.Properties[PropertyKey.TimeLimit] = options.TimeLimit;
             }
@@ -164,7 +168,7 @@ namespace MessagePredictor
             if (options.FullScreen) {
                 window.WindowState = WindowState.Maximized;
             }
-            if ((int)this.Properties[PropertyKey.TimeLimit] > 0) {
+            if (!(bool)this.Properties[PropertyKey.DevMode]) {
                 window.WindowStyle = WindowStyle.None;
             }
             window.Show();
@@ -432,6 +436,9 @@ namespace MessagePredictor
                             Console.Error.WriteLine("Error: No condition specified");
                             Environment.Exit(1);
                         }
+                        break;
+                    case "-d":
+                        options.DevMode = true;
                         break;
                     case "-f":
                         options.FullScreen = true;
