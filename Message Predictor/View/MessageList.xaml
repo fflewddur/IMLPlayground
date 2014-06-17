@@ -19,7 +19,7 @@
             <ColumnDefinition Width="9*" />
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0" Grid.ColumnSpan="3" Style="{StaticResource headerStyle1}">Messages</Label>
+        <Label Grid.Row="0" Grid.ColumnSpan="3" Style="{StaticResource headerStyle1}" Content="{Binding FolderListVM.SelectedFolder.Label}" ContentStringFormat="Messages in the '{0}' folder"></Label>
         
         <!-- Summary list -->
         <DataGrid Grid.Row="1" Grid.Column="0" ItemsSource="{Binding MessageListViewSource.View}" AutoGenerateColumns="False" Name="Grid"
@@ -43,7 +43,7 @@
                 </Style>
             </DataGrid.CellStyle>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="Order" Binding="{Binding Order}" Width="auto" SortDirection="Ascending" 
+                <DataGridTextColumn Header="{StaticResource ResourceKey=messageListOrderHeader}"  Binding="{Binding Order}" Width="auto" SortDirection="Ascending" 
                                     HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>
                 <DataGridTextColumn Header="Subject" Binding="{Binding Subject}" Width="5*" 
                                     HeaderStyle="{StaticResource ResourceKey=messageListHeaderStyle}"/>

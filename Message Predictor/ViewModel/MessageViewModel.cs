@@ -13,14 +13,16 @@ namespace MessagePredictor.ViewModel
     /// </summary>
     public class MessageViewModel : ViewModelBase
     {
+        private IReadOnlyList<Label> _labels;
         private NewsItem _message;
         private bool _featurePrChanged;
         private bool _classPrChanged;
         private bool _confChanged;
 
-        public MessageViewModel()
+        public MessageViewModel(IReadOnlyList<Label> labels)
             : base()
         {
+            _labels = labels;
             _featurePrChanged = false;
             _classPrChanged = false;
             _confChanged = false;
@@ -78,9 +80,9 @@ namespace MessagePredictor.ViewModel
         private void UpdateMessageForViewing(NewsItem message, bool showChanges)
         {
             if (message != null && message.Prediction != null) {
-                message.Prediction.UpdatePrDescriptions();
+                message.Prediction.UpdatePrDescriptions(_labels);
                 if (showChanges && message.PreviousPrediction != null) {
-                    message.PreviousPrediction.UpdatePrDescriptions();
+                    message.PreviousPrediction.UpdatePrDescriptions(_labels);
                     if (message.Prediction.FeaturePrDesc != message.PreviousPrediction.FeaturePrDesc) {
                         FeaturePrChanged = !FeaturePrChanged;
                     }
@@ -93,7 +95,7 @@ namespace MessagePredictor.ViewModel
                         ConfChanged = !ConfChanged;
                     }
                 } else if (!showChanges && message.PreviousPrediction != null) {
-                    message.PreviousPrediction.UpdatePrDescriptions();
+                    message.PreviousPrediction.UpdatePrDescriptions(_labels);
                 }
             }
         }

@@ -1,5 +1,6 @@
 ﻿using MessagePredictor.Model;
 using MessagePredictor.View;
+using MessagePredictor.ViewModel;
 using System;
 using System.IO;
 using System.Reflection;
@@ -21,8 +22,16 @@ namespace MessagePredictor
 
         public enum Condition
         {
+            None,
             Control,
             Treatment
+        }
+
+        public enum Mode
+        {
+            None,
+            Tutorial,
+            Study
         }
 
         // Use these to access Application.Properties items.
@@ -31,8 +40,10 @@ namespace MessagePredictor
             Unknown,
             Condition,
             TimeLimit,
+            EvalInterval,
             DatasetFile,
             TestDatasetFile,
+            TutorialDatasetFile,
             Topic1TrainSize,
             Topic1TestSize,
             Topic1VocabSize,
@@ -47,7 +58,29 @@ namespace MessagePredictor
             Topic2UserLabel,
             Topic2Color,
             Topic2ColorDesc,
-            AutoUpdatePredictions
+            AutoUpdatePredictions,
+            UserId,
+            Mode,
+            FullScreen
+        }
+
+        private class Options
+        {
+            public Mode Mode;
+            public Condition Condition;
+            public bool FullScreen;
+            public bool ShowHelp;
+            public bool ShowVersion;
+            public string UserId;
+            public bool OverWriteLog;
+            public int TimeLimit;
+            public int EvalInterval;
+
+            public Options()
+            {
+                Mode = Mode.None;
+                Condition = Condition.None;
+            }
         }
 
         private Logger _logger;
@@ -59,16 +92,59 @@ namespace MessagePredictor
         {
             base.OnStartup(e);
 
-            _logger = new Logger();
+            Options options = ParseCommandOptions(e.Args);
+            if (options.ShowHelp) {
+                Console.WriteLine("Options:");
+                Console.WriteLine("\t-c [condition]\tStart either the 'control' or 'treatment' condition");
+                Console.WriteLine("\t-f\t\tExpand window to full size of screen");
+                Console.WriteLine("\t-h\t\tDisplay this message and exit");
+                Console.WriteLine("\t-i [interval]\tEvaluate classifier every [interval] seconds");
+                Console.WriteLine("\t-m [mode]\tStart in either 'tutorial' or 'study' mode");
+                Console.WriteLine("\t-ow\t\tOverwrite the existing log file");
+                Console.WriteLine("\t-p [id]\t\tSet the participant ID to [id]");
+                Console.WriteLine("\t-t [time]\tAutomatically close the application after [time] minutes");
+                Console.WriteLine("\t-v\t\tDisplay the version number and exit");
+                Environment.Exit(0);
+            } else if (options.ShowVersion) {
+                Console.WriteLine("Message Predictor {0}", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+                Environment.Exit(0);
+            }
+
+            LoadPropertiesFile(options.Mode == Mode.Tutorial);
+
+            // If we specified command line arguments to over-ride the properties file, make sure that happens
+            if (options.Condition != Condition.None) {
+                this.Properties[PropertyKey.Condition] = options.Condition;
+            }
+            if (options.Mode != Mode.None) {
+                this.Properties[PropertyKey.Mode] = options.Mode;
+            }
+            if (!string.IsNullOrWhiteSpace(options.UserId)) {
+                this.Properties[PropertyKey.UserId] = options.UserId;
+            } else {
+                this.Properties[PropertyKey.UserId] = "dev"; // development identifier
+            }
+            this.Properties[PropertyKey.FullScreen] = options.FullScreen;
+            if (options.TimeLimit > 0) {
+                this.Properties[PropertyKey.TimeLimit] = options.TimeLimit;
+            }
+            if (options.EvalInterval > 0) {
+                this.Properties[PropertyKey.EvalInterval] = options.EvalInterval;
+            }
+
+            _logger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), options.OverWriteLog);
             _logger.Writer.WriteStartDocument();
             _logger.Writer.WriteStartElement("MessagePredictorLog");
 
-            LoadPropertiesFile();
             _logger.Writer.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
+            _logger.Writer.WriteAttributeString("mode", this.Properties[PropertyKey.Mode].ToString());
             _logger.Writer.WriteAttributeString("dataset", this.Properties[PropertyKey.DatasetFile].ToString());
             _logger.Writer.WriteAttributeString("testDataset", this.Properties[PropertyKey.TestDatasetFile].ToString());
             _logger.Writer.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
             _logger.Writer.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
+            _logger.Writer.WriteAttributeString("evalInterval", this.Properties[PropertyKey.EvalInterval].ToString());
+            _logger.Writer.WriteAttributeString("userid", this.Properties[PropertyKey.UserId].ToString());
+            _logger.Writer.WriteAttributeString("fullScreen", this.Properties[PropertyKey.FullScreen].ToString());
             _logger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
             _logger.Writer.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
             _logger.Writer.WriteAttributeString("runtime", Environment.Version.ToString());
@@ -84,6 +160,12 @@ namespace MessagePredictor
             var window = new MessagePredictorWindow();
             window.DataContext = _vm;
             window.Loaded += window_Loaded;
+            if (options.FullScreen) {
+                window.WindowState = WindowState.Maximized;
+            }
+            if ((int)this.Properties[PropertyKey.TimeLimit] > 0) {
+                window.WindowStyle = WindowStyle.None;
+            }
             window.Show();
             _logger.Writer.WriteStartElement("WindowOpen");
             _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
@@ -98,6 +180,30 @@ namespace MessagePredictor
             _logger.Writer.WriteEndElement(); // End <actions/> element
             _logger.Writer.WriteStartElement("WindowClose");
             _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+            _logger.Writer.WriteEndElement();
+
+            // Log the accuracy the user saw for each folder
+            _logger.Writer.WriteStartElement("FolderResults");
+            foreach (FolderViewModel fvm in _vm.FolderListVM.Folders) {
+                _logger.Writer.WriteStartElement("Folder");
+                _logger.Writer.WriteAttributeString("label", fvm.Label.ToString());
+                if (fvm.Evaluator != null) {
+                    _logger.Writer.WriteAttributeString("correctPredictions", fvm.Evaluator.CorrectPredictionCount.ToString());
+                    _logger.Writer.WriteAttributeString("averageConfidence", fvm.Evaluator.TrainingSetAverageConfidence.ToString());
+                }
+                _logger.Writer.WriteAttributeString("totalMessages", fvm.MessageCount.ToString());
+                _logger.Writer.WriteEndElement();
+            }
+            _logger.Writer.WriteEndElement();
+
+            // Log the average confidence of each topic
+            _logger.Writer.WriteStartElement("AverageConfidence");
+            foreach (Evaluator evaluator in _vm.EvaluatorVM.Evaluators) {
+                _logger.Writer.WriteStartElement("TopicAverageConfidence");
+                _logger.Writer.WriteAttributeString("label", evaluator.Label.ToString());
+                _logger.Writer.WriteAttributeString("averageConfidence", evaluator.AverageConfidence.ToString());
+                _logger.Writer.WriteEndElement();
+            }
             _logger.Writer.WriteEndElement();
 
             // Log the feature set and training set
@@ -126,6 +232,16 @@ namespace MessagePredictor
             this.Properties[PropertyKey.Condition] = condition;
         }
 
+        private void LoadModeProperty(XElement element)
+        {
+            string modeString = element.Value.ToString();
+            Mode mode = Mode.Study;
+            if (modeString.Equals("Tutorial", StringComparison.InvariantCultureIgnoreCase))
+                mode = Mode.Tutorial;
+
+            this.Properties[PropertyKey.Mode] = mode;
+        }
+
         /// <summary>
         /// Figure out how long to run the prototype for.
         /// </summary>
@@ -140,6 +256,18 @@ namespace MessagePredictor
                 seconds = Int32.Parse(element.Attribute("seconds").Value.ToString());
 
             this.Properties[PropertyKey.TimeLimit] = (minutes * 60) + seconds;
+        }
+
+        private void LoadEvalIntervalProperty(XElement element)
+        {
+            int minutes = 0;
+            int seconds = 0;
+            if (element.Attribute("minutes") != null)
+                minutes = Int32.Parse(element.Attribute("minutes").Value.ToString());
+            if (element.Attribute("seconds") != null)
+                seconds = Int32.Parse(element.Attribute("seconds").Value.ToString());
+
+            this.Properties[PropertyKey.EvalInterval] = (minutes * 60) + seconds;
         }
 
         /// <summary>
@@ -226,7 +354,7 @@ namespace MessagePredictor
         /// <summary>
         /// Load an XML file containing various runtime properties.
         /// </summary>
-        private void LoadPropertiesFile()
+        private void LoadPropertiesFile(bool isTutorial)
         {
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, DataDir, "Properties.xml");
             try {
@@ -235,10 +363,15 @@ namespace MessagePredictor
                     if (element.Name == "Condition") // Are we running control or treatment?
                     {
                         LoadConditionProperty(element);
+                    } else if (element.Name == "Mode") {
+                        LoadModeProperty(element);
                     } else if (element.Name == "TimeLimit") // How long should we let the program run?
                     {
                         LoadTimeLimitProperty(element);
-                    } else if (element.Name == "DataSet") {
+                    } else if (element.Name == "EvalInterval") // When should we log evaluations of the classifier?
+                    {
+                        LoadEvalIntervalProperty(element);
+                    } else if (element.Name == "DataSet" && !isTutorial) {
                         if (element.Attribute("file") != null)
                             this.Properties[PropertyKey.DatasetFile] = element.Attribute("file").Value.ToString();
 
@@ -255,11 +388,112 @@ namespace MessagePredictor
                         if (element.Attribute("file") != null) {
                             this.Properties[PropertyKey.TestDatasetFile] = element.Attribute("file").Value.ToString();
                         }
+                    } else if (element.Name == "TutorialDataSet" && isTutorial) {
+                        if (element.Attribute("file") != null)
+                            this.Properties[PropertyKey.DatasetFile] = element.Attribute("file").Value.ToString();
+
+                        foreach (XElement childElement in element.Elements()) {
+                            if (childElement.Name == "Topic1") {
+                                LoadTopicProperty(childElement, 1);
+                            } else if (childElement.Name == "Topic2") {
+                                LoadTopicProperty(childElement, 2);
+                            }
+                        }
                     }
                 }
             } catch (FileNotFoundException e) {
                 Console.Error.WriteLine("Could not load properties file: {0}", e.Message);
             }
+        }
+
+        private Options ParseCommandOptions(string[] args)
+        {
+            Options options = new Options();
+
+            for (int i = 0; i < args.Length; i++) {
+                switch (args[i]) {
+                    case "-c":
+                        i++;
+                        if (i < args.Length) {
+                            string c = args[i];
+                            if (c.Equals("treatment", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Condition = Condition.Treatment;
+                            } else if (c.Equals("control", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Condition = Condition.Control;
+                            } else {
+                                Console.Error.WriteLine("Error: {0} is not a valid condition. Use the -h option to view valid conditions.", c);
+                                Environment.Exit(1);
+                            }
+                        } else {
+                            Console.Error.WriteLine("Error: No condition specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-f":
+                        options.FullScreen = true;
+                        break;
+                    case "-h":
+                        options.ShowHelp = true;
+                        break;
+                    case "-i":
+                        i++;
+                        if (i < args.Length) {
+                            options.EvalInterval = int.Parse(args[i]);
+                        } else {
+                            Console.Error.WriteLine("Error: No evaluation interval specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-m":
+                        i++;
+                        if (i < args.Length) {
+                            string m = args[i];
+                            if (m.Equals("study", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Mode = Mode.Study;
+                            } else if (m.Equals("tutorial", StringComparison.CurrentCultureIgnoreCase)) {
+                                options.Mode = Mode.Tutorial;
+                            } else {
+                                Console.Error.WriteLine("Error: {0} is not a valid mode. Use the -h option to view valid mode.", m);
+                                Environment.Exit(1);
+                            }
+                        } else {
+                            Console.Error.WriteLine("Error: No mode specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-ow":
+                        options.OverWriteLog = true;
+                        break;
+                    case "-p":
+                        i++;
+                        if (i < args.Length) {
+                            string id = args[i];
+                            options.UserId = id;
+                        } else {
+                            Console.Error.WriteLine("Error: No user ID specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-t":
+                        i++;
+                        if (i < args.Length) {
+                            options.TimeLimit = int.Parse(args[i]) * 60; // Convert minutes to seconds
+                        } else {
+                            Console.Error.WriteLine("Error: No time limit specified");
+                            Environment.Exit(1);
+                        }
+                        break;
+                    case "-v":
+                        options.ShowVersion = true;
+                        break;
+                    default:
+                        Console.Error.WriteLine("Error: Unknown argument '{0}'.", args[i]);
+                        options.ShowHelp = true;
+                        break;
+                }
+            }
+
+            return options;
         }
 
         #region Event handlers

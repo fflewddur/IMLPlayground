@@ -165,7 +165,7 @@ namespace LibIML
         /// <summary>
         /// I'd rather do this in the View, but I can't get inside the Evidence dictionary from inside a multibinding, so now this is happening.
         /// </summary>
-        public void UpdatePrDescriptions()
+        public void UpdatePrDescriptions(IReadOnlyList<Label> labels)
         {
             // Figure out values for ClassPrDesc and FeaturePrDesc
             int smallestCount = int.MaxValue, largestCount = int.MinValue;
@@ -282,7 +282,7 @@ namespace LibIML
             // Also update data for our confidence pie chart
             foreach (KeyValuePair<Label, Evidence> pair in _evidencePerClass) {
                 // FIXME Yeah, this is a hack and won't work with different labels.
-                if (pair.Key.UserLabel == "Baseball") {
+                if (pair.Key.UserLabel == labels[1].UserLabel) {
                     // Subtract 90 to rotate the graph so that it starts at (0, 1) instead of (1, 0)
                     double angle = (360 * pair.Value.Confidence) - 90;
                     if (angle < 0) {
@@ -292,7 +292,7 @@ namespace LibIML
                     angle *= Math.PI / 180; // convert to radians
                     ConfidencePiePoint = new Point(50 + Math.Cos(angle) * 50, 50 + Math.Sin(angle) * 50);
                     ConfidencePieSlice = pair.Value.Confidence;
-                } else if (pair.Key.UserLabel == "Hockey") {
+                } else if (pair.Key.UserLabel == labels[0].UserLabel) {
                     ConfidencePieCircle = pair.Value.Confidence;
                 }
             }
