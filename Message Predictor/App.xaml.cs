@@ -168,7 +168,7 @@ namespace MessagePredictor
             if (options.FullScreen) {
                 window.WindowState = WindowState.Maximized;
             }
-            if (!(bool)this.Properties[PropertyKey.DevMode]) {
+            if ((int)this.Properties[PropertyKey.TimeLimit] > 0 && !(bool)this.Properties[PropertyKey.DevMode]) {
                 window.WindowStyle = WindowStyle.None;
             }
             window.Show();
@@ -177,7 +177,9 @@ namespace MessagePredictor
             _logger.Writer.WriteEndElement();
             _logger.Writer.WriteStartElement("UserActions");
 
-            AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+            this.DispatcherUnhandledException += Application_DispatcherUnhandledException;
+            // We don't want to intercept FirstChanceExceptions unless they turn into UnhandledExceptions
+            //AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
@@ -511,20 +513,26 @@ namespace MessagePredictor
             return options;
         }
 
-        private void LogExceptionAndExit(Exception e)
+        private void LogExceptionAndExit(Exception e, string source)
         {
-            if (_crashed) {
-                // If we've already crashed, don't do anything
-                return;
-            } else {
-                _crashed = true;
+            if (!(bool)this.Properties[PropertyKey.DevMode]) {
+                if (_crashed) {
+                    // If we've already crashed, don't do anything
+                    return;
+                } else {
+                    _crashed = true;
+                }
             }
 
             //Console.WriteLine("runtimeTimer elapsed");
             Logger l = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), false, true);
             l.Writer.WriteStartDocument();
             l.Writer.WriteStartElement("MessagePredictorCrashLog");
-            
+
+            l.Writer.WriteStartElement("Source");
+            l.Writer.WriteValue(source);
+            l.Writer.WriteEndElement();
+
             l.Writer.WriteStartElement("Exception");
             l.Writer.WriteValue(e.Message);
             l.Writer.WriteEndElement();
@@ -539,6 +547,10 @@ namespace MessagePredictor
             l.Writer.WriteValue(e.StackTrace);
             l.Writer.WriteEndElement();
 
+            l.Writer.WriteStartElement("TargetSite");
+            l.Writer.WriteValue(e.TargetSite.ToString());
+            l.Writer.WriteEndElement();
+
             l.Writer.WriteEndElement(); // End root element
             l.Writer.WriteEndDocument();
             l.Writer.Close();
@@ -549,10 +561,13 @@ namespace MessagePredictor
             if (e != null) {
                 msg = e.Message;
             }
-            d.DialogMessage = string.Format("Something went wrong horribly wrong. Please flag down a helper and show them this error: {0}", msg);
+            d.DialogMessage = string.Format("Something went wrong horribly wrong. Please flag down a helper and show them this error:\n\n{0}\n\nSource: {1}\n\nTargetSite: {2}", 
+                msg, source, e.TargetSite.ToString());
             d.Owner = App.Current.MainWindow;
             d.ShowDialog();
-            App.Current.MainWindow.Close();
+            if (!(bool)this.Properties[PropertyKey.DevMode]) {
+                App.Current.MainWindow.Close();
+            }
         }
 
         #region Event handlers
@@ -566,17 +581,17 @@ namespace MessagePredictor
 
         private void Application_DispatcherUnhandledException(object sender, System.Windows.Threading.DispatcherUnhandledExceptionEventArgs e)
         {
-            LogExceptionAndExit(e.Exception);
+            LogExceptionAndExit(e.Exception, "DispatcherUnhandledException");
         }
 
         private void CurrentDomain_FirstChanceException(object sender, System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
         {
-            LogExceptionAndExit(e.Exception);
+            LogExceptionAndExit(e.Exception, "FirstChanceException");
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            LogExceptionAndExit(e.ExceptionObject as Exception);
+            LogExceptionAndExit(e.ExceptionObject as Exception, "UnhandledException");
         }
 
         #endregion
