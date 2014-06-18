@@ -531,6 +531,26 @@ namespace MessagePredictor
             LogClassifierEvaluation("test", _testMessages, order);
         }
 
+        /// <summary>
+        /// Build a classifier/vocabulary w/ all available features based on the training set, then log its accuracy.
+        /// </summary>
+        public void LogClassifierBoW()
+        {
+            Console.WriteLine("LogClassifierBow() begin");
+            NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
+            IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
+            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1);
+            Console.WriteLine("LogClassifierBow() end");
+        }
+
+        /// <summary>
+        /// Build a classifier w/ all of the user's features, but none of their prior weights.
+        /// </summary>
+        public void LogClassifierOnlySysWeight()
+        {
+
+        }
+
         public void UpdateDatasetForLogging()
         {
             if (_vocab.HasUpdatedTokens) {

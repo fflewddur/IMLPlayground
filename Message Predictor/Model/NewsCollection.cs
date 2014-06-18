@@ -68,5 +68,22 @@ namespace MessagePredictor.Model
 
             return nc;
         }
+
+        /// <summary>
+        /// Create a new NewsCollection by making a deep-copy of items in an existing collection.
+        /// Only item attributes that are loaded from the source data (Subject, Body, Author, etc.) will be copied.
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static NewsCollection CreateFromExisting(NewsCollection e)
+        {
+            NewsCollection nc = new NewsCollection();
+            
+            foreach (NewsItem item in e.OrderBy(o => o.Order)) {
+                nc.Add(NewsItem.CreateFromExisting(item));
+            }
+
+            return nc;
+        }
     }
 }

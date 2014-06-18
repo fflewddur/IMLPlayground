@@ -221,6 +221,10 @@ namespace MessagePredictor
             _vm.LogClassifierEvaluationTraining();
             _vm.LogClassifierEvaluationTest();
 
+            // Log variations of the feature set/training set
+            _vm.LogClassifierBoW();
+            _vm.LogClassifierOnlySysWeight();
+
             _logger.Writer.WriteEndElement(); // End root element
             _logger.Writer.WriteEndDocument();
             _logger.Writer.Close();

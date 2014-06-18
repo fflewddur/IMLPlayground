@@ -9,6 +9,7 @@ using System.Windows.Documents;
 using System.Xml.Linq;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
+using System.Diagnostics;
 
 namespace MessagePredictor.Model
 {
@@ -416,6 +417,21 @@ namespace MessagePredictor.Model
                 if (body.Length > 0) // Ensure we have some content in this item
                     item = new NewsItem { Id = id, Order = order, OriginalGroup = originalGroup, Author = author, Subject = subject, Body = body.ToString() };
             }
+
+            return item;
+        }
+
+        /// <summary>
+        /// Create a new NewsItem from an existing NewsItem. Only copy the contents that would be loaded if we created this via the CreateFromStream method.
+        /// </summary>
+        /// <param name="existing">Item to deep-copy.</param>
+        /// <returns>A new deep-copy of the NewsItem.</returns>
+        public static NewsItem CreateFromExisting(NewsItem e)
+        {
+            Debug.Assert(e != null);
+
+            NewsItem item = new NewsItem { Id = e.Id, Order = e.Order, OriginalGroup = e.OriginalGroup, Author = e.Author, Subject = e.Subject, Body = e.Body };
+            item.UserLabel = e.UserLabel;
 
             return item;
         }
