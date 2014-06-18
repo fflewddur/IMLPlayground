@@ -179,7 +179,7 @@ namespace MessagePredictor
 
             this.DispatcherUnhandledException += Application_DispatcherUnhandledException;
             // We don't want to intercept FirstChanceExceptions unless they turn into UnhandledExceptions
-            AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
+            //AppDomain.CurrentDomain.FirstChanceException += CurrentDomain_FirstChanceException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
