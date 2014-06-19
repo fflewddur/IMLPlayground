@@ -430,8 +430,8 @@ namespace MessagePredictor.Model
         {
             Debug.Assert(e != null);
 
-            NewsItem item = new NewsItem { Id = e.Id, Order = e.Order, OriginalGroup = e.OriginalGroup, Author = e.Author, Subject = e.Subject, Body = e.Body };
-            item.UserLabel = e.UserLabel;
+            NewsItem item = new NewsItem { Id = e.Id, Order = e.Order, OriginalGroup = e.OriginalGroup, Author = e.Author, 
+                Subject = e.Subject, Body = e.Body, UserLabel = e.UserLabel, GroundTruthLabel = e.GroundTruthLabel };
 
             return item;
         }

@@ -493,12 +493,12 @@ namespace MessagePredictor
             _classifier.LogTrainingSet(_logger.Writer);
         }
 
-        public void LogClassifierEvaluation(string datasetName, NewsCollection messages, int order)
+        public void LogClassifierEvaluation(EvaluatorViewModel evaluatorVM, string datasetName, NewsCollection messages, int order)
         {
             Label positive = Labels[0];
             Label negative = Labels[1];
 
-            _evaluatorVM.EvaluateClassifier(messages, positive, negative);
+            evaluatorVM.EvaluateClassifier(messages, positive, negative);
 
             _logger.Writer.WriteStartElement("Evaluation");
             _logger.Writer.WriteAttributeString("dataset", datasetName);
@@ -511,24 +511,24 @@ namespace MessagePredictor
             _logger.Writer.WriteString(negative.ToString());
             _logger.Writer.WriteEndElement();
 
-            _logger.Writer.WriteElementString("TruePositives", _evaluatorVM.TruePositives.ToString());
-            _logger.Writer.WriteElementString("TrueNegatives", _evaluatorVM.TrueNegatives.ToString());
-            _logger.Writer.WriteElementString("FalsePositives", _evaluatorVM.FalsePositives.ToString());
-            _logger.Writer.WriteElementString("FalseNegatives", _evaluatorVM.FalseNegatives.ToString());
-            _logger.Writer.WriteElementString("F1Positive", _evaluatorVM.F1Positive.ToString());
-            _logger.Writer.WriteElementString("F1Negative", _evaluatorVM.F1Negative.ToString());
-            _logger.Writer.WriteElementString("F1Weighted", _evaluatorVM.F1Weighted.ToString());
+            _logger.Writer.WriteElementString("TruePositives", evaluatorVM.TruePositives.ToString());
+            _logger.Writer.WriteElementString("TrueNegatives", evaluatorVM.TrueNegatives.ToString());
+            _logger.Writer.WriteElementString("FalsePositives", evaluatorVM.FalsePositives.ToString());
+            _logger.Writer.WriteElementString("FalseNegatives", evaluatorVM.FalseNegatives.ToString());
+            _logger.Writer.WriteElementString("F1Positive", evaluatorVM.F1Positive.ToString());
+            _logger.Writer.WriteElementString("F1Negative", evaluatorVM.F1Negative.ToString());
+            _logger.Writer.WriteElementString("F1Weighted", evaluatorVM.F1Weighted.ToString());
             _logger.logEndElement();
         }
 
         public void LogClassifierEvaluationTraining(int order = -1)
         {
-            LogClassifierEvaluation("training", _messages, order);
+            LogClassifierEvaluation(_evaluatorVM, "training", _messages, order);
         }
 
         public void LogClassifierEvaluationTest(int order = -1)
         {
-            LogClassifierEvaluation("test", _testMessages, order);
+            LogClassifierEvaluation(_evaluatorVM, "test", _testMessages, order);
         }
 
         /// <summary>
@@ -538,8 +538,41 @@ namespace MessagePredictor
         {
             Console.WriteLine("LogClassifierBow() begin");
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
+            NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
             IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
             Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1);
+
+            // Training set
+            Parallel.ForEach(messages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(v, true);
+            });
+
+            // Test set
+            Parallel.ForEach(testMessages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(v, true);
+            });
+
+            MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, v);
+            classifier.ClearInstances();
+            classifier.AddInstances(trainingMessages);
+            classifier.Train();
+
+            PredictMessages(classifier, messages);
+            PredictMessages(classifier, testMessages);
+
+            EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
+
+            LogClassifierEvaluation(evaluatorVM, "trainingBoW", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, "testBoW", testMessages, -1);
+
             Console.WriteLine("LogClassifierBow() end");
         }
 
@@ -548,7 +581,86 @@ namespace MessagePredictor
         /// </summary>
         public void LogClassifierOnlySysWeight()
         {
+            Console.WriteLine("LogClassifierOnlySysWeight() begin");
+            NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
+            NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
+            IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
 
+            // Training set
+            Parallel.ForEach(messages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(_vocab, true);
+            });
+
+            // Test set
+            Parallel.ForEach(testMessages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(_vocab, true);
+            });
+
+            MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, _vocab);
+            classifier.ClearInstances();
+            classifier.AddInstances(trainingMessages);
+            classifier.Train();
+
+            PredictMessages(classifier, messages);
+            PredictMessages(classifier, testMessages);
+
+            EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
+
+            LogClassifierEvaluation(evaluatorVM, "trainingOnlySysWeight", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, "testOnlySysWeight", testMessages, -1);
+
+            Console.WriteLine("LogClassifierOnlySysWeight() end");
+        }
+
+        public void LogClassifierOnlyHighIGFeatures()
+        {
+            Console.WriteLine("LogClassifierOnlyHighIGFeatures() begin");
+            NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
+            NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
+            IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
+            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, _desiredVocabSize);
+
+            // Training set
+            Parallel.ForEach(messages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(v, true);
+            });
+
+            // Test set
+            Parallel.ForEach(testMessages, (instance, state, index) =>
+            {
+                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(v, true);
+            });
+
+            MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, v);
+            classifier.ClearInstances();
+            classifier.AddInstances(trainingMessages);
+            classifier.Train();
+
+            PredictMessages(classifier, messages);
+            PredictMessages(classifier, testMessages);
+
+            EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
+
+            LogClassifierEvaluation(evaluatorVM, "trainingOnlyHighIGFeatures", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, "testOnlyHighIGFeatures", testMessages, -1);
+
+            Console.WriteLine("LogClassifierOnlyHighIGFeatures() end");
         }
 
         public void UpdateDatasetForLogging()
@@ -643,10 +755,10 @@ namespace MessagePredictor
                 onlyUserFeatures = true;
             }
 
-            UpdateInstanceFeatures(false);
+            UpdateInstanceFeatures(_messages, _vocab, false);
             _vocab.RestrictVocab(FilterToTrainingSet(_messages), _labels,
                 _featureSetVM.UserAddedFeatures, _featureSetVM.UserRemovedFeatures, _desiredVocabSize, onlyUserFeatures);
-            UpdateInstanceFeatures(true);
+            UpdateInstanceFeatures(_messages, _vocab, true);
             TextToHighlight = _vocab.GetFeatureWords();
         }
 
@@ -752,10 +864,10 @@ namespace MessagePredictor
         /// </summary>
         /// <param name="isRestricted">If true, restrict feature vectors to the "restricted" 
         /// set of features in our vocabular. Otherwise, use all available features.</param>
-        private void UpdateInstanceFeatures(bool isRestricted)
+        private void UpdateInstanceFeatures(IEnumerable<IInstance> messages, Vocabulary vocab, bool isRestricted)
         {
-            foreach (IInstance instance in _messages) {
-                instance.ComputeFeatureVector(_vocab, isRestricted);
+            foreach (IInstance instance in messages) {
+                instance.ComputeFeatureVector(vocab, isRestricted);
             }
         }
 
