@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Script for assigning a random order to each item in the 20 Newsgroups dataset.
 # E.g., Add an "Order: [number]" line to the start of each message.
@@ -43,5 +43,3 @@ for root, subFolder, files in os.walk(rootdir):
         for line in content:
             fp.write(line)
         fp.close()
-
-        
