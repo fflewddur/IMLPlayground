@@ -236,9 +236,9 @@ namespace LibIML
                     double count;
                     if (instance.Features.Data.TryGetValue(id, out count)) {
                         int df;
-                        _perClassFeatureCounts[instance.GroundTruthLabel].TryGetValue(id, out df);
+                        _perClassFeatureCounts[instance.UserLabel].TryGetValue(id, out df);
                         df += (int)count;
-                        _perClassFeatureCounts[instance.GroundTruthLabel][id] = df;
+                        _perClassFeatureCounts[instance.UserLabel][id] = df;
                     }
                 }
                 int totalDf;
@@ -601,13 +601,13 @@ namespace LibIML
             // Update our feature counts
             foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
                 int count;
-                _perClassFeatureCounts[instance.GroundTruthLabel].TryGetValue(pair.Key, out count);
+                _perClassFeatureCounts[instance.UserLabel].TryGetValue(pair.Key, out count);
                 count += (int)pair.Value;
-                _perClassFeatureCounts[instance.GroundTruthLabel][pair.Key] = count;
+                _perClassFeatureCounts[instance.UserLabel][pair.Key] = count;
             }
 
             // Store this feature vector
-            _trainingSet[instance.GroundTruthLabel].Add(instance);
+            _trainingSet[instance.UserLabel].Add(instance);
         }
 
         /// <summary>

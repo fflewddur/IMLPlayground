@@ -354,22 +354,25 @@ namespace MessagePredictor
             }
 
             // Make sure the user is moving the item to the correct folder
+            bool wrongFolder = false;
             if (label != FolderListVM.UnknownLabel && label != item.GroundTruthLabel) {
-                Mouse.OverrideCursor = null;
-                _logger.Writer.WriteAttributeString("wrongFolder", "True");
-                _logger.Writer.WriteAttributeString("sameFolder", "False");
-                _logger.logEndElement();
+                //Mouse.OverrideCursor = null;
+                wrongFolder = true;
 
-                Dialog d = new Dialog();
-                d.DialogTitle = string.Format("Not about {0}", label);
-                d.DialogMessage = string.Format("For this experiment, we can't let you move this message to the {0} folder.\n\nThe person who wrote this message says it's about {1}.", label, item.GroundTruthLabel);
-                d.Owner = App.Current.MainWindow;
-                d.ShowDialog();
-                return;
+                //_logger.Writer.WriteAttributeString("wrongFolder", "True");
+                //_logger.Writer.WriteAttributeString("sameFolder", "False");
+                //_logger.logEndElement();
+
+                //Dialog d = new Dialog();
+                //d.DialogTitle = string.Format("Not about {0}", label);
+                //d.DialogMessage = string.Format("For this experiment, we can't let you move this message to the {0} folder.\n\nThe person who wrote this message says it's about {1}.", label, item.GroundTruthLabel);
+                //d.Owner = App.Current.MainWindow;
+                //d.ShowDialog();
+                //return;
             }
 
             _logger.Writer.WriteAttributeString("sameFolder", "False");
-            _logger.Writer.WriteAttributeString("wrongFolder", "False");
+            _logger.Writer.WriteAttributeString("wrongFolder", wrongFolder.ToString());
 
             // If we're moving the item to Unknown, it's label should be null
             if (label == FolderListVM.UnknownLabel) {
