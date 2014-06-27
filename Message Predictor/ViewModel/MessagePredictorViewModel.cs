@@ -496,7 +496,7 @@ namespace MessagePredictor
             _classifier.LogTrainingSet(_logger.Writer);
         }
 
-        public void LogClassifierEvaluation(EvaluatorViewModel evaluatorVM, string datasetName, NewsCollection messages, int order)
+        public void LogClassifierEvaluation(EvaluatorViewModel evaluatorVM, Vocabulary vocab, string datasetName, NewsCollection messages, int order)
         {
             Label positive = Labels[0];
             Label negative = Labels[1];
@@ -506,6 +506,7 @@ namespace MessagePredictor
             _logger.Writer.WriteStartElement("Evaluation");
             _logger.Writer.WriteAttributeString("dataset", datasetName);
             _logger.Writer.WriteAttributeString("order", order.ToString());
+            _logger.Writer.WriteAttributeString("vocabSize", vocab.Count.ToString());
             _logger.logTime();
             _logger.Writer.WriteStartElement("PositiveLabel");
             _logger.Writer.WriteString(positive.ToString());
@@ -526,12 +527,12 @@ namespace MessagePredictor
 
         public void LogClassifierEvaluationTraining(int order = -1)
         {
-            LogClassifierEvaluation(_evaluatorVM, "training", _messages, order);
+            LogClassifierEvaluation(_evaluatorVM, _vocab, "training", _messages, order);
         }
 
         public void LogClassifierEvaluationTest(int order = -1)
         {
-            LogClassifierEvaluation(_evaluatorVM, "test", _testMessages, order);
+            LogClassifierEvaluation(_evaluatorVM, _vocab, "test", _testMessages, order);
         }
 
         /// <summary>
@@ -543,7 +544,7 @@ namespace MessagePredictor
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
             NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
             IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
-            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1);
+            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, 5000);
 
             // Training set
             Parallel.ForEach(messages, (instance, state, index) =>
@@ -573,8 +574,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, "trainingBoW", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, "testBoW", testMessages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "trainingBoW", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "testBoW", testMessages, -1);
 
             Console.WriteLine("LogClassifierBow() end");
         }
@@ -617,8 +618,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, "trainingOnlySysWeight", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, "testOnlySysWeight", testMessages, -1);
+            LogClassifierEvaluation(evaluatorVM, _vocab, "trainingOnlySysWeight", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, _vocab, "testOnlySysWeight", testMessages, -1);
 
             Console.WriteLine("LogClassifierOnlySysWeight() end");
         }
@@ -629,7 +630,7 @@ namespace MessagePredictor
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
             NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
             IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
-            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, _desiredVocabSize);
+            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, 250);
 
             // Training set
             Parallel.ForEach(messages, (instance, state, index) =>
@@ -660,8 +661,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, "trainingOnlyHighIGFeatures", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, "testOnlyHighIGFeatures", testMessages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "trainingOnlyHighIGFeatures", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "testOnlyHighIGFeatures", testMessages, -1);
 
             Console.WriteLine("LogClassifierOnlyHighIGFeatures() end");
         }
