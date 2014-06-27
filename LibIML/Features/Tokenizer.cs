@@ -25,8 +25,9 @@ namespace LibIML
             _stopWords = new HashSet<string>();
             string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", STOPWORDS_FILENAME);
             string[] stopwords = File.ReadAllLines(path);
-            foreach (string word in stopwords)
+            foreach (string word in stopwords) {
                 _stopWords.Add(word);
+            }
         }
 
         public static IEnumerable<KeyValuePair<string, int>> Tokenize(string text)
