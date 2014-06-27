@@ -74,7 +74,6 @@ namespace Offline_tests
                         nLabeled++;
                     }
                 }
-                Console.WriteLine("Labeled {0} for {1}", nLabeled, label);
             }
         }
 
@@ -207,7 +206,7 @@ namespace Offline_tests
                 coreCount += int.Parse(item["NumberOfCores"].ToString());
             }
             int nThreads = coreCount;
-            int nFolds = 4;
+            int nFolds = 100;
 
             List<Label> labels = new List<Label>();
             labels.Add(new Label("Hockey", "rec.sport.hockey", null, null));
