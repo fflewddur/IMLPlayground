@@ -486,7 +486,7 @@ namespace LibIML
         }
 
         private void RestrictToHighIG(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int vocabSize,
-            IEnumerable<Feature> forceInclude = null, IEnumerable<Feature> forceExclude = null)
+            IEnumerable<Feature> forceInclude = null, IEnumerable<Feature> forceExclude = null, bool showOutput = false)
         {
             Dictionary<Label, double> PrC; // Probability of each class
             Dictionary<int, double> PrT; // Probability of each feature
@@ -499,19 +499,23 @@ namespace LibIML
             timer.Start();
             PrC = ComputePrC(instances, labels);
             timer.Stop();
-            Console.WriteLine("Vocab ComputePrC took {0}", timer.Elapsed);
+            if (showOutput)
+                Console.WriteLine("Vocab ComputePrC took {0}", timer.Elapsed);
             timer.Restart();
             PrT = ComputePrT(instances, labels);
             timer.Stop();
-            Console.WriteLine("Vocab ComputePrT took {0}", timer.Elapsed);
+            if (showOutput)
+                Console.WriteLine("Vocab ComputePrT took {0}", timer.Elapsed);
             timer.Restart();
             PrCGivenT = ComputePrCGivenT(instances, labels);
             timer.Stop();
-            Console.WriteLine("Vocab ComputePrCGivenT took {0}", timer.Elapsed);
+            if (showOutput)
+                Console.WriteLine("Vocab ComputePrCGivenT took {0}", timer.Elapsed);
             timer.Restart();
             PrCGivenNotT = ComputePrCGivenNotT(instances, labels);
             timer.Stop();
-            Console.WriteLine("Vocab ComputePrCGivenNotT took {0}", timer.Elapsed);
+            if (showOutput)
+                Console.WriteLine("Vocab ComputePrCGivenNotT took {0}", timer.Elapsed);
             timer.Restart();
 
             // Compute information gain for each feature
@@ -528,7 +532,8 @@ namespace LibIML
             }
 
             timer.Stop();
-            Console.WriteLine("Vocab computing IG took {0}", timer.Elapsed);
+            if (showOutput)
+                Console.WriteLine("Vocab computing IG took {0}", timer.Elapsed);
 
             // Find the features with the highest information gain
             List<KeyValuePair<int, double>> HighIG = IG.OrderByDescending(entry => entry.Value).Take(vocabSize).ToList();
@@ -585,7 +590,8 @@ namespace LibIML
         /// </summary>
         /// <param name="instances">A collection of items to use as the basis for this vocabulary.</param>
         /// <returns>A new Vocabulary object.</returns>
-        public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances, IEnumerable<Label> labels, Restriction restriction, int desiredVocabSize)
+        public static Vocabulary CreateVocabulary(IEnumerable<IInstance> instances, IEnumerable<Label> labels, Restriction restriction, 
+                                                  int desiredVocabSize, bool inParallel = true)
         {
             //ConcurrentDictionary<string, int> tokenDocCounts = new ConcurrentDictionary<string, int>();
 
@@ -623,10 +629,15 @@ namespace LibIML
             vocab.AddTokens(tokenDocCounts, instances.Count());
 
             // Update the Feature vector for each instance
-            Parallel.ForEach(instances, (instance, state, index) =>
-                {
+            if (inParallel) {
+                Parallel.ForEach(instances, (instance, state, index) => {
+                        instance.ComputeFeatureVector(vocab, false);
+                    });
+            } else {
+                foreach (IInstance instance in instances) {
                     instance.ComputeFeatureVector(vocab, false);
-                });
+                }
+            }
 
             // Restrict our vocabulary to terms with high information gain
             if (restriction == Restriction.HighIG) {
