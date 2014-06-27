@@ -20,6 +20,7 @@ namespace Offline_tests
             public double F1Positive;
             public double F1Negative;
             public double F1Weighted;
+            public double F1WeightedValidation;
         }
 
         public Program()
@@ -134,6 +135,15 @@ namespace Offline_tests
             return eval;
         }
 
+        internal void UpdateInstanceFeatures(IEnumerable<IInstance> instances, Vocabulary vocab)
+        {
+            foreach (IInstance instance in instances) {
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(vocab, true);
+            }
+        }
+
         /// <summary>
         /// Build the specified number of classifiers on random samples (of size 'trainingSize') on 'collection'. 
         /// Return an Evaluation object that averages the results of 'nFolds' evaluations.
@@ -143,35 +153,50 @@ namespace Offline_tests
         /// <param name="trainingSize"></param>
         /// <param name="vocabSize"></param>
         /// <param name="nFolds"></param>
-        internal Evaluation BuildAndEvalClassifier(IEnumerable<Label> labels, NewsCollection collection, int trainingSize, int vocabSize, int nFolds, int nThreads)
+        internal Evaluation BuildAndEvalClassifier(IEnumerable<Label> labels, NewsCollection collection, NewsCollection testCollection, 
+            int trainingSize, int vocabSize, int nFolds, int nThreads)
         {
             Evaluation evalSum = new Evaluation();
-
             ParallelOptions options = new ParallelOptions();
             options.MaxDegreeOfParallelism = nThreads;
             Random rand = new Random();
-            int count = 0;
+            int count = 0, countValidation = 0;
 
             Parallel.For(0, nFolds, options, i => {
                 NewsCollection localCollection = NewsCollection.CreateFromExisting(collection);
+                NewsCollection localTestCollection = NewsCollection.CreateFromExisting(testCollection);
                 this.LabelDataset(localCollection, labels, trainingSize, rand);
-                Vocabulary v = Vocabulary.CreateVocabulary(localCollection, labels, Vocabulary.Restriction.HighIG, vocabSize, false);
+                Vocabulary v = Vocabulary.CreateVocabulary(FilterToTrainingSet(localCollection, labels), labels, 
+                    Vocabulary.Restriction.HighIG, vocabSize, false);
+                UpdateInstanceFeatures(localCollection, v);
+                UpdateInstanceFeatures(localTestCollection, v);
                 MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(labels, v);
                 classifier.AddInstances(FilterToTrainingSet(localCollection, labels));
                 classifier.Train();
                 foreach (IInstance instance in localCollection) {
                     instance.Prediction = classifier.PredictInstance(instance);
                 }
+                foreach (IInstance instance in localTestCollection) {
+                    instance.Prediction = classifier.PredictInstance(instance);
+                }
                 Evaluation eval = EvalClassifier(labels, classifier, FilterToTestSet(localCollection, labels));
+                Evaluation evalValidation = EvalClassifier(labels, classifier, localTestCollection);
                 lock (evalSum) {
                     if (double.IsNaN(eval.F1Weighted)) {
-                        Console.Error.WriteLine("Error: NaN for trainingSize={0}, vocabSize={1}, i={2}", trainingSize, vocabSize, i);
+                        Console.Error.WriteLine("*** Error: F1 is NaN for trainingSize={0}, vocabSize={1}, i={2} ***", trainingSize, vocabSize, i);
                     } else {
                         evalSum.F1Weighted += eval.F1Weighted;
                         evalSum.VocabSizeActual += v.Count;
                         count++;
                     }
+                    if (double.IsNaN(evalValidation.F1Weighted)) {
+                        Console.Error.WriteLine("*** Error: Validation F1 is NaN for trainingSize={0}, vocabSize={1}, i={2} ***", trainingSize, vocabSize, i);
+                    } else {
+                        evalSum.F1WeightedValidation += evalValidation.F1Weighted;
+                        countValidation++;
+                    }
                 }
+                
                 Console.WriteLine("F1 = {0:F3} for iteration {1}", eval.F1Weighted, i);
             });
 
@@ -180,6 +205,7 @@ namespace Offline_tests
             evalAvg.VocabSizeRequested = vocabSize;
             evalAvg.VocabSizeActual = evalSum.VocabSizeActual / count;
             evalAvg.F1Weighted = evalSum.F1Weighted / count;
+            evalAvg.F1WeightedValidation = evalSum.F1WeightedValidation / countValidation;
 
             return evalAvg;
         }
@@ -201,11 +227,8 @@ namespace Offline_tests
         static void Main(string[] args)
         {
             Stopwatch watch = new Stopwatch();
-            int coreCount = 0;
-            foreach (var item in new System.Management.ManagementObjectSearcher("Select * from Win32_Processor").Get()) {
-                coreCount += int.Parse(item["NumberOfCores"].ToString());
-            }
-            int nThreads = coreCount;
+            // Limit the number of threads to 4; more than that and we start hitting .NET's 2GB memory limit
+            int nThreads = (Environment.ProcessorCount > 4) ? 4 : Environment.ProcessorCount;
             int nFolds = 100;
 
             List<Label> labels = new List<Label>();
@@ -214,6 +237,7 @@ namespace Offline_tests
 
             Program prog = new Program();
             NewsCollection messages = prog.LoadDataset("20news-sports-bydate-train.zip", labels);
+            NewsCollection testMessages = prog.LoadDataset("20news-sports-bydate-test.zip", labels);
             List<Evaluation> evaluations = new List<Evaluation>();
 
             watch.Start();
@@ -222,21 +246,22 @@ namespace Offline_tests
                 // Loop for different vocabulary sizes
                 for (int j = 10; j <= 20480; j *= 2) {
                     Console.WriteLine("=== Running evaluations for training set size = {0} and vocab size = {1} ===", i, j);
-                    Evaluation eval = prog.BuildAndEvalClassifier(labels, messages, i, j, nFolds, nThreads);
+                    Evaluation eval = prog.BuildAndEvalClassifier(labels, messages, testMessages, i, j, nFolds, nThreads);
                     evaluations.Add(eval);
-                    Console.WriteLine("Average Weighted F1: {0:F3}", eval.F1Weighted);
+                    Console.WriteLine("Average Weighted F1: {0:F3} on test, {1:F3} on validation ({2} features used)", 
+                        eval.F1Weighted, eval.F1WeightedValidation, eval.VocabSizeActual);
                 }
             }
             watch.Stop();
 
             Console.WriteLine("============= RESULTS =============");
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"evaluation.csv")) {
-                file.WriteLine("TrainingSize, VocabSizeRequested, VocabSizeActual, F1Weighted");
+                file.WriteLine("TrainingSize, VocabSizeRequested, VocabSizeActual, F1Weighted, F1WeightedValidation");
                 foreach (Evaluation eval in evaluations.OrderBy(x => x.TrainingSize).ThenBy(x => x.VocabSizeRequested)) {
-                    Console.WriteLine("\nTraining set size: {0}\nVocab size (requested): {1}\nVocab size (actual): {2}, F1Weighted Average: {3:F3}", 
-                        eval.TrainingSize, eval.VocabSizeRequested, eval.VocabSizeActual, eval.F1Weighted);
-                    file.WriteLine("{0}, {1}, {2}, {3}", 
-                        eval.TrainingSize, eval.VocabSizeRequested, eval.VocabSizeActual, eval.F1Weighted);
+                    Console.WriteLine("\nTraining set size: {0}\nVocab size (requested): {1}\nVocab size (actual): {2}, F1Weighted Average: {3:F3}, F1Weighted Validation Average: {4:F3}", 
+                        eval.TrainingSize, eval.VocabSizeRequested, eval.VocabSizeActual, eval.F1Weighted, eval.F1WeightedValidation);
+                    file.WriteLine("{0}, {1}, {2}, {3}, {4}", 
+                        eval.TrainingSize, eval.VocabSizeRequested, eval.VocabSizeActual, eval.F1Weighted, eval.F1WeightedValidation);
                 }
             }
             Console.WriteLine("\nEvaluation took {0}", watch.Elapsed.ToString());
