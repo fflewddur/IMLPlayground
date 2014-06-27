@@ -219,9 +219,9 @@ namespace Offline_tests
 
             watch.Start();
             // Loop for different training set sizes
-            for (int i = 10; i <= 400; i *= 2) {
+            for (int i = 10; i <= 1500; i *= 2) {
                 // Loop for different vocabulary sizes
-                for (int j = 10; j <= 10240; j *= 2) {
+                for (int j = 10; j <= 20480; j *= 2) {
                     Console.WriteLine("=== Running evaluations for training set size = {0} and vocab size = {1} ===", i, j);
                     Evaluation eval = prog.BuildAndEvalClassifier(labels, messages, i, j, nFolds, nThreads);
                     evaluations.Add(eval);
