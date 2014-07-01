@@ -21,6 +21,7 @@ namespace Offline_tests
             public double F1Negative;
             public double F1Weighted;
             public double F1WeightedValidation;
+            public double ElapsedSeconds;
         }
 
         public Program()
@@ -47,7 +48,8 @@ namespace Offline_tests
         /// </summary>
         /// <param name="instances"></param>
         /// <param name="nToLabelTotal"></param>
-        internal void LabelDataset(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int nToLabelTotal, Random rand)
+        internal void LabelDataset(IEnumerable<IInstance> instances, IEnumerable<Label> labels, int nToLabelTotal, Random rand,
+                                   bool inconsistent)
         {
             Dictionary<Label, int> labelCounts = new Dictionary<Label, int>();
             int nInstances = instances.Count();
@@ -66,13 +68,25 @@ namespace Offline_tests
                 int nLabeled = 0;
                 while (nLabeled < nToLabel) {
                     int index;
+                    bool incorrect = false; // should we intentionlly mislabel this item?
                     lock (rand) {
                         index = rand.Next(0, nInstances);
+                        // Simulate 20% inaccuracy in user-provided labels
+                        if (rand.Next(0, 100) < 20) {
+                            incorrect = true;
+                        }
                     }
                     IInstance instance = instances.ElementAt(index);
-                    if (instance.GroundTruthLabel == label) {
-                        instance.UserLabel = instance.GroundTruthLabel;
-                        nLabeled++;
+                    if (incorrect) {
+                        if (instance.GroundTruthLabel != label) {
+                            instance.UserLabel = label;
+                            nLabeled++;
+                        }
+                    } else {
+                        if (instance.GroundTruthLabel == label) {
+                            instance.UserLabel = instance.GroundTruthLabel;
+                            nLabeled++;
+                        }
                     }
                 }
             }
@@ -154,7 +168,7 @@ namespace Offline_tests
         /// <param name="vocabSize"></param>
         /// <param name="nFolds"></param>
         internal Evaluation BuildAndEvalClassifier(IEnumerable<Label> labels, NewsCollection collection, NewsCollection testCollection, 
-            int trainingSize, int vocabSize, int nFolds, int nThreads)
+            int trainingSize, int vocabSize, int nFolds, int nThreads, bool inconsistent = false)
         {
             Evaluation evalSum = new Evaluation();
             ParallelOptions options = new ParallelOptions();
@@ -165,7 +179,7 @@ namespace Offline_tests
             Parallel.For(0, nFolds, options, i => {
                 NewsCollection localCollection = NewsCollection.CreateFromExisting(collection);
                 NewsCollection localTestCollection = NewsCollection.CreateFromExisting(testCollection);
-                this.LabelDataset(localCollection, labels, trainingSize, rand);
+                this.LabelDataset(localCollection, labels, trainingSize, rand, inconsistent);
                 Vocabulary v = Vocabulary.CreateVocabulary(FilterToTrainingSet(localCollection, labels), labels, 
                     Vocabulary.Restriction.HighIG, vocabSize, false);
                 UpdateInstanceFeatures(localCollection, v);
@@ -230,6 +244,7 @@ namespace Offline_tests
             // Limit the number of threads to 4; more than that and we start hitting .NET's 2GB memory limit
             int nThreads = (Environment.ProcessorCount > 4) ? 4 : Environment.ProcessorCount;
             int nFolds = 100;
+            bool labelInconsistently = true;
 
             List<Label> labels = new List<Label>();
             labels.Add(new Label("Hockey", "rec.sport.hockey", null, null));
@@ -245,23 +260,28 @@ namespace Offline_tests
             for (int i = 10; i <= 1500; i *= 2) {
                 // Loop for different vocabulary sizes
                 for (int j = 10; j <= 20480; j *= 2) {
+                    Stopwatch run = new Stopwatch();
+                    run.Start();
                     Console.WriteLine("=== Running evaluations for training set size = {0} and vocab size = {1} ===", i, j);
-                    Evaluation eval = prog.BuildAndEvalClassifier(labels, messages, testMessages, i, j, nFolds, nThreads);
+                    Evaluation eval = prog.BuildAndEvalClassifier(labels, messages, testMessages, i, j, nFolds, nThreads, labelInconsistently);
+                    run.Stop();
+                    eval.ElapsedSeconds = (run.Elapsed.Minutes * 60 + run.Elapsed.Seconds) / (double)nFolds;
                     evaluations.Add(eval);
-                    Console.WriteLine("Average Weighted F1: {0:F3} on test, {1:F3} on validation ({2} features used)", 
-                        eval.F1Weighted, eval.F1WeightedValidation, eval.VocabSizeActual);
+                    Console.WriteLine("Average Weighted F1: {0:F3} on test, {1:F3} on validation, {2} features used, averaged {3:F3} seconds", 
+                        eval.F1Weighted, eval.F1WeightedValidation, eval.VocabSizeActual, eval.ElapsedSeconds);
                 }
             }
             watch.Stop();
 
             Console.WriteLine("============= RESULTS =============");
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(@"evaluation.csv")) {
-                file.WriteLine("TrainingSize, VocabSizeRequested, VocabSizeActual, F1Weighted, F1WeightedValidation");
+                file.WriteLine("TrainingSize, VocabSizeRequested, VocabSizeActual, F1Weighted, F1WeightedValidation, AvgTrainingTime");
                 foreach (Evaluation eval in evaluations.OrderBy(x => x.TrainingSize).ThenBy(x => x.VocabSizeRequested)) {
                     Console.WriteLine("\nTraining set size: {0}\nVocab size (requested): {1}\nVocab size (actual): {2}, F1Weighted Average: {3:F3}, F1Weighted Validation Average: {4:F3}", 
                         eval.TrainingSize, eval.VocabSizeRequested, eval.VocabSizeActual, eval.F1Weighted, eval.F1WeightedValidation);
-                    file.WriteLine("{0}, {1}, {2}, {3}, {4}", 
-                        eval.TrainingSize, eval.VocabSizeRequested, eval.VocabSizeActual, eval.F1Weighted, eval.F1WeightedValidation);
+                    file.WriteLine("{0}, {1}, {2}, {3}, {4}, {5}", 
+                        eval.TrainingSize, eval.VocabSizeRequested, eval.VocabSizeActual, eval.F1Weighted, eval.F1WeightedValidation, 
+                        eval.ElapsedSeconds);
                 }
             }
             Console.WriteLine("\nEvaluation took {0}", watch.Elapsed.ToString());
