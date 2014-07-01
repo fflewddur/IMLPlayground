@@ -33,6 +33,8 @@ namespace MessagePredictor
         private MultinomialNaiveBayesFeedbackClassifier _classifier;
         private Logger _logger;
         private LinkedList<UserAction> _actions;
+        private int _nMessagesLabeled;
+        private int _nFeaturesAdded;
 
         // Viewmodels (and data for this viewmodel)
         private FolderListViewModel _folderListVM;
@@ -55,17 +57,21 @@ namespace MessagePredictor
         // UI preferences (user-modifiable)
         private bool _autoUpdatePredictions;
         private bool _onlyShowRecentChanges;
+        private int _logEachNLabels = 5;
+        private int _logEachNFeatures = 5;
 
         public MessagePredictorViewModel(Logger logger)
         {
             Console.WriteLine("MessagePredictorViewModel() start");
             Stopwatch timer = new Stopwatch();
 
+            _nMessagesLabeled = 0;
+            _nFeaturesAdded = 0;
+
             _logger = logger;
             _actions = new LinkedList<UserAction>(); // Store undo-able user actions
 
             timer.Start();
-            //List<NewsCollection> folders = new List<NewsCollection>();
             _messages = LoadDataset();
             _testMessages = LoadTestDataset(); // Also load the test set, but use the existing labels
             timer.Stop();
@@ -409,8 +415,14 @@ namespace MessagePredictor
                 //_messageListViewSource.View.Refresh(); // FIXME super slow
             }
 
-            Mouse.OverrideCursor = null;
             _logger.logEndElement();
+
+            _nMessagesLabeled++;
+            if (_nMessagesLabeled % _logEachNLabels == 0) {
+                Mouse.OverrideCursor = Cursors.Wait;
+                LogInterval("messagesLabeled", _nMessagesLabeled);
+            }
+            Mouse.OverrideCursor = null;
         }
 
         private bool CanPerformFindText(string text)
@@ -496,17 +508,19 @@ namespace MessagePredictor
             _classifier.LogTrainingSet(_logger.Writer);
         }
 
-        public void LogClassifierEvaluation(EvaluatorViewModel evaluatorVM, Vocabulary vocab, string datasetName, NewsCollection messages, int order)
+        public void LogClassifierEvaluation(EvaluatorViewModel evaluatorVM, Vocabulary vocab, string elementName, 
+                                            string datasetName, IEnumerable<IInstance> messages, int order)
         {
             Label positive = Labels[0];
             Label negative = Labels[1];
 
             evaluatorVM.EvaluateClassifier(messages, positive, negative);
-
-            _logger.Writer.WriteStartElement("Evaluation");
+            int trainingSetSize = FilterToTrainingSet(messages).Count();
+            _logger.Writer.WriteStartElement(elementName);
             _logger.Writer.WriteAttributeString("dataset", datasetName);
             _logger.Writer.WriteAttributeString("order", order.ToString());
             _logger.Writer.WriteAttributeString("vocabSize", vocab.Count.ToString());
+            _logger.Writer.WriteAttributeString("trainingSetSize", trainingSetSize.ToString());
             _logger.logTime();
             _logger.Writer.WriteStartElement("PositiveLabel");
             _logger.Writer.WriteString(positive.ToString());
@@ -527,12 +541,12 @@ namespace MessagePredictor
 
         public void LogClassifierEvaluationTraining(int order = -1)
         {
-            LogClassifierEvaluation(_evaluatorVM, _vocab, "training", _messages, order);
+            LogClassifierEvaluation(_evaluatorVM, _vocab, "Evaluation", "training", _messages, order);
         }
 
         public void LogClassifierEvaluationTest(int order = -1)
         {
-            LogClassifierEvaluation(_evaluatorVM, _vocab, "test", _testMessages, order);
+            LogClassifierEvaluation(_evaluatorVM, _vocab, "Evaluation", "test", _testMessages, order);
         }
 
         /// <summary>
@@ -543,8 +557,8 @@ namespace MessagePredictor
             Console.WriteLine("LogClassifierBow() begin");
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
             NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
-            IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
-            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, 5000);
+            IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
+            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1, false);
 
             // Training set
             Parallel.ForEach(messages, (instance, state, index) =>
@@ -574,8 +588,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, v, "trainingBoW", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, v, "testBoW", testMessages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "trainingBoW", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "testBoW", testMessages, -1);
 
             Console.WriteLine("LogClassifierBow() end");
         }
@@ -588,7 +602,7 @@ namespace MessagePredictor
             Console.WriteLine("LogClassifierOnlySysWeight() begin");
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
             NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
-            IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
+            IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
 
             // Training set
             Parallel.ForEach(messages, (instance, state, index) =>
@@ -618,8 +632,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, _vocab, "trainingOnlySysWeight", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, _vocab, "testOnlySysWeight", testMessages, -1);
+            LogClassifierEvaluation(evaluatorVM, _vocab, "Evaluation", "trainingOnlySysWeight", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, _vocab, "Evaluation", "testOnlySysWeight", testMessages, -1);
 
             Console.WriteLine("LogClassifierOnlySysWeight() end");
         }
@@ -629,7 +643,7 @@ namespace MessagePredictor
             Console.WriteLine("LogClassifierOnlyHighIGFeatures() begin");
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
             NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
-            IEnumerable<NewsItem> trainingMessages = FilterToTrainingSet(messages);
+            IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
             Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, 250);
 
             // Training set
@@ -661,8 +675,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, v, "trainingOnlyHighIGFeatures", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, v, "testOnlyHighIGFeatures", testMessages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "trainingOnlyHighIGFeatures", messages, -1);
+            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "testOnlyHighIGFeatures", testMessages, -1);
 
             Console.WriteLine("LogClassifierOnlyHighIGFeatures() end");
         }
@@ -706,6 +720,37 @@ namespace MessagePredictor
         #endregion
 
         #region Private methods
+
+        private void LogInterval(string type, int interval)
+        {
+            //Stopwatch watch = new Stopwatch();
+            //watch.Start();
+            LogClassifierEvaluation(_evaluatorVM, _vocab, type, "training", _messages, interval);
+            //watch.Restart();
+            NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
+            IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
+            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1, false);
+
+            // Training set
+            foreach (IInstance instance in messages) { 
+            //Parallel.ForEach(messages, (instance, state, index) => {
+                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                instance.TokenCounts = tokens;
+                instance.ComputeFeatureVector(v, true);
+            }
+
+            MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, v);
+            classifier.ClearInstances();
+            classifier.AddInstances(trainingMessages);
+            classifier.Train();
+
+            PredictMessages(classifier, messages);
+
+            EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
+            LogClassifierEvaluation(evaluatorVM, v, type + "BoW", "training", messages, interval);
+            //watch.Stop();
+            //Console.WriteLine("Logging BoW interval took {0}", watch.Elapsed);
+        }
 
         private void UpdatePredictions()
         {
@@ -921,14 +966,14 @@ namespace MessagePredictor
             return;
         }
 
-        private IEnumerable<NewsItem> FilterToTrainingSet(IEnumerable<NewsItem> fullSet)
+        private IEnumerable<IInstance> FilterToTrainingSet(IEnumerable<IInstance> fullSet)
         {
             Debug.Assert(fullSet != null);
 
             return fullSet.Where(item => _labels.Contains(item.UserLabel));
         }
 
-        private IEnumerable<NewsItem> FilterToTestSet(IEnumerable<NewsItem> fullSet)
+        private IEnumerable<IInstance> FilterToTestSet(IEnumerable<IInstance> fullSet)
         {
             Debug.Assert(fullSet != null);
 
@@ -1020,6 +1065,13 @@ namespace MessagePredictor
                 //FeatureSetVM.UpdateFeaturePriors(); // FIXME this may cause two retrains?
             } else {
                 TrainClassifier(_classifier, FilterToTrainingSet(_messages));
+            }
+
+            _nFeaturesAdded++;
+            if (_nFeaturesAdded % _logEachNFeatures == 0) {
+                Mouse.OverrideCursor = Cursors.Wait;
+                LogInterval("featuresAdded", _nFeaturesAdded);
+                Mouse.OverrideCursor = null;
             }
         }
 
