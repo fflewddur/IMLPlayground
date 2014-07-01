@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <!-- Sample configuration file -->
 <MessagePredictorProperties>
-  <!--<Condition>Treatment</Condition>-->
-  <Condition>Control</Condition>
+  <Condition>Treatment</Condition>
+  <!--<Condition>Control</Condition>-->
   <Mode>Study</Mode>
   <TimeLimit minutes="0" seconds="0" />
   <EvalInterval minutes="1" seconds="0" />

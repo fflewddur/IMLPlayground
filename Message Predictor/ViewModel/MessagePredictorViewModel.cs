@@ -515,7 +515,10 @@ namespace MessagePredictor
             Label negative = Labels[1];
 
             evaluatorVM.EvaluateClassifier(messages, positive, negative);
-            int trainingSetSize = FilterToTrainingSet(messages).Count();
+            IEnumerable<IInstance> trainingSet = FilterToTrainingSet(messages);
+            int trainingSetSize = trainingSet.Count();
+            int positiveLabelCount = FilterToLabel(trainingSet, positive).Count();
+            int negativeLabelCount = FilterToLabel(trainingSet, negative).Count();
             _logger.Writer.WriteStartElement(elementName);
             _logger.Writer.WriteAttributeString("dataset", datasetName);
             _logger.Writer.WriteAttributeString("order", order.ToString());
@@ -523,9 +526,11 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("trainingSetSize", trainingSetSize.ToString());
             _logger.logTime();
             _logger.Writer.WriteStartElement("PositiveLabel");
+            _logger.Writer.WriteAttributeString("count", positiveLabelCount.ToString());
             _logger.Writer.WriteString(positive.ToString());
             _logger.Writer.WriteEndElement();
             _logger.Writer.WriteStartElement("NegativeLabel");
+            _logger.Writer.WriteAttributeString("count", negativeLabelCount.ToString());
             _logger.Writer.WriteString(negative.ToString());
             _logger.Writer.WriteEndElement();
 
@@ -723,8 +728,8 @@ namespace MessagePredictor
 
         private void LogInterval(string type, int interval)
         {
-            //Stopwatch watch = new Stopwatch();
-            //watch.Start();
+            Stopwatch watch = new Stopwatch();
+            watch.Start();
             LogClassifierEvaluation(_evaluatorVM, _vocab, type, "training", _messages, interval);
             //watch.Restart();
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
@@ -732,24 +737,24 @@ namespace MessagePredictor
             Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1, false);
 
             // Training set
-            foreach (IInstance instance in messages) { 
-            //Parallel.ForEach(messages, (instance, state, index) => {
+            //foreach (IInstance instance in messages) { 
+            Parallel.ForEach(messages, (instance, state, index) => {
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(v, true);
-            }
+            });
 
             MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, v);
             classifier.ClearInstances();
             classifier.AddInstances(trainingMessages);
             classifier.Train();
 
-            PredictMessages(classifier, messages);
+            PredictMessages(classifier, messages, false);
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
             LogClassifierEvaluation(evaluatorVM, v, type + "BoW", "training", messages, interval);
-            //watch.Stop();
-            //Console.WriteLine("Logging BoW interval took {0}", watch.Elapsed);
+            watch.Stop();
+            Console.WriteLine("Logging BoW interval took {0}", watch.Elapsed);
         }
 
         private void UpdatePredictions()
@@ -836,13 +841,13 @@ namespace MessagePredictor
         /// </summary>
         /// <param name="classifier">The classifier to use</param>
         /// <param name="folders">The folders to run predictions for.</param>
-        private void PredictMessages(IClassifier classifier, IEnumerable<IInstance> testSet)
+        private void PredictMessages(IClassifier classifier, IEnumerable<IInstance> testSet, bool withEvidence = true)
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
 
             foreach (IInstance instance in testSet) {
-                Prediction prediction = classifier.PredictInstance(instance);
+                Prediction prediction = classifier.PredictInstance(instance, withEvidence);
                 instance.Prediction = prediction;
             }
 
@@ -964,6 +969,13 @@ namespace MessagePredictor
             }
 
             return;
+        }
+
+        private IEnumerable<IInstance> FilterToLabel(IEnumerable<IInstance> fullSet, Label label)
+        {
+            Debug.Assert(fullSet != null);
+
+            return fullSet.Where(item => item.UserLabel == label);
         }
 
         private IEnumerable<IInstance> FilterToTrainingSet(IEnumerable<IInstance> fullSet)

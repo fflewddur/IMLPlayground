@@ -20,7 +20,7 @@ namespace LibIML
         void AddInstances(IEnumerable<IInstance> instances);
         void AddPriors(IEnumerable<Feature> priors);
         void UpdateCountsForNewFeature(int id);
-        Prediction PredictInstance(IInstance instance);
+        Prediction PredictInstance(IInstance instance, bool withEvidenceItems = true);
         void Train(); // Train the classifier on all added training instances
         void ClearInstances(); // Remove all existing training instances
         bool TryGetFeatureSystemWeight(int id, Label label, out double weight);

@@ -307,7 +307,7 @@ namespace LibIML
         /// </summary>
         /// <param name="instance">The instance whose label we want to predict.</param>
         /// <returns>A prediction for this instance.</returns>
-        public Prediction PredictInstance(IInstance instance)
+        public Prediction PredictInstance(IInstance instance, bool withEvidenceItems = true)
         {
             //Console.WriteLine("PredictInstance {0}", instance.Id);
             Label labelWinner = null;
@@ -325,10 +325,12 @@ namespace LibIML
 
             //List<EvidenceItem> evidenceItems = new List<EvidenceItem>();
             Dictionary<int, EvidenceItem> evidenceItems = new Dictionary<int, EvidenceItem>();
-            foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
-                string word = _vocab.GetWord(pair.Key);
-                EvidenceItem ei = new EvidenceItem(word, pair.Key, (int)pair.Value);
-                evidenceItems[pair.Key] = ei;
+            if (withEvidenceItems) {
+                foreach (KeyValuePair<int, double> pair in instance.Features.Data) {
+                    string word = _vocab.GetWord(pair.Key);
+                    EvidenceItem ei = new EvidenceItem(word, pair.Key, (int)pair.Value);
+                    evidenceItems[pair.Key] = ei;
+                }
             }
 
             // FIXME this only works for binary classification
@@ -370,10 +372,12 @@ namespace LibIML
                         }
                         //Feature f = new Feature(word, l, (int)pair.Value, sysWeight, userWeight);
                         evidence.SourceItems.Add(f);
-                        if (l == topic1) {
-                            evidenceItems[pair.Key].Label1Pr = userWeight + sysWeight;
-                        } else if (l == topic2) {
-                            evidenceItems[pair.Key].Label2Pr = userWeight + sysWeight;
+                        if (withEvidenceItems) {
+                            if (l == topic1) {
+                                evidenceItems[pair.Key].Label1Pr = userWeight + sysWeight;
+                            } else if (l == topic2) {
+                                evidenceItems[pair.Key].Label2Pr = userWeight + sysWeight;
+                            }
                         }
                         //Console.WriteLine("Feature={3}, weight={0}, userWeight={1}, sysWeight={2}, count={4}", weight, userWeight, sysWeight, word, (int)pair.Value);
                         prob += weight;
@@ -441,23 +445,25 @@ namespace LibIML
             prediction.Confidence = prediction.EvidencePerClass[labelWinner].Confidence;
             //prediction.UpdateEvidenceGraphData();
             //prediction.UpdatePrDescriptions();
-            prediction.EvidenceItems = evidenceItems.Values.OrderBy(i => i.FeatureText).ToList();
-            ////Console.WriteLine("Prediction: {0} ({1:0%})", labelWinner, prediction.Confidence);
-            foreach (EvidenceItem ei in prediction.EvidenceItems) {
-                if (labelWinner == topic2) {
-                    ei.InvertRatio();
-                }
+            if (withEvidenceItems) {
+                prediction.EvidenceItems = evidenceItems.Values.OrderBy(i => i.FeatureText).ToList();
+                ////Console.WriteLine("Prediction: {0} ({1:0%})", labelWinner, prediction.Confidence);
+                foreach (EvidenceItem ei in prediction.EvidenceItems) {
+                    if (labelWinner == topic2) {
+                        ei.InvertRatio();
+                    }
 
-                if (ei.Ratio > 1) {
-                    ei.Label = labelWinner;
-                    ei.OtherLabel = labelLoser;
-                } else if (ei.Ratio < 1) {
-                    ei.InvertRatio();
-                    ei.Label = labelLoser;
-                    ei.OtherLabel = labelWinner;
-                }
+                    if (ei.Ratio > 1) {
+                        ei.Label = labelWinner;
+                        ei.OtherLabel = labelLoser;
+                    } else if (ei.Ratio < 1) {
+                        ei.InvertRatio();
+                        ei.Label = labelLoser;
+                        ei.OtherLabel = labelWinner;
+                    }
 
-                //Console.WriteLine("  EvidenceItem = {0}", ei);
+                    //Console.WriteLine("  EvidenceItem = {0}", ei);
+                }
             }
 
             return prediction;
