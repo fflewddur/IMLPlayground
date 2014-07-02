@@ -86,6 +86,7 @@ namespace MessagePredictor
         }
 
         private Logger _logger;
+        private Logger _backgroundLogger;
         private MessagePredictorViewModel _vm;
         private bool _crashed = false;
 
@@ -137,7 +138,8 @@ namespace MessagePredictor
                 this.Properties[PropertyKey.EvalInterval] = options.EvalInterval;
             }
 
-            _logger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), options.OverWriteLog, false);
+            _logger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), 
+                                 options.OverWriteLog, false, false);
             _logger.Writer.WriteStartDocument();
             _logger.Writer.WriteStartElement("MessagePredictorLog");
 
@@ -157,11 +159,31 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
             _logger.Writer.WriteAttributeString("startTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
 
+            _backgroundLogger = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(),
+                                           options.OverWriteLog, false, true);
+            _backgroundLogger.Writer.WriteStartDocument();
+            _backgroundLogger.Writer.WriteStartElement("MessagePredictorBackgroundLog");
+            _backgroundLogger.Writer.WriteAttributeString("condition", this.Properties[PropertyKey.Condition].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("mode", this.Properties[PropertyKey.Mode].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("dataset", this.Properties[PropertyKey.DatasetFile].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("testDataset", this.Properties[PropertyKey.TestDatasetFile].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("autoupdate", this.Properties[PropertyKey.AutoUpdatePredictions].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("timelimit", this.Properties[PropertyKey.TimeLimit].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("evalInterval", this.Properties[PropertyKey.EvalInterval].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("userid", this.Properties[PropertyKey.UserId].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("fullScreen", this.Properties[PropertyKey.FullScreen].ToString());
+            _backgroundLogger.Writer.WriteAttributeString("system", Environment.OSVersion.ToString());
+            _backgroundLogger.Writer.WriteAttributeString("cpus", Environment.ProcessorCount.ToString());
+            _backgroundLogger.Writer.WriteAttributeString("runtime", Environment.Version.ToString());
+            _backgroundLogger.Writer.WriteAttributeString("machine", Environment.MachineName.ToString());
+            _backgroundLogger.Writer.WriteAttributeString("version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            _backgroundLogger.Writer.WriteAttributeString("startTime", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
+
             // Use a longer tooltip timeout (20 seconds)
             ToolTipService.ShowDurationProperty.OverrideMetadata(
                 typeof(DependencyObject), new FrameworkPropertyMetadata(20000));
 
-            _vm = new MessagePredictorViewModel(_logger);
+            _vm = new MessagePredictorViewModel(_logger, _backgroundLogger);
             var window = new MessagePredictorWindow();
             window.DataContext = _vm;
             window.Loaded += window_Loaded;
@@ -176,6 +198,7 @@ namespace MessagePredictor
             _logger.Writer.WriteAttributeString("time", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             _logger.Writer.WriteEndElement();
             _logger.Writer.WriteStartElement("UserActions");
+            _backgroundLogger.Writer.WriteStartElement("Evaluations");
 
             this.DispatcherUnhandledException += Application_DispatcherUnhandledException;
             // We don't want to intercept FirstChanceExceptions unless they turn into UnhandledExceptions
@@ -186,6 +209,12 @@ namespace MessagePredictor
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
+
+            _vm.StopBackgroundEvaluation();
+            _backgroundLogger.Writer.WriteEndElement(); // End <evaluations/> element
+            _backgroundLogger.Writer.WriteEndElement(); // End root element
+            _backgroundLogger.Writer.WriteEndDocument();
+            _backgroundLogger.Writer.Close();
 
             _logger.Writer.WriteEndElement(); // End <actions/> element
             _logger.Writer.WriteStartElement("WindowClose");
@@ -220,13 +249,13 @@ namespace MessagePredictor
             _vm.UpdateDatasetForLogging();
             _vm.LogFeatureSet();
             _vm.LogTrainingSet();
-            _vm.LogClassifierEvaluationTraining();
-            _vm.LogClassifierEvaluationTest();
+            _vm.LogClassifierEvaluationTraining(_logger);
+            _vm.LogClassifierEvaluationTest(_logger);
 
             // Log variations of the feature set/training set
             _vm.LogClassifierBoW();
             _vm.LogClassifierOnlySysWeight();
-            _vm.LogClassifierOnlyHighIGFeatures();
+            //_vm.LogClassifierOnlyHighIGFeatures();
 
             _logger.Writer.WriteEndElement(); // End root element
             _logger.Writer.WriteEndDocument();
@@ -526,7 +555,7 @@ namespace MessagePredictor
             }
 
             //Console.WriteLine("runtimeTimer elapsed");
-            Logger l = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), false, true);
+            Logger l = new Logger(this.Properties[PropertyKey.UserId].ToString(), this.Properties[PropertyKey.Mode].ToString(), false, true, false);
             l.Writer.WriteStartDocument();
             l.Writer.WriteStartElement("MessagePredictorCrashLog");
 

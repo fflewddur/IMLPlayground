@@ -13,12 +13,14 @@ namespace MessagePredictor.Model
     {
         XmlWriter _writer;
 
-        public Logger(string userId, string mode, bool overwrite, bool crash)
+        public Logger(string userId, string mode, bool overwrite, bool crash, bool background)
         {
             // Is this a crash log or a regular user action log?
             string prefix = "log";
             if (crash) {
                 prefix = "crash";
+            } else if (background) {
+                prefix = "background";
             }
 
             // If our log directory doesn't exist, create it.

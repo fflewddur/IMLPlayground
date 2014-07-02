@@ -32,6 +32,7 @@ namespace MessagePredictor
         private Vocabulary _vocab;
         private MultinomialNaiveBayesFeedbackClassifier _classifier;
         private Logger _logger;
+        private Logger _backgroundLogger;
         private LinkedList<UserAction> _actions;
         private int _nMessagesLabeled;
         private int _nFeaturesAdded;
@@ -57,10 +58,10 @@ namespace MessagePredictor
         // UI preferences (user-modifiable)
         private bool _autoUpdatePredictions;
         private bool _onlyShowRecentChanges;
-        private int _logEachNLabels = 5;
-        private int _logEachNFeatures = 5;
+        private int _logEachNLabels = 1;
+        private int _logEachNFeatures = 1;
 
-        public MessagePredictorViewModel(Logger logger)
+        public MessagePredictorViewModel(Logger logger, Logger backgroundLogger)
         {
             Console.WriteLine("MessagePredictorViewModel() start");
             Stopwatch timer = new Stopwatch();
@@ -69,6 +70,7 @@ namespace MessagePredictor
             _nFeaturesAdded = 0;
 
             _logger = logger;
+            _backgroundLogger = backgroundLogger;
             _actions = new LinkedList<UserAction>(); // Store undo-able user actions
 
             timer.Start();
@@ -100,9 +102,8 @@ namespace MessagePredictor
 
             // Update our test set in light of our new vocabulary
             timer.Restart();
-            Parallel.ForEach(FilterToTestSet(_messages), (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(FilterToTestSet(_messages), (instance, state, index) => {
+                //PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
                 //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
@@ -419,8 +420,8 @@ namespace MessagePredictor
 
             _nMessagesLabeled++;
             if (_nMessagesLabeled % _logEachNLabels == 0) {
-                Mouse.OverrideCursor = Cursors.Wait;
-                LogInterval("messagesLabeled", _nMessagesLabeled);
+                //Mouse.OverrideCursor = Cursors.Wait;
+                LogIntervalAsync("messagesLabeled", _nMessagesLabeled);
             }
             Mouse.OverrideCursor = null;
         }
@@ -452,6 +453,11 @@ namespace MessagePredictor
         #endregion
 
         #region Public methods
+
+        public void StopBackgroundEvaluation()
+        {
+            _logTimer.Stop();
+        }
 
         /// <summary>
         /// Select the first message in the first folder.
@@ -508,8 +514,9 @@ namespace MessagePredictor
             _classifier.LogTrainingSet(_logger.Writer);
         }
 
-        public void LogClassifierEvaluation(EvaluatorViewModel evaluatorVM, Vocabulary vocab, string elementName, 
-                                            string datasetName, IEnumerable<IInstance> messages, int order)
+        public void LogClassifierEvaluation(Logger logger, EvaluatorViewModel evaluatorVM, Vocabulary vocab,
+                                            string elementName, string datasetName, IEnumerable<IInstance> messages,
+                                            int order)
         {
             Label positive = Labels[0];
             Label negative = Labels[1];
@@ -517,41 +524,57 @@ namespace MessagePredictor
             evaluatorVM.EvaluateClassifier(messages, positive, negative);
             IEnumerable<IInstance> trainingSet = FilterToTrainingSet(messages);
             int trainingSetSize = trainingSet.Count();
-            int positiveLabelCount = FilterToLabel(trainingSet, positive).Count();
-            int negativeLabelCount = FilterToLabel(trainingSet, negative).Count();
-            _logger.Writer.WriteStartElement(elementName);
-            _logger.Writer.WriteAttributeString("dataset", datasetName);
-            _logger.Writer.WriteAttributeString("order", order.ToString());
-            _logger.Writer.WriteAttributeString("vocabSize", vocab.Count.ToString());
-            _logger.Writer.WriteAttributeString("trainingSetSize", trainingSetSize.ToString());
-            _logger.logTime();
-            _logger.Writer.WriteStartElement("PositiveLabel");
-            _logger.Writer.WriteAttributeString("count", positiveLabelCount.ToString());
-            _logger.Writer.WriteString(positive.ToString());
-            _logger.Writer.WriteEndElement();
-            _logger.Writer.WriteStartElement("NegativeLabel");
-            _logger.Writer.WriteAttributeString("count", negativeLabelCount.ToString());
-            _logger.Writer.WriteString(negative.ToString());
-            _logger.Writer.WriteEndElement();
+            IEnumerable<IInstance> positiveInstances = FilterToLabel(trainingSet, positive);
+            IEnumerable<IInstance> negativeInstances = FilterToLabel(trainingSet, negative);
+            int positiveLabelCount = positiveInstances.Count();
+            int negativeLabelCount = negativeInstances.Count();
+            int positiveWrongCount = 0;
+            int negativeWrongCount = 0;
+            foreach (IInstance instance in positiveInstances) {
+                if (instance.UserLabel != instance.GroundTruthLabel) {
+                    positiveWrongCount++;
+                }
+            }
+            foreach (IInstance instance in negativeInstances) {
+                if (instance.UserLabel != instance.GroundTruthLabel) {
+                    negativeWrongCount++;
+                }
+            }
+            logger.Writer.WriteStartElement(elementName);
+            logger.Writer.WriteAttributeString("dataset", datasetName);
+            logger.Writer.WriteAttributeString("order", order.ToString());
+            logger.Writer.WriteAttributeString("vocabSize", vocab.Count.ToString());
+            logger.Writer.WriteAttributeString("trainingSetSize", trainingSetSize.ToString());
+            logger.logTime();
+            logger.Writer.WriteStartElement("PositiveLabel");
+            logger.Writer.WriteAttributeString("count", positiveLabelCount.ToString());
+            logger.Writer.WriteAttributeString("wrongCount", positiveWrongCount.ToString());
+            logger.Writer.WriteString(positive.ToString());
+            logger.Writer.WriteEndElement();
+            logger.Writer.WriteStartElement("NegativeLabel");
+            logger.Writer.WriteAttributeString("count", negativeLabelCount.ToString());
+            logger.Writer.WriteAttributeString("wrongCount", negativeWrongCount.ToString());
+            logger.Writer.WriteString(negative.ToString());
+            logger.Writer.WriteEndElement();
 
-            _logger.Writer.WriteElementString("TruePositives", evaluatorVM.TruePositives.ToString());
-            _logger.Writer.WriteElementString("TrueNegatives", evaluatorVM.TrueNegatives.ToString());
-            _logger.Writer.WriteElementString("FalsePositives", evaluatorVM.FalsePositives.ToString());
-            _logger.Writer.WriteElementString("FalseNegatives", evaluatorVM.FalseNegatives.ToString());
-            _logger.Writer.WriteElementString("F1Positive", evaluatorVM.F1Positive.ToString());
-            _logger.Writer.WriteElementString("F1Negative", evaluatorVM.F1Negative.ToString());
-            _logger.Writer.WriteElementString("F1Weighted", evaluatorVM.F1Weighted.ToString());
-            _logger.logEndElement();
+            logger.Writer.WriteElementString("TruePositives", evaluatorVM.TruePositives.ToString());
+            logger.Writer.WriteElementString("TrueNegatives", evaluatorVM.TrueNegatives.ToString());
+            logger.Writer.WriteElementString("FalsePositives", evaluatorVM.FalsePositives.ToString());
+            logger.Writer.WriteElementString("FalseNegatives", evaluatorVM.FalseNegatives.ToString());
+            logger.Writer.WriteElementString("F1Positive", evaluatorVM.F1Positive.ToString());
+            logger.Writer.WriteElementString("F1Negative", evaluatorVM.F1Negative.ToString());
+            logger.Writer.WriteElementString("F1Weighted", evaluatorVM.F1Weighted.ToString());
+            logger.logEndElement();
         }
 
-        public void LogClassifierEvaluationTraining(int order = -1)
+        public void LogClassifierEvaluationTraining(Logger logger, int order = -1)
         {
-            LogClassifierEvaluation(_evaluatorVM, _vocab, "Evaluation", "training", _messages, order);
+            LogClassifierEvaluation(logger, _evaluatorVM, _vocab, "Evaluation", "training", _messages, order);
         }
 
-        public void LogClassifierEvaluationTest(int order = -1)
+        public void LogClassifierEvaluationTest(Logger logger, int order = -1)
         {
-            LogClassifierEvaluation(_evaluatorVM, _vocab, "Evaluation", "test", _testMessages, order);
+            LogClassifierEvaluation(logger, _evaluatorVM, _vocab, "Evaluation", "test", _testMessages, order);
         }
 
         /// <summary>
@@ -566,18 +589,14 @@ namespace MessagePredictor
             Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1, false);
 
             // Training set
-            Parallel.ForEach(messages, (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(messages, (instance, state, index) => {
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(v, true);
             });
 
             // Test set
-            Parallel.ForEach(testMessages, (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(testMessages, (instance, state, index) => {
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(v, true);
@@ -593,8 +612,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "trainingBoW", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "testBoW", testMessages, -1);
+            LogClassifierEvaluation(_logger, evaluatorVM, v, "Evaluation", "trainingBoW", messages, -1);
+            LogClassifierEvaluation(_logger, evaluatorVM, v, "Evaluation", "testBoW", testMessages, -1);
 
             Console.WriteLine("LogClassifierBow() end");
         }
@@ -610,18 +629,14 @@ namespace MessagePredictor
             IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
 
             // Training set
-            Parallel.ForEach(messages, (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(messages, (instance, state, index) => {
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(_vocab, true);
             });
 
             // Test set
-            Parallel.ForEach(testMessages, (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(testMessages, (instance, state, index) => {
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(_vocab, true);
@@ -637,13 +652,13 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, _vocab, "Evaluation", "trainingOnlySysWeight", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, _vocab, "Evaluation", "testOnlySysWeight", testMessages, -1);
+            LogClassifierEvaluation(_logger, evaluatorVM, _vocab, "Evaluation", "trainingOnlySysWeight", messages, -1);
+            LogClassifierEvaluation(_logger, evaluatorVM, _vocab, "Evaluation", "testOnlySysWeight", testMessages, -1);
 
             Console.WriteLine("LogClassifierOnlySysWeight() end");
         }
 
-        public void LogClassifierOnlyHighIGFeatures()
+        public void LogClassifierOnlyHighIGFeatures(Logger logger)
         {
             Console.WriteLine("LogClassifierOnlyHighIGFeatures() begin");
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
@@ -652,9 +667,8 @@ namespace MessagePredictor
             Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, 250);
 
             // Training set
-            Parallel.ForEach(messages, (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(messages, (instance, state, index) => {
+                //PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
                 //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
@@ -662,9 +676,8 @@ namespace MessagePredictor
             });
 
             // Test set
-            Parallel.ForEach(testMessages, (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(testMessages, (instance, state, index) => {
+                //PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
                 instance.ComputeFeatureVector(v, true);
@@ -680,8 +693,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "trainingOnlyHighIGFeatures", messages, -1);
-            LogClassifierEvaluation(evaluatorVM, v, "Evaluation", "testOnlyHighIGFeatures", testMessages, -1);
+            LogClassifierEvaluation(logger, evaluatorVM, v, "Evaluation", "trainingOnlyHighIGFeatures", messages, -1);
+            LogClassifierEvaluation(logger, evaluatorVM, v, "Evaluation", "testOnlyHighIGFeatures", testMessages, -1);
 
             Console.WriteLine("LogClassifierOnlyHighIGFeatures() end");
         }
@@ -694,8 +707,7 @@ namespace MessagePredictor
             TrainClassifier(_classifier, FilterToTrainingSet(_messages));
 
             // Training set
-            Parallel.ForEach(_messages, (instance, state, index) =>
-            {
+            Parallel.ForEach(_messages, (instance, state, index) => {
                 //PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
                 //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
@@ -705,9 +717,8 @@ namespace MessagePredictor
             PredictMessages(_classifier, _messages);
 
             // Test set
-            Parallel.ForEach(_testMessages, (instance, state, index) =>
-            {
-                PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
+            Parallel.ForEach(_testMessages, (instance, state, index) => {
+                //PorterStemmer stemmer = new PorterStemmer(); // PorterStemmer isn't threadsafe, so we need one for each operation.
                 //Dictionary<string, int> tokens = Tokenizer.TokenizeAndStem(instance.AllText, stemmer) as Dictionary<string, int>;
                 Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
                 instance.TokenCounts = tokens;
@@ -726,35 +737,37 @@ namespace MessagePredictor
 
         #region Private methods
 
-        private void LogInterval(string type, int interval)
+        private Task LogIntervalAsync(string type, int interval)
         {
-            Stopwatch watch = new Stopwatch();
-            watch.Start();
-            LogClassifierEvaluation(_evaluatorVM, _vocab, type, "training", _messages, interval);
-            //watch.Restart();
-            NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
-            IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
-            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1, false);
+            return Task.Run(() => {
+                //Stopwatch watch = new Stopwatch();
+                //watch.Start();
+                LogClassifierEvaluation(_backgroundLogger, _evaluatorVM, _vocab, type, "training", _messages, interval);
+                //watch.Restart();
+                NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
+                IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
+                Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.None, -1, false);
 
-            // Training set
-            //foreach (IInstance instance in messages) { 
-            Parallel.ForEach(messages, (instance, state, index) => {
-                Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
-                instance.TokenCounts = tokens;
-                instance.ComputeFeatureVector(v, true);
+                // Training set
+                //foreach (IInstance instance in messages) { 
+                Parallel.ForEach(messages, (instance, state, index) => {
+                    Dictionary<string, int> tokens = Tokenizer.Tokenize(instance.AllText) as Dictionary<string, int>;
+                    instance.TokenCounts = tokens;
+                    instance.ComputeFeatureVector(v, true);
+                });
+
+                MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, v);
+                classifier.ClearInstances();
+                classifier.AddInstances(trainingMessages);
+                classifier.Train();
+
+                PredictMessages(classifier, messages, false);
+
+                EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
+                LogClassifierEvaluation(_backgroundLogger, evaluatorVM, v, type + "BoW", "training", messages, interval);
+                //watch.Stop();
+                //Console.WriteLine("Logging BoW interval took {0}", watch.Elapsed);
             });
-
-            MultinomialNaiveBayesFeedbackClassifier classifier = new MultinomialNaiveBayesFeedbackClassifier(_labels, v);
-            classifier.ClearInstances();
-            classifier.AddInstances(trainingMessages);
-            classifier.Train();
-
-            PredictMessages(classifier, messages, false);
-
-            EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
-            LogClassifierEvaluation(evaluatorVM, v, type + "BoW", "training", messages, interval);
-            watch.Stop();
-            Console.WriteLine("Logging BoW interval took {0}", watch.Elapsed);
         }
 
         private void UpdatePredictions()
@@ -1081,9 +1094,9 @@ namespace MessagePredictor
 
             _nFeaturesAdded++;
             if (_nFeaturesAdded % _logEachNFeatures == 0) {
-                Mouse.OverrideCursor = Cursors.Wait;
-                LogInterval("featuresAdded", _nFeaturesAdded);
-                Mouse.OverrideCursor = null;
+                //Mouse.OverrideCursor = Cursors.Wait;
+                LogIntervalAsync("featuresAdded", _nFeaturesAdded);
+                //Mouse.OverrideCursor = null;
             }
         }
 
@@ -1189,7 +1202,7 @@ namespace MessagePredictor
         void _logTimer_Tick(object sender, EventArgs e)
         {
             //Console.WriteLine("logTimer elapsed");
-            LogClassifierEvaluationTraining(_logTimerCount);
+            LogClassifierEvaluationTraining(_backgroundLogger, _logTimerCount);
             _logTimerCount++;
         }
 
