@@ -37,7 +37,7 @@ Function startUserStudy(condition, id)
 	MsgBox "Please wait for the instructor before clicking 'OK'", vbCritical + vbOKOnly
 	runPrototype(" -p " + id + " -c " + condition + " -m tutorial -t 0 -i 0")
 	MsgBox "Please wait for the instructor before clicking 'OK'", vbCritical + vbOKOnly
-	runPrototype(" -p " + id + " -c " + condition + " -m study -t 30 -i 60")
+	runPrototype(" -p " + id + " -c " + condition + " -m study -t 30 -i 30")
 End Function
 
 Function runPrototype(parameters)
