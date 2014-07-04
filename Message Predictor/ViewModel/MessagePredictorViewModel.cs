@@ -658,13 +658,13 @@ namespace MessagePredictor
             Console.WriteLine("LogClassifierOnlySysWeight() end");
         }
 
-        public void LogClassifierOnlyHighIGFeatures(Logger logger)
+        public void LogClassifierOnlyHighIGFeatures()
         {
             Console.WriteLine("LogClassifierOnlyHighIGFeatures() begin");
             NewsCollection messages = NewsCollection.CreateFromExisting(_messages);
             NewsCollection testMessages = NewsCollection.CreateFromExisting(_testMessages);
             IEnumerable<IInstance> trainingMessages = FilterToTrainingSet(messages);
-            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, 250);
+            Vocabulary v = Vocabulary.CreateVocabulary(trainingMessages, _labels, Vocabulary.Restriction.HighIG, _desiredVocabSize);
 
             // Training set
             Parallel.ForEach(messages, (instance, state, index) => {
@@ -693,8 +693,8 @@ namespace MessagePredictor
 
             EvaluatorViewModel evaluatorVM = new EvaluatorViewModel(_labels);
 
-            LogClassifierEvaluation(logger, evaluatorVM, v, "Evaluation", "trainingOnlyHighIGFeatures", messages, -1);
-            LogClassifierEvaluation(logger, evaluatorVM, v, "Evaluation", "testOnlyHighIGFeatures", testMessages, -1);
+            LogClassifierEvaluation(_logger, evaluatorVM, v, "Evaluation", "trainingOnlyHighIGFeatures", messages, -1);
+            LogClassifierEvaluation(_logger, evaluatorVM, v, "Evaluation", "testOnlyHighIGFeatures", testMessages, -1);
 
             Console.WriteLine("LogClassifierOnlyHighIGFeatures() end");
         }
