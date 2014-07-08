@@ -205,6 +205,14 @@ def main():
             (c, f1w, o, vs, tss, wl) = score
             print("BoW F1 after {0} messages labeled: {1:.3f} "\
                   "({2} labels total, {3} incorrect)".format(c, f1w, tss, wl))
+        for score in results['featuresAdded']:
+            (c, f1w, o, vs, tss, wl) = score
+            print("F1 after {0} features added: {1:.3f} "\
+                  "({2} labels total, {3} incorrect)".format(c, f1w, tss, wl))
+        for score in results['featuresAddedBoW']:
+            (c, f1w, o, vs, tss, wl) = score
+            print("BoW F1 after {0} features added: {1:.3f} "\
+                  "({2} labels total, {3} incorrect)".format(c, f1w, tss, wl))
         # print("results: {0}".format(results))
 
 if __name__ == "__main__":
