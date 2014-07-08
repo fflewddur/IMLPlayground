@@ -24,14 +24,28 @@ def getLogType(root):
 def getF1(node):
     try:
         return float(node.find('F1Weighted').text)
-    except AttributeError:
-        print("Node doesn't have a child element 'F1Weighted'")
+    except AttributeError as e:
+        print("[EXCEPTION] {0}".format(e))
+
+def getWrongLabels(node):
+    wrong_labels = 0
+    try:
+        n = node.find('PositiveLabel')
+        wrong_labels += int(n.attrib['wrongCount'])
+        n = node.find('NegativeLabel')
+        wrong_labels += int(n.attrib['wrongCount'])
+    except AttributeError as e:
+        print("[EXCEPTION] {0}".format(e))
+
+    return wrong_labels
 
 def parseActionsLog(root):
     results = dict()
 
     condition = root.attrib["condition"]
     userid = root.attrib["userid"]
+    results['condition'] = condition
+    results['userid'] = userid
 
     # When did we start?
     windowOpen = root.find("WindowOpen")
@@ -90,8 +104,29 @@ def parseActionsLog(root):
 
     return (LOG_TYPE_ACTIONS, results)
 
+def parseEvalSection(root, elementName, results):
+    evals = root.findall("./" + elementName)
+    scores = []
+    onlyEvery = 5
+    c = 0
+    for evaluation in evals:
+        c += 1
+        if c % onlyEvery == 0:
+            f1w = getF1(evaluation)
+            wl = getWrongLabels(evaluation)
+            o = evaluation.attrib['order']
+            vs = evaluation.attrib['vocabSize']
+            tss = evaluation.attrib['trainingSetSize']
+            scores.append((c, f1w, o, vs, tss, wl))
+    results[elementName] = scores
+
 def parseEvaluationsLog(root):
     results = dict()
+
+    condition = root.attrib["condition"]
+    userid = root.attrib["userid"]
+    results['condition'] = condition
+    results['userid'] = userid
 
     evaluations = root.find("Evaluations")
 
@@ -106,9 +141,13 @@ def parseEvaluationsLog(root):
         c += 1
         if c % bucketSize == 0:
             key = 'f1Avg' + str(c)
-            print("key = {0}".format(key))
             results[key] = f1Sum / bucketSize
             f1Sum = 0.0;
+
+    parseEvalSection(evaluations, "featuresAdded", results)
+    parseEvalSection(evaluations, "featuresAddedBoW", results)
+    parseEvalSection(evaluations, "messagesLabeled", results)
+    parseEvalSection(evaluations, "messagesLabeledBoW", results)
 
     return (LOG_TYPE_EVALUATIONS, results)
 
@@ -133,6 +172,8 @@ def main():
     (lt, results) = parseLogfile(logfile)
 
     if lt == LOG_TYPE_ACTIONS:
+        print("User ID: {0}".format(results['userid']))
+        print("Condition: {0}".format(results['condition']))
         print("There were {0} feature adds".format(results['featuresAdded']))
         print("There were {0} feature removals".format(results['featuresRemoved']))
         print("There were {0} messages labeled".format(results['messagesLabeled']))
@@ -148,12 +189,23 @@ def main():
         print("Final F1 (training w/o user features): {0:.3f}".format(results['f1FinalTrainingOnlyHighIGFeatures']))
         print("Final F1 (test w/o user features): {0:.3f}".format(results['f1FinalTestOnlyHighIGFeatures']))
     elif lt == LOG_TYPE_EVALUATIONS:
+        print("User ID: {0}".format(results['userid']))
+        print("Condition: {0}".format(results['condition']))
         print("Average F1 from minutes 0-4: {0:.3f}".format(results['f1Avg5']))
         print("Average F1 from minutes 5-9: {0:.3f}".format(results['f1Avg10']))
         print("Average F1 from minutes 10-14: {0:.3f}".format(results['f1Avg15']))
         print("Average F1 from minutes 15-19: {0:.3f}".format(results['f1Avg20']))
         print("Average F1 from minutes 20-24: {0:.3f}".format(results['f1Avg25']))
         print("Average F1 from minutes 25-29: {0:.3f}".format(results['f1Avg30']))
+        for score in results['messagesLabeled']:
+            (c, f1w, o, vs, tss, wl) = score
+            print("F1 after {0} messages labeled: {1:.3f} "\
+                  "({2} labels total, {3} incorrect)".format(c, f1w, tss, wl))
+        for score in results['messagesLabeledBoW']:
+            (c, f1w, o, vs, tss, wl) = score
+            print("BoW F1 after {0} messages labeled: {1:.3f} "\
+                  "({2} labels total, {3} incorrect)".format(c, f1w, tss, wl))
+        # print("results: {0}".format(results))
 
 if __name__ == "__main__":
     main()
