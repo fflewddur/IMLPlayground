@@ -71,43 +71,58 @@ def parseActionsLog(root):
 
     # Look at other measures of the classifier's accuracy
     evaluation = root.find("./Evaluation[@dataset='training']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='training']")
     results['f1FinalTraining'] = getF1(evaluation)
     # print("Final F1 on training set: {0:.2f}".format(getF1(evaluation)))
 
     evaluation = root.find("./Evaluation[@dataset='test']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='test']")
     results['f1FinalTest'] = getF1(evaluation)
     # print("Final F1 on test set: {0:.2f}".format(getF1(evaluation)))
 
     evaluation = root.find("./Evaluation[@dataset='trainingBoW']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='trainingBoW']")
     results['f1FinalTrainingBoW'] = getF1(evaluation)
     # print("Final F1 on trainingBoW set: {0:.2f}".format(getF1(evaluation)))
 
     evaluation = root.find("./Evaluation[@dataset='testBoW']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='testBoW']")
     results['f1FinalTestBow'] = getF1(evaluation)
     # print("Final F1 on testBoW set: {0:.2f}".format(getF1(evaluation)))
 
     evaluation = root.find("./Evaluation[@dataset='trainingOnlySysWeight']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='trainingOnlySysWeight']")
     results['f1FinalTrainingOnlySysWeight'] = getF1(evaluation)
     # print("Final F1 on trainingOnlySysWeight set: {0:.2f}".format(getF1(evaluation)))
 
     evaluation = root.find("./Evaluation[@dataset='testOnlySysWeight']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='testOnlySysWeight']")
     results['f1FinalTestOnlySysWeight'] = getF1(evaluation)
     # print("Final F1 on testOnlySysWeight set: {0:.2f}".format(getF1(evaluation)))
 
     evaluation = root.find("./Evaluation[@dataset='trainingOnlyHighIGFeatures']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='trainingOnlyHighIGFeatures']")
     results['f1FinalTrainingOnlyHighIGFeatures'] = getF1(evaluation)
     # print("Final F1 on trainingOnlyHighIGFeatures set: {0:.2f}".format(getF1(evaluation)))
 
     evaluation = root.find("./Evaluation[@dataset='testOnlyHighIGFeatures']")
+    if not evaluation:
+        evaluation = root.find("./UserActions/Evaluation[@dataset='testOnlyHighIGFeatures']")
     results['f1FinalTestOnlyHighIGFeatures'] = getF1(evaluation)
     # print("Final F1 on testOnlyHighIGFeatures set: {0:.2f}".format(getF1(evaluation)))
 
     return (LOG_TYPE_ACTIONS, results)
 
-def parseEvalSection(root, elementName, results):
+def parseEvalSection(root, elementName, results, onlyEvery=5):
     evals = root.findall("./" + elementName)
     scores = []
-    onlyEvery = 5
     c = 0
     for evaluation in evals:
         c += 1
@@ -144,10 +159,10 @@ def parseEvaluationsLog(root):
             results[key] = f1Sum / bucketSize
             f1Sum = 0.0;
 
-    parseEvalSection(evaluations, "featuresAdded", results)
-    parseEvalSection(evaluations, "featuresAddedBoW", results)
-    parseEvalSection(evaluations, "messagesLabeled", results)
-    parseEvalSection(evaluations, "messagesLabeledBoW", results)
+    parseEvalSection(evaluations, "featuresAdded", results, 2)
+    parseEvalSection(evaluations, "featuresAddedBoW", results, 2)
+    parseEvalSection(evaluations, "messagesLabeled", results, 2)
+    parseEvalSection(evaluations, "messagesLabeledBoW", results, 2)
 
     return (LOG_TYPE_EVALUATIONS, results)
 
