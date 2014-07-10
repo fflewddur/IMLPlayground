@@ -7,6 +7,7 @@
 
 import sys
 import xml.etree.ElementTree as etree
+import argparse
 
 LOG_TYPE_UNKNOWN = 0
 LOG_TYPE_ACTIONS = 1
@@ -181,11 +182,7 @@ def parseLogfile(logfile):
         print("Error: unknown log file type.")
         return (LOG_TYPE_UNKNOWN, None)
 
-def main():
-    logfile = sys.argv[1]
-
-    (lt, results) = parseLogfile(logfile)
-
+def displayLogResults(lt, results):
     if lt == LOG_TYPE_ACTIONS:
         print("User ID: {0}".format(results['userid']))
         print("Condition: {0}".format(results['condition']))
@@ -229,6 +226,21 @@ def main():
             print("BoW F1 after {0} features added: {1:.3f} "\
                   "({2} labels total, {3} incorrect)".format(c, f1w, tss, wl))
         # print("results: {0}".format(results))
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('-f', '--file', help='The log file to parse')
+    ap.add_argument('-d', '--dir', help='Parse all log files in the given directory')
+    args = ap.parse_args()
+
+    if not args.file and not args.dir:
+        ap.print_help()
+        return
+
+    if args.file:
+        (lt, results) = parseLogfile(args.file)
+        displayLogResults(lt, results)
+
 
 if __name__ == "__main__":
     main()
